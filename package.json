@@ -1,20 +1,10 @@
 {
-  "name": "react-spread",
-  "version": "1.0.2",
+  "version": "1.0.0",
+  "private":true,
   "scripts": {
-    "start": "vite",
-    "build": "vite build"
-  },
-  "dependencies": {
-    "@grapecity/spread-sheets": "^16.1.1",
-    "@grapecity/spread-sheets-react": "^16.1.1",
-    "@grapecity/spread-sheets-resources-zh": "^16.1.1",
-    "@reduxjs/toolkit": "^1.9.7",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-redux": "^8.1.3",
-    "sass": "^1.69.5",
-    "sass-resources-loader": "^2.2.5"
+    "designer": "pnpm -F report-designer dev",
+    "build-designer": "pnpm -F report-designer build",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "@types/react": "^18.0.37",

@@ -1,35 +1,54 @@
 # 项目描述
 
-web版在线编辑器
+web版报表在线编辑器
 
-# 相关文档
+## 准备工作
 
-## spreadjs 官方文档
+### 安装Nodejs
 
-https://developer.mescius.com/spreadjs/demos/features/worksheet/context-menu/custom-menu-view/react
+如未安装Nodejs，请前往[【Nodejs 官网】](https://nodejs.org/en/)下载稳定版本并安装。
 
-## React
+####
+![nodejs-download.png](assets/images/nodejs-download.png)
+
+### 环境初始化
+
+目前vendor-report使用[【pnpm】](https://pnpm.io/zh/)进行nodejs插件管理，如未安装pnpm，请使用以下命令进行安装：
+```sh
+npm install -g pnpm
+```
+pnpm安装完成后，使用以下命令进行项目初始化：
+```sh
+pnpm install
+```
+
+## 报表设计器
+
+本地开启报表设计器预览服务，执行以下命令：
+```js
+pnpm run designer
+```
+
+## 相关参考文档
+
+### pnpm
+
+https://pnpm.io/zh/
+
+### spreadjs
+
+#### Demos
+
+https://developer.mescius.com/spreadjs/demos
+
+#### API
+
+https://developer.mescius.com/spreadjs/api/modules/GC.Data
+
+### React
 
 https://react.docschina.org/
 
-## React Redux
+### React Redux
 
 https://cn.react-redux.js.org/
-
-# 项目初始化
-
-## 本地安装依赖
-
-在项目的根目录下运行以下命令
-
-```
-npm install
-```
-
-## 运行项目
-
-在项目的根目录下运行以下命令
-
-```
-npm run start
-```

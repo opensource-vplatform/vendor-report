@@ -1,0 +1,55 @@
+.app-container {
+  margin: 0 10%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 0 20px #e3e3e3;
+}
+.app-header {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 60px;
+  background-color: white;
+  color: black;
+  text-align: center;
+  border-bottom: 2px solid #982271;
+}
+.items-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  padding-left: 200px;
+}
+.header-item {
+  margin-left: 60px;
+  margin-top: 20px;
+  font-size: medium;
+  cursor: pointer;
+}
+.header-item a:hover {
+  color: #982271;
+  text-decoration: underline;
+}
+.header-item a {
+  color: black;
+  text-decoration: none;
+}
+.logo {
+  position: absolute;
+  top: 40%;
+  margin-top: -14px;
+  width: 240px;
+  left: 25px;
+}
+.body-container {
+  position: absolute;
+  top: 80px;
+  bottom: 60px;
+  left: 0;
+  right: 0;
+}
