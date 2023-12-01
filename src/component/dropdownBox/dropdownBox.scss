@@ -1,0 +1,66 @@
+.uiDropdownBox {
+    position: relative;
+    border: 1px solid lightgray;
+    /* padding: .4em .2em .4em .2em; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    height: 28px;
+    padding: 0 0.2em;
+    width: max-content;
+
+    &.noBorder {
+        border: none;
+    }
+
+    .uiText {
+        overflow: hidden;
+        white-space: nowrap;
+
+        &.hide {
+            display: none;
+        }
+    }
+
+    .uiArrowBox {
+        display: flex;
+        width: 16px;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+
+        .uiArrow {
+            background-image: url(/src/assets/icons.png);
+            background-position: 0px -2576px;
+            height: 14px;
+            display: inline-block;
+            width: 20px;
+        }
+    }
+
+    .uiSelect {
+        position: absolute;
+        background: white;
+        top: 26px;
+        padding: 0;
+        margin: 0;
+        border: 1px solid lightgray;
+        display: none;
+        min-width: 40px;
+        list-style-type: none;
+        z-index: 1;
+        width: max-content;
+
+        &.show {
+            display: block;
+        }
+
+        .item {
+            padding: .2em .4em;
+            cursor: pointer;
+        }
+    }
+}
