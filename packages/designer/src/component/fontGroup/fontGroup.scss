@@ -1,6 +1,7 @@
 .groupBox {
     width: 280px;
     border: 1px solid lightgrey;
+    border-width: 0 1px 1px 1px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
