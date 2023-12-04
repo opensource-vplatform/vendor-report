@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -15,6 +15,7 @@ import {
 } from './component/tabs/Index';
 import { setSpread } from './store/appSlice/appSlice';
 import { resetCellFont } from './store/fontSlice/fontSlice';
+import FileTab from './tabs/file/Index';
 import StartTab from './tabs/start/Index';
 
 function Designer(props) {
@@ -23,8 +24,10 @@ function Designer(props) {
     const sheetName = 'Person Address';
     const autoGenerateColumns = false;
     const data = DataService.getPersonAddressData();
+    const [fileTabVisible,setFileTabVisible] = useState(false);
     return (
         <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
+            {fileTabVisible ? (<FileTab closeHandler={()=>setFileTabVisible(false)}></FileTab>):null}
             <Tabs value="start">
                 <Tab
                     code='file'
@@ -44,7 +47,7 @@ function Designer(props) {
                             文件
                         </a>
                     }
-                    onClick={()=>alert(1)}
+                    onClick={()=>setFileTabVisible(true)}
                 >
                     文件
                 </Tab>

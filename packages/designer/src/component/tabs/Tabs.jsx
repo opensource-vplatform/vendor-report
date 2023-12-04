@@ -17,7 +17,6 @@ const activeHeaderStyle = {
 };
 
 function Tabs(props) {
-    debugger;
     let { value, children } = props;
     const tabs = Array.isArray(children) ? children : [children];
     const [active, setActive] = useState(() => {
