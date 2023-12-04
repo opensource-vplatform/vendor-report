@@ -12,6 +12,7 @@ function Index(props) {
         width = 'auto',
         height = 'auto',
         open = true,
+        mask = true,
         onClose,
     } = props;
     const dialogEl = createRef(null);
@@ -31,7 +32,7 @@ function Index(props) {
     };
     return opened ? (
         <Fragment>
-            <div className='dialog-mask'></div>
+            {mask ? <div className='dialog-mask'></div>:null}
             <div
                 className='dialog-wrap'
                 style={{ width, height }}
