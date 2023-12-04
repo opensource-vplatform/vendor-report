@@ -1,12 +1,13 @@
 import '../index.scss';
 
 import {
+  createElement,
   Fragment,
   useState,
 } from 'react';
 
 function WithLeftMenu(menu) {
-    return function () {
+    return function (props) {
         const [menuCode,setMenuCode] = useState(menu[0].code);
         const item = menu.find(item=>item.code == menuCode);
         return (
@@ -24,7 +25,7 @@ function WithLeftMenu(menu) {
                     })}
                 </div>
                 {}
-                {item ? item.comp:null}
+                {item&&item.comp ? createElement(item.comp,props):null}
             </div>
         );
     };

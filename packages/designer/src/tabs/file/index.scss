@@ -1,16 +1,17 @@
-.fileMenu{
+.fileMenu {
     display: fixed;
     width: 100%;
     height: 100%;
     left: 0;
     top: 0;
     background-color: white;
+    font-family: Tahoma, Arial, Helvetica, "Microsoft YaHei New", "Microsoft Yahei", "微软雅黑", "宋体", SimSun, STXihei, "华文细黑", sans-serif;
     z-index: 1000;
-    .fileMenu-wrap{
+    .fileMenu-wrap {
         display: flex;
         width: 100%;
         height: 100%;
-        .leftMenu-wrap{
+        .leftMenu-wrap {
             width: 15%;
             min-width: 90px;
             height: 100%;
@@ -18,47 +19,47 @@
             flex-direction: column;
             margin: 0;
             padding: 0;
-            .menuItem{
+            .menuItem {
                 padding: 10px 25px;
-                color:white;
+                color: white;
                 cursor: pointer;
-                .backIcon{
+                .backIcon {
                     width: 32px;
                     height: 32px;
                     background-position: -16px -3840px;
                     background-image: url(../../assets/icons.png);
                 }
             }
-            .menuItem:hover{
+            .menuItem:hover {
                 background-color: #3f8159;
             }
-            .selected{
+            .selected {
                 background-color: #0a6332;
             }
-            .menuDivider{
+            .menuDivider {
                 border-bottom: 1px solid lightgray;
                 margin: 4px 25px;
             }
         }
-        .content-wrap{
+        .content-wrap {
             width: 85%;
             height: 100%;
-            .content-title-wrap{
+            .content-title-wrap {
                 display: flex;
                 flex-direction: column;
                 width: 100%;
                 height: 100%;
-                .content-title{
+                .content-title {
                     margin: 50px 0px 15px 50px;
                     font-size: 36px;
                     line-height: 80px;
                 }
             }
-            .content-menu-wrap{
+            .content-menu-wrap {
                 display: flex;
-                .content-menu{
+                .content-menu {
                     width: 300px;
-                    .content-menu-item{
+                    .content-menu-item {
                         display: flex;
                         align-items: center;
                         cursor: pointer;
@@ -66,12 +67,99 @@
                         padding: 0 0 0 20px;
                         height: 50px;
                     }
-                    .content-menu-item:hover{
+                    .content-menu-item:hover {
                         background: #d3f0e0;
                     }
-                    .selected{
+                    .selected {
                         background: #9fd5b7;
                     }
+                }
+            }
+            .detail-wrap {
+                width: 100%;
+                height: 100%;
+                padding-left: 5%;
+                display: flex;
+                flex-direction: column;
+                .import-title {
+                    margin-bottom: 16px;
+                    font-size: x-large;
+                    color: #217346;
+                }
+                .import-sub-title{
+                    margin-top: 8px;
+                    margin-bottom: 8px;
+                    font-size: medium;
+                }
+                .import-options{
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    li{
+                        padding: 2px 0px;
+                        cursor: pointer;
+                        label{
+                            display: flex;
+                            align-items: center;
+                            span{
+                                cursor: pointer;
+                            }
+                            input{
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                    ul{
+                        padding-left: 2em;
+                    }
+                }
+                .import-operation{
+                    border: 1px solid #ababab;
+                    width: 91px;
+                    height: 91px;
+                    padding: 8px;
+                    margin: 30px 20px 20px 0;
+                    cursor: pointer;
+                    .excelIcon{
+                        background-image: url(../../assets/icons.png);
+                        width: 32px;
+                        height: 32px;
+                        margin: 10px auto 10px auto;
+                        background-position: -16px -832px;
+                    }
+                    .csvIcon{
+                        background-image: url(../../assets/icons.png);
+                        width: 32px;
+                        height: 32px;
+                        margin: 10px auto 10px auto;
+                        background-position: -16px -416px;
+                    }
+                    .title{
+                        display: block;
+                        text-align: center;
+                        font-size: small;
+                    }
+                }
+                .import-operation:hover{
+                    background-color: #d3f0e0;
+                }
+                .import-item{
+                    margin-top: 8px;
+                }
+                .import-ipt{
+                    margin-top: 8px;
+                    width: 200px;
+                    padding: 1px 5px;
+                    line-height: 24px;
+                    height: 24px;
+                    box-sizing: border-box;
+                    border: solid 1px #d3d3d3;
+                    border-radius: 0;
+                    font-family: inherit;
+                    font-size: 12px;
+                }
+                .import-ipt:hover{
+                    border: solid 1px #5292f7 !important;
                 }
             }
         }

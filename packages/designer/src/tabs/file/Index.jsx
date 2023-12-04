@@ -11,7 +11,7 @@ function Index(props) {
     const [menuCode,setMenuCode] = useState('import');
     let content = null;
     if(menuCode == 'import'){
-        content = <Import></Import>
+        content = <Import closeHandler={closeHandler}></Import>
     }else{
         content = <Error></Error>
     }

@@ -26,6 +26,9 @@ importers:
 
   packages/designer:
     dependencies:
+      '@grapecity/spread-excelio':
+        specifier: ^16.2.6
+        version: 16.2.6
       '@grapecity/spread-sheets':
         specifier: ^16.1.1
         version: 16.1.1
@@ -501,6 +504,12 @@ packages:
     dev: true
     optional: true
 
+  /@grapecity/spread-excelio@16.2.6:
+    resolution: {integrity: sha512-P2wrATgeD8DHvGj0PuldIk6TttyApE/h+n9aIDr7Zm687JbqcoRTdMXo8c0x/ZtJeDnXHV10Y7fSINjtmkD3Lg==}
+    dependencies:
+      '@grapecity/spread-sheets': 16.2.6
+    dev: false
+
   /@grapecity/spread-sheets-react@16.1.1:
     resolution: {integrity: sha512-lBOls14veqUiLDhNNMPxHWEdevbXJJXN0DG4odiSouf8TXJJVr+df45PPY4SWlp0eRHZBf3oxW/eKGP2RQb7EQ==}
     dependencies:
@@ -515,6 +524,10 @@ packages:
 
   /@grapecity/spread-sheets@16.1.1:
     resolution: {integrity: sha512-63hYco8fUUjTfQHbSM8fJUiDVJFzGfjx7YbKe9BTf72nvTXz3XWyPXxJKGurPpnDAOyU3ukQ88SRnMT1E+z63Q==}
+    dev: false
+
+  /@grapecity/spread-sheets@16.2.6:
+    resolution: {integrity: sha512-Qf05tHuKBJ1pldEIJ6VP2V0DrbPO7G/w67QTHn3FnggUsxi3kbgctcJ/gc9+FnfPSmGyEP3KYur59tYVEQj6fA==}
     dev: false
 
   /@jridgewell/gen-mapping@0.3.3:
