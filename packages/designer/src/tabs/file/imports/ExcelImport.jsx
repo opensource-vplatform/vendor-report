@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 
 import { IO } from '@grapecity/spread-excelio';
 
+import Error from '../../../component/error/Index';
 import WaitMsg from './WaitMsg';
 
 function ExcelImport(props) {
@@ -20,13 +21,15 @@ function ExcelImport(props) {
         doNotRecalculateAfterLoad: false,
     });
     const [loading, setLoading] = useState(false);
+    const [errMessage, setErrMessage] = useState(null);
     const importHandler = () => {
         if (iptRef.current) {
             iptRef.current.click();
         }
     };
     const handleFileChange = (evt) => {
-        const fileList = evt.target.files;
+        const target = evt.target;
+        const fileList = target.files;
         if (fileList && fileList[0] && spread) {
             setLoading(true);
             setTimeout(() => {
@@ -42,13 +45,23 @@ function ExcelImport(props) {
                     excelIo.open(
                         reader.result,
                         (json) => {
+                            if(target){
+                                target.value = null;
+                            }
                             spread.fromJSON(json, excelOpenFlags);
                             closeHandler();
                             setLoading(false);
                         },
                         (err) => {
+                            if(target){
+                                target.value = null;
+                            }
                             setLoading(false);
-                            console.error(err);
+                            if (err && err.errorMessage) {
+                                setErrMessage(err.errorMessage);
+                            } else {
+                                console.error(err);
+                            }
                         },
                         {
                             excelOpenFlags,
@@ -63,12 +76,15 @@ function ExcelImport(props) {
     return (
         <Fragment>
             {loading ? <WaitMsg></WaitMsg> : null}
+            <Error message={errMessage} open={!!errMessage} onClose={()=>{
+                setErrMessage(null);
+            }}></Error>
             <div className='detail-wrap'>
                 <div className='import-title'>Excel文件</div>
                 <div className='import-sub-title'>导入选项</div>
                 <ul className='import-options'>
                     <li>
-                        <label>
+                        <label title='忽略工作簿中所有样式设置。如果您只关注工作簿中的数据且遇到了性能问题，可勾选此项。'>
                             <input
                                 type='checkbox'
                                 checked={cfg.ignoreStyle}
@@ -85,7 +101,7 @@ function ExcelImport(props) {
                         </label>
                     </li>
                     <li>
-                        <label>
+                        <label title='忽略工作簿中所有公式设置。如果您不需要使用工作簿中的公式，仅需要显示值，可勾选此项。'>
                             <input
                                 type='checkbox'
                                 checked={cfg.ignoreFormula}
@@ -102,7 +118,7 @@ function ExcelImport(props) {
                         </label>
                     </li>
                     <li>
-                        <label>
+                        <label title='导入文件后将重新进行计算。勾选此项可禁用自动计算，提高初始加载性能。'>
                             <input
                                 type='checkbox'
                                 name=''

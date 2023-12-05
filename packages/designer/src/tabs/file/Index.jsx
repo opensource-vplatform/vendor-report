@@ -3,6 +3,7 @@ import './index.scss';
 import { useState } from 'react';
 
 import Error from './Error';
+import Export from './Export';
 import Import from './Import';
 import Menu from './Menu';
 
@@ -12,6 +13,8 @@ function Index(props) {
     let content = null;
     if(menuCode == 'import'){
         content = <Import closeHandler={closeHandler}></Import>
+    }else if(menuCode == 'export'){
+        content = <Export closeHandler={closeHandler}></Export>
     }else{
         content = <Error></Error>
     }
