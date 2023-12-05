@@ -1,16 +1,13 @@
 import './index.scss';
 
-import FontAlign from '../../component/fontAlign/fontAlign';
-import FontGroup from '../../component/fontGroup/fontGroup';
+import FontStyle from '@components/fontStyle/Index';
+import { Group } from '@components/group/Index';
 
 function Index() {
     return (
-        <div className='header_container'>
-            <div className='designer'>
-                <FontGroup></FontGroup>
-                <FontAlign></FontAlign>
-            </div>
-        </div>
+        <Group>
+            <FontStyle></FontStyle>
+        </Group>
     );
 }
 export default Index;

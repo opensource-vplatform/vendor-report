@@ -50,17 +50,30 @@
         border: 1px solid lightgray;
         display: none;
         min-width: 40px;
+        //max-height: 350px;
+        overflow-y: auto;
         list-style-type: none;
         z-index: 1;
         width: max-content;
+
+        
 
         &.show {
             display: block;
         }
 
         .item {
-            padding: .2em .4em;
+            height:30px;
+            display: flex;
+            align-items: center;
+            padding: .2em .8em;
             cursor: pointer;
+            .icon-wrap{
+                margin-right: 8px;
+            }
+        }
+        .item:hover{
+            background-color: lightgray;
         }
     }
 }

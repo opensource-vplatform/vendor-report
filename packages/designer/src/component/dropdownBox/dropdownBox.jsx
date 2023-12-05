@@ -7,19 +7,19 @@ import {
 } from 'react';
 
 import LineSepatator from '../lineSeparator/lineSeparator';
-import UiIcon from '../uiIcon/uiIcon';
 
 function DropdownBox(props) {
     const {
         datas,
         style = {},
+        optionStyle={},
         onChange,
         isShowText = true,
         isShowBorder = true,
-        isShowIcon = false,
         release = true, //点击任何下拉项都放行
         className,
         lineIndexs = [],
+        children,
     } = props;
     const selectItem = useRef(datas[0]);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -63,14 +63,19 @@ function DropdownBox(props) {
                 ...style,
             }}
         >
-            <div className={`uiText ${isShowText ? 'show' : 'hide'}`}>
-                {selectItem.current.text}
-            </div>
-            <div className='uiArrowBox'>
-                <span className='uiArrow'></span>
-            </div>
-
-            <ul className={`uiSelect ${showDropdown ? 'show' : 'hide'}`}>
+            {children ? (
+                children
+            ) : (
+                <Fragment>
+                    <div className={`uiText ${isShowText ? 'show' : 'hide'}`}>
+                        {selectItem.current.text}
+                    </div>
+                    <div className='uiArrowBox'>
+                        <span className='uiArrow'></span>
+                    </div>
+                </Fragment>
+            )}
+            <ul className={`uiSelect ${showDropdown ? 'show' : 'hide'}`} style={optionStyle}>
                 {datas.map(function (data, index) {
                     const key = data.id || data.value;
                     return (
@@ -81,11 +86,10 @@ function DropdownBox(props) {
                                 title={data.title}
                                 key={key}
                             >
-                                {isShowIcon ? (
-                                    <UiIcon text={data.text}></UiIcon>
-                                ) : (
-                                    <span>{data.text}</span>
-                                )}
+                                {data.icon ? (
+                                    <div className='icon-wrap'>{data.icon}</div>
+                                ) : null}
+                                <span>{data.text}</span>
                             </li>
                             {lineIndexs.indexOf(index) >= 0 ? (
                                 <li>

@@ -361,7 +361,7 @@ export function increasedFontSize(currentSize) {
     const sizeArray = [
         8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 26, 28, 36, 48, 72,
     ];
-    const _currentSize = Number(currentSize);
+    const _currentSize = parseInt(currentSize);
     if (_currentSize >= sizeArray[sizeArray.length - 1]) {
         return;
     }
@@ -380,7 +380,7 @@ export function decreasedFontSize(currentSize) {
     const sizeArray = [
         8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 26, 28, 36, 48, 72,
     ];
-    const _currentSize = Number(currentSize);
+    const _currentSize = parseInt(currentSize);
     if (_currentSize <= sizeArray[0]) {
         return;
     }
