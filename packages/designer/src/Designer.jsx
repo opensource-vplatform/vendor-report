@@ -3,20 +3,18 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import {
-  Column,
-  SpreadSheets,
-  Worksheet,
+    Column,
+    SpreadSheets,
+    Worksheet,
 } from '@grapecity/spread-sheets-react';
 
 import DataService from './assets/dataService';
-import {
-  Tab,
-  Tabs,
-} from './component/tabs/Index';
+import { Tab, Tabs } from './component/tabs/Index';
 import { setSpread } from './store/appSlice/appSlice';
 import { resetCellFont } from './store/fontSlice/fontSlice';
 import FileTab from './tabs/file/Index';
 import StartTab from './tabs/start/Index';
+import CellStyleSetting from './component/cellStyles/cellStyleSetting';
 
 function Designer(props) {
     const dispatch = useDispatch();
@@ -24,30 +22,34 @@ function Designer(props) {
     const sheetName = 'Person Address';
     const autoGenerateColumns = false;
     const data = DataService.getPersonAddressData();
-    const [fileTabVisible,setFileTabVisible] = useState(false);
+    const [fileTabVisible, setFileTabVisible] = useState(false);
     return (
         <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
-            {fileTabVisible ? (<FileTab closeHandler={()=>setFileTabVisible(false)}></FileTab>):null}
-            <Tabs value="start">
+            {fileTabVisible ? (
+                <FileTab
+                    closeHandler={() => setFileTabVisible(false)}
+                ></FileTab>
+            ) : null}
+            <Tabs value='start'>
                 <Tab
                     code='file'
                     title={
                         <a
                             style={{
                                 padding: '6px 12px 6px 12px',
-                                display:'block',
+                                display: 'block',
                                 color: 'white',
                                 cursor: 'pointer',
                                 background: '#217346',
-                                fontSize:'12px',
-                                fontWeight:700,
-                                margin: '0px 3px'
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                margin: '0px 3px',
                             }}
                         >
                             文件
                         </a>
                     }
-                    onClick={()=>setFileTabVisible(true)}
+                    onClick={() => setFileTabVisible(true)}
                 >
                     文件
                 </Tab>
@@ -76,6 +78,7 @@ function Designer(props) {
                     <Column width={100} dataField='PostalCode' />
                 </Worksheet>
             </SpreadSheets>
+            <CellStyleSetting></CellStyleSetting>
         </div>
     );
 }
