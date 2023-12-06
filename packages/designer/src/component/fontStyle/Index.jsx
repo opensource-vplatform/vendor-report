@@ -3,6 +3,7 @@ import {
   useSelector,
 } from 'react-redux';
 
+import ColorEditor from '@components/color/Index';
 import {
   GroupItem,
   ItemList,
@@ -139,7 +140,7 @@ export default function (props) {
         const sheet = spread?.getActiveSheet?.();
         spread.suspendPaint();
         try {
-            values.forEach(value=>{
+            values.forEach((value) => {
                 setBorder({
                     value,
                     sheet,
@@ -209,14 +210,18 @@ export default function (props) {
                     isShowText={false}
                     isShowBorder={false}
                     className='borderOpt'
-                    optionStyle={{left:-24}}
+                    optionStyle={{ left: -24 }}
                     onChange={_borderOptChangeHandler}
                 >
                     <ArrowDown tips='边框'></ArrowDown>
                 </DropdownBox>
                 <LineSepatator></LineSepatator>
-                <FillColor tips='填充颜色'></FillColor>
-                <ForceColor tips='字体颜色'></ForceColor>
+                <ColorEditor>
+                    <FillColor tips='填充颜色'></FillColor>
+                </ColorEditor>
+                <ColorEditor>
+                    <ForceColor tips='字体颜色'></ForceColor>
+                </ColorEditor>
             </ItemList>
         </GroupItem>
     );

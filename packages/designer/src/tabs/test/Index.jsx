@@ -1,7 +1,9 @@
 import Button from '@components/button/Index';
+import Color from '@components/color/Index';
 import Integer from '@components/integer/Index';
 import Tab from '@components/tabs/Tab';
 import Tabs from '@components/tabs/Tabs';
+import FillColor from '@icons/font/FillColor';
 
 export default function(){
     return <div
@@ -20,5 +22,6 @@ export default function(){
         <Tab code="tab1" title="页签1">页签1</Tab>
         <Tab code="tab2" title="页签2">页签2</Tab>
     </Tabs>
+    <Color><FillColor></FillColor></Color>
 </div>
 }
