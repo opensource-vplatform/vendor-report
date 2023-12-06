@@ -1,0 +1,171 @@
+.defineDatasourceBox {
+    width: 100%;
+    height: 100%;
+    padding: 0 24px;
+    box-sizing: border-box;
+
+    .defineDatasourceOptBox {
+        width: 100%;
+        display: flex;
+
+        .defineDatasourceOptBoxLeft {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            border-right: 1px solid #ddd;
+
+            .header {
+                display: flex;
+                justify-content: right;
+                padding-right: 16px;
+                padding-top: 16px;
+
+                .addDatasource {
+                    padding-bottom: 1px;
+                    height: 16px;
+                    padding-left: 14px;
+                    background-size: 14px;
+                    background-position: left;
+                    background-repeat: no-repeat;
+                    background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSJ0cmFuc3BhcmVudCIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTggN1YwSDdWN0gwVjhIN1YxNUg4VjhIMTVWN0g4WiIgZmlsbD0iIzY2NjY2NiIvPgo8L3N2Zz4K);
+                    cursor: pointer;
+                    font-size: 12px;
+
+                    &.notAllow {
+                        pointer-events: none;
+                        opacity: 0.4;
+                    }
+                }
+            }
+
+        }
+
+
+
+        .defineDatasourceOptBoxRight {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 16px;
+
+            &.notAllow {
+                pointer-events: none;
+                opacity: 0.4;
+            }
+
+            input {
+                position: relative;
+                border: 1px solid #ddd;
+                min-width: 500px;
+                min-height: 26px;
+                border-radius: 4px;
+                cursor: pointer;
+                caret-color: #777;
+
+                &:focus {
+                    outline: 2px solid #ddd;
+                }
+            }
+
+            textarea {
+                border: 1px solid #ddd;
+                min-width: 500px;
+                min-height: 80px;
+                border-radius: 4px;
+                cursor: pointer;
+                caret-color: #777;
+
+
+                &:focus {
+                    outline: 2px solid #ddd;
+                }
+            }
+
+            .uiSelect {
+                width: 100%;
+                left: -1px;
+            }
+
+            .optBtnBox {
+                display: flex;
+                justify-content: right;
+
+                .saveBtn {
+                    background-color: white;
+                    border: 1px solid #ddd;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    cursor: pointer;
+
+                    &.notAllow {
+                        pointer-events: none;
+                        opacity: 0.4;
+                    }
+
+                    &:active {
+                        background-color: #ddd;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.datasourceList {
+    padding: 0;
+    counter-reset: listCounter;
+    list-style-type: none;
+
+    >li {
+        cursor: pointer;
+
+        &.draggable {
+            cursor: move;
+        }
+
+        .listItemText {
+            padding: 4px 8px 4px 0px;
+            display: flex;
+            justify-content: space-between;
+
+            &.active {
+                background-color: #ddd;
+            }
+
+            &:hover {
+                background-color: #ddd;
+            }
+
+            .text {
+                &::before {
+                    counter-increment: listCounter;
+                    content: counters(listCounter, '.');
+                    display: inline-block;
+                    padding-right: 6px;
+                }
+            }
+
+            .addSubDatasource {
+                height: 18px;
+                padding-left: 14px;
+                background-size: 14px;
+                background-position: left;
+                background-repeat: no-repeat;
+                background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiBmaWxsPSJ0cmFuc3BhcmVudCIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTggN1YwSDdWN0gwVjhIN1YxNUg4VjhIMTVWN0g4WiIgZmlsbD0iIzY2NjY2NiIvPgo8L3N2Zz4K);
+                cursor: pointer;
+
+                &.notAllow {
+                    pointer-events: none;
+                    opacity: 0.4;
+                }
+            }
+
+
+        }
+
+
+    }
+
+}

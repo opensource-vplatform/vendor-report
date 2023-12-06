@@ -3,13 +3,15 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import {
-  Column,
   SpreadSheets,
   Worksheet,
 } from '@grapecity/spread-sheets-react';
 
 import DataService from './assets/dataService';
 import CellStyleSetting from './component/cellStyles/cellStyleSetting';
+import {
+  DraggableDatasourceList,
+} from './component/defineDatasource/defineDatasource';
 import {
   Tab,
   Tabs,
@@ -28,7 +30,15 @@ function Designer(props) {
     const data = DataService.getPersonAddressData();
     const [fileTabVisible, setFileTabVisible] = useState(false);
     return (
-        <div style={{ height: '100%', width: '100%', overflow: 'hidden' }}>
+        <div
+            style={{
+                height: '100%',
+                width: '100%',
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+            }}
+        >
             {fileTabVisible ? (
                 <FileTab
                     closeHandler={() => setFileTabVisible(false)}
@@ -61,30 +71,35 @@ function Designer(props) {
                     <StartTab />
                 </Tab>
                 <Tab code='test' title='组件测试'>
-                    <TestTab/>
+                    <TestTab />
                 </Tab>
             </Tabs>
-            <SpreadSheets
-                backColor={spreadBackColor}
-                workbookInitialized={function (spread) {
-                    dispatch(setSpread({ spread }));
-                }}
-                enterCell={function (event, spread) {
-                    dispatch(resetCellFont());
-                }}
-            >
-                <Worksheet
-                    name={sheetName}
-                    dataSource={data}
-                    autoGenerateColumns={autoGenerateColumns}
+            <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+                <SpreadSheets
+                    backColor={spreadBackColor}
+                    workbookInitialized={function (spread) {
+                        dispatch(setSpread({ spread }));
+                    }}
+                    enterCell={function (event, spread) {
+                        dispatch(resetCellFont());
+                    }}
                 >
-                    <Column width={150} dataField='Name' />
+                    <Worksheet
+                        name={sheetName}
+                        /* dataSource={data} */
+                        autoGenerateColumns={autoGenerateColumns}
+                        rowCount={20}
+                        colCount={100}
+                    >
+                        {/* <Column width={150} dataField='Name' />
                     <Column width={150} dataField='CountryRegionCode' />
                     <Column width={100} dataField='City' />
                     <Column width={200} dataField='AddressLine' />
-                    <Column width={100} dataField='PostalCode' />
-                </Worksheet>
-            </SpreadSheets>
+                    <Column width={100} dataField='PostalCode' /> */}
+                    </Worksheet>
+                </SpreadSheets>
+                <DraggableDatasourceList></DraggableDatasourceList>
+            </div>
             <CellStyleSetting></CellStyleSetting>
         </div>
     );
