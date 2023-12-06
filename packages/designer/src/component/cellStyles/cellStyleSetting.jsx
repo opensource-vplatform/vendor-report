@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Index from '../dialog/Index';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
+import Integer from '../integer/Index';
 import './CellStyleSetting.scss';
 function CellStyleSetting(props) {
     const categories = {
@@ -189,50 +190,55 @@ function CellStyleSetting(props) {
                             </fieldset>
                         </div>
                         <div className='rightArea'>
-                            <div className='decimalPlaces'>
-                                <span>小数位数：</span>
-                                <input
-                                    id='decimal-places'
-                                    defaultValue='2'
-                                    role='spinbutton'
-                                ></input>
-                                <a
-                                    tabIndex='-1'
-                                    role='button'
-                                    aria-disabled='false'
-                                >
-                                    <span className='ui-button-text'>▲</span>
-                                </a>
-                                <a
-                                    className='ui-spinner-button ui-spinner-down ui-corner-br ui-button ui-widget ui-state-default ui-button-text-only'
-                                    tabIndex='-1'
-                                    role='button'
-                                    aria-disabled='false'
-                                >
-                                    <span className='ui-button-text'>
-                                        <span className='ui-icon ui-icon-triangle-1-s'>
-                                            ▼
-                                        </span>
-                                    </span>
-                                </a>
-                            </div>
-                            <div id='thousand-separator'>
-                                <input type='checkbox'></input>
-                                <span>使用千位分隔符(,)</span>
-                            </div>
-                            <div>
-                                <span>负数：</span>
-                                <select
-                                    name='negative-number-list'
-                                    id='negative-number-list'
-                                    size={6}
-                                >
-                                    <option value='xxxx'>xxxx</option>
-                                    <option value='xxx'>xxx</option>
-                                    <option value='xx'>xx</option>
-                                    <option value='x'>x</option>
-                                </select>
-                            </div>
+                            {(selectedValue === 'numbers' ||
+                                selectedValue === 'currency' ||
+                                selectedValue === 'accounting' ||
+                                selectedValue === 'scientific' ||
+                                selectedValue === 'percentage') && (
+                                <div className='decimalPlaces'>
+                                    <span>小数位数：</span>
+                                    <Integer
+                                        style={{ width: '50%', height: 23 }}
+                                        max={255}
+                                        min={0}
+                                        onChange={(val) => alert(val)}
+                                    ></Integer>
+                                </div>
+                            )}
+
+                            {selectedValue === 'numbers' && (
+                                <div id='thousand-separator'>
+                                    <input type='checkbox'></input>
+                                    <span>使用千位分隔符(,)</span>
+                                </div>
+                            )}
+                            {(selectedValue === 'currency' ||
+                                selectedValue === 'accounting') && (
+                                <div className='decimalPlaces'>
+                                    <span>货币符号： </span>
+                                    <Integer
+                                        style={{ width: '50%', height: 23 }}
+                                        min={0}
+                                        onChange={(val) => alert(val)}
+                                    ></Integer>
+                                </div>
+                            )}
+                            {(selectedValue === 'numbers' ||
+                                selectedValue === 'currency') && (
+                                <div>
+                                    <span>负数：</span>
+                                    <select
+                                        name='negative-number-list'
+                                        id='negative-number-list'
+                                        size={6}
+                                    >
+                                        <option value='xxxx'>xxxx</option>
+                                        <option value='xxx'>xxx</option>
+                                        <option value='xx'>xx</option>
+                                        <option value='x'>x</option>
+                                    </select>
+                                </div>
+                            )}
                         </div>
                         <div className='bottomArea'>
                             <span>{formatNumber[selectedValue]}</span>

@@ -82,8 +82,10 @@
         margin: 5px;
         .decimalPlaces {
             width: 100%;
-            height: 25px;
+            height: 26px;
             margin-top: 10px;
+            display: flex;
+            align-items: center;
         }
         #thousand-separator {
             height: 25px;
