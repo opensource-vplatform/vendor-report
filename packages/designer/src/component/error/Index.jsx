@@ -19,7 +19,7 @@ function Index(props) {
                         onClick={() => {
                             onClose && onClose();
                         }}
-                    ></Button>
+                    >确定</Button>
                 </div>
             </div>
         </Dialog>

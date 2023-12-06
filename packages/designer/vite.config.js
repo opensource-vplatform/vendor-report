@@ -33,6 +33,9 @@ export default defineConfig({
             {
                 find: '@hooks',
                 replacement: resolve(__dirname, 'src/hooks'),
+            },{
+                find: '@metadatas',
+                replacement: resolve(__dirname, 'src/metadatas'),
             },
         ],
     },

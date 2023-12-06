@@ -3,18 +3,22 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import {
-    Column,
-    SpreadSheets,
-    Worksheet,
+  Column,
+  SpreadSheets,
+  Worksheet,
 } from '@grapecity/spread-sheets-react';
 
 import DataService from './assets/dataService';
-import { Tab, Tabs } from './component/tabs/Index';
+import CellStyleSetting from './component/cellStyles/cellStyleSetting';
+import {
+  Tab,
+  Tabs,
+} from './component/tabs/Index';
 import { setSpread } from './store/appSlice/appSlice';
 import { resetCellFont } from './store/fontSlice/fontSlice';
 import FileTab from './tabs/file/Index';
 import StartTab from './tabs/start/Index';
-import CellStyleSetting from './component/cellStyles/cellStyleSetting';
+import TestTab from './tabs/test/Index';
 
 function Designer(props) {
     const dispatch = useDispatch();
@@ -55,6 +59,9 @@ function Designer(props) {
                 </Tab>
                 <Tab code='start' title='开始'>
                     <StartTab />
+                </Tab>
+                <Tab code='test' title='组件测试'>
+                    <TestTab/>
                 </Tab>
             </Tabs>
             <SpreadSheets

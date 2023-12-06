@@ -131,7 +131,6 @@ export function setStyle(params) {
             setFontStyle({ style, attribute, value, row, column, sheet });
         } else if ('font-family' === attribute) {
             //style.themeFont = keyword_undefined;
-            debugger;
             var newValue = value;
             if (
                 value &&

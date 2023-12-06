@@ -158,6 +158,10 @@
                     font-family: inherit;
                     font-size: 12px;
                 }
+                .import-ipt:focus-visible{
+                    border: solid 1px #5292f7 !important;
+                    outline: none;
+                }
                 .import-ipt:hover{
                     border: solid 1px #5292f7 !important;
                 }

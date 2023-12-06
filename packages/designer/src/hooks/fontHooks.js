@@ -38,6 +38,7 @@ export function useFontAction() {
             });
             dispatch(dispatchFun(dispatchParams));
         } catch (e) {
+            console.error(e);
         } finally {
             spread.resumePaint();
         }
