@@ -35,6 +35,48 @@ function CellStyleSetting(props) {
         custom: '以现有格式为基础，生成自定义的数字格式。',
     };
 
+    const accountingSymbol = [
+        ['无', null, null],
+        ['$', '$', 'en-US'],
+        ['¥(Chinese)', '¥', 'zh-cn'],
+        ['¥(Japanese)', '¥', 'ja-jp'],
+        ['₩(Korean)', '₩', 'ko-kr'],
+    ];
+    const localeType = {
+        en_us: '英语(美国)',
+        ja_jp: '日语',
+    };
+    const timeFormats = [
+        '[$-F400]h:mm:ss AM/PM',
+        'h:mm;@',
+        '[$-409]h:mm AM/PM;@',
+        'h:mm:ss;@',
+        '[$-409]h:mm:ss AM/PM;@',
+        'mm:ss.0;@',
+        '[h]:mm:ss;@',
+        '[$-409]m/d/yy h:mm AM/PM;@',
+        'm/d/yy h:mm;@',
+    ];
+    const dateFormats = [
+        'm/d/yyyy',
+        '[$-F800]dddd, mmmm dd, yyyy',
+        'm/d;@',
+        'm/d/yy;@',
+        'mm/dd/yy;@',
+        '[$-409]d-mmm;@',
+        '[$-409]d-mmm-yy;@',
+        '[$-409]dd-mmm-yy;@',
+        '[$-409]mmm-yy;@',
+        '[$-409]mmmm-yy;@',
+        '[$-409]mmmm d, yyyy;@',
+        '[$-409]m/d/yy h:mm AM/PM;@',
+        'm/d/yy h:mm;@',
+        '[$-409]mmmmm;@',
+        '[$-409]mmmmm-yy;@',
+        'm/d/yyyy;@',
+        '[$-409]d-mmm-yyyy;@',
+    ];
+
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState('general');
     const dispatch = useDispatch();
@@ -216,11 +258,19 @@ function CellStyleSetting(props) {
                                 selectedValue === 'accounting') && (
                                 <div className='decimalPlaces'>
                                     <span>货币符号： </span>
-                                    <Integer
-                                        style={{ width: '50%', height: 23 }}
-                                        min={0}
-                                        onChange={(val) => alert(val)}
-                                    ></Integer>
+                                    <select
+                                        name='currencySelect'
+                                        id='currencySelect'
+                                        size={1}
+                                        // value={selectedValue}
+                                    >
+                                        <option value='general'>￥</option>
+                                        <option value='numbers'>$</option>
+                                        <option value='currency'>K</option>
+                                        <option value='accounting'>
+                                            会计专用
+                                        </option>
+                                    </select>
                                 </div>
                             )}
                             {(selectedValue === 'numbers' ||
@@ -239,7 +289,43 @@ function CellStyleSetting(props) {
                                     </select>
                                 </div>
                             )}
+                            {(selectedValue === 'date' ||
+                                selectedValue === 'time' ||
+                                selectedValue === 'fraction' ||
+                                selectedValue === 'special' ||
+                                selectedValue === 'custom') && (
+                                <div>
+                                    <span>类型</span>
+                                    <select
+                                        name='negative-number-list'
+                                        id='negative-number-list'
+                                        size={4}
+                                    >
+                                        <option value='xxxx'>xxxx</option>
+                                        <option value='xxx'>xxx</option>
+                                        <option value='xx'>xx</option>
+                                        <option value='x'>x</option>
+                                        <option value='xxxx'>xxxx</option>
+                                        <option value='xxx'>xxx</option>
+                                        <option value='xx'>xx</option>
+                                        <option value='x'>x</option>
+                                    </select>
+                                </div>
+                            )}
+                            {(selectedValue === 'date' ||
+                                selectedValue === 'time' ||
+                                selectedValue === 'special') && (
+                                <div>
+                                    <span>区域设置（国家/地区）:</span>
+                                    <select name='locale' id='locale' size={1}>
+                                        <option value='xxx'>xxx</option>
+                                        <option value='xx'>xx</option>
+                                        <option value='x'>x</option>
+                                    </select>
+                                </div>
+                            )}
                         </div>
+
                         <div className='bottomArea'>
                             <span>{formatNumber[selectedValue]}</span>
                         </div>

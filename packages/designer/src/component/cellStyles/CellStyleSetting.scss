@@ -86,6 +86,11 @@
             margin-top: 10px;
             display: flex;
             align-items: center;
+            #currencySelect {
+                width: 50%;
+                height: 26px;
+                border: 1px solid lightgray;
+            }
         }
         #thousand-separator {
             height: 25px;
