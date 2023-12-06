@@ -1,7 +1,4 @@
-import {
-  Fragment,
-  useState,
-} from 'react';
+import { Fragment, useState } from 'react';
 
 import Context from './Context';
 
@@ -9,6 +6,7 @@ const activeHeaderStyle = {
     paddingBottom: 1,
     borderTopLeftRadius: 4,
     borderTopRightRadius: 4,
+    borderBottom: 'none',
     borderTop: 'solid 1px lightgray',
     borderLeft: 'solid 1px lightgray',
     borderRight: 'solid 1px lightgray',
@@ -36,15 +34,14 @@ function Tabs(props) {
                 const childCode = childProps.code;
                 const onClick = childProps.onClick;
                 const styles = {
-                    border: '1px solid transparent',
                     borderBottom: 'none',
                     bottom: '-1px',
                     cursor: 'pointer',
                     display: 'inline-block',
                     listStyle: 'none',
                     //padding: '6px 12px',
-                    fontSize:'12px',
-                    position: 'relative'
+                    fontSize: '12px',
+                    position: 'relative',
                 };
                 const actived = childCode == active;
                 if (actived) {
@@ -56,7 +53,7 @@ function Tabs(props) {
                         <a
                             style={{
                                 padding: '6px 12px 6px 12px',
-                                display:'block',
+                                display: 'block',
                                 color: '#333',
                                 cursor: actived ? 'text' : 'pointer',
                             }}
@@ -66,7 +63,8 @@ function Tabs(props) {
                     ) : (
                         children
                     );
-                const clickHandler = typeof onClick == 'function' ? onClick:setActive;
+                const clickHandler =
+                    typeof onClick == 'function' ? onClick : setActive;
                 return (
                     <Fragment key={childCode}>
                         <li
@@ -86,8 +84,8 @@ function Tabs(props) {
         <Fragment>
             <Context.Provider value={active}>
                 <div>
-                {headers}
-                {children}
+                    {headers}
+                    {children}
                 </div>
             </Context.Provider>
         </Fragment>
