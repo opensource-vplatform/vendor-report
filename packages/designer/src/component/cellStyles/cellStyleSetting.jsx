@@ -1,9 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Index from '../dialog/Index';
+import Tab from '../tabs/Tab';
+import Tabs from '../tabs/Tabs';
 import './CellStyleSetting.scss';
 function CellStyleSetting(props) {
+    const categories = {
+        general: '常规',
+        numbers: '数值',
+        currency: '货币',
+        accounting: '会计专用',
+        date: '日期',
+        time: '时间',
+        percentage: '百分比',
+        fraction: '分数',
+        scientific: '科学记数',
+        text: '文本',
+        special: '特殊',
+        custom: '自定义',
+    };
+    const formatNumber = {
+        general: '常规单元格格式不包含任何特定的数字格式。',
+        numbers:
+            '数值格式用于一般数字的表示。货币和会计格式则提供货币值计算的专用格式。',
+        currency:
+            '货币格式用于表示一般货币数值。会计格式可以对一列数值进行小数点对齐。',
+        accounting: '会计格式可对一列数值进行货币符号和小数点对齐。',
+        date: '日期格式将日期和时间系列数值显示为日期值。',
+        time: '时间格式将日期和时间系列数值显示为时间值。',
+        percentage: '百分比格式将单元格中数值乘以100，并以百分数形式显示。',
+        text: '在文本单元格格式中，数字作为文本处理。单元格显示的内容与输入的内容完全一致。',
+        special: '特殊格式可用于跟踪数据列表及数据库的值。',
+        custom: '以现有格式为基础，生成自定义的数字格式。',
+    };
+
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedValue, setSelectedValue] = useState('general');
     const dispatch = useDispatch();
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
 
@@ -76,7 +108,7 @@ function CellStyleSetting(props) {
         false
     );
 
-    const Tabs = ({ children }) => {
+    /*  const Tabs = ({ children }) => {
         const [activeTab, setActiveTab] = useState(0);
 
         const handleClick = (index) => {
@@ -108,38 +140,118 @@ function CellStyleSetting(props) {
 
     const TabPane = ({ children }) => {
         return <>{children}</>;
+    }; */
+
+    const handleSelectChange = (event) => {
+        const selectedOptionValue = event.target.value;
+        setSelectedValue(selectedOptionValue);
     };
 
     return isOpen ? (
         <Index
             title='设置单元格格式'
-            width='600px'
-            height='500px'
+            width='730px'
+            height='630px'
             open={true}
             mask={true}
         >
-            <Tabs>
-                {/* 可以抽成组件 <numberFormat>*/}
-                <TabPane label='数字'>
-                    <p>分类：</p>
-                    <div className='leftArea'>sel area</div>
-                    <div className='simpleArea'>simple</div>
-                    <div className='rightArea'>format show</div>
-                    <div className='bottomArea'>tootip</div>
-                </TabPane>
-                <TabPane label='对齐'>
-                    <p>Content for Sheet 2</p>
-                </TabPane>
-                <TabPane label='字体'>
-                    <p>Content for Sheet 3</p>
-                </TabPane>
-                <TabPane label='边框'>
-                    <p>Content for 边框</p>
-                </TabPane>
-                <TabPane label='保护'>
-                    <p>Content for 保护 </p>
-                </TabPane>
-            </Tabs>
+            <div className='tabBox'>
+                <Tabs value='数字'>
+                    {/* 可以抽成组件 <numberFormat>*/}
+                    <Tab code='数字' title='数字'>
+                        <p>分类：</p>
+                        <div className='leftArea'>
+                            <select
+                                name='categoryList'
+                                id='categoryList'
+                                size={16}
+                                value={selectedValue}
+                                onChange={handleSelectChange}
+                            >
+                                <option value='general'>常规</option>
+                                <option value='numbers'>数字</option>
+                                <option value='currency'>货币</option>
+                                <option value='accounting'>会计专用</option>
+                                <option value='date'>日期</option>
+                                <option value='time'>时间</option>
+                                <option value='percentage'>百分比</option>
+                                <option value='fraction'>分数</option>
+                                <option value='scientific'>科学计数</option>
+                                <option value='text'>文本</option>
+                                <option value='special'>特殊</option>
+                                <option value='custom'>自定义</option>
+                            </select>
+                        </div>
+                        <div className='simpleArea'>
+                            <fieldset>
+                                <legend>示例</legend>
+                                <label>示例结果</label>
+                            </fieldset>
+                        </div>
+                        <div className='rightArea'>
+                            <div className='decimalPlaces'>
+                                <span>小数位数：</span>
+                                <input
+                                    id='decimal-places'
+                                    defaultValue='2'
+                                    role='spinbutton'
+                                ></input>
+                                <a
+                                    tabIndex='-1'
+                                    role='button'
+                                    aria-disabled='false'
+                                >
+                                    <span className='ui-button-text'>▲</span>
+                                </a>
+                                <a
+                                    className='ui-spinner-button ui-spinner-down ui-corner-br ui-button ui-widget ui-state-default ui-button-text-only'
+                                    tabIndex='-1'
+                                    role='button'
+                                    aria-disabled='false'
+                                >
+                                    <span className='ui-button-text'>
+                                        <span className='ui-icon ui-icon-triangle-1-s'>
+                                            ▼
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                            <div id='thousand-separator'>
+                                <input type='checkbox'></input>
+                                <span>使用千位分隔符(,)</span>
+                            </div>
+                            <div>
+                                <span>负数：</span>
+                                <select
+                                    name='negative-number-list'
+                                    id='negative-number-list'
+                                    size={6}
+                                >
+                                    <option value='xxxx'>xxxx</option>
+                                    <option value='xxx'>xxx</option>
+                                    <option value='xx'>xx</option>
+                                    <option value='x'>x</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className='bottomArea'>
+                            <span>{formatNumber[selectedValue]}</span>
+                        </div>
+                    </Tab>
+                    <Tab code='对齐' title='对齐'>
+                        <p>Content for Sheet 2</p>
+                    </Tab>
+                    <Tab code='字体' title='字体'>
+                        <p>Content for Sheet 3</p>
+                    </Tab>
+                    <Tab code='边框' title='边框'>
+                        <p>Content for 边框</p>
+                    </Tab>
+                    <Tab code='保护' title='保护'>
+                        <p>Content for 保护 </p>
+                    </Tab>
+                </Tabs>{' '}
+            </div>
         </Index>
     ) : null;
 }
