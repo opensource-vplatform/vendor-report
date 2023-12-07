@@ -1,9 +1,27 @@
-import './fontAlign.scss';
-
 import {
   useDispatch,
   useSelector,
 } from 'react-redux';
+import styled from 'styled-components';
+
+import {
+  GroupItem,
+  ItemList,
+} from '@components/group/Index';
+import AlignCenter from '@icons/align/AlignCenter';
+import AlignLeft from '@icons/align/AlignLeft';
+import AlignRight from '@icons/align/AlignRight';
+import VAlignBottom from '@icons/align/VAlignBottom';
+import VAlignCenter from '@icons/align/VAlignCenter';
+import VAlignTop from '@icons/align/VAlignTop';
+import ArrowDown from '@icons/arrow/ArrowDown';
+import DirectionSetting from '@icons/direction/DirectionSetting';
+import BreakLine from '@icons/font/BreakLine';
+import DecreaseIndent from '@icons/indent/DecreaseIndent.jsx';
+import IncreaseIndent from '@icons/indent/IncreaseIndent.jsx';
+import MergeCenter from '@icons/merge/MergeCenter';
+import { getWordDirections } from '@metadatas/direction';
+import { getMergeTypes } from '@metadatas/merge';
 
 import { useFontAction } from '../../hooks/fontHooks.js';
 import {
@@ -18,20 +36,11 @@ import {
   unMergeCell,
 } from '../../utils/fontUtil.js';
 import DropdownBox from '../dropdownBox/dropdownBox';
-import FooterLabel from '../footerLabel/footerLabel';
 import LineSepatator from '../lineSeparator/lineSeparator';
-import UiIcon from '../uiIcon/uiIcon';
 
-const mergeOptDatas = [
-    { value: 'mergeCenter', text: '合并后居中', title: '合并后居中' },
-    { value: 'mergeAcross', text: '跨越合并', title: '跨越合并' },
-    { value: 'mergeCells', text: '合并单元格', title: '合并单元格' },
-    {
-        value: 'unMergeCell',
-        text: '取消单元格合并',
-        title: '取消单元格合并',
-    },
-];
+const Label = styled.span`
+    font-size: 12px;
+`;
 
 function FontAlign(props) {
     const dispatch = useDispatch();
@@ -188,111 +197,98 @@ function FontAlign(props) {
             mergeType: data.value,
         });
     };
-
+    const wordDirections = getWordDirections();
+    const mergeTypes = getMergeTypes();
     return (
-        <div className='fontAlignBox'>
-            <div className='header'>
-                <div className='headerLeft'>
-                    <div>
-                        <UiIcon
-                            title='顶端对齐'
-                            className={`topAlign ${
-                                vAlign === 0 ? 'active' : ''
-                            }`}
-                            click={_topAlignClickHandler}
-                        ></UiIcon>
-                        <UiIcon
-                            title='垂直居中'
-                            className={`middleAlign ${
-                                vAlign === 1 ? 'active' : ''
-                            }`}
-                            click={_middleAlignClickHandler}
-                        ></UiIcon>
-                        <UiIcon
-                            title='底端对齐'
-                            className={`bottomAlign ${
-                                vAlign === 2 ? 'active' : ''
-                            }`}
-                            click={_bottomAlignClickHandler}
-                        ></UiIcon>
+        <GroupItem title='对齐方式' onMore={() => {}}>
+            <div style={{ display: 'flex' }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        borderRight: 'solid 1px lightgray',
+                    }}
+                >
+                    <ItemList>
+                        <VAlignTop
+                            tips='顶端对齐'
+                            active={vAlign === 0}
+                            onClick={_topAlignClickHandler}
+                        ></VAlignTop>
+                        <VAlignCenter
+                            tips='垂直居中'
+                            active={vAlign === 1}
+                            onClick={_middleAlignClickHandler}
+                        ></VAlignCenter>
+                        <VAlignBottom
+                            tips='底端对齐'
+                            active={vAlign === 2}
+                            onClick={_bottomAlignClickHandler}
+                        ></VAlignBottom>
                         <LineSepatator></LineSepatator>
-                        <UiIcon
-                            title='竖排文字'
-                            className={`verticalText ${
-                                isVerticalText ? 'active' : ''
-                            }`}
-                            click={_verticalTextClickHandler}
-                        ></UiIcon>
-                    </div>
-                    <div>
-                        <UiIcon
-                            title='文本左对齐'
-                            className={`leftAlgin ${
-                                hAlign === 0 ? 'active' : ''
-                            }`}
-                            click={_leftAlignClickHandler}
-                        ></UiIcon>
-                        <UiIcon
-                            title='居中'
-                            className={`centerAlign ${
-                                hAlign === 1 ? 'active' : ''
-                            }`}
-                            click={_centerAlignClickHandler}
-                        ></UiIcon>
-                        <UiIcon
-                            title='文本右对齐'
-                            className={`rightAlign ${
-                                hAlign === 2 ? 'active' : ''
-                            }`}
-                            click={_rightAlignClickHandler}
-                        ></UiIcon>
-                        <LineSepatator></LineSepatator>
-                        <UiIcon
-                            title='增加缩进量'
-                            className='increaseIndent'
-                            click={_increaseIndentClickHandler}
-                        ></UiIcon>
-                        <UiIcon
-                            title='减少缩进量'
-                            className='decreaseIndent'
-                            click={_decreaseIndentClickHandler}
-                        ></UiIcon>
-                    </div>
-                </div>
-                <LineSepatator></LineSepatator>
-                <div className='headerRight'>
-                    <div>
-                        <UiIcon
-                            title='自动换行'
-                            text='自动换行'
-                            className={`wrapText ${isWordWrap ? 'active' : ''}`}
-                            click={_wrapTextClickHandler}
-                        ></UiIcon>
-                    </div>
-                    <div className='headerRightBotton'>
-                        <UiIcon
-                            title='合并后居中'
-                            text='合并后居中'
-                            className={`mergeCenter ${
-                                mergeType === 'mergeCenter' ? 'active' : ''
-                            }`}
-                            click={_mergeCenterClickHandler}
-                        ></UiIcon>
                         <DropdownBox
+                            datas={wordDirections}
+                            lineIndexs={[4]}
                             isShowIcon={true}
                             isShowText={false}
                             isShowBorder={false}
-                            release={true}
-                            datas={mergeOptDatas}
-                            className='mergeOpt'
+                            className='borderOpt'
+                            optionStyle={{ left: -24 }}
+                            onChange={() => {}}
+                        >
+                            <DirectionSetting tips='方向'><ArrowDown tips='边框'></ArrowDown></DirectionSetting>
+                        </DropdownBox>
+                    </ItemList>
+                    <ItemList>
+                        <AlignLeft
+                            tips='左对齐'
+                            active={hAlign === 0}
+                            onClick={_leftAlignClickHandler}
+                        ></AlignLeft>
+                        <AlignCenter
+                            tips='居中'
+                            active={hAlign === 1}
+                            onClick={_centerAlignClickHandler}
+                        ></AlignCenter>
+                        <AlignRight
+                            tips='右对齐'
+                            active={hAlign === 2}
+                            onClick={_rightAlignClickHandler}
+                        ></AlignRight>
+                        <LineSepatator></LineSepatator>
+                        <DecreaseIndent
+                            tips='减少缩进量'
+                            onClick={_decreaseIndentClickHandler}
+                        ></DecreaseIndent>
+                        <IncreaseIndent
+                            tips='增加缩进量'
+                            onClick={_increaseIndentClickHandler}
+                        ></IncreaseIndent>
+                    </ItemList>
+                </div>
+                <div>
+                    <ItemList>
+                        <div onClick={_wrapTextClickHandler}>
+                            <BreakLine tips='自动换行'><Label>自动换行</Label></BreakLine>
+                        </div>
+                    </ItemList>
+                    <ItemList>
+                    <MergeCenter tips='合并后居中'  onClick={_mergeCenterClickHandler}><Label>合并后居中</Label></MergeCenter>
+                    <DropdownBox
+                            datas={mergeTypes}
+                            isShowIcon={true}
+                            isShowText={false}
+                            isShowBorder={false}
+                            className='borderOpt'
+                            optionStyle={{ left: -24 }}
                             onChange={_mergeOptChangeHandler}
-                            style={{ width: '16px' }}
-                        ></DropdownBox>
-                    </div>
+                        >
+                            <ArrowDown tips='合并后居中'></ArrowDown>
+                        </DropdownBox>
+                    </ItemList>
                 </div>
             </div>
-            <FooterLabel labelText='对齐方式' className=''></FooterLabel>
-        </div>
+        </GroupItem>
     );
 }
 

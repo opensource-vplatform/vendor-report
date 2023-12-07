@@ -21,7 +21,7 @@ const Icon = styled.div`
 `;
 
 function Index(pros) {
-    const { icon, tips, active = false, onClick, style={},iconStyle={} } = pros;
+    const { icon, tips, active = false, onClick, style={},iconStyle={},children } = pros;
     const st = {...style}
     if(active){
         st.backgroundColor = '#dadada';
@@ -33,6 +33,7 @@ function Index(pros) {
             <Icon
                 style={icSt}
             ></Icon>
+            {children}
         </IconWrap>
     );
 }
