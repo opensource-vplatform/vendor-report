@@ -4,78 +4,16 @@ import Index from '../dialog/Index';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
 import Integer from '../integer/Index';
+import {
+    Categories,
+    FormatNumber,
+    AccountingSymbol,
+    LocaleType,
+    TimeFormats,
+    DateFormats,
+} from './constant';
 import './CellStyleSetting.scss';
 function CellStyleSetting(props) {
-    const categories = {
-        general: '常规',
-        numbers: '数值',
-        currency: '货币',
-        accounting: '会计专用',
-        date: '日期',
-        time: '时间',
-        percentage: '百分比',
-        fraction: '分数',
-        scientific: '科学记数',
-        text: '文本',
-        special: '特殊',
-        custom: '自定义',
-    };
-    const formatNumber = {
-        general: '常规单元格格式不包含任何特定的数字格式。',
-        numbers:
-            '数值格式用于一般数字的表示。货币和会计格式则提供货币值计算的专用格式。',
-        currency:
-            '货币格式用于表示一般货币数值。会计格式可以对一列数值进行小数点对齐。',
-        accounting: '会计格式可对一列数值进行货币符号和小数点对齐。',
-        date: '日期格式将日期和时间系列数值显示为日期值。',
-        time: '时间格式将日期和时间系列数值显示为时间值。',
-        percentage: '百分比格式将单元格中数值乘以100，并以百分数形式显示。',
-        text: '在文本单元格格式中，数字作为文本处理。单元格显示的内容与输入的内容完全一致。',
-        special: '特殊格式可用于跟踪数据列表及数据库的值。',
-        custom: '以现有格式为基础，生成自定义的数字格式。',
-    };
-    const accountingSymbol = [
-        ['无', null, null],
-        ['$', '$', 'en-US'],
-        ['¥(Chinese)', '¥', 'zh-cn'],
-        ['¥(Japanese)', '¥', 'ja-jp'],
-        ['₩(Korean)', '₩', 'ko-kr'],
-    ];
-    const localeType = {
-        en_us: '英语(美国)',
-        ja_jp: '日语',
-    };
-    const timeFormats = [
-        '[$-F400]h:mm:ss AM/PM',
-        'h:mm;@',
-        '[$-409]h:mm AM/PM;@',
-        'h:mm:ss;@',
-        '[$-409]h:mm:ss AM/PM;@',
-        'mm:ss.0;@',
-        '[h]:mm:ss;@',
-        '[$-409]m/d/yy h:mm AM/PM;@',
-        'm/d/yy h:mm;@',
-    ];
-    const dateFormats = [
-        'm/d/yyyy',
-        '[$-F800]dddd, mmmm dd, yyyy',
-        'm/d;@',
-        'm/d/yy;@',
-        'mm/dd/yy;@',
-        '[$-409]d-mmm;@',
-        '[$-409]d-mmm-yy;@',
-        '[$-409]dd-mmm-yy;@',
-        '[$-409]mmm-yy;@',
-        '[$-409]mmmm-yy;@',
-        '[$-409]mmmm d, yyyy;@',
-        '[$-409]m/d/yy h:mm AM/PM;@',
-        'm/d/yy h:mm;@',
-        '[$-409]mmmmm;@',
-        '[$-409]mmmmm-yy;@',
-        'm/d/yyyy;@',
-        '[$-409]d-mmm-yyyy;@',
-    ];
-
     let firstCellValue = null;
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
@@ -108,11 +46,14 @@ function CellStyleSetting(props) {
                 decimalPlacesValue
             );
             setExampleValue(value.concat('', '%'));
-            return;
+        } else {
+            const value = formatNumberDecimal(
+                firstCellValue,
+                decimalPlacesValue
+            );
+            setExampleValue(value);
         }
-        const value = formatNumberDecimal(firstCellValue, decimalPlacesValue);
-        setExampleValue(value);
-    }, [firstCellValue]);
+    }, [firstCellValue, selectedValue]);
 
     let commandManager = spread?.commandManager();
 
@@ -241,7 +182,7 @@ function CellStyleSetting(props) {
         }
     };
 
-    // 处理小数位数
+    // 小数位数格式化
     function formatNumberDecimal(number, decimalPlaces) {
         // 将数字转换为字符串
         const numberString = number.toString();
@@ -274,7 +215,7 @@ function CellStyleSetting(props) {
         }
         return newValue;
     }
-
+    // 处理小数位数
     const handleDecimalValue = (decimalPlaces) => {
         setDecimalPlacesValue(decimalPlaces);
         if (!exampleValue) {
@@ -309,18 +250,11 @@ function CellStyleSetting(props) {
                                 value={selectedValue}
                                 onChange={handleSelectChange}
                             >
-                                <option value='general'>常规</option>
-                                <option value='numbers'>数字</option>
-                                <option value='currency'>货币</option>
-                                <option value='accounting'>会计专用</option>
-                                <option value='date'>日期</option>
-                                <option value='time'>时间</option>
-                                <option value='percentage'>百分比</option>
-                                <option value='fraction'>分数</option>
-                                <option value='scientific'>科学计数</option>
-                                <option value='text'>文本</option>
-                                <option value='special'>特殊</option>
-                                <option value='custom'>自定义</option>
+                                {Object.keys(Categories).map((key) => (
+                                    <option value={key}>
+                                        {Categories[key]}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className='simpleArea'>
@@ -412,14 +346,22 @@ function CellStyleSetting(props) {
                                         id='negative-number-list'
                                         size={4}
                                     >
-                                        <option value='xxxx'>xxxx</option>
-                                        <option value='xxx'>xxx</option>
-                                        <option value='xx'>xx</option>
-                                        <option value='x'>x</option>
-                                        <option value='xxxx'>xxxx</option>
-                                        <option value='xxx'>xxx</option>
-                                        <option value='xx'>xx</option>
-                                        <option value='x'>x</option>
+                                        {selectedValue === 'time' &&
+                                            Object.keys(TimeFormats).map(
+                                                (key) => (
+                                                    <option value={key}>
+                                                        {TimeFormats[key]}
+                                                    </option>
+                                                )
+                                            )}
+                                        {selectedValue === 'date' &&
+                                            Object.keys(DateFormats).map(
+                                                (key) => (
+                                                    <option value={key}>
+                                                        {DateFormats[key]}
+                                                    </option>
+                                                )
+                                            )}
                                     </select>
                                 </div>
                             )}
@@ -429,15 +371,17 @@ function CellStyleSetting(props) {
                                 <div>
                                     <span>区域设置（国家/地区）: </span>
                                     <select name='locale' id='locale' size={1}>
-                                        <option value='xxx'>xxx</option>
-                                        <option value='xx'>xx</option>
-                                        <option value='x'>x</option>
+                                        {Object.keys(LocaleType).map((key) => (
+                                            <option value={key}>
+                                                {LocaleType[key]}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                             )}
                         </div>
                         <div className='bottomArea'>
-                            <span>{formatNumber[selectedValue]}</span>
+                            <span>{FormatNumber[selectedValue]}</span>
                         </div>
                     </Tab>
                     <Tab code='对齐' title='对齐'>

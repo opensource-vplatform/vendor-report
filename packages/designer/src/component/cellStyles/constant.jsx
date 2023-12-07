@@ -1,4 +1,4 @@
-const categories = {
+export const Categories = {
     general: '常规',
     numbers: '数值',
     currency: '货币',
@@ -12,7 +12,7 @@ const categories = {
     special: '特殊',
     custom: '自定义',
 };
-const formatNumber = {
+export const FormatNumber = {
     general: '常规单元格格式不包含任何特定的数字格式。',
     numbers:
         '数值格式用于一般数字的表示。货币和会计格式则提供货币值计算的专用格式。',
@@ -27,18 +27,18 @@ const formatNumber = {
     custom: '以现有格式为基础，生成自定义的数字格式。',
 };
 
-const accountingSymbol = [
+export const AccountingSymbol = [
     ['无', null, null],
     ['$', '$', 'en-US'],
     ['¥(Chinese)', '¥', 'zh-cn'],
     ['¥(Japanese)', '¥', 'ja-jp'],
     ['₩(Korean)', '₩', 'ko-kr'],
 ];
-const localeType = {
+export const LocaleType = {
     en_us: '英语(美国)',
     ja_jp: '日语',
 };
-const timeFormats = [
+export const TimeFormats = [
     '[$-F400]h:mm:ss AM/PM',
     'h:mm;@',
     '[$-409]h:mm AM/PM;@',
@@ -49,7 +49,7 @@ const timeFormats = [
     '[$-409]m/d/yy h:mm AM/PM;@',
     'm/d/yy h:mm;@',
 ];
-const dateFormats = [
+export const DateFormats = [
     'm/d/yyyy',
     '[$-F800]dddd, mmmm dd, yyyy',
     'm/d;@',
@@ -67,4 +67,30 @@ const dateFormats = [
     '[$-409]mmmmm-yy;@',
     'm/d/yyyy;@',
     '[$-409]d-mmm-yyyy;@',
+];
+
+export const FractionType = [
+    '分母为一位数(1/4)',
+    '分母为两位数(21/25)',
+    '分母为三位数(312/943)',
+    '以2为分母(1/2)',
+    '以4为分母(2/4)',
+    '以8为分母(4/8)',
+    '以16为分母(8/16)',
+    '以10为分母(3/10)',
+    '百分之几(30/100)',
+];
+// 有待验证
+export const currencyNegativeNumbers = {
+    number1: '-1,234.10',
+    'red:number2': '1,234.10',
+    number3: '-1,234.10',
+    'red:number4': '-1,234.10',
+};
+
+export const specialFormats = [
+    '00000',
+    '00000-0000',
+    '[<=9999999]###-####;(###) ###-####',
+    '000-00-0000',
 ];
