@@ -126,6 +126,11 @@ export default function (props) {
             fireChange(newVal);
         }
     };
+    const handleFocus = (evt)=>{
+        try{
+            evt.nativeEvent.target.select();
+        }catch(e){}
+    }
     useEffect(() => {
         setData(()=>{
             return {
@@ -140,6 +145,7 @@ export default function (props) {
                 value={data.innerVal}
                 onInput={handleInput}
                 onBlur={handleBlur}
+                onFocus={handleFocus}
             ></NumberInput>
             <NumberIconWrap>
                 <IconWrap
