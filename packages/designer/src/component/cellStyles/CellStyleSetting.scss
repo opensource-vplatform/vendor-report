@@ -104,8 +104,22 @@
             height: 130px;
             border: 1px solid lightgray;
             option {
-                height: 30px;
-                padding: 2;
+                height: 26px;
+                padding: 2px;
+                display: flex;
+                align-items: center;
+            }
+            &:focus-visible {
+                outline: unset;
+            }
+        }
+        #locale {
+            width: 96%;
+            height: 26px;
+            border: 1px solid lightgray;
+            option {
+                height: 26px;
+                padding: 2px;
                 display: flex;
                 align-items: center;
             }

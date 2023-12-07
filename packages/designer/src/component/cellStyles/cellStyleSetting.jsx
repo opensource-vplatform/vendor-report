@@ -34,7 +34,6 @@ function CellStyleSetting(props) {
         special: '特殊格式可用于跟踪数据列表及数据库的值。',
         custom: '以现有格式为基础，生成自定义的数字格式。',
     };
-
     const accountingSymbol = [
         ['无', null, null],
         ['$', '$', 'en-US'],
@@ -77,10 +76,43 @@ function CellStyleSetting(props) {
         '[$-409]d-mmm-yyyy;@',
     ];
 
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState('general');
+    let firstCellValue = null;
     const dispatch = useDispatch();
+    const [isOpen, setIsOpen] = useState(false);
+    const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
+    const [selectedValue, setSelectedValue] = useState('general');
+    const [exampleValue, setExampleValue] = useState(
+        firstCellValue ? firstCellValue : '12345'
+    );
+    const [checkboxOfThousandSeparator, setCheckboxOfThousandSeparator] =
+        useState(false);
+
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
+
+    // 获取第一个选择区域的第一个单元格的值
+    const activeSheet = spread?.getActiveSheet();
+    const selections = activeSheet?.getSelections();
+    if (selections?.length > 0) {
+        const selection = selections[0];
+        const startRow = selection.row;
+        const startColumn = selection.col;
+        firstCellValue = activeSheet.getValue(startRow, startColumn);
+    }
+
+    useEffect(() => {
+        if (!firstCellValue) return;
+        // 当选择的是百分比，则初始化时示例值将百分号加到第一个值后面
+        if (selectedValue === 'percentage') {
+            const value = formatNumberDecimal(
+                firstCellValue,
+                decimalPlacesValue
+            );
+            setExampleValue(value.concat('', '%'));
+            return;
+        }
+        const value = formatNumberDecimal(firstCellValue, decimalPlacesValue);
+        setExampleValue(value);
+    }, [firstCellValue]);
 
     let commandManager = spread?.commandManager();
 
@@ -89,16 +121,25 @@ function CellStyleSetting(props) {
             spread?.contextMenu.menuData.splice(index, 1);
         }
     });
+    // 设定菜单项
+    let formatCells = {
+        text: '设置单元格格式',
+        name: 'formatCells',
+        command: 'formatCells',
+        workArea: 'viewport',
+    };
+    // 纳入菜单项中
+    spread?.contextMenu.menuData.push(formatCells);
+    // 单元格格式执行命令
     let formatCellsCommand = {
         canUndo: false,
         execute: function () {
-            console.log('command :>> ');
             setIsOpen(!isOpen);
-
             //设置所选的单元格格式
             let style = new GC.Spread.Sheets.Style();
             style.name = 'style1';
             style.backColor = 'red';
+            // 获取所选的单元格
             let sheet = spread.getActiveSheet();
             sheet.suspendPaint();
             let selections = sheet.getSelections();
@@ -128,19 +169,8 @@ function CellStyleSetting(props) {
             sheet.resumePaint();
         },
     };
-    let formatCells = {
-        text: '设置单元格格式',
-        name: 'formatCells',
-        command: 'formatCells',
-        workArea: 'viewport',
-    };
-    spread?.contextMenu.menuData.push(formatCells);
 
-    console.log('spread :>> ', spread);
-    useEffect(() => {
-        console.log('isOpen :>> ', isOpen);
-    }, [isOpen]);
-
+    // 注入命令管理器
     commandManager?.register(
         'formatCells',
         formatCellsCommand,
@@ -190,6 +220,74 @@ function CellStyleSetting(props) {
         setSelectedValue(selectedOptionValue);
     };
 
+    // 处理千位分隔符
+    const handleCheckboxChange = (event) => {
+        setCheckboxOfThousandSeparator(event.target.checked);
+        if (!exampleValue) {
+            return;
+        } else if (event.target.checked === false) {
+            if (typeof exampleValue === 'number') {
+                return;
+            }
+            const stringWithoutCommas = exampleValue.replace(/,/g, '');
+            const numberValue = parseFloat(stringWithoutCommas);
+            setExampleValue(numberValue);
+        } else {
+            const newValue = exampleValue
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            console.log('newValue :>> ', newValue);
+            setExampleValue(newValue);
+        }
+    };
+
+    // 处理小数位数
+    function formatNumberDecimal(number, decimalPlaces) {
+        // 将数字转换为字符串
+        const numberString = number.toString();
+
+        // 检查是否存在小数点
+        const hasDecimal = numberString.includes('.');
+
+        // 如果不存在小数点，或者整数部分为空，则直接加上指定小数位数的小数点和零
+        if (!hasDecimal || numberString.split('.')[0] === '') {
+            // 如果小数部分为空，则直接返回整数部分
+            if (decimalPlaces === 0) {
+                return numberString.split('.')[0];
+            }
+            const newValue = numberString + '.' + '0'.repeat(decimalPlaces);
+            return newValue;
+        }
+
+        // 如果存在小数点，进行切割
+        const [integerPart, decimalPart] = numberString.split('.');
+
+        // 补零到指定小数位数
+        const paddedDecimalPart = decimalPart.padEnd(decimalPlaces, '0');
+
+        // 如果小数部分的位数超过指定的小数位数，则截取小数部分
+        const truncatedDecimalPart = paddedDecimalPart.slice(0, decimalPlaces);
+
+        const newValue = integerPart + '.' + truncatedDecimalPart;
+        if (decimalPlaces === 0) {
+            return numberString.split('.')[0];
+        }
+        return newValue;
+    }
+
+    const handleDecimalValue = (decimalPlaces) => {
+        setDecimalPlacesValue(decimalPlaces);
+        if (!exampleValue) {
+            return;
+        }
+        const newValue = formatNumberDecimal(firstCellValue, decimalPlaces);
+        if (selectedValue === 'percentage') {
+            setExampleValue(newValue.concat('', '%'));
+            return;
+        }
+        setExampleValue(newValue);
+    };
+
     return isOpen ? (
         <Index
             title='设置单元格格式'
@@ -228,7 +326,11 @@ function CellStyleSetting(props) {
                         <div className='simpleArea'>
                             <fieldset>
                                 <legend>示例</legend>
-                                <label>示例结果</label>
+                                <label>
+                                    {selectedValue === 'general'
+                                        ? 12345
+                                        : exampleValue}
+                                </label>
                             </fieldset>
                         </div>
                         <div className='rightArea'>
@@ -240,17 +342,26 @@ function CellStyleSetting(props) {
                                 <div className='decimalPlaces'>
                                     <span>小数位数：</span>
                                     <Integer
+                                        value={decimalPlacesValue}
                                         style={{ width: '50%', height: 23 }}
                                         max={255}
                                         min={0}
-                                        onChange={(val) => alert(val)}
+                                        onChange={(decimalPlacesValue) =>
+                                            handleDecimalValue(
+                                                decimalPlacesValue
+                                            )
+                                        }
                                     ></Integer>
                                 </div>
                             )}
 
                             {selectedValue === 'numbers' && (
                                 <div id='thousand-separator'>
-                                    <input type='checkbox'></input>
+                                    <input
+                                        type='checkbox'
+                                        checked={checkboxOfThousandSeparator}
+                                        onChange={handleCheckboxChange}
+                                    ></input>
                                     <span>使用千位分隔符(,)</span>
                                 </div>
                             )}
@@ -295,7 +406,7 @@ function CellStyleSetting(props) {
                                 selectedValue === 'special' ||
                                 selectedValue === 'custom') && (
                                 <div>
-                                    <span>类型</span>
+                                    <span>类型：</span>
                                     <select
                                         name='negative-number-list'
                                         id='negative-number-list'
@@ -316,7 +427,7 @@ function CellStyleSetting(props) {
                                 selectedValue === 'time' ||
                                 selectedValue === 'special') && (
                                 <div>
-                                    <span>区域设置（国家/地区）:</span>
+                                    <span>区域设置（国家/地区）: </span>
                                     <select name='locale' id='locale' size={1}>
                                         <option value='xxx'>xxx</option>
                                         <option value='xx'>xx</option>
@@ -325,7 +436,6 @@ function CellStyleSetting(props) {
                                 </div>
                             )}
                         </div>
-
                         <div className='bottomArea'>
                             <span>{formatNumber[selectedValue]}</span>
                         </div>
