@@ -36,7 +36,9 @@ export function useFontAction() {
                 sheet,
                 spread,
             });
-            dispatch(dispatchFun(dispatchParams));
+            if(dispatchFun){
+                dispatch(dispatchFun(dispatchParams));
+            }
         } catch (e) {
             console.error(e);
         } finally {

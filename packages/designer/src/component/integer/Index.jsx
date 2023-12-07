@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
@@ -115,6 +118,9 @@ export default function (props) {
             fireChange(newVal);
         }
     };
+    useEffect(()=>{
+        setVal(typeof value == 'number' ? value : 0);
+    },[value]);
     return (
         <NumberWrap style={style}>
             <NumberInput
