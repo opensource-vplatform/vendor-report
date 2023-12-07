@@ -80,51 +80,64 @@ export default function (props) {
         min = Number.MIN_SAFE_INTEGER,
         max = Number.MAX_SAFE_INTEGER,
     } = props;
-    const [val, setVal] = useState(() => {
-        return typeof value == 'number' ? value : 0;
+    const [data, setData] = useState(() => {
+        return { innerVal: typeof value == 'number' ? value : 0, value: value };
     });
+    const setVal = (val)=>{
+        if (val >= min && val <= max) {
+            setData((data)=>{
+                return {
+                    ...data,
+                    innerVal:val
+                }
+            });
+        }
+    }
     const fireChange = (val) => {
         if (typeof onChange == 'function') {
             onChange(parseInt(val));
         }
     };
     const increase = () => {
-        let newVal = parseInt(val) + 1;
-        newVal = newVal <= max ? newVal : val;
-        if (newVal != val) {
+        let newVal = parseInt(data.innerVal) + 1;
+        newVal = newVal <= max ? newVal : max;
+        if (newVal != data.innerVal) {
             setVal(newVal);
             fireChange(newVal);
         }
     };
     const decrease = () => {
-        let newVal = parseInt(val) - 1;
-        newVal = newVal >= min ? newVal : val;
-        if (newVal != val) {
+        let newVal = parseInt(data.innerVal) - 1;
+        newVal = newVal >= min ? newVal : min;
+        if (newVal != data.innerVal) {
             setVal(newVal);
             fireChange(newVal);
         }
     };
     const handleInput = (evt) => {
         const newVal = parseInt(evt.target.value);
-        if (newVal >= min && newVal <= max) {
-            setVal(newVal);
-        }
+        setVal(newVal);
     };
-    const handleBlur = () => {
-        let newVal = parseInt(val);
+    const handleBlur = (evt) => {
+        let newVal = parseInt(evt.target.value);
         newVal = isNaN(newVal) ? 0 : newVal;
-        if (newVal + '' != val) {
+        if (newVal + '' != data.value) {
             setVal(newVal);
             fireChange(newVal);
         }
     };
-    useEffect(()=>{
-        setVal(typeof value == 'number' ? value : 0);
-    },[value]);
+    useEffect(() => {
+        setData(()=>{
+            return {
+                innerVal:typeof value == 'number' ? value : 0,
+                value
+            };
+        });
+    }, [value]);
     return (
         <NumberWrap style={style}>
             <NumberInput
-                value={val}
+                value={data.innerVal}
                 onInput={handleInput}
                 onBlur={handleBlur}
             ></NumberInput>

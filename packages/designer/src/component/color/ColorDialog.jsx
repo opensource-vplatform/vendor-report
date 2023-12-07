@@ -205,7 +205,7 @@ export default function (props) {
         const { saturation, hue,luminosity } = data.hls;
         const color = colorFromHLS(
             Math.floor((hue / 255) * 240),
-            Math.floor((luminosity / 255) * 240),
+            Math.floor(((type=='pallet' ? 128:luminosity) / 255) * 240),
             Math.floor((saturation / 255) * 240)
         );
         color.r = parseInt(color.r.toString(), 10);
@@ -252,10 +252,9 @@ export default function (props) {
                             data-type='palletPointer'
                         ></Pallet>
                     </Pallet>
-                    <PalletBarWrap>
+                    <PalletBarWrap onMouseMove={handlePalletArrowMouseMove}>
                         <PalletBar
                             onMouseDown={handlePalletArrowMouseDown}
-                            onMouseMove={handlePalletArrowMouseMove}
                             onMouseUp={handlePalletArrowMouseUp}
                             style={{
                                 backgroundImage: `linear-gradient(to bottom, rgb(255,  255, 255),${lumRgbColor}, rgb(0, 0, 0))`,
@@ -290,6 +289,7 @@ export default function (props) {
                                         return {
                                             ...data,
                                             color,
+                                            lumColor:color
                                         };
                                     });
                                 }}
@@ -308,6 +308,7 @@ export default function (props) {
                                         return {
                                             ...data,
                                             color,
+                                            lumColor:color
                                         };
                                     });
                                 }}
@@ -326,6 +327,7 @@ export default function (props) {
                                         return {
                                             ...data,
                                             color,
+                                            lumColor:color
                                         };
                                     });
                                 }}

@@ -2,7 +2,7 @@ export function hexToRgb(hex) {
     hex = hex.replace('#', '');
     const len = hex.length;
     if (len % 3) {
-        throw Error('hex颜色格式不正确！');
+        throw Error('hex颜色格式不正确！颜色值：'+hex);
     }
     const count = len / 3;
     const pow = 6 / len;
@@ -21,7 +21,7 @@ export function rgbToHex(rgb) {
     const h = parseInt(r).toString(16);
     const e = parseInt(g).toString(16);
     const x = parseInt(b).toString(16);
-    return `#${h}${e}${x}`;
+    return `#${h.length>1 ? h:'0'+h}${e.length>1 ? e:'0'+e}${x.length>1 ? x:'0'+x}`;
 }
 
 export function hueToRGB(n1, n2, hue) {
@@ -144,10 +144,9 @@ export function updateCustomColor(color) {
   const index = colors.indexOf(color);
   let newColors = null;
   if(index == -1){
-    if(color.length>10){
-      colors[10] = color; 
-    }else{
-      colors.push(color);
+    colors.splice(0,0,color);
+    if(colors.length>10){
+      colors.length = 10;
     }
     newColors = colors;
   }else if(index != colors.length-1){
