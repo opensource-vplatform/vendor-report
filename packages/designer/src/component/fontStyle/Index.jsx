@@ -10,12 +10,12 @@ import {
 } from '@components/group/Index';
 import ArrowDown from '@icons/arrow/ArrowDown';
 import BorderBottom from '@icons/border/BorderBottom';
+import BackColor from '@icons/font/BackColor ';
 import Bold from '@icons/font/Bold';
 import DoubleUnderline from '@icons/font/DoubleUnderline ';
-import FillColor from '@icons/font/FillColor ';
 import FontSizeDown from '@icons/font/FontSizeDown';
 import FontSizeUp from '@icons/font/FontSizeUp';
-import ForceColor from '@icons/font/ForceColor';
+import ForeColor from '@icons/font/ForeColor';
 import Italic from '@icons/font/Italic';
 import Underline from '@icons/font/Underline';
 import {
@@ -51,6 +51,8 @@ export default function (props) {
         fontSize = 14,
         isUnderline = false,
         isDoubleUnderline = false,
+        backColor,
+        foreColor
     } = useSelector(({ fontSlice }) => fontSlice);
 
     const _setFontAction = useFontAction();
@@ -152,6 +154,20 @@ export default function (props) {
         }
         spread.focus(true);
     };
+
+    const setBackColor = function(color){
+        _setFontAction({
+            value: color,
+            property: 'backColor'
+        });
+    }
+
+    const setForceColor = function(color){
+        _setFontAction({
+            value: color,
+            property: 'foreColor'
+        });
+    }
     const fontFamilies = getFontFamilies();
     const fontSizes = getFontSizes();
     const borders = getBorderEnums();
@@ -216,11 +232,11 @@ export default function (props) {
                     <ArrowDown tips='边框'></ArrowDown>
                 </DropdownBox>
                 <LineSepatator></LineSepatator>
-                <ColorEditor>
-                    <FillColor tips='填充颜色'></FillColor>
+                <ColorEditor onChange={setBackColor} value={backColor}>
+                    <BackColor tips='填充颜色'></BackColor>
                 </ColorEditor>
-                <ColorEditor>
-                    <ForceColor tips='字体颜色'></ForceColor>
+                <ColorEditor nonable={false} onChange={setForceColor} value={foreColor}>
+                    <ForeColor tips='字体颜色'></ForeColor>
                 </ColorEditor>
             </ItemList>
         </GroupItem>

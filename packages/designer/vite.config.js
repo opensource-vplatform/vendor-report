@@ -36,6 +36,9 @@ export default defineConfig({
             },{
                 find: '@metadatas',
                 replacement: resolve(__dirname, 'src/metadatas'),
+            },{
+                find: '@utils',
+                replacement: resolve(__dirname, 'src/utils'),
             },
         ],
     },

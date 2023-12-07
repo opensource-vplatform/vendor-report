@@ -10,6 +10,12 @@ import {
   getCustomColors,
   getStandarColors,
 } from '@metadatas/color';
+import {
+  getCustomColors as getLocalCustomColors,
+  updateCustomColor as updateLocalCustomColor,
+} from '@utils/colorUtil';
+
+import ColorDialog from './ColorDialog';
 
 const Mask = styled.div`
     position: fixed;
@@ -26,7 +32,7 @@ const Wrap = styled.div`
 
 const Dialog = styled.div`
     position: absolute;
-    width: 176px;
+    width: auto;
     height: auto;
     border: 1px solid #a7abb0;
     overflow: hidden;
@@ -48,6 +54,7 @@ const Title = styled.div`
 
 const Content = styled.div`
     display: flex;
+    padding: 2px;
 `;
 
 const BlockVList = styled.div`
@@ -70,32 +77,58 @@ const ColorBlock = styled.div`
     }
 `;
 
-const CustomColorButton = styled.div`
-    display:flex;
-    width:100%;
-    &:hover:{
-        background-color:#dadada;
+const ColorButton = styled.div`
+    display: flex;
+    width: 100%;
+    cursor: pointer;
+    align-items: center;
+    padding: 4px;
+    &:hover {
+        background-color: #dadada;
     }
 `;
 
+const Divider = styled.div`
+    width: 1px;
+    height: 20px;
+    margin: 0px 4px;
+    border-left: solid 1px #dadada;
+`;
+
 export default function (props) {
-    const { children,onChange,noneable=true } = props;
+    const { children, onChange, nonable = true,value } = props;
     const [visible, setVisible] = useState(false);
+    const [dialogVisible, setDialogVisible] = useState(false);
     const customerColors = getCustomColors();
     const standColors = getStandarColors();
+    const handleChange = (val) => {
+        setVisible(false);
+        if (typeof onChange == 'function') {
+            onChange(val);
+        }
+    };
+    const [customColors, setCustomColors] = useState(() => {
+        return getLocalCustomColors();
+    });
     return (
         <Fragment>
             {visible ? <Mask onClick={() => setVisible(false)}></Mask> : null}
-            <Wrap onClick={() => setVisible(true)}>
+            <Wrap
+                onClick={(evt) => {
+                    if (!evt.target.closest('.colorDialog')) {
+                        setVisible(true);
+                    }
+                }}
+            >
                 {children}
                 {visible ? (
-                    <Dialog>
+                    <Dialog className='colorDialog'>
                         <Title>自定义</Title>
                         <Content>
                             {customerColors.map((colors, index) => {
                                 return (
                                     <BlockVList key={index}>
-                                        {colors.map((item,i) => {
+                                        {colors.map((item, i) => {
                                             const color = item.color;
                                             return (
                                                 <Fragment>
@@ -105,6 +138,9 @@ export default function (props) {
                                                             background: color,
                                                         }}
                                                         title={item.title}
+                                                        onClick={() => {
+                                                            handleChange(color);
+                                                        }}
                                                     ></ColorBlock>
                                                     {i == 0 ? (
                                                         <div
@@ -130,18 +166,83 @@ export default function (props) {
                                             key={color}
                                             style={{ background: color }}
                                             title={item.title}
+                                            onClick={() => {
+                                                handleChange(color);
+                                            }}
                                         ></ColorBlock>
                                     );
                                 })}
                             </BlockHList>
                         </Content>
-                        <Title>最近使用的颜色</Title>
-                        <CustomColorButton>
-                                <PalletIcon></PalletIcon>
-                        </CustomColorButton>
+                        {customColors.length > 0 ? (
+                            <Fragment>
+                                <Title>最近使用的颜色</Title>
+                                <Content>
+                                    <BlockHList>
+                                        {customColors.map((color) => {
+                                            return (
+                                                <ColorBlock
+                                                    key={color}
+                                                    style={{
+                                                        background: color,
+                                                    }}
+                                                    onClick={() => {
+                                                        handleChange(color);
+                                                    }}
+                                                ></ColorBlock>
+                                            );
+                                        })}
+                                    </BlockHList>
+                                </Content>
+                            </Fragment>
+                        ) : null}
+                        {nonable ? (
+                            <ColorButton
+                                style={{ borderBottom: 'solid 1px lightgray' }}
+                                onClick={() => handleChange()}
+                            >
+                                <div
+                                    style={{
+                                        width: 16,
+                                        height: 16,
+                                        marginLeft: 4,
+                                        marginRight: 4,
+                                        border: 'solid 1px lightgray',
+                                    }}
+                                ></div>
+                                <Divider></Divider>
+                                <span>无颜色</span>
+                            </ColorButton>
+                        ) : null}
+                        <ColorButton
+                            onClick={() => {
+                                setVisible(false);
+                                setDialogVisible(true);
+                            }}
+                        >
+                            <PalletIcon style={{ marginLeft: 4 }}></PalletIcon>
+                            <Divider></Divider>
+                            <span>其他颜色...</span>
+                        </ColorButton>
                     </Dialog>
                 ) : null}
             </Wrap>
+            {dialogVisible ? (
+                <ColorDialog
+                    value={value}
+                    onClose={() => {
+                        setDialogVisible(false);
+                    }}
+                    onChange={(color) => {
+                        setDialogVisible(false);
+                        handleChange(color);
+                        const colors = updateLocalCustomColor(color);
+                        if (colors) {
+                            setCustomColors(colors);
+                        }
+                    }}
+                ></ColorDialog>
+            ) : null}
         </Fragment>
     );
 }

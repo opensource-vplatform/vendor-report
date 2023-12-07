@@ -290,8 +290,9 @@ export function parseFont(spread) {
         fontStyle = 'normal',
         fontWeight = 'normal',
         fontVariant = 'normal',
-        lineHeight = 'normal';
-
+        lineHeight = 'normal',
+        backColor = style?.backColor,
+        foreColor = style?.foreColor;
     if (font) {
         const elements = font.split(/\s+/);
         let element;
@@ -352,6 +353,8 @@ export function parseFont(spread) {
         fontSize: fontSize,
         lineHeight: lineHeight,
         fontFamily: fontFamily,
+        backColor,
+        foreColor
     };
 }
 

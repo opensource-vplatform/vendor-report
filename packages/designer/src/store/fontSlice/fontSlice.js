@@ -19,7 +19,9 @@ export const fontSlice = createSlice({
         hAlign: null,
         isVerticalText: false,
         isWordWrap: false,
-        mergeType:''
+        mergeType:'',
+        backColor:null,
+        foreColor:null
     },
     reducers: {
         toggleFontStyle(state) {

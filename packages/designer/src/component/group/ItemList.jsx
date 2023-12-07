@@ -5,5 +5,5 @@ export default styled.div`
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    padding: 1px 2px;
+    padding: 4px 2px;
 `;
