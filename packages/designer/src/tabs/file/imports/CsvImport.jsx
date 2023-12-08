@@ -6,6 +6,17 @@ import {
 
 import { useSelector } from 'react-redux';
 
+import {
+  CsvIcon,
+  DetailInput,
+  DetailOption,
+  DetailTitle,
+  DetailWrap,
+  DetialOptions,
+  IconTitle,
+  ImportButtonWrap,
+  None,
+} from './Components';
 import WaitMsg from './WaitMsg';
 
 function CsvImport(props) {
@@ -48,65 +59,59 @@ function CsvImport(props) {
     return (
         <Fragment>
             {loading ? <WaitMsg></WaitMsg> : null}
-            <div className='detail-wrap'>
-                <div className='import-title'>CSV文件</div>
-                <div className='import-item'>
-                    <div>行分隔符</div>
-                    <input
-                        type='text'
+            <DetailWrap>
+                <DetailTitle>CSV文件</DetailTitle>
+                <DetialOptions>
+                    <DetailOption>行分隔符</DetailOption>
+                    <DetailOption>
+                        <DetailInput type='text'
                         value={data.rowDelimiter}
-                        className='import-ipt'
                         onChange={(evt) => {
                             setData((data) => {
                                 return { ...data, rowDelimiter: evt.target.value };
                             });
-                        }}
-                    ></input>
-                </div>
-                <div className='import-item'>
-                    <div>列分隔符</div>
-                    <input
-                        type='text'
+                        }}></DetailInput>
+                    </DetailOption>
+                    <DetailOption>列分隔符</DetailOption>
+                    <DetailOption>
+                        <DetailInput type='text'
                         value={data.columnDelimiter}
                         className='import-ipt'
                         onChange={(evt) => {
                             setData((data) => {
                                 return { ...data, columnDelimiter: evt.target.value };
                             });
-                        }}
-                    ></input>
-                </div>
-                <div className='import-item'>
-                    <div>文件编码</div>
-                    <input
-                        type='text'
-                        value={data.encoding}
-                        className='import-ipt'
-                        onChange={(evt) => {
-                            setData((data) => {
-                                return { ...data, encoding: evt.target.value };
-                            });
-                        }}
-                    ></input>
-                </div>
-                <div
-                    className='import-operation'
+                        }}></DetailInput>
+                    </DetailOption>
+                    <DetailOption>文件编码</DetailOption>
+                    <DetailOption>
+                        <DetailInput type='text'
+                       value={data.encoding}
+                       className='import-ipt'
+                       onChange={(evt) => {
+                           setData((data) => {
+                               return { ...data, encoding: evt.target.value };
+                           });
+                       }}></DetailInput>
+                    </DetailOption>
+                </DetialOptions>
+                <ImportButtonWrap
                     onClick={() => {
                         importHandler();
                     }}
                 >
-                    <div className='csvIcon'></div>
-                    <div className='title'>导入CSV文件</div>
-                </div>
-                <div style={{ display: 'none' }}>
+                    <CsvIcon></CsvIcon>
+                    <IconTitle>导入CSV文件</IconTitle>
+                </ImportButtonWrap>
+                <None>
                     <input
                         type='file'
                         accept='.csv'
                         ref={iptRef}
                         onChange={handleFileChange}
                     ></input>
-                </div>
-            </div>
+                </None>
+            </DetailWrap>
         </Fragment>
     );
 }

@@ -20,7 +20,10 @@ import BreakLine from '@icons/font/BreakLine';
 import DecreaseIndent from '@icons/indent/DecreaseIndent.jsx';
 import IncreaseIndent from '@icons/indent/IncreaseIndent.jsx';
 import MergeCenter from '@icons/merge/MergeCenter';
-import { getWordDirections } from '@metadatas/direction';
+import {
+  directionToStyles,
+  getWordDirections,
+} from '@metadatas/direction';
 import { getMergeTypes } from '@metadatas/merge';
 
 import { useFontAction } from '../../hooks/fontHooks.js';
@@ -197,6 +200,25 @@ function FontAlign(props) {
             mergeType: data.value,
         });
     };
+    const handleTextOrientation = (item)=>{
+       const {value} = item;
+       const styles = directionToStyles(value);
+       if(styles){
+           spread.suspendPaint();
+            try{
+                for(let attr in styles){
+                    if(styles.hasOwnProperty(attr)){
+                        _setStyle({
+                            value: styles[attr],
+                            property: attr
+                        });
+                    }
+                }
+            } finally{
+                spread.resumePaint();
+            }
+       }
+    }
     const wordDirections = getWordDirections();
     const mergeTypes = getMergeTypes();
     return (
@@ -234,9 +256,9 @@ function FontAlign(props) {
                             isShowBorder={false}
                             className='borderOpt'
                             optionStyle={{ left: -24 }}
-                            onChange={() => {}}
+                            onChange={handleTextOrientation}
                         >
-                            <DirectionSetting tips='方向'><ArrowDown tips='边框'></ArrowDown></DirectionSetting>
+                            <DirectionSetting tips='方向'><ArrowDown tips='方向'></ArrowDown></DirectionSetting>
                         </DropdownBox>
                     </ItemList>
                     <ItemList>

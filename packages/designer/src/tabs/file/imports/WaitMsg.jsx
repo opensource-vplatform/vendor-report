@@ -1,4 +1,4 @@
-import Loading from '../../../component/loading/Index';
+import Loading from '@components/loading/Index';
 
 function WaitMsg() {
     return (

@@ -6,9 +6,23 @@ import {
 
 import { useSelector } from 'react-redux';
 
+import Error from '@components/error/Index';
 import { IO } from '@grapecity/spread-excelio';
 
-import Error from '../../../component/error/Index';
+import {
+  DetailDesc,
+  DetailInput,
+  DetailLabel,
+  DetailOption,
+  DetailSubTitle,
+  DetailTitle,
+  DetailWrap,
+  DetialOptions,
+  ExcelIcon,
+  IconTitle,
+  ImportButtonWrap,
+  None,
+} from './Components';
 import WaitMsg from './WaitMsg';
 
 function ExcelImport(props) {
@@ -79,13 +93,13 @@ function ExcelImport(props) {
             <Error message={errMessage} open={!!errMessage} onClose={()=>{
                 setErrMessage(null);
             }}></Error>
-            <div className='detail-wrap'>
-                <div className='import-title'>Excel文件</div>
-                <div className='import-sub-title'>导入选项</div>
-                <ul className='import-options'>
-                    <li>
-                        <label title='忽略工作簿中所有样式设置。如果您只关注工作簿中的数据且遇到了性能问题，可勾选此项。'>
-                            <input
+            <DetailWrap>
+                <DetailTitle>Excel文件</DetailTitle>
+                <DetailSubTitle>导入选项</DetailSubTitle>
+                <DetialOptions>
+                    <DetailOption>
+                        <DetailLabel title='忽略工作簿中所有样式设置。如果您只关注工作簿中的数据且遇到了性能问题，可勾选此项。'>
+                            <DetailInput
                                 type='checkbox'
                                 checked={cfg.ignoreStyle}
                                 onChange={(evt) => {
@@ -96,13 +110,13 @@ function ExcelImport(props) {
                                         };
                                     });
                                 }}
-                            ></input>
-                            <span>忽略样式</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label title='忽略工作簿中所有公式设置。如果您不需要使用工作簿中的公式，仅需要显示值，可勾选此项。'>
-                            <input
+                            ></DetailInput>
+                            <DetailDesc>忽略样式</DetailDesc>
+                        </DetailLabel>
+                    </DetailOption>
+                    <DetailOption>
+                        <DetailLabel title='忽略工作簿中所有公式设置。如果您不需要使用工作簿中的公式，仅需要显示值，可勾选此项。'>
+                            <DetailInput
                                 type='checkbox'
                                 checked={cfg.ignoreFormula}
                                 onChange={(evt) => {
@@ -113,13 +127,13 @@ function ExcelImport(props) {
                                         };
                                     });
                                 }}
-                            ></input>
-                            <span>忽略公式</span>
-                        </label>
-                    </li>
-                    <li>
-                        <label title='导入文件后将重新进行计算。勾选此项可禁用自动计算，提高初始加载性能。'>
-                            <input
+                            ></DetailInput>
+                            <DetailDesc>忽略公式</DetailDesc>
+                        </DetailLabel>
+                    </DetailOption>
+                    <DetailOption>
+                        <DetailLabel title='导入文件后将重新进行计算。勾选此项可禁用自动计算，提高初始加载性能。'>
+                            <DetailInput
                                 type='checkbox'
                                 name=''
                                 checked={cfg.doNotRecalculateAfterLoad}
@@ -132,29 +146,28 @@ function ExcelImport(props) {
                                         };
                                     });
                                 }}
-                            ></input>
-                            <span>导入后不自动计算公式</span>
-                        </label>
-                    </li>
-                </ul>
-                <div
-                    className='import-operation'
+                            ></DetailInput>
+                            <DetailDesc>导入后不自动计算公式</DetailDesc>
+                        </DetailLabel>
+                    </DetailOption>
+                </DetialOptions>
+                <ImportButtonWrap
                     onClick={() => {
                         importHandler();
                     }}
                 >
-                    <div className='excelIcon'></div>
-                    <div className='title'>导入Excel文件</div>
-                </div>
-                <div style={{ display: 'none' }}>
+                    <ExcelIcon></ExcelIcon>
+                    <IconTitle>导入Excel文件</IconTitle>
+                </ImportButtonWrap>
+                <None>
                     <input
                         type='file'
                         accept='.xlsx'
                         ref={iptRef}
                         onChange={handleFileChange}
                     ></input>
-                </div>
-            </div>
+                </None>
+            </DetailWrap>
         </Fragment>
     );
 }
