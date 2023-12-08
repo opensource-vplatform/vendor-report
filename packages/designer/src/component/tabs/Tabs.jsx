@@ -1,18 +1,47 @@
-import { Fragment, useState } from 'react';
+import {
+  Fragment,
+  useState,
+} from 'react';
+
+import styled from 'styled-components';
 
 import Context from './Context';
 
-const activeHeaderStyle = {
-    paddingBottom: 1,
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
-    borderBottom: 'none',
-    borderTop: 'solid 1px lightgray',
-    borderLeft: 'solid 1px lightgray',
-    borderRight: 'solid 1px lightgray',
-    background: 'white',
-    cursor: 'pointer',
-};
+const Headers = styled.ul`
+    border: solid 1px lightgray;
+    background-color: white;
+    margin: 0px;
+    padding: 0px;
+`;
+
+const Header = styled.li`
+    border-bottom: none;
+    bottom: -1px;
+    cursor: pointer;
+    display: inline-block;
+    list-style: none;
+    font-size: 12px;
+    position: relative;
+    &[data-active='true'] {
+        padding-bottom: 1px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        border: solid 1px lightgray;
+        border-bottom: none;
+        background-color: white;
+        cursor: pointer;
+    }
+`;
+
+const TitleWrap = styled.a`
+    padding: 6px 12px 6px 12px;
+    display: block;
+    color: #333;
+    cursor: pointer;
+    &[data-active='true'] {
+        cursor: text;
+    }
+`;
 
 function Tabs(props) {
     let { value, children } = props;
@@ -21,45 +50,16 @@ function Tabs(props) {
         return typeof value == 'undefined' ? tabs[0].props.code : value;
     });
     const headers = (
-        <ul
-            style={{
-                border: 'solid 1px lightgray',
-                background: 'white',
-                margin: 0,
-                padding: 0,
-            }}
-        >
+        <Headers>
             {children.map((child) => {
                 const childProps = child.props;
                 const childCode = childProps.code;
                 const onClick = childProps.onClick;
-                const styles = {
-                    borderBottom: 'none',
-                    bottom: '-1px',
-                    cursor: 'pointer',
-                    display: 'inline-block',
-                    listStyle: 'none',
-                    //padding: '6px 12px',
-                    fontSize: '12px',
-                    position: 'relative',
-                };
                 const actived = childCode == active;
-                if (actived) {
-                    Object.assign(styles, activeHeaderStyle);
-                }
                 let children = childProps.title;
                 children =
                     typeof children == 'string' ? (
-                        <a
-                            style={{
-                                padding: '6px 12px 6px 12px',
-                                display: 'block',
-                                color: '#333',
-                                cursor: actived ? 'text' : 'pointer',
-                            }}
-                        >
-                            {children}
-                        </a>
+                        <TitleWrap data-active={actived}>{children}</TitleWrap>
                     ) : (
                         children
                     );
@@ -67,18 +67,18 @@ function Tabs(props) {
                     typeof onClick == 'function' ? onClick : setActive;
                 return (
                     <Fragment key={childCode}>
-                        <li
-                            style={styles}
+                        <Header
+                            data-active={actived}
                             onClick={() => {
                                 clickHandler(childCode);
                             }}
                         >
                             {children}
-                        </li>
+                        </Header>
                     </Fragment>
                 );
             })}
-        </ul>
+        </Headers>
     );
     return (
         <Fragment>

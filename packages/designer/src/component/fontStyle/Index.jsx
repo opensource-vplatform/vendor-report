@@ -52,7 +52,7 @@ export default function (props) {
         isUnderline = false,
         isDoubleUnderline = false,
         backColor,
-        foreColor
+        foreColor,
     } = useSelector(({ fontSlice }) => fontSlice);
 
     const _setFontAction = useFontAction();
@@ -155,19 +155,19 @@ export default function (props) {
         spread.focus(true);
     };
 
-    const setBackColor = function(color){
+    const setBackColor = function (color) {
         _setFontAction({
             value: color,
-            property: 'backColor'
+            property: 'backColor',
         });
-    }
+    };
 
-    const setForceColor = function(color){
+    const setForceColor = function (color) {
         _setFontAction({
             value: color,
-            property: 'foreColor'
+            property: 'foreColor',
         });
-    }
+    };
     const fontFamilies = getFontFamilies();
     const fontSizes = getFontSizes();
     const borders = getBorderEnums();
@@ -183,7 +183,7 @@ export default function (props) {
                 <DropdownBox
                     datas={fontSizes}
                     className='fontSize'
-                    style={{ width: '50px' }}
+                    style={{ width: '50px', borderLeft: 'none' }}
                     optionStyle={{ width: '50px' }}
                     onChange={_fontSizeClickHandler}
                 ></DropdownBox>
@@ -235,7 +235,11 @@ export default function (props) {
                 <ColorEditor onChange={setBackColor} value={backColor}>
                     <BackColor tips='填充颜色'></BackColor>
                 </ColorEditor>
-                <ColorEditor nonable={false} onChange={setForceColor} value={foreColor}>
+                <ColorEditor
+                    nonable={false}
+                    onChange={setForceColor}
+                    value={foreColor}
+                >
                     <ForeColor tips='字体颜色'></ForeColor>
                 </ColorEditor>
             </ItemList>
