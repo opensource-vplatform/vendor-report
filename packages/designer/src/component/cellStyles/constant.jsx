@@ -28,7 +28,7 @@ export const FormatNumber = {
 };
 
 export const AccountingSymbol = [
-    ['无', null, null],
+    ['无', '', null],
     ['$', '$', 'en-US'],
     ['¥(Chinese)', '¥', 'zh-cn'],
     ['¥(Japanese)', '¥', 'ja-jp'],
@@ -80,15 +80,14 @@ export const FractionType = [
     '以10为分母(3/10)',
     '百分之几(30/100)',
 ];
-// 有待验证
-export const currencyNegativeNumbers = {
+export const CurrencyNegativeNumbers = {
     number1: '-1,234.10',
-    'red:number2': '1,234.10',
-    number3: '-1,234.10',
-    'red:number4': '-1,234.10',
+    rednumber2: '1,234.10',
+    number3: '(1,234.10)',
+    rednumber4: '1,234.10',
 };
 
-export const specialFormats = [
+export const SpecialFormats = [
     '00000',
     '00000-0000',
     '[<=9999999]###-####;(###) ###-####',

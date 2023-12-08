@@ -4,6 +4,7 @@ import Index from '../dialog/Index';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
 import Integer from '../integer/Index';
+import Button from '../button/Index';
 import {
     Categories,
     FormatNumber,
@@ -11,6 +12,8 @@ import {
     LocaleType,
     TimeFormats,
     DateFormats,
+    CurrencyNegativeNumbers,
+    SpecialFormats,
 } from './constant';
 import './CellStyleSetting.scss';
 function CellStyleSetting(props) {
@@ -18,7 +21,8 @@ function CellStyleSetting(props) {
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
-    const [selectedValue, setSelectedValue] = useState('general');
+    const [selectedValue, setSelectedCategoriesValue] = useState('general');
+    const [selectedSymbol, setSelectedSymbolValue] = useState('');
     const [exampleValue, setExampleValue] = useState(
         firstCellValue ? firstCellValue : '12345'
     );
@@ -37,23 +41,23 @@ function CellStyleSetting(props) {
         firstCellValue = activeSheet.getValue(startRow, startColumn);
     }
 
-    useEffect(() => {
-        if (!firstCellValue) return;
-        // 当选择的是百分比，则初始化时示例值将百分号加到第一个值后面
-        if (selectedValue === 'percentage') {
-            const value = formatNumberDecimal(
-                firstCellValue,
-                decimalPlacesValue
-            );
-            setExampleValue(value.concat('', '%'));
-        } else {
-            const value = formatNumberDecimal(
-                firstCellValue,
-                decimalPlacesValue
-            );
-            setExampleValue(value);
-        }
-    }, [firstCellValue, selectedValue]);
+    // useEffect(() => {
+    //     if (!firstCellValue) return;
+    //     // 当选择的是百分比，则初始化时示例值将百分号加到第一个值后面
+    //     if (selectedValue === 'percentage') {
+    //         const value = formatNumberDecimal(
+    //             firstCellValue,
+    //             decimalPlacesValue
+    //         );
+    //         setExampleValue(value.concat('', '%'));
+    //     } else {
+    //         const value = formatNumberDecimal(
+    //             firstCellValue,
+    //             decimalPlacesValue
+    //         );
+    //         setExampleValue(value);
+    //     }
+    // }, [firstCellValue, selectedValue]);
 
     let commandManager = spread?.commandManager();
 
@@ -122,70 +126,53 @@ function CellStyleSetting(props) {
         false
     );
 
-    /*  const Tabs = ({ children }) => {
-        const [activeTab, setActiveTab] = useState(0);
-
-        const handleClick = (index) => {
-            setActiveTab(index);
-        };
-
-        return (
-            <div className='tabBox'>
-                <div className='header'>
-                    {React.Children.map(children, (child, index) => (
-                        <button
-                            onClick={() => handleClick(index)}
-                            className={
-                                index === activeTab
-                                    ? 'activeTab'
-                                    : 'unActiveTab'
-                            }
-                        >
-                            {child.props.label}
-                        </button>
-                    ))}
-                </div>
-                <div className='content'>
-                    {React.Children.toArray(children)[activeTab]}
-                </div>
-            </div>
-        );
-    };
-
-    const TabPane = ({ children }) => {
-        return <>{children}</>;
-    }; */
-
-    const handleSelectChange = (event) => {
+    const handleSelectCategoriesChange = (event) => {
         const selectedOptionValue = event.target.value;
-        setSelectedValue(selectedOptionValue);
+        setSelectedCategoriesValue(selectedOptionValue);
+    };
+    const handleSelectSymbolChange = (event) => {
+        const selectedSymbolValue = event.target.value;
+        setSelectedSymbolValue(selectedSymbolValue);
     };
 
     // 处理千位分隔符
     const handleCheckboxChange = (event) => {
         setCheckboxOfThousandSeparator(event.target.checked);
-        if (!exampleValue) {
-            return;
-        } else if (event.target.checked === false) {
-            if (typeof exampleValue === 'number') {
-                return;
-            }
-            const stringWithoutCommas = exampleValue.replace(/,/g, '');
-            const numberValue = parseFloat(stringWithoutCommas);
-            setExampleValue(numberValue);
-        } else {
-            const newValue = exampleValue
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            console.log('newValue :>> ', newValue);
-            setExampleValue(newValue);
-        }
     };
+    // 格式化千位分割符
+    function formatThousandSeparator(number, isCheck) {
+        if (!number) {
+            return number;
+        } else if (isCheck === false) {
+            const stringWithoutCommas = number.replace(/,/g, '');
+            return parseFloat(stringWithoutCommas);
+        } else {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+    }
 
-    // 小数位数格式化
+    // 格式化小数位数
     function formatNumberDecimal(number, decimalPlaces) {
+        // if (isNaN(number)) {
+        //     return number;
+        // }
+
         // 将数字转换为字符串
-        const numberString = number.toString();
+        let numberString = number.toString();
+
+        let symbolString = '';
+        // 兼容带括号、货币字符串处理
+
+        // 没有匹配到，因为传入的不是示例
+        let isIncludedBracket =
+            numberString.includes('(') ||
+            numberString.includes('$') ||
+            numberString.includes('₩') ||
+            numberString.includes('¥');
+        if (isIncludedBracket) {
+            symbolString = numberString.split('')[0];
+            numberString = numberString.replace(/\(|\)|¥|$|₩/g, '');
+        }
 
         // 检查是否存在小数点
         const hasDecimal = numberString.includes('.');
@@ -213,21 +200,57 @@ function CellStyleSetting(props) {
         if (decimalPlaces === 0) {
             return numberString.split('.')[0];
         }
+        if (isIncludedBracket) {
+            if (!symbolString) {
+                newValue = symbolString.concat('', newValue);
+            }
+            return `(${newValue})`;
+        }
         return newValue;
     }
     // 处理小数位数
     const handleDecimalValue = (decimalPlaces) => {
         setDecimalPlacesValue(decimalPlaces);
-        if (!exampleValue) {
-            return;
-        }
-        const newValue = formatNumberDecimal(firstCellValue, decimalPlaces);
-        if (selectedValue === 'percentage') {
-            setExampleValue(newValue.concat('', '%'));
-            return;
-        }
-        setExampleValue(newValue);
     };
+
+    const handleApply = () => {
+        setIsOpen(false);
+    };
+    const handleCancel = () => {
+        setIsOpen(false);
+    };
+    const handleClose = () => {
+        setIsOpen(false);
+    };
+
+    useEffect(() => {
+        let tempValue;
+        tempValue = formatThousandSeparator(
+            exampleValue,
+            checkboxOfThousandSeparator
+        );
+
+        //处理小数
+        tempValue = formatNumberDecimal(tempValue, decimalPlacesValue);
+        if (selectedValue === 'percentage') {
+            tempValue = tempValue.concat('', '%');
+            if (decimalPlacesValue === 0)
+                tempValue = tempValue.slice(0, tempValue.length - 1);
+            setExampleValue(tempValue);
+            return;
+        }
+        if (selectedValue === 'currency' || selectedValue === 'accounting') {
+            if (selectedSymbol === '无')
+                tempValue = tempValue.slice(0, tempValue.length - 1);
+            tempValue = selectedSymbol.split('(')[0].concat('', tempValue);
+        }
+        setExampleValue(tempValue);
+    }, [
+        decimalPlacesValue,
+        checkboxOfThousandSeparator,
+        selectedValue,
+        selectedSymbol,
+    ]);
 
     return isOpen ? (
         <Index
@@ -236,6 +259,7 @@ function CellStyleSetting(props) {
             height='630px'
             open={true}
             mask={true}
+            onClose={handleClose}
         >
             <div className='tabBox'>
                 <Tabs value='数字'>
@@ -248,10 +272,10 @@ function CellStyleSetting(props) {
                                 id='categoryList'
                                 size={16}
                                 value={selectedValue}
-                                onChange={handleSelectChange}
+                                onChange={handleSelectCategoriesChange}
                             >
                                 {Object.keys(Categories).map((key) => (
-                                    <option value={key}>
+                                    <option key={key} value={key}>
                                         {Categories[key]}
                                     </option>
                                 ))}
@@ -307,14 +331,17 @@ function CellStyleSetting(props) {
                                         name='currencySelect'
                                         id='currencySelect'
                                         size={1}
-                                        // value={selectedValue}
+                                        value={selectedSymbol}
+                                        onChange={handleSelectSymbolChange}
                                     >
-                                        <option value='general'>￥</option>
-                                        <option value='numbers'>$</option>
-                                        <option value='currency'>K</option>
-                                        <option value='accounting'>
-                                            会计专用
-                                        </option>
+                                        {AccountingSymbol.map((item, index) => (
+                                            <option
+                                                key={`currency${index}`}
+                                                value={item[1]}
+                                            >
+                                                {item[1]}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                             )}
@@ -327,10 +354,28 @@ function CellStyleSetting(props) {
                                         id='negative-number-list'
                                         size={6}
                                     >
-                                        <option value='xxxx'>xxxx</option>
-                                        <option value='xxx'>xxx</option>
-                                        <option value='xx'>xx</option>
-                                        <option value='x'>x</option>
+                                        {Object.keys(
+                                            CurrencyNegativeNumbers
+                                        ).map((key) => {
+                                            let negative = formatNumberDecimal(
+                                                CurrencyNegativeNumbers[key],
+                                                decimalPlacesValue
+                                            );
+
+                                            return (
+                                                <option
+                                                    key={key}
+                                                    className={
+                                                        key.includes('red')
+                                                            ? 'redNumer'
+                                                            : null
+                                                    }
+                                                    value={key}
+                                                >
+                                                    {negative}
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
                             )}
@@ -349,7 +394,10 @@ function CellStyleSetting(props) {
                                         {selectedValue === 'time' &&
                                             Object.keys(TimeFormats).map(
                                                 (key) => (
-                                                    <option value={key}>
+                                                    <option
+                                                        key={key}
+                                                        value={key}
+                                                    >
                                                         {TimeFormats[key]}
                                                     </option>
                                                 )
@@ -357,7 +405,10 @@ function CellStyleSetting(props) {
                                         {selectedValue === 'date' &&
                                             Object.keys(DateFormats).map(
                                                 (key) => (
-                                                    <option value={key}>
+                                                    <option
+                                                        key={key}
+                                                        value={key}
+                                                    >
                                                         {DateFormats[key]}
                                                     </option>
                                                 )
@@ -372,7 +423,7 @@ function CellStyleSetting(props) {
                                     <span>区域设置（国家/地区）: </span>
                                     <select name='locale' id='locale' size={1}>
                                         {Object.keys(LocaleType).map((key) => (
-                                            <option value={key}>
+                                            <option key={key} value={key}>
                                                 {LocaleType[key]}
                                             </option>
                                         ))}
@@ -397,6 +448,15 @@ function CellStyleSetting(props) {
                         <p>Content for 保护 </p>
                     </Tab>
                 </Tabs>{' '}
+            </div>
+
+            <div className='bottomButtons'>
+                <Button title={'确定'} onClick={handleApply}>
+                    确定
+                </Button>
+                <Button title={'取消'} onClick={handleCancel}>
+                    取消
+                </Button>
             </div>
         </Index>
     ) : null;
