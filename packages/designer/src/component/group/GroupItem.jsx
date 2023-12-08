@@ -48,8 +48,6 @@ const MoreIcon = styled.div`
 const Content = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    justify-content: space-evenly;
     align-items: flex;
     padding: 4px 2px;
     height: 100%;

@@ -21,6 +21,7 @@ import { resetCellFont } from './store/fontSlice/fontSlice';
 import FileTab from './tabs/file/Index';
 import StartTab from './tabs/start/Index';
 import TestTab from './tabs/test/Index';
+import ViewTab from './tabs/view/Index';
 
 function Designer(props) {
     const dispatch = useDispatch();
@@ -69,6 +70,9 @@ function Designer(props) {
                 </Tab>
                 <Tab code='start' title='开始'>
                     <StartTab />
+                </Tab>
+                <Tab code='view' title='视图'>
+                    <ViewTab></ViewTab>
                 </Tab>
                 <Tab code='test' title='组件测试'>
                     <TestTab />

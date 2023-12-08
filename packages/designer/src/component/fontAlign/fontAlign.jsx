@@ -6,7 +6,9 @@ import styled from 'styled-components';
 
 import {
   GroupItem,
+  HLayout,
   ItemList,
+  VGroupItem,
 } from '@components/group/Index';
 import AlignCenter from '@icons/align/AlignCenter';
 import AlignLeft from '@icons/align/AlignLeft';
@@ -92,20 +94,6 @@ function FontAlign(props) {
     //底端对齐
     const _bottomAlignClickHandler = function () {
         _AlignAction('vAlign', 2);
-    };
-
-    //竖排文字
-    const _verticalTextClickHandler = function () {
-        const value = !isVerticalText;
-        _setStyle({
-            value,
-            attribute: 'isVerticalText',
-            property: 'isVerticalText',
-            dispatchFun: updateFont,
-            dispatchParams: {
-                font: { isVerticalText: value },
-            },
-        });
     };
 
     //文本左对齐
@@ -223,14 +211,8 @@ function FontAlign(props) {
     const mergeTypes = getMergeTypes();
     return (
         <GroupItem title='对齐方式' onMore={() => {}}>
-            <div style={{ display: 'flex' }}>
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        borderRight: 'solid 1px lightgray',
-                    }}
-                >
+            <HLayout>
+                <VGroupItem>
                     <ItemList>
                         <VAlignTop
                             tips='顶端对齐'
@@ -287,8 +269,8 @@ function FontAlign(props) {
                             onClick={_increaseIndentClickHandler}
                         ></IncreaseIndent>
                     </ItemList>
-                </div>
-                <div>
+                </VGroupItem>
+                <VGroupItem>
                     <ItemList>
                         <div onClick={_wrapTextClickHandler}>
                             <BreakLine tips='自动换行'><Label>自动换行</Label></BreakLine>
@@ -308,8 +290,8 @@ function FontAlign(props) {
                             <ArrowDown tips='合并后居中'></ArrowDown>
                         </DropdownBox>
                     </ItemList>
-                </div>
-            </div>
+                </VGroupItem>
+            </HLayout>
         </GroupItem>
     );
 }
