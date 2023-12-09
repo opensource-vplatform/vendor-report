@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import GC from '@grapecity/spread-sheets';
+import {} from '@grapecity/spread-sheets';
 import Index from '../dialog/Index';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
@@ -22,7 +24,8 @@ function CellStyleSetting(props) {
     const [isOpen, setIsOpen] = useState(false);
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
     const [selectedValue, setSelectedCategoriesValue] = useState('general');
-    const [selectedSymbol, setSelectedSymbolValue] = useState('');
+    const [selectedSymbol, setSelectedSymbol] = useState('');
+    const [selectedTimeFormat, setSelectedTimeFormat] = useState('1:30:00 PM');
     const [exampleValue, setExampleValue] = useState(
         firstCellValue ? firstCellValue : '12345'
     );
@@ -41,22 +44,10 @@ function CellStyleSetting(props) {
         firstCellValue = activeSheet.getValue(startRow, startColumn);
     }
 
+    // 获取并初始化单元格值
     // useEffect(() => {
     //     if (!firstCellValue) return;
-    //     // 当选择的是百分比，则初始化时示例值将百分号加到第一个值后面
-    //     if (selectedValue === 'percentage') {
-    //         const value = formatNumberDecimal(
-    //             firstCellValue,
-    //             decimalPlacesValue
-    //         );
-    //         setExampleValue(value.concat('', '%'));
-    //     } else {
-    //         const value = formatNumberDecimal(
-    //             firstCellValue,
-    //             decimalPlacesValue
-    //         );
-    //         setExampleValue(value);
-    //     }
+    //     setExampleValue(firstCellValue);
     // }, [firstCellValue, selectedValue]);
 
     let commandManager = spread?.commandManager();
@@ -132,22 +123,58 @@ function CellStyleSetting(props) {
     };
     const handleSelectSymbolChange = (event) => {
         const selectedSymbolValue = event.target.value;
-        setSelectedSymbolValue(selectedSymbolValue);
+        setSelectedSymbol(selectedSymbolValue);
     };
 
     // 处理千位分隔符
     const handleCheckboxChange = (event) => {
         setCheckboxOfThousandSeparator(event.target.checked);
     };
+
+    const handleTimeFonmatChange = (event) => {
+        const selectedTimeFormat = event.target.value;
+        setSelectedTimeFormat(selectedTimeFormat);
+    };
     // 格式化千位分割符
     function formatThousandSeparator(number, isCheck) {
         if (!number) {
             return number;
-        } else if (isCheck === false) {
+        }
+        number = number.toString();
+        if (isCheck === false) {
             const stringWithoutCommas = number.replace(/,/g, '');
             return parseFloat(stringWithoutCommas);
         } else {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+    }
+
+    //格式化货币字符
+    function formatCurrencySymbol(number, symbol) {
+        if (!number) return;
+        let numberString = number.toString();
+        if (symbol === '') {
+            if (
+                numberString.includes('$') ||
+                numberString.includes('¥') ||
+                numberString.includes('₩')
+            ) {
+                numberString = numberString.replace(/[$¥₩]/g, '');
+                return numberString;
+            } else {
+                return numberString;
+            }
+        } else {
+            if (
+                numberString.includes('$') ||
+                numberString.includes('¥') ||
+                numberString.includes('₩')
+            ) {
+                return numberString;
+            } else {
+                let value = symbol.split('')[0].concat('', numberString);
+                return value;
+            }
         }
     }
 
@@ -156,24 +183,14 @@ function CellStyleSetting(props) {
         // if (isNaN(number)) {
         //     return number;
         // }
-
+        if (!number) return;
         // 将数字转换为字符串
         let numberString = number.toString();
-
-        let symbolString = '';
-        // 兼容带括号、货币字符串处理
-
-        // 没有匹配到，因为传入的不是示例
-        let isIncludedBracket =
-            numberString.includes('(') ||
-            numberString.includes('$') ||
-            numberString.includes('₩') ||
-            numberString.includes('¥');
+        // 兼容带括号字符串处理
+        let isIncludedBracket = numberString.includes('(');
         if (isIncludedBracket) {
-            symbolString = numberString.split('')[0];
-            numberString = numberString.replace(/\(|\)|¥|$|₩/g, '');
+            numberString = numberString.replace(/\(|\)/g, '');
         }
-
         // 检查是否存在小数点
         const hasDecimal = numberString.includes('.');
 
@@ -201,9 +218,6 @@ function CellStyleSetting(props) {
             return numberString.split('.')[0];
         }
         if (isIncludedBracket) {
-            if (!symbolString) {
-                newValue = symbolString.concat('', newValue);
-            }
             return `(${newValue})`;
         }
         return newValue;
@@ -212,6 +226,23 @@ function CellStyleSetting(props) {
     const handleDecimalValue = (decimalPlaces) => {
         setDecimalPlacesValue(decimalPlaces);
     };
+
+    // 格式化时间方法
+    function formatTime(timeStr, formatKey) {
+        // 创建Globalize实例
+        let globalize = new Globalize();
+
+        // 设置时间格式
+        globalize.dateTimeFormat = TimeFormats[formatKey];
+
+        // let culture = new GC.Spread.Common.CultureInfo();
+
+        //     culture.DateTimeFormat = TimeFormats[formatKey];
+
+        //     let formattedTime = culture.format(new Date(timeStr));
+        //     console.log('formattedTime :>> ', formattedTime);
+        return globalize.format(timeStr);
+    }
 
     const handleApply = () => {
         setIsOpen(false);
@@ -224,26 +255,33 @@ function CellStyleSetting(props) {
     };
 
     useEffect(() => {
-        let tempValue;
+        let tempValue = firstCellValue;
         tempValue = formatThousandSeparator(
-            exampleValue,
+            tempValue,
             checkboxOfThousandSeparator
         );
 
         //处理小数
         tempValue = formatNumberDecimal(tempValue, decimalPlacesValue);
+
         if (selectedValue === 'percentage') {
             tempValue = tempValue.concat('', '%');
             if (decimalPlacesValue === 0)
                 tempValue = tempValue.slice(0, tempValue.length - 1);
-            setExampleValue(tempValue);
-            return;
         }
-        if (selectedValue === 'currency' || selectedValue === 'accounting') {
-            if (selectedSymbol === '无')
-                tempValue = tempValue.slice(0, tempValue.length - 1);
-            tempValue = selectedSymbol.split('(')[0].concat('', tempValue);
+
+        //处理货币
+        if (selectedValue === 'currency' || 'accounting') {
+            tempValue = formatCurrencySymbol(tempValue, selectedSymbol);
         }
+
+        // 处理时间格式
+        if (selectedValue === 'time') {
+            if (tempValue !== '') {
+                tempValue = formatTime(tempValue, selectedTimeFormat);
+            }
+        }
+
         setExampleValue(tempValue);
     }, [
         decimalPlacesValue,
@@ -337,9 +375,9 @@ function CellStyleSetting(props) {
                                         {AccountingSymbol.map((item, index) => (
                                             <option
                                                 key={`currency${index}`}
-                                                value={item[1]}
+                                                value={item[0]}
                                             >
-                                                {item[1]}
+                                                {item[0]}
                                             </option>
                                         ))}
                                     </select>
@@ -361,6 +399,9 @@ function CellStyleSetting(props) {
                                                 CurrencyNegativeNumbers[key],
                                                 decimalPlacesValue
                                             );
+                                            const symbol = selectedSymbol
+                                                ? selectedSymbol.split('')[0]
+                                                : '';
 
                                             return (
                                                 <option
@@ -372,7 +413,7 @@ function CellStyleSetting(props) {
                                                     }
                                                     value={key}
                                                 >
-                                                    {negative}
+                                                    {`${symbol}${negative}`}
                                                 </option>
                                             );
                                         })}
@@ -390,6 +431,8 @@ function CellStyleSetting(props) {
                                         name='negative-number-list'
                                         id='negative-number-list'
                                         size={4}
+                                        value={selectedTimeFormat}
+                                        onChange={handleTimeFonmatChange}
                                     >
                                         {selectedValue === 'time' &&
                                             Object.keys(TimeFormats).map(

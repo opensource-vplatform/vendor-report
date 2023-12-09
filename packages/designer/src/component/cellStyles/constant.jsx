@@ -28,7 +28,7 @@ export const FormatNumber = {
 };
 
 export const AccountingSymbol = [
-    ['无', '', null],
+    ['', '', null],
     ['$', '$', 'en-US'],
     ['¥(Chinese)', '¥', 'zh-cn'],
     ['¥(Japanese)', '¥', 'ja-jp'],
@@ -38,17 +38,18 @@ export const LocaleType = {
     en_us: '英语(美国)',
     ja_jp: '日语',
 };
-export const TimeFormats = [
-    '[$-F400]h:mm:ss AM/PM',
-    'h:mm;@',
-    '[$-409]h:mm AM/PM;@',
-    'h:mm:ss;@',
-    '[$-409]h:mm:ss AM/PM;@',
-    'mm:ss.0;@',
-    '[h]:mm:ss;@',
-    '[$-409]m/d/yy h:mm AM/PM;@',
-    'm/d/yy h:mm;@',
-];
+export const TimeFormats = {
+    '1:30:00 PM': 'h:mm:ss tt',
+    '13:30': 'HH:mm',
+    '1:30 PM': 'h:mm tt',
+    '13:30:00': 'HH:mm:ss',
+    '1:30:00 PM': 'h:mm:ss tt',
+    '30:00.0': 'mm:ss.f',
+    '887149:30:00': 'H:mm:ss',
+    '3/14/01 1:30 PM': 'M/d/yy h:mm tt',
+    '3/14/01 13:30': 'M/d/yy HH:mm',
+};
+
 export const DateFormats = [
     'm/d/yyyy',
     '[$-F800]dddd, mmmm dd, yyyy',
