@@ -18,6 +18,7 @@ import {
 } from './component/tabs/Index';
 import { setSpread } from './store/appSlice/appSlice';
 import { resetCellFont } from './store/fontSlice/fontSlice';
+import { resetView } from './store/viewSlice/viewSlice';
 import FileTab from './tabs/file/Index';
 import StartTab from './tabs/start/Index';
 import TestTab from './tabs/test/Index';
@@ -86,6 +87,10 @@ function Designer(props) {
                     }}
                     enterCell={function (event, spread) {
                         dispatch(resetCellFont());
+                    }}
+                    activeSheetChanged={(evt,spread)=>{
+                        dispatch(resetCellFont());
+                        dispatch(resetView());
                     }}
                 >
                     <Worksheet

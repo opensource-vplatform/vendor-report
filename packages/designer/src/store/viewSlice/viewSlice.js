@@ -1,9 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { parseFont } from '../../utils/fontUtil';
 import { setSpread } from '../appSlice/appSlice';
 
-export const fontSlice = createSlice({
+export const viewSlice = createSlice({
     name: 'viewSlice',
     initialState: {
         spread: null,
@@ -17,41 +16,44 @@ export const fontSlice = createSlice({
         showVerticalGridline: true,
         //显示新增sheet图标
         newTabVisible: true,
+        //显示工作表选项卡
+        tabStripVisible:true
     },
     reducers: {
-        toggleFontStyle(state) {
-            state.fontStyle =
-                state.fontStyle === 'normal' ? 'italic' : 'normal';
+        setColHeaderVisible(state,action){
+            const visible = action.payload.visible;
+            state.colHeaderVisible = visible;
         },
-        toggleFontWeight(state) {
-            state.fontWeight =
-                state.fontWeight === 'normal' ? 'bold' : 'normal';
+        setRowHeaderVisible(state,action){
+            const visible = action.payload.visible;
+            state.rowHeaderVisible = visible;
         },
-        toggleFont(state, action) {
-            //切换状态为布尔值的属性
-            const hasOwnProperty = Object.prototype.hasOwnProperty;
-            if (Array.isArray(action.payload)) {
-                action.payload.forEach(function (key) {
-                    if (hasOwnProperty.call(state, key)) {
-                        state[key] = !state[key];
-                    }
-                });
-            } else {
-                if (hasOwnProperty.call(state, action.payload)) {
-                    state[action.payload] = !state[action.payload];
-                }
-            }
+        setShowHorizontalGridline(state,action){
+            const visible = action.payload.visible;
+            state.showHorizontalGridline = visible;
         },
-        updateFont(state, action) {
-            const font = action.payload.font;
-            Object.entries(font).forEach(function ([key, value]) {
-                state[key] = value;
-            });
+        setShowVerticalGridline(state,action){
+            const visible = action.payload.visible;
+            state.showVerticalGridline = visible;
         },
-        resetCellFont(state) {
-            //切换单元格会重置状态
-            Object.assign(state, parseFont(state.spread));
+        setNewTabVisible(state,action){
+            const visible = action.payload.visible;
+            state.newTabVisible = visible;
         },
+        setTabStripVisible(state,action){
+            const visible = action.payload.visible;
+            state.tabStripVisible = visible;
+        },
+        resetView(state,action){
+            const spread = state.spread;
+            state.tabStripVisible = spread.options.tabStripVisible
+            state.newTabVisible = spread.options.newTabVisible;
+            const sheet = spread.getActiveSheet();
+            state.colHeaderVisible = sheet.options.colHeaderVisible;
+            state.rowHeaderVisible = sheet.options.rowHeaderVisible;
+            state.showHorizontalGridline = sheet.options.gridline.showHorizontalGridline;
+            state.showVerticalGridline = sheet.options.gridline.showVerticalGridline;
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(setSpread, (state, action) => {
@@ -60,10 +62,12 @@ export const fontSlice = createSlice({
     },
 });
 export const {
-    toggleFontWeight,
-    resetCellFont,
-    toggleFontStyle,
-    updateFont,
-    toggleFont,
-} = fontSlice.actions;
-export default fontSlice.reducer;
+    setColHeaderVisible,
+    setRowHeaderVisible,
+    setShowHorizontalGridline,
+    setShowVerticalGridline,
+    setNewTabVisible,
+    setTabStripVisible,
+    resetView,
+} = viewSlice.actions;
+export default viewSlice.reducer;
