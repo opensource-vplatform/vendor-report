@@ -230,18 +230,14 @@ function CellStyleSetting(props) {
     // 格式化时间方法
     function formatTime(timeStr, formatKey) {
         // 创建Globalize实例
-        let globalize = new Globalize();
-
+        // let globalize = new Globalize();
         // 设置时间格式
-        globalize.dateTimeFormat = TimeFormats[formatKey];
-
+        // globalize.dateTimeFormat = TimeFormats[formatKey];
         // let culture = new GC.Spread.Common.CultureInfo();
-
         //     culture.DateTimeFormat = TimeFormats[formatKey];
-
         //     let formattedTime = culture.format(new Date(timeStr));
         //     console.log('formattedTime :>> ', formattedTime);
-        return globalize.format(timeStr);
+        // return globalize.format(timeStr);
     }
 
     const handleApply = () => {
@@ -255,7 +251,7 @@ function CellStyleSetting(props) {
     };
 
     useEffect(() => {
-        let tempValue = firstCellValue;
+        let tempValue = firstCellValue ? firstCellValue : '12345';
         tempValue = formatThousandSeparator(
             tempValue,
             checkboxOfThousandSeparator
@@ -276,11 +272,11 @@ function CellStyleSetting(props) {
         }
 
         // 处理时间格式
-        if (selectedValue === 'time') {
-            if (tempValue !== '') {
-                tempValue = formatTime(tempValue, selectedTimeFormat);
-            }
-        }
+        // if (selectedValue === 'time') {
+        //     if (tempValue !== '') {
+        //         tempValue = formatTime(tempValue, selectedTimeFormat);
+        //     }
+        // }
 
         setExampleValue(tempValue);
     }, [
@@ -441,7 +437,7 @@ function CellStyleSetting(props) {
                                                         key={key}
                                                         value={key}
                                                     >
-                                                        {TimeFormats[key]}
+                                                        {key}
                                                     </option>
                                                 )
                                             )}
