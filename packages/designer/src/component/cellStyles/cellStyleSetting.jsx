@@ -21,14 +21,16 @@ import {
     CustomFormats,
 } from './constant';
 import './CellStyleSetting.scss';
+import List from '../list/List';
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
+    const [isApply, setIsApply] = useState(false);
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
     const [selectedValue, setSelectedCategoriesValue] = useState('general');
     const [selectedSymbol, setSelectedSymbol] = useState('');
-    const [selectedTimeFormat, setSelectedTimeFormat] = useState('1:30:00 PM');
+    const [selectedTimeFormat, setSelectedTimeFormat] = useState('');
     const [exampleValue, setExampleValue] = useState(
         firstCellValue ? firstCellValue : '12345'
     );
@@ -46,12 +48,6 @@ function CellStyleSetting(props) {
         const startColumn = selection.col;
         firstCellValue = activeSheet.getValue(startRow, startColumn);
     }
-
-    // 获取并初始化单元格值
-    // useEffect(() => {
-    //     if (!firstCellValue) return;
-    //     setExampleValue(firstCellValue);
-    // }, [firstCellValue, selectedValue]);
 
     let commandManager = spread?.commandManager();
 
@@ -74,38 +70,6 @@ function CellStyleSetting(props) {
         canUndo: false,
         execute: function () {
             setIsOpen(!isOpen);
-            //设置所选的单元格格式
-            // let style = new GC.Spread.Sheets.Style();
-            // style.name = 'style1';
-            // style.backColor = 'red';
-            // 获取所选的单元格
-            // let sheet = spread.getActiveSheet();
-            // sheet.suspendPaint();
-            // let selections = sheet.getSelections();
-            // let selectionIndex = 0,
-            //     selectionCount = selections.length;
-            // for (; selectionIndex < selectionCount; selectionIndex++) {
-            //     let selection = selections[selectionIndex];
-            //     for (
-            //         let i = selection.row;
-            //         i < selection.row + selection.rowCount;
-            //         i++
-            //     ) {
-            //         for (
-            //             let j = selection.col;
-            //             j < selection.col + selection.colCount;
-            //             j++
-            //         ) {
-            //             sheet.setStyle(
-            //                 i,
-            //                 j,
-            //                 style,
-            //                 GC.Spread.Sheets.SheetArea.viewport
-            //             );
-            //         }
-            //     }
-            // }
-            // sheet.resumePaint();
         },
     };
 
@@ -134,9 +98,8 @@ function CellStyleSetting(props) {
         setCheckboxOfThousandSeparator(event.target.checked);
     };
 
-    const handleTimeFonmatChange = (event) => {
-        const selectedTimeFormat = event.target.value;
-        setSelectedTimeFormat(selectedTimeFormat);
+    const handleTimeFormatChange = (value) => {
+        setSelectedTimeFormat(value);
     };
     // 格式化千位分割符
     function formatThousandSeparator(number, isCheck) {
@@ -191,12 +154,18 @@ function CellStyleSetting(props) {
         setDecimalPlacesValue(decimalPlaces);
     };
 
-    // 格式化时间方法
+    // 格式化接口
     function formatData(formatString) {
         // 获取所选的单元格
         let sheet = spread.getActiveSheet();
         sheet.suspendPaint();
+
         let selections = sheet.getSelections();
+
+        var currentValue = sheet.getValue(selections[0].row, selections[0].col);
+        sheet.setFormatter(selections[0].row, selections[0].col, formatString);
+        sheet.setValue(selections[0].row, selections[0].col, currentValue);
+
         let selectionIndex = 0,
             selectionCount = selections.length;
         for (; selectionIndex < selectionCount; selectionIndex++) {
@@ -217,8 +186,9 @@ function CellStyleSetting(props) {
                 }
             }
         }
+
         sheet.resumePaint();
-        // 返回第一个作为示例值
+        // 返回第一个格式过的数值作为示例值
         return sheet.getText(selections[0].row, selections[0].col);
     }
 
@@ -228,11 +198,17 @@ function CellStyleSetting(props) {
     };
     const handleCancel = () => {
         setIsOpen(false);
-        setSelectedCategoriesValue('general');
+
+        setDecimalPlacesValue(0);
+        setSelectedSymbol('');
+        setSelectedTimeFormat('');
     };
     const handleClose = () => {
         setIsOpen(false);
-        setSelectedCategoriesValue('general');
+
+        setDecimalPlacesValue(0);
+        setSelectedSymbol('');
+        setSelectedTimeFormat('');
     };
 
     useEffect(() => {
@@ -447,6 +423,7 @@ function CellStyleSetting(props) {
                                     </select>
                                 </div>
                             )}
+
                             {(selectedValue === 'date' ||
                                 selectedValue === 'time' ||
                                 selectedValue === 'fractionType' ||
@@ -454,69 +431,57 @@ function CellStyleSetting(props) {
                                 selectedValue === 'custom') && (
                                 <div>
                                     <span>类型：</span>
-                                    <select
-                                        name='negative-number-list'
-                                        id='negative-number-list'
-                                        size={4}
-                                        value={selectedTimeFormat}
-                                        onChange={handleTimeFonmatChange}
-                                    >
-                                        {selectedValue === 'time' &&
-                                            Object.keys(TimeFormats).map(
-                                                (key) => (
-                                                    <option
-                                                        key={key}
-                                                        value={key}
-                                                    >
-                                                        {key.toString()}
-                                                    </option>
-                                                )
+
+                                    {selectedValue === 'time' && (
+                                        <List
+                                            width='480px'
+                                            height='130px'
+                                            values={Object.keys(TimeFormats)}
+                                            selectedValue={selectedTimeFormat}
+                                            onChange={handleTimeFormatChange}
+                                        />
+                                    )}
+                                    {selectedValue === 'date' && (
+                                        <List
+                                            width='480px'
+                                            height='130px'
+                                            values={Object.values(DateFormats)}
+                                            selectedValue={selectedTimeFormat}
+                                            onChange={handleTimeFormatChange}
+                                        />
+                                    )}
+                                    {selectedValue === 'fractionType' && (
+                                        <List
+                                            width='480px'
+                                            height='130px'
+                                            values={Object.values(FractionType)}
+                                            selectedValue={selectedTimeFormat}
+                                            onChange={handleTimeFormatChange}
+                                        />
+                                    )}
+
+                                    {selectedValue === 'special' && (
+                                        <List
+                                            width='480px'
+                                            height='120px'
+                                            values={Object.values(
+                                                SpecialFormats
                                             )}
-                                        {selectedValue === 'date' &&
-                                            Object.values(DateFormats).map(
-                                                (value) => (
-                                                    <option
-                                                        key={value}
-                                                        value={value}
-                                                    >
-                                                        {value.toString()}
-                                                    </option>
-                                                )
+                                            selectedValue={selectedTimeFormat}
+                                            onChange={handleTimeFormatChange}
+                                        />
+                                    )}
+                                    {selectedValue === 'custom' && (
+                                        <List
+                                            width='480px'
+                                            height='130px'
+                                            values={Object.values(
+                                                CustomFormats
                                             )}
-                                        {selectedValue === 'fractionType' &&
-                                            Object.values(FractionType).map(
-                                                (value) => (
-                                                    <option
-                                                        key={value}
-                                                        value={value}
-                                                    >
-                                                        {value.toString()}
-                                                    </option>
-                                                )
-                                            )}
-                                        {selectedValue === 'special' &&
-                                            Object.values(SpecialFormats).map(
-                                                (value) => (
-                                                    <option
-                                                        key={value}
-                                                        value={value}
-                                                    >
-                                                        {value.toString()}
-                                                    </option>
-                                                )
-                                            )}
-                                        {selectedValue === 'custom' &&
-                                            Object.values(CustomFormats).map(
-                                                (value) => (
-                                                    <option
-                                                        key={value}
-                                                        value={value}
-                                                    >
-                                                        {value.toString()}
-                                                    </option>
-                                                )
-                                            )}
-                                    </select>
+                                            selectedValue={selectedTimeFormat}
+                                            onChange={handleTimeFormatChange}
+                                        />
+                                    )}
                                 </div>
                             )}
                             {(selectedValue === 'date' ||

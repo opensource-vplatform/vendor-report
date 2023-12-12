@@ -1,0 +1,32 @@
+.list {
+    margin: 5px 0;
+    border: 1px solid lightgray;
+    overflow: auto;
+    .listItem {
+        height: 25px;
+        margin: 2px;
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 12px;
+        &:hover,
+        :active {
+            background-color: #dbdbdb;
+        }
+    }
+    .listItemSelected {
+        height: 25px;
+        margin: 2px;
+        padding-left: 10px;
+        width: 97%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 12px;
+        background-color: #dbdbdb;
+    }
+    .redNumer {
+        color: red;
+    }
+}
