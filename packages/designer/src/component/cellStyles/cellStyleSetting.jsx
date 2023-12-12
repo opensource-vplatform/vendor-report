@@ -464,15 +464,20 @@ function CellStyleSetting(props) {
                                     >
                                         {selectedValue === 'time' &&
                                             Object.keys(TimeFormats).map(
-                                                (key) => (
-                                                    <option
-                                                        key={key}
-                                                        value={key}
-                                                    >
-                                                        {key.toLocaleString()}
-                                                    </option>
-                                                )
+                                                (key) => {
+                                                    // TimeFormats 中的 key 都是字符串,需要转换为 Date 对象才能使用 toLocaleString
+                                                    const date = new Date(key);
+                                                    return (
+                                                        <option
+                                                            key={key}
+                                                            value={key}
+                                                        >
+                                                            {date.toLocaleString()}
+                                                        </option>
+                                                    );
+                                                }
                                             )}
+
                                         {selectedValue === 'date' &&
                                             Object.values(DateFormats).map(
                                                 (value) => (
