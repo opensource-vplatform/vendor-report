@@ -363,7 +363,6 @@ function CellStyleSetting(props) {
                                 selectedValue === 'currency' ||
                                 selectedValue === 'accounting' ||
                                 selectedValue === 'scientific' ||
-                                selectedValue === 'scientific' ||
                                 selectedValue === 'percentage') && (
                                 <div className='decimalPlaces'>
                                     <span>小数位数：</span>
@@ -448,69 +447,78 @@ function CellStyleSetting(props) {
                                     </select>
                                 </div>
                             )}
-
-                            <div>
-                                <span>类型：</span>
-                                <select
-                                    name='negative-number-list'
-                                    id='negative-number-list'
-                                    size={4}
-                                    value={selectedTimeFormat}
-                                    onChange={handleTimeFonmatChange}
-                                >
-                                    {selectedValue === 'time' &&
-                                        Object.keys(TimeFormats).map((key) => (
-                                            <option key={key} value={key}>
-                                                {key.toString()}
-                                            </option>
-                                        ))}
-                                    {selectedValue === 'date' &&
-                                        Object.values(DateFormats).map(
-                                            (value) => (
-                                                <option
-                                                    key={value}
-                                                    value={value}
-                                                >
-                                                    {value.toString()}
-                                                </option>
-                                            )
-                                        )}
-                                    {selectedValue === 'fractionType' &&
-                                        Object.values(FractionType).map(
-                                            (value) => (
-                                                <option
-                                                    key={value}
-                                                    value={value}
-                                                >
-                                                    {value.toString()}
-                                                </option>
-                                            )
-                                        )}
-                                    {selectedValue === 'special' &&
-                                        Object.values(SpecialFormats).map(
-                                            (value) => (
-                                                <option
-                                                    key={value}
-                                                    value={value}
-                                                >
-                                                    {value.toString()}
-                                                </option>
-                                            )
-                                        )}
-                                    {selectedValue === 'custom' &&
-                                        Object.values(CustomFormats).map(
-                                            (value) => (
-                                                <option
-                                                    key={value}
-                                                    value={value}
-                                                >
-                                                    {value.toString()}
-                                                </option>
-                                            )
-                                        )}
-                                </select>
-                            </div>
-
+                            {(selectedValue === 'date' ||
+                                selectedValue === 'time' ||
+                                selectedValue === 'fractionType' ||
+                                selectedValue === 'special' ||
+                                selectedValue === 'custom') && (
+                                <div>
+                                    <span>类型：</span>
+                                    <select
+                                        name='negative-number-list'
+                                        id='negative-number-list'
+                                        size={4}
+                                        value={selectedTimeFormat}
+                                        onChange={handleTimeFonmatChange}
+                                    >
+                                        {selectedValue === 'time' &&
+                                            Object.keys(TimeFormats).map(
+                                                (key) => (
+                                                    <option
+                                                        key={key}
+                                                        value={key}
+                                                    >
+                                                        {key.toString()}
+                                                    </option>
+                                                )
+                                            )}
+                                        {selectedValue === 'date' &&
+                                            Object.values(DateFormats).map(
+                                                (value) => (
+                                                    <option
+                                                        key={value}
+                                                        value={value}
+                                                    >
+                                                        {value.toString()}
+                                                    </option>
+                                                )
+                                            )}
+                                        {selectedValue === 'fractionType' &&
+                                            Object.values(FractionType).map(
+                                                (value) => (
+                                                    <option
+                                                        key={value}
+                                                        value={value}
+                                                    >
+                                                        {value.toString()}
+                                                    </option>
+                                                )
+                                            )}
+                                        {selectedValue === 'special' &&
+                                            Object.values(SpecialFormats).map(
+                                                (value) => (
+                                                    <option
+                                                        key={value}
+                                                        value={value}
+                                                    >
+                                                        {value.toString()}
+                                                    </option>
+                                                )
+                                            )}
+                                        {selectedValue === 'custom' &&
+                                            Object.values(CustomFormats).map(
+                                                (value) => (
+                                                    <option
+                                                        key={value}
+                                                        value={value}
+                                                    >
+                                                        {value.toString()}
+                                                    </option>
+                                                )
+                                            )}
+                                    </select>
+                                </div>
+                            )}
                             {(selectedValue === 'date' ||
                                 selectedValue === 'time' ||
                                 selectedValue === 'special') && (
