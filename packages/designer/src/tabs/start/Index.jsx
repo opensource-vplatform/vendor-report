@@ -1,12 +1,13 @@
-import FontAlign from '@components/fontAlign/fontAlign';
-import FontStyle from '@components/fontStyle/Index';
 import { Group } from '@components/group/Index';
+
+import Align from './align/Index';
+import Font from './font/Index';
 
 function Index() {
     return (
         <Group>
-            <FontStyle></FontStyle>
-            <FontAlign></FontAlign>
+            <Font></Font>
+            <Align></Align>
         </Group>
     );
 }

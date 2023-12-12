@@ -9,58 +9,80 @@ export const fontSlice = createSlice({
         spread: null,
         fontFamily: null,
         fontSize: null,
-        fontStyle: "normal",
-        fontWeight: "normal",
-        fontVariant: "normal",
-        lineHeight: "normal",
-        isUnderline: false,
-        isDoubleUnderline: false,
+        fontStyle: 'normal',
+        fontWeight: 'normal',
+        fontVariant: 'normal',
+        lineHeight: 'normal',
+        textDecoration:undefined,
         vAlign: null,
         hAlign: null,
         isVerticalText: false,
-        isWordWrap: false,
-        mergeType:'',
-        backColor:null,
-        foreColor:null
+        wordWrap: false,
+        backColor: null,
+        foreColor: null,
+        //文字方向
+        textOrientation: undefined,
+        //文字竖向排列
+        isVerticalText: undefined,
     },
     reducers: {
-        toggleFontStyle(state) {
-            state.fontStyle = state.fontStyle === 'normal' ? 'italic' : 'normal'
+        setHAlign(state, action) {
+            state.hAlign = action.payload.hAlign;
         },
-        toggleFontWeight(state) {
-            state.fontWeight = state.fontWeight === 'normal' ? 'bold' : 'normal'
+        setVAlign(state, action) {
+            state.vAlign = action.payload.vAlign;
         },
-        toggleFont(state,action) {
-            //切换状态为布尔值的属性
-            const hasOwnProperty = Object.prototype.hasOwnProperty
-            if (Array.isArray(action.payload)) {
-                action.payload.forEach(function(key) {
-                    if (hasOwnProperty.call(state,key)) {
-                        state[key] = !state[key]
-                    }
-                })
-            } else {
-                if (hasOwnProperty.call(state,action.payload)) {
-                    state[action.payload] = !state[action.payload]
-                }
-            }
+        setWordWrap(state, action) {
+            state.wordWrap = action.payload.wordWrap;
         },
-        updateFont(state, action) {
-            const font = action.payload.font
-            Object.entries(font).forEach(function([key, value]) {
-                state[key] = value
-            })
+        setTextOrientation(state, action) {
+            state.isVerticalText = action.payload.isVerticalText;
+            state.textOrientation = action.payload.textOrientation;
         },
-        resetCellFont(state) {
+        setFontFamily(state, action) {
+            state.fontFamily = action.payload.fontFamily;
+        },
+        setFontStyle(state, action) {
+            state.fontStyle = action.payload.fontStyle;
+        },
+        setFontWeight(state, action) {
+            state.fontWeight = action.payload.fontWeight;
+        },
+        setFontSize(state, action) {
+            state.fontSize = action.payload.fontSize;
+        },
+        setTextDecoration(state, action){
+            state.textDecoration = action.payload.textDecoration;
+        },
+        setBackColor(state, action){
+            state.backColor = action.payload.backColor;
+        },
+        setForeColor(state, action){
+            state.foreColor = action.payload.foreColor;
+        },
+        parseCellFont(state) {
             //切换单元格会重置状态
-            Object.assign(state, parseFont(state.spread))
-        }
+            Object.assign(state, parseFont(state.spread));
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(setSpread, (state, action) => {
-            state.spread = action.payload.spread
+            state.spread = action.payload.spread;
         });
     },
-})
-export const { toggleFontWeight, resetCellFont, toggleFontStyle, updateFont,toggleFont } = fontSlice.actions
-export default fontSlice.reducer
+});
+export const {
+    setFontWeight,
+    parseCellFont,
+    setFontStyle,
+    setFontSize,
+    setHAlign,
+    setVAlign,
+    setWordWrap,
+    setTextOrientation,
+    setFontFamily,
+    setTextDecoration,
+    setBackColor,
+    setForeColor,
+} = fontSlice.actions;
+export default fontSlice.reducer;

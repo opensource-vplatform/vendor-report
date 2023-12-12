@@ -67,8 +67,30 @@ const DIRECTION_TO_STYLE_MAP = {
         textOrientation: -90,
         isVerticalText: false,
     },
+    none:{
+        textOrientation: 0,
+        isVerticalText: false,
+    }
 };
 
 export const directionToStyles = function (direction) {
     return DIRECTION_TO_STYLE_MAP[direction];
 };
+
+export const valueToEnum = function(style){
+    const {textOrientation=0,isVerticalText=false} = style;
+    const map = {textOrientation,isVerticalText};
+    for(const [key,val] of Object.entries(DIRECTION_TO_STYLE_MAP)){
+        let flag = true;
+        for(const [attr,attrVal] of Object.entries(val)){
+            if(map[attr] !== attrVal){
+                flag = false;
+                break;
+            }
+        }
+        if(flag){
+            return key;
+        }
+    }
+    return null;
+}

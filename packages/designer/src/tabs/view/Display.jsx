@@ -11,8 +11,7 @@ import {
   HLayout,
   VGroupItem,
 } from '@components/group/Index';
-
-import ItemList from '../../component/group/ItemList';
+import ItemList from '@components/group/ItemList';
 import {
   setColHeaderVisible,
   setNewTabVisible,
@@ -20,7 +19,8 @@ import {
   setShowHorizontalGridline,
   setShowVerticalGridline,
   setTabStripVisible,
-} from '../../store/viewSlice/viewSlice';
+} from '@store/viewSlice/viewSlice';
+import { withBatchUpdate } from '@utils/spreadUtil';
 
 const Label = styled.label`
     display: flex;
@@ -74,20 +74,15 @@ export default function () {
         tabStripVisible,
     } = useSelector(({ viewSlice }) => viewSlice);
     useEffect(() => {
-        if (spread) {
-            spread.suspendPaint();
-            try {
-                spread.options.newTabVisible = newTabVisible;
-                spread.options.tabStripVisible = tabStripVisible;
-                const sheet = spread.getActiveSheet();
-                sheet.options.colHeaderVisible = colHeaderVisible;
-                sheet.options.rowHeaderVisible = rowHeaderVisible;
-                sheet.options.gridline.showHorizontalGridline = showHorizontalGridline;
-                sheet.options.gridline.showVerticalGridline = showVerticalGridline;
-            } finally {
-                spread.resumePaint();
-            }
-        }
+        withBatchUpdate(spread,()=>{
+            spread.options.newTabVisible = newTabVisible;
+            spread.options.tabStripVisible = tabStripVisible;
+            const sheet = spread.getActiveSheet();
+            sheet.options.colHeaderVisible = colHeaderVisible;
+            sheet.options.rowHeaderVisible = rowHeaderVisible;
+            sheet.options.gridline.showHorizontalGridline = showHorizontalGridline;
+            sheet.options.gridline.showVerticalGridline = showVerticalGridline;
+        });
     }, [
         colHeaderVisible,
         rowHeaderVisible,

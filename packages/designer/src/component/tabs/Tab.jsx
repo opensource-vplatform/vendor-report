@@ -14,7 +14,7 @@ const Wrap = styled.div`
 function Tab(props) {
     const {code,children} = props;
     return <Context.Consumer >{(active)=>{
-        return <Wrap data-active={active==code}>{children}</Wrap>
+        return active==code ? (<Wrap data-active={active==code}>{children}</Wrap>):null
     }}</Context.Consumer>
 }
 
