@@ -127,8 +127,7 @@ const parseFontStr = function (font) {
 };
 
 //解析激活状态的单元格字体
-export function parseFont(spread) {
-    const sheet = spread.getActiveSheet();
+export function parseFont(sheet) {
     const style = sheet.getActualStyle(
         sheet.getActiveRowIndex(),
         sheet.getActiveColumnIndex()

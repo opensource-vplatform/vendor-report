@@ -18,4 +18,8 @@ function Tab(props) {
     }}</Context.Consumer>
 }
 
+Tab.defaultProps = {
+    visible: true
+}
+
 export default Tab;

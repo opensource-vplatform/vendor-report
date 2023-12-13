@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { parseFont } from '../../utils/fontUtil';
 import { setSpread } from '../appSlice/appSlice';
 
 export const fontSlice = createSlice({
@@ -60,10 +59,12 @@ export const fontSlice = createSlice({
         setForeColor(state, action){
             state.foreColor = action.payload.foreColor;
         },
-        parseCellFont(state) {
-            //切换单元格会重置状态
-            Object.assign(state, parseFont(state.spread));
-        },
+        setFontStyles(state,action){
+            const styles = action.payload.styles;
+            if(styles){
+                Object.assign(state,styles);
+            }
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(setSpread, (state, action) => {
@@ -73,7 +74,7 @@ export const fontSlice = createSlice({
 });
 export const {
     setFontWeight,
-    parseCellFont,
+    setFontStyles,
     setFontStyle,
     setFontSize,
     setHAlign,

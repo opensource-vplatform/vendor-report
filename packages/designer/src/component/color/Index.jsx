@@ -112,8 +112,9 @@ export default function (props) {
     });
     return (
         <Fragment>
-            {visible ? <Mask onClick={() => setVisible(false)}></Mask> : null}
+            {visible ? <Mask key='mask' onClick={() => setVisible(false)}></Mask> : null}
             <Wrap
+                key='wrap'
                 onClick={(evt) => {
                     if (!evt.target.closest('.colorDialog')) {
                         setVisible(true);
@@ -229,6 +230,7 @@ export default function (props) {
             </Wrap>
             {dialogVisible ? (
                 <ColorDialog
+                    key='dialog'
                     value={value}
                     onClose={() => {
                         setDialogVisible(false);

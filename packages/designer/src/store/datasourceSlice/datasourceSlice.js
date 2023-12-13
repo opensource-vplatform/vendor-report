@@ -41,19 +41,19 @@ export const datasourceSlice = createSlice({
                 name: '工作经历',
                 children: [
                     {
-                        id: 'A',
+                        id: 'A001',
                         code: 'startDate',
                         name: '开始日期',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
                     {
-                        id: 'B',
+                        id: 'B001',
                         code: 'endDate',
                         name: '结束日期',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
                     {
-                        id: 'C',
+                        id: 'C001',
                         code: 'companyName',
                         name: '公司名称',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
@@ -132,6 +132,8 @@ export const datasourceSlice = createSlice({
                 }
             } */
         },
+        previewViewDatas: null,
+        isShowPreviewView: false,
     },
     reducers: {
         pushDsList(state, { payload }) {
@@ -226,6 +228,12 @@ export const datasourceSlice = createSlice({
                 delete state.bindInfos[id][sheetInstanceId][cellInstanceId];
             }
         },
+        setPreviewViewDatas(state, { payload }) {
+            if (payload?.datas) {
+                state.previewViewDatas = payload.datas;
+            }
+            state.isShowPreviewView = !state.isShowPreviewView;
+        },
     },
 });
 export const {
@@ -235,5 +243,6 @@ export const {
     deleteDsList,
     saveBindInfos,
     removeBindInfos,
+    setPreviewViewDatas,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

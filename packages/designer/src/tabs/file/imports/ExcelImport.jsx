@@ -22,8 +22,8 @@ import {
   IconTitle,
   ImportButtonWrap,
   None,
-} from './Components';
-import WaitMsg from './WaitMsg';
+} from '../Components';
+import WaitMsg from '../WaitMsg';
 
 function ExcelImport(props) {
     const { closeHandler } = props;
