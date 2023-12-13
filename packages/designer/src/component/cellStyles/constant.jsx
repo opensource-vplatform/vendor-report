@@ -31,9 +31,9 @@ export const FormatNumber = {
 
 export const AccountingSymbol = [
     { value: '', title: '', text: '' },
-    { value: '$#,##0', title: '$', text: '$' },
-    { value: '¥#,##0', title: '¥(Chinese)', text: '¥(Chinese)' },
-    { value: '₩#,##0', title: '₩(Korean)', text: '₩(Korean)' },
+    { value: '$', title: '$', text: '$' },
+    { value: '¥', title: '¥(Chinese)', text: '¥(Chinese)' },
+    { value: '₩', title: '₩(Korean)', text: '₩(Korean)' },
 ];
 
 export const LocaleType = [

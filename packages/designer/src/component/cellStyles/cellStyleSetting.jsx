@@ -25,6 +25,7 @@ function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
+
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
     const [selectedValue, setSelectedCategoriesValue] = useState('general');
     const [selectedSymbol, setSelectedSymbol] = useState('');
@@ -34,7 +35,7 @@ function CellStyleSetting(props) {
     );
     const [checkboxOfThousandSeparator, setCheckboxOfThousandSeparator] =
         useState(false);
-
+    const [locale, setLocale] = useState('en_us');
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
 
     // 获取第一个选择区域的第一个单元格的值
@@ -102,6 +103,10 @@ function CellStyleSetting(props) {
 
     const handleTimeFormatChange = (value) => {
         setSelectedTimeFormat(value);
+    };
+
+    const handleLocaleType = (value) => {
+        setLocale(value);
     };
     // 格式化千位分割符
     function formatThousandSeparator(number, isCheck) {
@@ -230,17 +235,17 @@ function CellStyleSetting(props) {
                     formatString = `${currency}${thousandsSep}${decimals}_);-${currency}${thousandsSep}${decimals}`;
                     break;
                 case 'rednumber2':
-                    formatString = `[Red]${currency}${thousandsSep}${decimals};[Red]${currency}${thousandsSep}${decimals}`;
+                    formatString = `${currency}${thousandsSep}${decimals};[Red]${currency}${thousandsSep}${decimals}`;
                     break;
                 case 'number3':
-                    formatString = `(${currency}${thousandsSep}${decimals});(${currency}${thousandsSep}${decimals})`;
+                    formatString = `${currency}${thousandsSep}${decimals};(${currency}${thousandsSep}${decimals})`;
                     break;
                 case 'rednumber4':
-                    formatString = `([Red]${currency}${thousandsSep}${decimals});([Red]${currency}${thousandsSep}${decimals})`;
+                    formatString = `${currency}${thousandsSep}${decimals};([Red]${currency}${thousandsSep}${decimals})`;
                     break;
 
                 default:
-                    formatString = `${thousandsSep}${decimals}`;
+                    formatString = `${currency}${thousandsSep}${decimals}`;
                     break;
             }
             tempValue = formatData(formatString);
@@ -390,7 +395,6 @@ function CellStyleSetting(props) {
                                 selectedValue === 'accounting') && (
                                 <div className='decimalPlaces'>
                                     <span>货币符号： </span>
-
                                     <Select
                                         datas={AccountingSymbol}
                                         style={{
@@ -490,8 +494,8 @@ function CellStyleSetting(props) {
                                             height: '25px',
                                             margin: '5px 0px',
                                         }}
-                                        onChange={handleTimeFormatChange}
-                                        value={selectedTimeFormat}
+                                        onChange={handleLocaleType}
+                                        value={locale}
                                     />
                                 </div>
                             )}
