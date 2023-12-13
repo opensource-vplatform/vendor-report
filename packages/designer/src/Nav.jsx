@@ -4,6 +4,7 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
+import Button from '@components/Button/Index';
 import {
   Tab,
   Tabs,
@@ -11,8 +12,11 @@ import {
 import { setActive } from '@store/navSlice/navSlice';
 import FileTab from '@tabs/file/Index';
 import StartTab from '@tabs/start/Index';
+import TableTab from '@tabs/table/Index';
 import TestTab from '@tabs/test/Index';
 import ViewTab from '@tabs/view/Index';
+
+import { setMode } from './store/appSlice/appSlice';
 
 const FileTabTitle = styled.a`
     padding: 6px 12px 6px 12px;
@@ -40,7 +44,7 @@ const WithNavItem = function (Component) {
             >
                 <Component {...tabProps}></Component>
             </Tab>
-        ) ;
+        );
     };
 };
 
@@ -48,12 +52,25 @@ const FileNavItem = WithNavItem(FileTab);
 const StartNavItem = WithNavItem(StartTab);
 const ViewNavItem = WithNavItem(ViewTab);
 const TestNavItem = WithNavItem(TestTab);
+const TableNavItem = WithNavItem(TableTab);
 
 export default function () {
     const dispatch = useDispatch();
-    const { active,hideCodes } = useSelector(({ navSlice }) => navSlice);
+    const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     return (
-        <Tabs value={active} hideCodes={hideCodes} onChange={(code) => dispatch(setActive({ code }))}>
+        <Tabs
+            value={active}
+            hideCodes={hideCodes}
+            onChange={(code) => dispatch(setActive({ code }))}
+            tool={
+                <Button
+                    style={{ marginRight: 8 }}
+                    onClick={() => dispatch(setMode({ mode: 'preview' }))}
+                >
+                    预览
+                </Button>
+            }
+        >
             <FileNavItem
                 code='file'
                 autoSelect={false}
@@ -64,6 +81,7 @@ export default function () {
             ></FileNavItem>
             <StartNavItem code='start' title='开始'></StartNavItem>
             <ViewNavItem code='view' title='视图'></ViewNavItem>
+            <TableNavItem code='table' title='表设计'></TableNavItem>
             <TestNavItem code='test' title='测试组件'></TestNavItem>
         </Tabs>
     );

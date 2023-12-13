@@ -8,14 +8,21 @@ import styled from 'styled-components';
 
 import Context from './Context';
 
-const Headers = styled.ul`
-    border: solid 1px lightgray;
+const Headers = styled.div`
+    border-bottom: solid 1px lightgray;
     background-color: white;
     margin: 0px;
     padding: 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items:center;
 `;
 
-const Header = styled.li`
+const HeaderWrap = styled.div``
+
+const ToolWrap = styled.div``;
+
+const Header = styled.div`
     border-bottom: none;
     bottom: -1px;
     cursor: pointer;
@@ -23,6 +30,7 @@ const Header = styled.li`
     list-style: none;
     font-size: 12px;
     position: relative;
+    margin-top: 4px;
     &[data-active='true'] {
         padding-bottom: 1px;
         border-top-left-radius: 4px;
@@ -75,7 +83,7 @@ const getValidTabCode = function (code, children) {
 };
 
 function Tabs(props) {
-    let { value, onChange, hideCodes = [], children } = props;
+    let { value, onChange, hideCodes = [], children,tool } = props;
     const tabs = Array.isArray(children) ? children : [children];
     const [active, setActive] = useState(() => {
         const activeCode = getValidTabCode(value, tabs);
@@ -95,6 +103,7 @@ function Tabs(props) {
     }, [value]);
     const headers = (
         <Headers>
+            <HeaderWrap>
             {children.map((child) => {
                 const childProps = child.props;
                 const childCode = childProps.code;
@@ -127,6 +136,8 @@ function Tabs(props) {
                     </Fragment>
                 );
             })}
+            </HeaderWrap>
+            {tool ? <ToolWrap>{tool}</ToolWrap>:null}
         </Headers>
     );
     return (
