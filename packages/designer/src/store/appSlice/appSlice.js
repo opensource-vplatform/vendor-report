@@ -7,9 +7,9 @@ export const appSlice = createSlice({
     },
     reducers: {
         setSpread(state, action) {
-            state.spread = action.payload.spread
-        }
-    }
-})
-export const { setSpread } = appSlice.actions
-export default appSlice.reducer
+            state.spread = action.payload.spread;
+        },
+    },
+});
+export const { setSpread } = appSlice.actions;
+export default appSlice.reducer;

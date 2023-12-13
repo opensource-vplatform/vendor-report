@@ -1,6 +1,7 @@
 import Loading from '@components/loading/Index';
 
-function WaitMsg() {
+function WaitMsg(props) {
+    const {title='导入中...'} = props;
     return (
         <div
             style={{
@@ -20,7 +21,7 @@ function WaitMsg() {
                 left: 0,
                 backgroundColor: 'lightgray',
             }}></div>
-            <Loading title='导入中...'></Loading>
+            <Loading title={title}></Loading>
         </div>
     );
 }

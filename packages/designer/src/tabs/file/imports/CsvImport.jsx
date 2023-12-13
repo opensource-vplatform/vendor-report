@@ -16,8 +16,8 @@ import {
   IconTitle,
   ImportButtonWrap,
   None,
-} from './Components';
-import WaitMsg from './WaitMsg';
+} from '../Components';
+import WaitMsg from '../WaitMsg';
 
 function CsvImport(props) {
     const { closeHandler } = props;

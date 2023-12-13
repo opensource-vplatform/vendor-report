@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import appSlice from './appSlice/appSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
 import fontSlice from './fontSlice/fontSlice';
+import navSlice from './navSlice/navSlice';
 import viewSlice from './viewSlice/viewSlice';
 
 //不可序列化的值存储在redux中控制台会报错，需添加忽略动作和路径
@@ -21,6 +22,7 @@ export default configureStore({
         fontSlice,
         datasourceSlice,
         viewSlice,
+        navSlice,
     },
     middleware(getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });

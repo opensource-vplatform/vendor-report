@@ -39,6 +39,9 @@ export default defineConfig({
             },{
                 find: '@utils',
                 replacement: resolve(__dirname, 'src/utils'),
+            },{
+                find: '@tabs',
+                replacement: resolve(__dirname, 'src/tabs'),
             },
         ],
     },

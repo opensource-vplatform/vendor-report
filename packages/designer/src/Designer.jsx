@@ -1,23 +1,41 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+import styled from 'styled-components';
 
-import { SpreadSheets, Worksheet } from '@grapecity/spread-sheets-react';
+import {
+  SpreadSheets,
+  Worksheet,
+} from '@grapecity/spread-sheets-react';
 
-import DataService from './assets/dataService';
 import CellStyleSetting from './component/cellStyles/cellStyleSetting';
-import { DraggableDatasourceList } from './component/defineDatasource/defineDatasource';
-import { Tab, Tabs } from './component/tabs/Index';
+import {
+  DraggableDatasourceList,
+} from './component/defineDatasource/defineDatasource';
+import Nav from './Nav';
 import { setSpread } from './store/appSlice/appSlice';
 import { updateDslist } from './store/datasourceSlice/datasourceSlice';
 import { parseCellFont } from './store/fontSlice/fontSlice';
 import { resetView } from './store/viewSlice/viewSlice';
-import FileTab from './tabs/file/Index';
-import StartTab from './tabs/start/Index';
-import TestTab from './tabs/test/Index';
-import ViewTab from './tabs/view/Index';
 import { findTreeNodeById } from './utils/commonUtil';
 import { getCellTag } from './utils/worksheetUtil';
+
+const Wrap = styled.div`
+    height: 100%;
+    width: 100%;
+    overflow: hidden
+    display: flex;
+    flex-direction: column;
+`;
+
+const SpreadWrap = styled.div`
+    display: flex;
+    height: 100%;
+    width: 100%;
+`;
 
 function Designer(props) {
     const dispatch = useDispatch();
@@ -27,8 +45,6 @@ function Designer(props) {
     const spreadBackColor = 'aliceblue';
     const sheetName = 'Person Address';
     const autoGenerateColumns = false;
-    const data = DataService.getPersonAddressData();
-    const [fileTabVisible, setFileTabVisible] = useState(false);
     function valueChanged(event, info) {
         const { sheet, row, col, newValue } = info;
         const bindInfo = getCellTag(sheet, row, col, 'bindInfo');
@@ -46,54 +62,9 @@ function Designer(props) {
         }
     }
     return (
-        <div
-            style={{
-                height: '100%',
-                width: '100%',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-            }}
-        >
-            {fileTabVisible ? (
-                <FileTab
-                    closeHandler={() => setFileTabVisible(false)}
-                ></FileTab>
-            ) : null}
-            <Tabs value='start'>
-                <Tab
-                    code='file'
-                    title={
-                        <a
-                            style={{
-                                padding: '6px 12px 6px 12px',
-                                display: 'block',
-                                color: 'white',
-                                cursor: 'pointer',
-                                background: '#217346',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                margin: '0px 3px',
-                            }}
-                        >
-                            文件
-                        </a>
-                    }
-                    onClick={() => setFileTabVisible(true)}
-                >
-                    文件
-                </Tab>
-                <Tab code='start' title='开始'>
-                    <StartTab />
-                </Tab>
-                <Tab code='view' title='视图'>
-                    <ViewTab></ViewTab>
-                </Tab>
-                <Tab code='test' title='组件测试'>
-                    <TestTab />
-                </Tab>
-            </Tabs>
-            <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+        <Wrap>
+            <Nav></Nav>
+            <SpreadWrap>
                 <DraggableDatasourceList></DraggableDatasourceList>
                 <SpreadSheets
                     backColor={spreadBackColor}
@@ -116,9 +87,9 @@ function Designer(props) {
                         colCount={100}
                     ></Worksheet>
                 </SpreadSheets>
-            </div>
+            </SpreadWrap>
             <CellStyleSetting></CellStyleSetting>
-        </div>
+        </Wrap>
     );
 }
 
