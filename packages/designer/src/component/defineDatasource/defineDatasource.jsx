@@ -369,8 +369,10 @@ export function DraggableDatasourceList() {
                 } else {
                     const bindingPathCellType = new BindingPathCellType();
                     cell.bindingPath(dataPath).cellType(bindingPathCellType);
-                    setCellTag(sheet, row, col, 'bindType', 'normal');
-                    setCellTag(sheet, row, col, 'dsInstanceId', itemId);
+                    setCellTag(sheet, row, col, 'bindInfo', {
+                        bindType: 'cell',
+                        bindDsInstanceId: itemId,
+                    });
                     dispatch(
                         saveBindInfos({
                             bindInfos: {
@@ -461,10 +463,11 @@ export function DraggableDatasourceList() {
                         preview({
                             spread,
                             state,
+                            dispatch,
                         });
                     }}
                 >
-                    测试绑定数据
+                    测试预览
                 </span>
             </div>
         </>

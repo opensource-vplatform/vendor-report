@@ -1,21 +1,14 @@
 import React from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  SpreadSheets,
-  Worksheet,
-} from '@grapecity/spread-sheets-react';
+import { SpreadSheets, Worksheet } from '@grapecity/spread-sheets-react';
 
 import CellStyleSetting from './component/cellStyles/cellStyleSetting';
-import {
-  DraggableDatasourceList,
-} from './component/defineDatasource/defineDatasource';
+import { DraggableDatasourceList } from './component/defineDatasource/defineDatasource';
 import Nav from './Nav';
+import PreviewView from './PreviewView';
 import { setSpread } from './store/appSlice/appSlice';
 import { updateDslist } from './store/datasourceSlice/datasourceSlice';
 import { parseCellFont } from './store/fontSlice/fontSlice';
@@ -40,7 +33,7 @@ const SpreadWrap = styled.div`
 function Designer(props) {
     const dispatch = useDispatch();
     let {
-        datasourceSlice: { dsList },
+        datasourceSlice: { dsList, isShowPreviewView },
     } = useSelector((state) => state);
     const spreadBackColor = 'aliceblue';
     const sheetName = 'Person Address';
@@ -63,6 +56,7 @@ function Designer(props) {
     }
     return (
         <Wrap>
+            {isShowPreviewView ? <PreviewView></PreviewView> : ''}
             <Nav></Nav>
             <SpreadWrap>
                 <DraggableDatasourceList></DraggableDatasourceList>

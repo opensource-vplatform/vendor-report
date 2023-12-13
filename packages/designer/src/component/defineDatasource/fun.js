@@ -3,6 +3,7 @@ import GC from '@grapecity/spread-sheets';
 import {
     removeBindInfos,
     saveBindInfos,
+    setPreviewViewDatas,
 } from '../../store/datasourceSlice/datasourceSlice';
 import { findTreeNodeById, genUUID } from '../../utils/commonUtil.js';
 import {
@@ -67,8 +68,6 @@ export function addTable(params) {
     }
 
     table.bindingPath(dataPath);
-    setCellTag(sheet, row, col, 'bindType', 'table');
-    setCellTag(sheet, row, col, 'dsInstanceId', itemId);
     dispatch(
         saveBindInfos({
             bindInfos: {
@@ -174,14 +173,11 @@ export function checkHasBind(params) {
                             return false;
                         }
 
-                        const dsInstanceId = getCellTag(
-                            sheetInstance,
-                            row,
-                            col,
-                            'dsInstanceId'
-                        );
+                        const { bindDsInstanceId } =
+                            getCellTag(sheetInstance, row, col, 'bindInfo') ||
+                            {};
 
-                        if (dsInstanceId !== id) {
+                        if (bindDsInstanceId !== id) {
                             return false;
                         }
 
@@ -257,7 +253,7 @@ export function checkHasBind(params) {
                             return true;
                         }
 
-                        if (tableName) {
+                        if (tableName && sync) {
                             spread.suspendPaint();
                             const table =
                                 sheetInstance.tables.findByName(tableName);
@@ -403,7 +399,7 @@ export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
 }
 
 export function preview(params) {
-    const { spread, state } = params;
+    const { spread, state, dispatch } = params;
     const sheets = [];
     spread.sheets.forEach(function (sheet) {
         const sheetColumnCount = sheet.getColumnCount();
@@ -422,7 +418,13 @@ export function preview(params) {
                 //单元格的值
                 const cell = sheet.getCell(rowIndex, colIndex);
                 const cellValue = cell.value();
-                if (cellValue) {
+                const bindInfo = getCellTag(
+                    sheet,
+                    rowIndex,
+                    colIndex,
+                    'bindInfo'
+                );
+                if (cellValue && bindInfo?.bindType !== 'tableColumn') {
                     _sheet.row[rowIndex][colIndex] =
                         _sheet.row[rowIndex][colIndex] || {};
                     _sheet.row[rowIndex][colIndex].value = cellValue;
@@ -441,6 +443,8 @@ export function preview(params) {
         //收集表格
         const tables = sheet.tables.all();
         tables.forEach(function (table) {
+            debugger;
+            const range = table.range();
             const tableName = table.name();
             const path = table.bindingPath();
             const columns = [];
@@ -455,6 +459,7 @@ export function preview(params) {
                 });
             });
             _sheet.tables.push({
+                range,
                 tableName,
                 path,
                 columns,
@@ -462,5 +467,45 @@ export function preview(params) {
         });
         sheets.push(_sheet);
     });
-    console.log(sheets);
+
+    const datas = {};
+    state.datasourceSlice.finalDsList.forEach(function ({
+        type,
+        code,
+        name,
+        children,
+    }) {
+        if (type !== 'entity') {
+            datas[code] = name + '1';
+        } else {
+            datas[code] = [];
+            if (Array.isArray(children)) {
+                for (let i = 1; i <= 10; i++) {
+                    const instanceObject = {};
+                    children.forEach(function ({ code, name }) {
+                        instanceObject[code] = name + i;
+                    });
+                    datas[code].push(instanceObject);
+                }
+            }
+        }
+    });
+
+    /*   let source = new GC.Spread.Sheets.Bindings.CellBindingSource(datas);
+    spread.sheets.forEach(function (sheet) {
+        sheet.setDataSource(source);
+    });
+ */
+    dispatch(
+        setPreviewViewDatas({
+            datas: {
+                sheets,
+                datas,
+            },
+        })
+    );
+    console.log({
+        sheets,
+        datas,
+    });
 }
