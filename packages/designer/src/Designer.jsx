@@ -26,7 +26,7 @@ import { getCellTag } from './utils/worksheetUtil';
 const Wrap = styled.div`
     height: 100%;
     width: 100%;
-    overflow: hidden
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 `;
