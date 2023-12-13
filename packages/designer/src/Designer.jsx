@@ -1,36 +1,50 @@
 import React, { useState } from 'react';
 
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  SpreadSheets,
-  Worksheet,
-} from '@grapecity/spread-sheets-react';
+import { SpreadSheets, Worksheet } from '@grapecity/spread-sheets-react';
 
 import DataService from './assets/dataService';
 import CellStyleSetting from './component/cellStyles/cellStyleSetting';
-import {
-  DraggableDatasourceList,
-} from './component/defineDatasource/defineDatasource';
-import {
-  Tab,
-  Tabs,
-} from './component/tabs/Index';
+import { DraggableDatasourceList } from './component/defineDatasource/defineDatasource';
+import { Tab, Tabs } from './component/tabs/Index';
 import { setSpread } from './store/appSlice/appSlice';
+import { updateDslist } from './store/datasourceSlice/datasourceSlice';
 import { parseCellFont } from './store/fontSlice/fontSlice';
 import { resetView } from './store/viewSlice/viewSlice';
 import FileTab from './tabs/file/Index';
 import StartTab from './tabs/start/Index';
 import TestTab from './tabs/test/Index';
 import ViewTab from './tabs/view/Index';
+import { findTreeNodeById } from './utils/commonUtil';
+import { getCellTag } from './utils/worksheetUtil';
 
 function Designer(props) {
     const dispatch = useDispatch();
+    let {
+        datasourceSlice: { dsList },
+    } = useSelector((state) => state);
     const spreadBackColor = 'aliceblue';
     const sheetName = 'Person Address';
     const autoGenerateColumns = false;
     const data = DataService.getPersonAddressData();
     const [fileTabVisible, setFileTabVisible] = useState(false);
+    function valueChanged(event, info) {
+        const { sheet, row, col, newValue } = info;
+        const bindInfo = getCellTag(sheet, row, col, 'bindInfo');
+        if (bindInfo && bindInfo.bindType === 'tableColumn') {
+            const ds = findTreeNodeById(bindInfo.bindDsInstanceId, dsList);
+            dispatch(
+                updateDslist({
+                    newData: {
+                        ...ds,
+                        name: newValue,
+                    },
+                    isSave: true,
+                })
+            );
+        }
+    }
     return (
         <div
             style={{
@@ -80,34 +94,28 @@ function Designer(props) {
                 </Tab>
             </Tabs>
             <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+                <DraggableDatasourceList></DraggableDatasourceList>
                 <SpreadSheets
                     backColor={spreadBackColor}
                     workbookInitialized={function (spread) {
                         dispatch(setSpread({ spread }));
                     }}
-                    enterCell={function (event, spread) {
+                    enterCell={function (event, info) {
                         dispatch(parseCellFont());
                     }}
-                    activeSheetChanged={(evt,spread)=>{
+                    activeSheetChanged={(evt, info) => {
                         dispatch(parseCellFont());
                         dispatch(resetView());
                     }}
+                    valueChanged={valueChanged}
                 >
                     <Worksheet
                         name={sheetName}
-                        /* dataSource={data} */
                         autoGenerateColumns={autoGenerateColumns}
                         rowCount={20}
                         colCount={100}
-                    >
-                        {/* <Column width={150} dataField='Name' />
-                    <Column width={150} dataField='CountryRegionCode' />
-                    <Column width={100} dataField='City' />
-                    <Column width={200} dataField='AddressLine' />
-                    <Column width={100} dataField='PostalCode' /> */}
-                    </Worksheet>
+                    ></Worksheet>
                 </SpreadSheets>
-                <DraggableDatasourceList></DraggableDatasourceList>
             </div>
             <CellStyleSetting></CellStyleSetting>
         </div>

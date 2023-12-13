@@ -1,56 +1,85 @@
-import './defineDatasource.scss';
+import { useEffect, useRef, useState } from 'react';
 
-import {
-  useEffect,
-  useRef,
-} from 'react';
-
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import GC from '@grapecity/spread-sheets';
 
 import {
-  pushDsList,
-  toggleActiveDs,
-  updateDslist,
+    deleteDsList,
+    pushDsList,
+    saveBindInfos,
+    toggleActiveDs,
+    updateDslist,
 } from '../../store/datasourceSlice/datasourceSlice';
 import {
-  findTreeNodeById,
-  genUUID,
-  hasSameNode,
+    findTreeNodeById,
+    genUUID,
+    hasSameNode,
 } from '../../utils/commonUtil.js';
+import {
+    getCellInstanceId,
+    getSheetInstanceId,
+    setCellTag,
+} from '../../utils/worksheetUtil.js';
+import Dialog from '../dialog/Index.jsx';
 import DropdownBox from '../dropdownBox/dropdownBox';
 import LineSepatator from '../lineSeparator/lineSeparator';
+import {
+    addTable,
+    BindingPathCellType,
+    checkHasBind,
+    getCellInfo,
+    getChanged,
+    getPath,
+    preview,
+} from './fun.js';
+import {
+    AddDatasourceBtn,
+    ConfirmDialogBox,
+    DatasourceBox,
+    DatasourceListOl,
+    DatasourceOptBox,
+    DatasourceOptBoxLeft,
+    DatasourceOptBoxRight,
+    DddSubDatasource,
+    DelDatasource,
+    InputField,
+    ListItemText,
+    OptBtnBox,
+    SaveBtn,
+    TextareaField,
+} from './ui.jsx';
 
-class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
-    constructor() {
-        super();
-    }
-
-    paint(ctx, value, x, y, w, h, style, context) {
-        if (value === null || value === undefined) {
-            let sheet = context.sheet,
-                row = context.row,
-                col = context.col;
-            if (sheet && (row === 0 || !!row) && (col === 0 || !!col)) {
-                let bindingPath = sheet.getBindingPath(
-                    context.row,
-                    context.col
-                );
-                if (bindingPath) {
-                    value = '[' + bindingPath + ']';
-                }
-            }
+//弹窗
+function ConfirmDialog(props) {
+    const { onCancle, onConfirm } = props;
+    function onClose() {
+        if (typeof onCancle === 'function') {
+            onCancle(false);
         }
-        super.paint(ctx, value, x, y, w, h, style, context);
     }
+
+    function onClick() {
+        if (typeof onConfirm === 'function') {
+            onConfirm(true);
+        }
+    }
+    return (
+        <Dialog width='350px' height='150px' onClose={onClose}>
+            <ConfirmDialogBox>
+                <div>
+                    之前绑定数据源与本次修改后的数据源不一致，将会同步修改，是否继续?
+                </div>
+                <button onClick={onClick}>确定</button>
+            </ConfirmDialogBox>
+        </Dialog>
+    );
 }
 
+//树形数据源列表
 function DatasourceTree(props) {
     const dispatch = useDispatch();
+    const datasObj = useRef({}).current;
     const {
         datas,
         activeId,
@@ -64,7 +93,6 @@ function DatasourceTree(props) {
     if (!Array.isArray(datas)) {
         return '';
     }
-    const datasObj = useRef({}).current;
     const listClickHandler = function (e) {
         if (typeof click === 'function') {
             const target = e.target.closest('.listItem');
@@ -85,15 +113,20 @@ function DatasourceTree(props) {
 
         dispatch(pushDsList({ datas: newData, parentId }));
     };
+
+    const delDatasourceClickHandler = function (e) {
+        e.stopPropagation();
+        const itemId = e.target.dataset.itemId;
+        dispatch(deleteDsList({ itemId }));
+    };
+
     return (
-        <ol
-            className='datasourceList'
+        <DatasourceListOl
             onClick={listClickHandler}
             style={{ width: width + 'px' }}
         >
             {datas.map(function (dataItem) {
-                const { name, id, children, type, path, code } = dataItem;
-                const newPath = path ? `${path}.${code}` : code;
+                const { name, id, children, type } = dataItem;
                 datasObj[id] = dataItem;
                 return (
                     <li
@@ -101,43 +134,52 @@ function DatasourceTree(props) {
                         key={id}
                         data-item-id={id}
                     >
-                        <div
-                            className={`listItemText  ${
-                                id === activeId ? 'active' : ''
-                            }`}
+                        <ListItemText
+                            className={`${id === activeId ? 'active' : ''}`}
                             data-item-id={id}
-                            data-path={newPath}
                             style={{ paddingLeft: indent + 'px' }}
                             draggable={draggable}
                         >
                             <div className='text'>{name || '-'}</div>
                             {type === 'entity' && isShowAddSubDatasource ? (
-                                <div
-                                    className={`addSubDatasource  ${
-                                        isNotAllow ? 'notAllow' : ''
-                                    }`}
+                                <DddSubDatasource
+                                    data-not-allow={isNotAllow}
                                     onClick={addSubDatasourceClickHandler}
-                                ></div>
+                                ></DddSubDatasource>
                             ) : (
                                 ''
                             )}
-                        </div>
-                        <DatasourceTree
-                            datas={children}
-                            activeId={activeId}
-                            click={click}
-                            indent={2 * indent}
-                            parentId={id}
-                            isNotAllow={isNotAllow}
-                            draggable={draggable}
-                        ></DatasourceTree>
+                            {isShowAddSubDatasource ? (
+                                <DelDatasource
+                                    data-item-id={id}
+                                    onClick={delDatasourceClickHandler}
+                                ></DelDatasource>
+                            ) : (
+                                ''
+                            )}
+                        </ListItemText>
+                        {type === 'entity' ? (
+                            <DatasourceTree
+                                datas={children}
+                                activeId={activeId}
+                                click={click}
+                                indent={2 * indent}
+                                parentId={id}
+                                isNotAllow={isNotAllow}
+                                draggable={draggable}
+                                isShowAddSubDatasource={isShowAddSubDatasource}
+                            ></DatasourceTree>
+                        ) : (
+                            ''
+                        )}
                     </li>
                 );
             })}
-        </ol>
+        </DatasourceListOl>
     );
 }
 
+//数据源列表
 export function DatasourceList(props) {
     const {
         activeId,
@@ -146,15 +188,17 @@ export function DatasourceList(props) {
         width,
         draggable,
     } = props;
-    let { dsList, activeDs } = useSelector(
+    let { dsList, activeDs, finalDsList } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
+    if (draggable) {
+        dsList = finalDsList;
+    }
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
     }
     const isCanBeSaved = activeDs.code && activeDs.name;
-    const isNotAllow =
-        (activeDs.id && activeDs.optType === 'add') || !isCanBeSaved;
+    const isNotAllow = !isCanBeSaved;
     return (
         <DatasourceTree
             width={width}
@@ -168,24 +212,33 @@ export function DatasourceList(props) {
     );
 }
 
+//可拖拽树形数据源列表
 export function DraggableDatasourceList() {
+    const state = useSelector((state) => state);
     const {
         fontSlice: { spread },
-        datasourceSlice: { dsList },
-    } = useSelector((state) => state);
+        datasourceSlice: { dsList, bindInfos },
+    } = state;
+    const dispatch = useDispatch();
+    console.log('bindInfos==>', bindInfos);
+    const [opened, setOpened] = useState(false);
 
     const cacheDatasRef = useRef({
         hasBindEvent: false,
         spread,
         dsList,
+        tableNameIndex: 0,
     });
+    window.mySpread = spread;
     cacheDatasRef.current.spread = spread;
     cacheDatasRef.current.dsList = dsList;
     useEffect(function () {
         if (!cacheDatasRef.current.hasBindEvent) {
             cacheDatasRef.current.hasBindEvent = true;
             let dragged = null;
-
+            const oldStyles = [];
+            let lastRow = null,
+                lastCol = null;
             document.addEventListener(
                 'dragstart',
                 function (ev) {
@@ -201,8 +254,41 @@ export function DraggableDatasourceList() {
                 'dragend',
                 function (event) {
                     // 重设透明度
-                    debugger;
                     dragged.style.opacity = 1;
+                },
+                false
+            );
+
+            //drag 事件在用户拖动元素或选择的文本时，每隔几百毫秒就会被触发一次。
+            document.addEventListener(
+                'drag',
+                function (event) {
+                    const { spread } = cacheDatasRef.current;
+                    const { cell, row, col } =
+                        getCellInfo({ event, spread }) || {};
+                    if (!cell) {
+                        return;
+                    }
+
+                    if (lastRow === row && lastCol === col) {
+                        return;
+                    }
+                    //还原样式
+                    while (oldStyles.length > 0) {
+                        const { cell, value } = oldStyles.shift();
+                        cell.backColor(value);
+                    }
+                    lastCol = col;
+                    lastRow = row;
+                    //存储旧样式
+                    oldStyles.push({
+                        cell,
+                        value: cell.backColor(),
+                        row,
+                        col,
+                    });
+
+                    cell.backColor('#F7A711');
                 },
                 false
             );
@@ -222,6 +308,7 @@ export function DraggableDatasourceList() {
                 'dragenter',
                 function (event) {
                     // 当拖拽元素进入潜在放置区域时可以在这做优化提示。例如高亮处理
+                    console.log('dragenter');
                 },
                 false
             );
@@ -239,130 +326,148 @@ export function DraggableDatasourceList() {
             document.addEventListener('drop', function (event) {
                 // 阻止默认行为（drop的默认处理方式是当初链接处理）
                 event.preventDefault();
+
+                dragged.style.opacity = 1;
+                while (oldStyles.length > 0) {
+                    const { cell, value } = oldStyles.shift();
+                    cell.backColor(value);
+                }
+
                 // 把拖拽元素移入目标区域
                 //获取拖动物理在屏幕的位置
                 const { spread, dsList } = cacheDatasRef.current;
-                const targetElement = spread.getHost();
+                spread.suspendPaint();
+                const { cell, row, col } = getCellInfo({ event, spread });
+                if (!cell) {
+                    return;
+                }
                 debugger;
-                const { x: offsetLeft, y: offsetTop } =
-                    targetElement.getBoundingClientRect();
+                const sheet = spread.getActiveSheet();
                 //获取拖动块的值
                 const itemId = dragged.dataset.itemId;
                 const current = findTreeNodeById(itemId, dsList);
 
-                //根据坐标获取单元格
-                const x = event.pageX - offsetLeft;
-                const y = event.pageY - offsetTop;
-
-                const target = spread.hitTest(x, y);
-                const { row, col } = target.worksheetHitInfo;
-
-                //目标区域中不存在单元格，则退出
-                if (typeof row !== 'number' || typeof col !== 'number') {
-                    return;
-                }
-
-                const sheet = spread.getActiveSheet();
-                const dataPath = dragged.dataset.path;
+                const dataPath = getPath(current, dsList);
                 const spreadNS = GC.Spread.Sheets;
+
+                const cellInstanceId = getCellInstanceId(sheet, row, col);
+                const sheetInstanceId = getSheetInstanceId(sheet);
+
                 if (current.type === 'entity') {
-                    const tableColumnsCount = Array.isArray(current.children)
-                        ? current.children.length
-                        : 0;
-
-                    const columnCount = sheet.getColumnCount(
-                        spreadNS.SheetArea.viewport
-                    );
-                    if (col + tableColumnsCount > columnCount) {
-                        sheet.addColumns(col, tableColumnsCount - 1);
-                    }
-
-                    const table = sheet.tables.add(
-                        'tableRecordds',
+                    addTable({
+                        columnsTemp: current.children,
+                        sheet,
+                        spreadNS,
+                        dispatch,
                         row,
                         col,
-                        10,
-                        tableColumnsCount,
-                        spreadNS.Tables.TableThemes.light6
-                    );
-
-                    table.autoGenerateColumns(false);
-
-                    if (Array.isArray(current.children)) {
-                        const tableColumns = [];
-                        current.children.forEach(function ({ name, code }) {
-                            const tableColumn = new spreadNS.Tables.TableColumn(
-                                genUUID(),
-                                code,
-                                name
-                            );
-                            tableColumns.push(tableColumn);
-                        });
-
-                        tableColumns.length > 0 &&
-                            table.bindColumns(tableColumns);
-                    }
-
-                    table.bindingPath(dataPath);
+                        cellInstanceId,
+                        sheetInstanceId,
+                        dataPath,
+                        itemId,
+                    });
                 } else {
                     const bindingPathCellType = new BindingPathCellType();
-                    sheet
-                        .getCell(row, col)
-                        .bindingPath(dataPath)
-                        .cellType(bindingPathCellType);
+                    cell.bindingPath(dataPath).cellType(bindingPathCellType);
+                    setCellTag(sheet, row, col, 'bindType', 'normal');
+                    setCellTag(sheet, row, col, 'dsInstanceId', itemId);
+                    dispatch(
+                        saveBindInfos({
+                            bindInfos: {
+                                row,
+                                col,
+                                path: dataPath,
+                                id: itemId,
+                                bindType: 'cell',
+                                cellInstanceId,
+                                sheetInstanceId,
+                            },
+                        })
+                    );
                 }
-
-                let source = new spreadNS.Bindings.CellBindingSource({
-                    name: 'zona',
-                    age: 18,
-                    work: [
-                        {
-                            startDate: '2001',
-                            endDate: '2010',
-                            companyName: 'A公司',
-                        },
-                        {
-                            startDate: '2011',
-                            endDate: '2020',
-                            companyName: 'B公司',
-                        },
-                    ],
-                });
-                sheet.autoGenerateColumns = true;
-                sheet.setDataSource(source);
+                spread.resumePaint();
             });
         }
     }, []);
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                textAlign: 'center',
-            }}
-        >
-            <span
+        <>
+            {opened ? (
+                <Dialog
+                    open={true}
+                    width='100%'
+                    height='100%'
+                    onClose={function () {
+                        setOpened(false);
+                    }}
+                >
+                    <Index></Index>
+                </Dialog>
+            ) : (
+                ''
+            )}
+            <div
                 style={{
-                    backgroundColor: '#f6f6f6',
-                    borderBottom: '1px solid #ababab',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    textAlign: 'center',
+                    borderRight: '1px solid #ababab',
                 }}
             >
-                数据源
-            </span>
-            <DatasourceList
-                isShowAddSubDatasource={false}
-                width={200}
-                draggable={true}
-            ></DatasourceList>
-            <span
-                style={{
-                    height: '26px',
-                    background: '#f6f6f6',
-                    marginTop: 'auto',
-                    borderTop: '1px solid #ababab',
-                }}
-            ></span>
-        </div>
+                <span
+                    style={{
+                        backgroundColor: '#f6f6f6',
+                        borderBottom: '1px solid #ababab',
+                        height: '32px',
+                        lineHeight: '32px',
+                    }}
+                    onClick={function () {
+                        setOpened(!opened);
+                    }}
+                >
+                    数据源
+                </span>
+                <DatasourceList
+                    isShowAddSubDatasource={false}
+                    width={350}
+                    draggable={true}
+                ></DatasourceList>
+                <span
+                    style={{
+                        height: '27px',
+                        background: '#f6f6f6',
+                        marginTop: 'auto',
+                        borderTop: '1px solid #ababab',
+                    }}
+                    onClick={function () {
+                        /* const sheet = spread.getActiveSheet();
+                        const spreadNS = GC.Spread.Sheets;
+                        let source = new spreadNS.Bindings.CellBindingSource({
+                            name: 'zona',
+                            age: 18,
+                            work: [
+                                {
+                                    startDate: '2001',
+                                    endDate: '2010',
+                                    companyName: 'A公司',
+                                },
+                                {
+                                    startDate: '2011',
+                                    endDate: '2020',
+                                    companyName: 'B公司',
+                                },
+                            ],
+                        });
+                        sheet.setDataSource(source); */
+                        preview({
+                            spread,
+                            state,
+                        });
+                    }}
+                >
+                    测试绑定数据
+                </span>
+            </div>
+        </>
     );
 }
 
@@ -374,23 +479,29 @@ const initialDatasourceData = {
     code: '',
     name: '',
     parentId: '',
-    optType: 'add',
 };
 
+//编辑
 function Index(props) {
     const dispatch = useDispatch();
-    let { dsList, activeDs } = useSelector(
-        ({ datasourceSlice }) => datasourceSlice
-    );
+    const [isShowConfirmDialog, setIsShowConfirmDialog] = useState(false);
+    const cacheDatasRef = useRef({
+        updated: [],
+    });
+    let {
+        fontSlice: { spread },
+        datasourceSlice: { dsList, bindInfos, activeDs, finalDsList },
+    } = useSelector((state) => state);
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
     }
     const datasourceTypeDatas = [
-        { value: 'a', text: '字符串' },
-        { value: 'b', text: '实体' },
+        { value: 'string', text: '字符串' },
+        { value: 'entity', text: '实体' },
     ];
 
     const isCanBeSaved = activeDs.code && activeDs.name;
+    const isCanAdd = (isCanBeSaved && dsList.length > 0) || dsList.length === 0;
 
     //添加
     const addDatasourceClickHandler = function () {
@@ -409,6 +520,12 @@ function Index(props) {
         if (value === activeDs[key]) {
             return;
         }
+        console.log('onChange', e.target.value);
+        const pattern = /^[a-zA-Z0-9_]+$/;
+        if (key === 'code' && !pattern.test(value) && value) {
+            e.target.value = activeDs[key];
+            return;
+        }
         const newData = {
             ...activeDs,
             [key]: value,
@@ -423,9 +540,25 @@ function Index(props) {
         }
         const newData = {
             ...activeDs,
-            optType: '',
         };
-        dispatch(updateDslist({ newData }));
+        const { updated } = getChanged({
+            dsList,
+            finalDsList,
+        });
+        debugger;
+        const result = checkHasBind({
+            spread,
+            bindInfos,
+            updated,
+            dsList,
+        });
+
+        cacheDatasRef.current.updated = updated;
+        if (result) {
+            setIsShowConfirmDialog(true);
+        } else {
+            dispatch(updateDslist({ newData, isSave: true }));
+        }
     };
 
     //校验编码是否唯一
@@ -451,93 +584,131 @@ function Index(props) {
         }
 
         if (data && data.id !== activeDs.id && isCanBeSaved) {
-            saveBtnClickHandler();
             dispatch(toggleActiveDs({ dataItemId: data.id }));
         }
     };
 
     return (
-        <div className='defineDatasourceBox'>
+        <DatasourceBox>
+            {isShowConfirmDialog ? (
+                <ConfirmDialog
+                    onCancle={function () {
+                        setIsShowConfirmDialog(false);
+                    }}
+                    onConfirm={function () {
+                        setIsShowConfirmDialog(false);
+                        const newData = {
+                            ...activeDs,
+                        };
+                        dispatch(updateDslist({ newData, isSave: true }));
+                        checkHasBind({
+                            dispatch,
+                            spread,
+                            bindInfos,
+                            dsList,
+                            updated: cacheDatasRef.current.updated,
+                            sync: true,
+                        });
+                        console.log('你确定了');
+                    }}
+                ></ConfirmDialog>
+            ) : (
+                ''
+            )}
             <h1>数据源</h1>
             <LineSepatator type='horizontal'></LineSepatator>
-            <div className='defineDatasourceOptBox'>
-                <div className='defineDatasourceOptBoxLeft'>
+            <DatasourceOptBox>
+                <DatasourceOptBoxLeft>
                     <div className='header'>
-                        <div
-                            className={`addDatasource  ${
-                                (activeDs.id && activeDs.optType === 'add') ||
-                                !isCanBeSaved
-                                    ? 'notAllow'
-                                    : ''
-                            }`}
+                        <AddDatasourceBtn
+                            data-not-allow={!isCanAdd}
                             onClick={addDatasourceClickHandler}
                         >
                             添加
-                        </div>
+                        </AddDatasourceBtn>
                     </div>
                     <DatasourceList
                         activeId={activeDs.id}
                         click={datasourceListClickHandler}
                     ></DatasourceList>
-                </div>
-                <div
-                    className={`defineDatasourceOptBoxRight ${
-                        activeDs.id ? '' : 'notAllow'
-                    }`}
+                </DatasourceOptBoxLeft>
+                <DatasourceOptBoxRight
+                    data-not-allow={activeDs.id ? false : true}
                 >
-                    <div className='optBtnBox'>
-                        <button
-                            className={`saveBtn ${
-                                isCanBeSaved ? '' : 'notAllow'
-                            }`}
+                    <OptBtnBox>
+                        <SaveBtn
+                            data-not-allow={!isCanBeSaved}
                             onClick={saveBtnClickHandler}
                         >
                             保存
-                        </button>
-                    </div>
+                        </SaveBtn>
+                    </OptBtnBox>
                     <div>编码</div>
                     <div>
-                        <input
-                            className='hint'
+                        <InputField
                             type='text'
                             value={activeDs.code || ''}
                             onChange={dataChangeHandler}
                             onBlur={checkIsUnique}
                             data-item-type='code'
                             maxLength={20}
-                            data-hint-msg='编码不能重复'
-                        />
+                        ></InputField>
                     </div>
                     <div>名称</div>
                     <div>
-                        <input
+                        <InputField
                             type='text'
                             value={activeDs.name}
                             onChange={dataChangeHandler}
                             data-item-type='name'
                             maxLength={80}
-                        />
+                        ></InputField>
                     </div>
-                    <div>类型</div>
-                    <div>
-                        <DropdownBox
-                            datas={datasourceTypeDatas}
-                            className='datasourceType'
-                            style={{ minWidth: '500px' }}
-                        ></DropdownBox>
-                    </div>
+                    {activeDs.parentId ? (
+                        ''
+                    ) : (
+                        <>
+                            <div>类型</div>
+                            <div>
+                                <DropdownBox
+                                    datas={datasourceTypeDatas}
+                                    className='datasourceType'
+                                    style={{ minWidth: '500px' }}
+                                    release={true}
+                                    onChange={function (data) {
+                                        console.log(data);
+                                        const newData = {
+                                            ...activeDs,
+                                            type: data.value,
+                                        };
+                                        dispatch(updateDslist({ newData }));
+                                    }}
+                                >
+                                    <div className={`uiText show`}>
+                                        {activeDs.type === 'string'
+                                            ? '字符串'
+                                            : '实体'}
+                                    </div>
+                                    <div className='uiArrowBox'>
+                                        <span className='uiArrow'></span>
+                                    </div>
+                                </DropdownBox>
+                            </div>
+                        </>
+                    )}
+
                     <div>描述</div>
                     <div>
-                        <textarea
+                        <TextareaField
                             onChange={dataChangeHandler}
                             value={activeDs.desc}
                             data-item-type='desc'
                             maxLength={200}
-                        ></textarea>
+                        ></TextareaField>
                     </div>
-                </div>
-            </div>
-        </div>
+                </DatasourceOptBoxRight>
+            </DatasourceOptBox>
+        </DatasourceBox>
     );
 }
 

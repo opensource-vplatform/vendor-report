@@ -1,9 +1,7 @@
 import Designer from './Designer';
 
-function QuickStart(props) {
-    return (
-        <Designer></Designer>
-    );
+function App(props) {
+    return <Designer></Designer>;
 }
 
-export default QuickStart;
+export default App;
