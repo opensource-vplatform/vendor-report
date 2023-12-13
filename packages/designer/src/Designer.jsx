@@ -10,7 +10,6 @@ import {
 import Excel from './Excel';
 import Nav from './Nav';
 import Preview from './Preview';
-import PreviewView from './PreviewView';
 
 const Wrap = styled.div`
     height: 100%;
@@ -27,13 +26,9 @@ const SpreadWrap = styled.div`
 `;
 
 function Designer() {
-    let {
-        datasourceSlice: { dsList, isShowPreviewView },
-    } = useSelector((state) => state);
     const { mode } = useSelector(({ appSlice }) => appSlice);
     return (
         <Wrap>
-            {isShowPreviewView ? <PreviewView></PreviewView> : ''}
             {mode == 'edit' ? (
                 <Fragment>
                     <Nav></Nav>
