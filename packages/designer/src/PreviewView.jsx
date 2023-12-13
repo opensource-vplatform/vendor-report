@@ -6,8 +6,6 @@ import styled from 'styled-components';
 import GC from '@grapecity/spread-sheets';
 import { SpreadSheets, Worksheet } from '@grapecity/spread-sheets-react';
 
-import { setPreviewViewDatas } from './store/datasourceSlice/datasourceSlice';
-
 const PreviewViewBox = styled.div`
     height: 100%;
     width: 100%;
@@ -48,9 +46,29 @@ function PreviewView() {
         if (spread) {
             spread.sheets.forEach(function (sheet, index) {
                 const sheetsInfo = previewViewDatas.sheets[index];
+
+                Object.entries(sheetsInfo.row).forEach(function ([row, cols]) {
+                    const _row = Number(row);
+                    Object.entries(cols).forEach(function ([col, info]) {
+                        const _col = Number(col);
+                        if (
+                            Object.prototype.hasOwnProperty.call(info, 'value')
+                        ) {
+                            sheet.setValue(_row, _col, info.value);
+                        }
+
+                        if (
+                            Object.prototype.hasOwnProperty.call(info, 'path')
+                        ) {
+                            sheet.getCell(_row, _col).bindingPath(info.path);
+                        }
+                    });
+                });
+
                 sheet.tables.all().forEach(function (table) {
                     sheet.tables.remove(table);
                 });
+                //表格
                 sheetsInfo.tables.forEach(function ({
                     tableName,
                     range: { row, col },
@@ -93,7 +111,25 @@ function PreviewView() {
     });
 
     return (
-        <PreviewViewBox>
+        <SpreadSheets
+            workbookInitialized={function (spread) {
+                setSpread(spread);
+            }}
+        >
+            {previewViewDatas.sheets.map(function (sheet, index) {
+                let source = new GC.Spread.Sheets.Bindings.CellBindingSource(
+                    previewViewDatas.datas
+                );
+                return (
+                    <Worksheet
+                        name={sheet.sheetName}
+                        key={index}
+                        dataSource={source}
+                    ></Worksheet>
+                );
+            })}
+        </SpreadSheets>
+        /*  <PreviewViewBox>
             <PreviewViewBoxTop>
                 <CloseBtn
                     onClick={function () {
@@ -122,7 +158,7 @@ function PreviewView() {
                     );
                 })}
             </SpreadSheets>
-        </PreviewViewBox>
+        </PreviewViewBox> */
     );
 }
 

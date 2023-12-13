@@ -2,11 +2,8 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import {
-  SpreadSheets,
-  Worksheet,
-} from '@grapecity/spread-sheets-react';
 
+import PreviewView from './PreviewView';
 import { setMode } from './store/appSlice/appSlice';
 
 const Wrap = styled.div`
@@ -50,14 +47,15 @@ export default function () {
                 </Button>
             </Toolbar>
             <ExcelWrap>
-                <SpreadSheets tabEditable={false} newTabVisible={false} allowContextMenu={false}>
+                <PreviewView></PreviewView>
+                {/*  <SpreadSheets tabEditable={false} newTabVisible={false} allowContextMenu={false}>
                     <Worksheet
                         name='本地预览'
                         autoGenerateColumns={false}
                         rowCount={20}
                         colCount={20}
                     ></Worksheet>
-                </SpreadSheets>
+                </SpreadSheets> */}
             </ExcelWrap>
         </Wrap>
     );

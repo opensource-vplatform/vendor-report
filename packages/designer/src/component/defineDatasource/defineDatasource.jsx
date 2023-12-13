@@ -89,6 +89,7 @@ function DatasourceTree(props) {
         isShowAddSubDatasource = true,
         width,
         draggable = false,
+        parentType,
     } = props;
     if (!Array.isArray(datas)) {
         return '';
@@ -120,6 +121,13 @@ function DatasourceTree(props) {
         dispatch(deleteDsList({ itemId }));
     };
 
+    const draggableClass = ` ${
+        draggable && parentType !== 'entity'
+            ? 'draggable'
+            : draggable
+              ? 'notDraggable'
+              : ''
+    }`;
     return (
         <DatasourceListOl
             onClick={listClickHandler}
@@ -130,15 +138,17 @@ function DatasourceTree(props) {
                 datasObj[id] = dataItem;
                 return (
                     <li
-                        className={`listItem ${draggable ? 'draggable' : ''}`}
+                        className={`listItem ${draggableClass}`}
                         key={id}
                         data-item-id={id}
                     >
                         <ListItemText
-                            className={`${id === activeId ? 'active' : ''}`}
+                            className={`${
+                                id === activeId ? 'active' : ''
+                            } ${draggableClass}`}
                             data-item-id={id}
                             style={{ paddingLeft: indent + 'px' }}
-                            draggable={draggable}
+                            draggable={draggable && parentType !== 'entity'}
                         >
                             <div className='text'>{name || '-'}</div>
                             {type === 'entity' && isShowAddSubDatasource ? (
@@ -167,6 +177,7 @@ function DatasourceTree(props) {
                                 parentId={id}
                                 isNotAllow={isNotAllow}
                                 draggable={draggable}
+                                parentType='entity'
                                 isShowAddSubDatasource={isShowAddSubDatasource}
                             ></DatasourceTree>
                         ) : (

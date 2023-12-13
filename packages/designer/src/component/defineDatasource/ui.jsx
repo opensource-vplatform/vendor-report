@@ -149,6 +149,9 @@ export const ListItemText = styled.div`
     &:hover {
         background-color: #ddd;
     }
+    &.notDraggable:hover {
+        background-color: transparent;
+    }
 
     .text {
         &::before {
@@ -170,6 +173,11 @@ export const DatasourceListOl = styled.ol`
 
         &.draggable {
             cursor: move;
+        }
+
+        &.notDraggable {
+            cursor: not-allowed;
+            color: #ddd;
         }
     }
 `;

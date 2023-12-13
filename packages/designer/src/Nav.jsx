@@ -1,14 +1,8 @@
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/Button/Index';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
+import { Tab, Tabs } from '@components/tabs/Index';
 import { setActive } from '@store/navSlice/navSlice';
 import FileTab from '@tabs/file/Index';
 import StartTab from '@tabs/start/Index';
@@ -16,6 +10,7 @@ import TableTab from '@tabs/table/Index';
 import TestTab from '@tabs/test/Index';
 import ViewTab from '@tabs/view/Index';
 
+import { preview } from '../src/component/defineDatasource/fun';
 import { setMode } from './store/appSlice/appSlice';
 
 const FileTabTitle = styled.a`
@@ -56,7 +51,11 @@ const TableNavItem = WithNavItem(TableTab);
 
 export default function () {
     const dispatch = useDispatch();
-    const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
+    const state = useSelector((state) => state);
+    const {
+        navSlice: { active, hideCodes },
+        fontSlice: { spread },
+    } = state;
     return (
         <Tabs
             value={active}
@@ -65,7 +64,14 @@ export default function () {
             tool={
                 <Button
                     style={{ marginRight: 8 }}
-                    onClick={() => dispatch(setMode({ mode: 'preview' }))}
+                    onClick={() => {
+                        preview({
+                            dispatch,
+                            spread,
+                            state,
+                        });
+                        dispatch(setMode({ mode: 'preview' }));
+                    }}
                 >
                     预览
                 </Button>

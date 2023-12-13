@@ -253,7 +253,7 @@ export function checkHasBind(params) {
                             return true;
                         }
 
-                        if (tableName && sync) {
+                        if (tableName) {
                             spread.suspendPaint();
                             const table =
                                 sheetInstance.tables.findByName(tableName);
@@ -459,7 +459,7 @@ export function preview(params) {
                 });
             });
             _sheet.tables.push({
-                range,
+                range: { ...range },
                 tableName,
                 path,
                 columns,
@@ -490,12 +490,6 @@ export function preview(params) {
             }
         }
     });
-
-    /*   let source = new GC.Spread.Sheets.Bindings.CellBindingSource(datas);
-    spread.sheets.forEach(function (sheet) {
-        sheet.setDataSource(source);
-    });
- */
     dispatch(
         setPreviewViewDatas({
             datas: {
