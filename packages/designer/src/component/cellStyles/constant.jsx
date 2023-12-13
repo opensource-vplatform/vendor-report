@@ -30,16 +30,28 @@ export const FormatNumber = {
 };
 
 export const AccountingSymbol = [
-    ['', '', null],
-    ['$', '$#,##0', 'en-US'],
-    ['¥(Chinese)', '¥#,##0', 'zh-cn'],
-    ['¥(Japanese)', '¥#,##0', 'ja-jp'],
-    ['₩(Korean)', '₩#,##0', 'ko-kr'],
+    { value: '', title: '', text: '' },
+    { value: '$#,##0', title: '$', text: '$' },
+    { value: '¥#,##0', title: '¥(Chinese)', text: '¥(Chinese)' },
+    { value: '₩#,##0', title: '₩(Korean)', text: '₩(Korean)' },
 ];
 
-export const LocaleType = {
-    en_us: '英语(美国)',
-    ja_jp: '日语',
+export const LocaleType = [
+    { value: 'en_us', title: '英语(美国)', text: '英语(美国)' },
+    { value: 'zh_cn', title: '中文(中国)', text: '中文(中国)' },
+];
+
+export const CurrencyNegativeNumbers = {
+    number1: '-1,234.10',
+    rednumber2: '1,234.10',
+    number3: '(1,234.10)',
+    rednumber4: '(1,234.10)',
+};
+export const NegativeNumbersFormatStrings = {
+    number1: '$#,##0.00_);($#,##0.00)',
+    rednumber2: '[Red]$#,##0.00',
+    number3: '($#,##0.00)',
+    rednumber4: '([Red]$#,##0.00)',
 };
 export const TimeFormats = {
     '1:30:00 PM': 'h:mm:ss tt',
@@ -83,12 +95,7 @@ export const FractionType = [
     '以10为分母(3/10)',
     '百分之几(30/100)',
 ];
-export const CurrencyNegativeNumbers = {
-    number1: '-1,234.10',
-    rednumber2: '1,234.10',
-    number3: '(1,234.10)',
-    rednumber4: '1,234.10',
-};
+
 export const SpecialFormats = [
     '00000',
     '00000-0000',

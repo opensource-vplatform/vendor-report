@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import GC from '@grapecity/spread-sheets';
-import {} from '@grapecity/spread-sheets';
 import Index from '../dialog/Index';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
 import Integer from '../integer/Index';
 import Button from '../button/Index';
-import DropdownBox from '../dropdownBox/dropdownBox';
+import Select from '@components/Select/Index';
 import {
     Categories,
     FormatNumber,
@@ -26,7 +25,6 @@ function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
-    const [isApply, setIsApply] = useState(false);
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
     const [selectedValue, setSelectedCategoriesValue] = useState('general');
     const [selectedSymbol, setSelectedSymbol] = useState('');
@@ -84,12 +82,16 @@ function CellStyleSetting(props) {
         false
     );
 
-    const handleSelectCategoriesChange = (event) => {
-        const selectedOptionValue = event.target.value;
-        setSelectedCategoriesValue(selectedOptionValue);
+    const handleSelectCategoriesChange = (value) => {
+        const keys = Object.keys(Categories);
+        const selectedOptionValue = keys.find((k) => Categories[k] === value);
+        setSelectedCategoriesValue(selectedOptionValue.toString());
     };
-    const handleSelectSymbolChange = (event) => {
-        const selectedSymbolValue = event.target.value;
+    const handleNegativeNumbers = (value) => {
+        setSelectedTimeFormat(value);
+    };
+    const handleSelectSymbolChange = (value) => {
+        const selectedSymbolValue = value;
         setSelectedSymbol(selectedSymbolValue);
     };
 
@@ -124,7 +126,7 @@ function CellStyleSetting(props) {
         let tempValue;
         let currencyFormat;
         if (decimalPlacesValue === 0) {
-            currencyFormat = '¥#,##0';
+            currencyFormat = symbol;
         } else {
             currencyFormat = `${symbol}.${'0'.repeat(decimalPlacesValue)}`;
         }
@@ -198,7 +200,6 @@ function CellStyleSetting(props) {
     };
     const handleCancel = () => {
         setIsOpen(false);
-
         setDecimalPlacesValue(0);
         setSelectedSymbol('');
         setSelectedTimeFormat('');
@@ -213,16 +214,40 @@ function CellStyleSetting(props) {
 
     useEffect(() => {
         let tempValue = firstCellValue ? firstCellValue : '12345';
-        if (selectedValue === 'numbers') {
-            tempValue = formatThousandSeparator(
-                tempValue,
-                checkboxOfThousandSeparator
-            );
+        if (selectedValue === 'numbers' || selectedValue === 'currency') {
+            let formatString, decimals, currency, thousandsSep;
+            currency = selectedSymbol;
+            thousandsSep = checkboxOfThousandSeparator ? '#,##' : '';
+
+            if (decimalPlacesValue > 0) {
+                decimals = '0.' + '0'.repeat(decimalPlacesValue);
+            } else {
+                decimals = '0';
+            }
+
+            switch (selectedTimeFormat) {
+                case 'number1':
+                    formatString = `${currency}${thousandsSep}${decimals}_);-${currency}${thousandsSep}${decimals}`;
+                    break;
+                case 'rednumber2':
+                    formatString = `[Red]${currency}${thousandsSep}${decimals};[Red]${currency}${thousandsSep}${decimals}`;
+                    break;
+                case 'number3':
+                    formatString = `(${currency}${thousandsSep}${decimals});(${currency}${thousandsSep}${decimals})`;
+                    break;
+                case 'rednumber4':
+                    formatString = `([Red]${currency}${thousandsSep}${decimals});([Red]${currency}${thousandsSep}${decimals})`;
+                    break;
+
+                default:
+                    formatString = `${thousandsSep}${decimals}`;
+                    break;
+            }
+            tempValue = formatData(formatString);
         }
 
         // 处理小数
         if (
-            selectedValue === 'currency' ||
             selectedValue === 'accounting' ||
             selectedValue === 'percentage' ||
             selectedValue === 'scientific'
@@ -245,7 +270,7 @@ function CellStyleSetting(props) {
         }
 
         // 处理货币
-        if (selectedValue === 'currency' || selectedValue === 'accounting') {
+        if (selectedValue === 'accounting') {
             tempValue = formatCurrencySymbol(tempValue, selectedSymbol);
         }
 
@@ -310,19 +335,14 @@ function CellStyleSetting(props) {
                     <Tab code='数字' title='数字'>
                         <p>分类：</p>
                         <div className='leftArea'>
-                            <select
-                                name='categoryList'
-                                id='categoryList'
-                                size={16}
-                                value={selectedValue}
+                            <List
+                                height='423px'
+                                values={Object.values(Categories)}
+                                selectedValue={Categories[
+                                    selectedValue
+                                ].toString()}
                                 onChange={handleSelectCategoriesChange}
-                            >
-                                {Object.keys(Categories).map((key) => (
-                                    <option key={key} value={key}>
-                                        {Categories[key].toString()}
-                                    </option>
-                                ))}
-                            </select>
+                            />
                         </div>
                         <div className='simpleArea'>
                             <fieldset>
@@ -352,7 +372,7 @@ function CellStyleSetting(props) {
                                                 decimalPlacesValue
                                             )
                                         }
-                                    ></Integer>
+                                    />
                                 </div>
                             )}
 
@@ -370,57 +390,30 @@ function CellStyleSetting(props) {
                                 selectedValue === 'accounting') && (
                                 <div className='decimalPlaces'>
                                     <span>货币符号： </span>
-                                    <select
-                                        name='currencySelect'
-                                        id='currencySelect'
-                                        size={1}
-                                        value={selectedSymbol}
+
+                                    <Select
+                                        datas={AccountingSymbol}
+                                        style={{
+                                            width: '253px',
+                                            height: '25px',
+                                            margin: '5px 0px',
+                                        }}
                                         onChange={handleSelectSymbolChange}
-                                    >
-                                        {AccountingSymbol.map((item, index) => (
-                                            <option
-                                                key={`currency${index}`}
-                                                value={item[1]}
-                                            >
-                                                {item[0].toString()}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        value={selectedSymbol}
+                                    />
                                 </div>
                             )}
                             {(selectedValue === 'numbers' ||
                                 selectedValue === 'currency') && (
                                 <div>
                                     <span>负数：</span>
-                                    <select
-                                        name='negative-number-list'
-                                        id='negative-number-list'
-                                        size={6}
-                                    >
-                                        {Object.keys(
-                                            CurrencyNegativeNumbers
-                                        ).map((key) => {
-                                            let negative =
-                                                formatNumberDecimal();
-                                            const symbol = selectedSymbol
-                                                ? selectedSymbol.split('')[0]
-                                                : '';
-
-                                            return (
-                                                <option
-                                                    key={key}
-                                                    className={
-                                                        key.includes('red')
-                                                            ? 'redNumer'
-                                                            : null
-                                                    }
-                                                    value={key}
-                                                >
-                                                    {`${symbol.toString()}${negative.toString()}`}
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
+                                    <List
+                                        width='480px'
+                                        height='130px'
+                                        objDatas={CurrencyNegativeNumbers}
+                                        selectedValue={selectedTimeFormat}
+                                        onChange={handleNegativeNumbers}
+                                    />
                                 </div>
                             )}
 
@@ -437,7 +430,7 @@ function CellStyleSetting(props) {
                                             width='480px'
                                             height='130px'
                                             values={Object.keys(TimeFormats)}
-                                            selectedValue={selectedTimeFormat}
+                                            selectedValue={[selectedTimeFormat]}
                                             onChange={handleTimeFormatChange}
                                         />
                                     )}
@@ -488,18 +481,18 @@ function CellStyleSetting(props) {
                                 selectedValue === 'time' ||
                                 selectedValue === 'special') && (
                                 <div>
-                                    <span>区域设置（国家/地区）: </span>
-                                    <select name='locale' id='locale' size={1}>
-                                        {/* {Object.keys(LocaleType).map((key) => (
-                                            <option key={key} value={key}>
-                                                {LocaleType[key]}
-                                            </option>
-                                            
-                                        ))} */}
-                                        <option key={1} value={1}>
-                                            {'英语(美国)'}
-                                        </option>
-                                    </select>
+                                    <span>区域设置（国家/地区）:</span>
+
+                                    <Select
+                                        datas={LocaleType}
+                                        style={{
+                                            width: '50%',
+                                            height: '25px',
+                                            margin: '5px 0px',
+                                        }}
+                                        onChange={handleTimeFormatChange}
+                                        value={selectedTimeFormat}
+                                    />
                                 </div>
                             )}
                         </div>

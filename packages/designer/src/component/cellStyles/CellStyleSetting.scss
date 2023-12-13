@@ -9,57 +9,12 @@
     P {
         margin: 5px 0 0 5px;
     }
-    .header {
-        display: flex;
-
-        .activeTab {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 30px;
-            background-color: #fff;
-            border: 0px solid #d3d3d3;
-            border-bottom: none;
-            cursor: pointer;
-        }
-        .unActiveTab {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            width: 100%;
-            height: 30px;
-            background-color: 'while';
-            border: 1px solid #d3d3d3;
-            cursor: pointer;
-        }
-    }
 
     .leftArea {
         float: left;
         width: 150px;
         height: 423px;
         margin: 0px 5px 5px 5px;
-        #categoryList {
-            margin-top: 5px;
-            width: 100%;
-            height: 100%;
-            border: 1px solid lightgray;
-            option {
-                padding: 2px;
-                width: 100%;
-                height: 30px;
-                display: flex;
-                align-items: center;
-                &:hover {
-                    background-color: #dbdbdb !important;
-                }
-            }
-            &:focus-visible {
-                outline: unset;
-            }
-        }
     }
     .simpleArea {
         float: left;
@@ -91,71 +46,12 @@
             margin-top: 10px;
             display: flex;
             align-items: center;
-            #currencySelect {
-                width: 50%;
-                height: 26px;
-                border: 1px solid lightgray;
-                option {
-                    height: 26px;
-                    padding: 2px 10px;
-                    width: 100%;
-                    display: flex;
-                    align-items: center;
-                    &:hover {
-                        background-color: #dbdbdb;
-                    }
-                }
-                &:focus-visible {
-                    outline: unset;
-                }
-            }
         }
         #thousand-separator {
             height: 25px;
             margin: 5px 0;
             display: flex;
             align-items: center;
-        }
-        #negative-number-list {
-            margin: 5px 0;
-            width: 96%;
-            height: 130px;
-            border: 1px solid lightgray;
-            option {
-                height: 26px;
-                padding: 2px 10px;
-                width: 100%;
-                display: flex;
-                align-items: center;
-                &:hover,
-                :active {
-                    background-color: #dbdbdb;
-                }
-            }
-            .redNumer {
-                color: red;
-            }
-            &:focus-visible {
-                outline: unset;
-            }
-        }
-        #locale {
-            width: 96%;
-            height: 26px;
-            border: 1px solid lightgray;
-            option {
-                height: 26px;
-                padding: 2px;
-                display: flex;
-                align-items: center;
-                &:hover,
-                :active {
-                    background-color: #dbdbdb;
-                }
-            }
-            &:focus-visible {
-                outline: unset;
-            }
         }
     }
     .bottomArea {

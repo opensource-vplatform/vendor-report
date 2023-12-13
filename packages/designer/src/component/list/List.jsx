@@ -2,12 +2,14 @@ import React from 'react';
 import { useState } from 'react';
 import './list.scss';
 const List = ({
-    values, // 数据源
+    values, // 数据源：数组类型
+    objDatas = null, //数据源拓展：可传对象
     width = 'auto',
     height = 'auto',
     selectedValue,
     onChange,
     isHasInput = false,
+    className = {},
 }) => {
     const [filterText, setFilterText] = useState(selectedValue);
 
@@ -26,14 +28,14 @@ const List = ({
                 />
             )}
             <div className='list'>
-                {values.map((value) => {
+                {values?.map((value, index) => {
                     const isSelected = selectedValue === value;
                     const itemClassName = isSelected
                         ? 'listItemSelected'
                         : 'listItem';
                     return (
                         <div
-                            key={value}
+                            key={value + index}
                             className={itemClassName}
                             onClick={() => handleItemClick(value)}
                         >
@@ -41,6 +43,25 @@ const List = ({
                         </div>
                     );
                 })}
+                {objDatas &&
+                    Object.keys(objDatas).map((key) => {
+                        const isSelected = selectedValue === key;
+                        const itemClassName = isSelected
+                            ? 'listItemSelected'
+                            : 'listItem';
+                        const isRedNumClassName = key.includes('red')
+                            ? 'redNumer'
+                            : null;
+                        return (
+                            <div
+                                key={key}
+                                className={`${itemClassName} ${isRedNumClassName}`}
+                                onClick={() => handleItemClick(key)}
+                            >
+                                {objDatas[key]}
+                            </div>
+                        );
+                    })}
             </div>
         </div>
     );
