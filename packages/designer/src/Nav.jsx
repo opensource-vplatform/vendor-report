@@ -10,6 +10,7 @@ import {
   Tabs,
 } from '@components/tabs/Index';
 import { setActive } from '@store/navSlice/navSlice';
+import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
@@ -54,6 +55,7 @@ const StartNavItem = WithNavItem(StartTab);
 const ViewNavItem = WithNavItem(ViewTab);
 const TestNavItem = WithNavItem(TestTab);
 const TableNavItem = WithNavItem(TableTab);
+const DataNavItem = WithNavItem(DataTab);
 
 export default function () {
     const dispatch = useDispatch();
@@ -88,6 +90,7 @@ export default function () {
                 }}
             ></FileNavItem>
             <StartNavItem code='start' title='开始'></StartNavItem>
+            <DataNavItem code='data' title='数据'></DataNavItem>
             <ViewNavItem code='view' title='视图'></ViewNavItem>
             <TableNavItem code='table' title='表设计'></TableNavItem>
             <TestNavItem code='test' title='测试组件'></TestNavItem>

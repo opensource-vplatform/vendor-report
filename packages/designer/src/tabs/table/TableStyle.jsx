@@ -170,7 +170,7 @@ export default function () {
                     </ItemList>
                     <ItemList>
                         <CheckBox
-                            title='汇总行工具'
+                            title='汇总工具箱'
                             desc='勾选此项，汇总行将提供下拉选择工具，方便进行求和、平均值、最大值、最小值等汇总设置'
                             value={footerDropDownList}
                             disabled={!showFooter}
