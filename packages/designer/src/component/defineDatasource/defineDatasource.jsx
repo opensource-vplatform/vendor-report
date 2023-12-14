@@ -56,6 +56,26 @@ import {
   TextareaField,
 } from './ui.jsx';
 
+//清除动作。当触发清除动作的时候，需要调用接口清除已经绑定的数据源路径
+const clearContentsCommand = {
+    canUndo: false,
+    execute: function execute(spread, { selections }) {
+        const activeSheet = spread.getActiveSheet();
+        selections.forEach(function ({ col, row, colCount, rowCount }) {
+            const endRow = row + rowCount;
+            const endCol = col + colCount;
+            for (let rowIndex = row; rowIndex < endRow; rowIndex++) {
+                for (let colIndex = col; colIndex < endCol; colIndex++) {
+                    if (activeSheet.getBindingPath(rowIndex, colIndex)) {
+                        activeSheet.setBindingPath(rowIndex, colIndex, '');
+                    }
+                }
+            }
+        });
+        console.log(22222);
+    },
+};
+
 //弹窗
 function ConfirmDialog(props) {
     const { onCancle, onConfirm } = props;
@@ -155,6 +175,11 @@ function DatasourceTree(props) {
                             data-item-id={id}
                             style={{ paddingLeft: indent + 'px' }}
                             draggable={draggable && parentType !== 'entity'}
+                            data-children-count={
+                                type === 'entity' && Array.isArray(children)
+                                    ? children.length
+                                    : 0
+                            }
                         >
                             <div className='text'>{name || '-'}</div>
                             {type === 'entity' && isShowAddSubDatasource ? (
@@ -249,6 +274,25 @@ export function DraggableDatasourceList() {
     window.mySpread = spread;
     cacheDatasRef.current.spread = spread;
     cacheDatasRef.current.dsList = dsList;
+    useEffect(
+        function () {
+            if (!spread) {
+                return;
+            }
+
+            const commandManager = spread.commandManager();
+            commandManager.register(
+                'gc.spread.contextMenu.clearContents',
+                clearContentsCommand,
+                null,
+                false,
+                false,
+                false,
+                false
+            );
+        },
+        [spread]
+    );
     useEffect(function () {
         if (!cacheDatasRef.current.hasBindEvent) {
             cacheDatasRef.current.hasBindEvent = true;
@@ -297,6 +341,7 @@ export function DraggableDatasourceList() {
                     }
                     lastCol = col;
                     lastRow = row;
+
                     //存储旧样式
                     oldStyles.push({
                         cell,
@@ -306,6 +351,25 @@ export function DraggableDatasourceList() {
                     });
 
                     cell.backColor('#F7A711');
+
+                    const childrenCount = Number(dragged.dataset.childrenCount);
+                    if (childrenCount > 0) {
+                        for (let i = 1; i < childrenCount; i++) {
+                            const activeSheet = spread.getActiveSheet();
+                            const newCol = col + i;
+                            const cell = activeSheet.getCell(row, newCol);
+                            //存储旧样式
+                            oldStyles.push({
+                                cell,
+                                value: cell.backColor(),
+                                row,
+                                newCol,
+                            });
+
+                            cell.backColor('#F7A711');
+                        }
+                        return;
+                    }
                 },
                 false
             );

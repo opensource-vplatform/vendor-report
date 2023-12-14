@@ -286,15 +286,17 @@ export function checkHasBind(params) {
                                     });
                                     if (ds) {
                                         if (ds.code !== dataField) {
-                                            tableColumn.dataField(ds.code);
+                                            sync &&
+                                                tableColumn.dataField(ds.code);
                                             columnHasChange = true;
                                         }
                                         if (ds.name !== columnName) {
-                                            tableColumn.name(ds.name);
+                                            sync && tableColumn.name(ds.name);
                                             columnHasChange = true;
                                         }
                                     } else {
-                                        table.deleteColumns(index, 1);
+                                        columnHasChange = true;
+                                        sync && table.deleteColumns(index, 1);
                                     }
                                 }
                             });
