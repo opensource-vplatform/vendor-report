@@ -1,16 +1,19 @@
 import GC from '@grapecity/spread-sheets';
 
 import {
-    removeBindInfos,
-    saveBindInfos,
-    setPreviewViewDatas,
+  removeBindInfos,
+  saveBindInfos,
+  setPreviewViewDatas,
 } from '../../store/datasourceSlice/datasourceSlice';
-import { findTreeNodeById, genUUID } from '../../utils/commonUtil.js';
 import {
-    getCellInstanceId,
-    getCellTag,
-    getSheetInstanceId,
-    setCellTag,
+  findTreeNodeById,
+  genUUID,
+} from '../../utils/commonUtil.js';
+import {
+  getCellInstanceId,
+  getCellTag,
+  getSheetInstanceId,
+  setCellTag,
 } from '../../utils/worksheetUtil.js';
 
 export function addTable(params) {
@@ -415,6 +418,14 @@ export function preview(params) {
         for (let rowIndex = 0; rowIndex < sheetRowCount; rowIndex++) {
             _sheet.row[rowIndex] = {};
             for (let colIndex = 0; colIndex < sheetColumnCount; colIndex++) {
+                _sheet.row[rowIndex][colIndex] = {};
+
+                //样式
+                const cellStyle = JSON.parse(
+                    JSON.stringify(sheet.getActualStyle(rowIndex, colIndex))
+                );
+                _sheet.row[rowIndex][colIndex].cellStyle = cellStyle;
+
                 //单元格的值
                 const cell = sheet.getCell(rowIndex, colIndex);
                 const cellValue = cell.value();
@@ -425,16 +436,12 @@ export function preview(params) {
                     'bindInfo'
                 );
                 if (cellValue && bindInfo?.bindType !== 'tableColumn') {
-                    _sheet.row[rowIndex][colIndex] =
-                        _sheet.row[rowIndex][colIndex] || {};
                     _sheet.row[rowIndex][colIndex].value = cellValue;
                 }
 
                 //收集单元格绑定数据源路径
                 const path = sheet.getBindingPath(rowIndex, colIndex);
                 if (path) {
-                    _sheet.row[rowIndex][colIndex] =
-                        _sheet.row[rowIndex][colIndex] || {};
                     _sheet.row[rowIndex][colIndex].path = path;
                 }
             }

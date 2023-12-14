@@ -1,42 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
 import GC from '@grapecity/spread-sheets';
-import { SpreadSheets, Worksheet } from '@grapecity/spread-sheets-react';
-
-const PreviewViewBox = styled.div`
-    height: 100%;
-    width: 100%;
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    background-color: rgb(255, 255, 255);
-`;
-
-const PreviewViewBoxTop = styled.div`
-    height: 40px;
-    border: 1px solid rgb(221, 221, 221);
-    display: flex;
-    justify-content: end;
-    align-items: center;
-    padding-right: 10px;
-`;
-
-const CloseBtn = styled.button`
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    height: 26px;
-    padding: 0 12px;
-    cursor: pointer;
-`;
+import {
+  SpreadSheets,
+  Worksheet,
+} from '@grapecity/spread-sheets-react';
 
 function PreviewView() {
-    const dispatch = useDispatch();
     const { previewViewDatas } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
@@ -51,17 +26,25 @@ function PreviewView() {
                     const _row = Number(row);
                     Object.entries(cols).forEach(function ([col, info]) {
                         const _col = Number(col);
+                        //固定值
                         if (
                             Object.prototype.hasOwnProperty.call(info, 'value')
                         ) {
                             sheet.setValue(_row, _col, info.value);
                         }
 
+                        //数据源路径
                         if (
                             Object.prototype.hasOwnProperty.call(info, 'path')
                         ) {
                             sheet.getCell(_row, _col).bindingPath(info.path);
                         }
+
+                        //样式
+                        const style = new GC.Spread.Sheets.Style(
+                            info.cellStyle
+                        );
+                        sheet.setStyle(_row, _col, style);
                     });
                 });
 
@@ -129,36 +112,6 @@ function PreviewView() {
                 );
             })}
         </SpreadSheets>
-        /*  <PreviewViewBox>
-            <PreviewViewBoxTop>
-                <CloseBtn
-                    onClick={function () {
-                        dispatch(setPreviewViewDatas());
-                    }}
-                >
-                    关闭
-                </CloseBtn>
-            </PreviewViewBoxTop>
-            <SpreadSheets
-                workbookInitialized={function (spread) {
-                    setSpread(spread);
-                }}
-            >
-                {previewViewDatas.sheets.map(function (sheet, index) {
-                    let source =
-                        new GC.Spread.Sheets.Bindings.CellBindingSource(
-                            previewViewDatas.datas
-                        );
-                    return (
-                        <Worksheet
-                            name={sheet.sheetName}
-                            key={index}
-                            dataSource={source}
-                        ></Worksheet>
-                    );
-                })}
-            </SpreadSheets>
-        </PreviewViewBox> */
     );
 }
 

@@ -1,6 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { deepCopy, findTreeNodeById } from '../../utils/commonUtil.js';
+import {
+  deepCopy,
+  findTreeNodeById,
+} from '../../utils/commonUtil.js';
 
 export const datasourceSlice = createSlice({
     name: 'datasourceSlice',
@@ -132,7 +135,17 @@ export const datasourceSlice = createSlice({
                 }
             } */
         },
-        previewViewDatas: null,
+        previewViewDatas: {
+            sheets: [
+                {
+                    sheetName: 'sheet1',
+                    rowCount: 20,
+                    colCount: 20,
+                    row: {},
+                    tables: [],
+                },
+            ],
+        },
         isShowPreviewView: false,
     },
     reducers: {

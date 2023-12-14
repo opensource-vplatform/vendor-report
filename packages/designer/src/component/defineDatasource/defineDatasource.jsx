@@ -1,53 +1,59 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import GC from '@grapecity/spread-sheets';
 
 import {
-    deleteDsList,
-    pushDsList,
-    saveBindInfos,
-    toggleActiveDs,
-    updateDslist,
+  deleteDsList,
+  pushDsList,
+  saveBindInfos,
+  toggleActiveDs,
+  updateDslist,
 } from '../../store/datasourceSlice/datasourceSlice';
 import {
-    findTreeNodeById,
-    genUUID,
-    hasSameNode,
+  findTreeNodeById,
+  genUUID,
+  hasSameNode,
 } from '../../utils/commonUtil.js';
 import {
-    getCellInstanceId,
-    getSheetInstanceId,
-    setCellTag,
+  getCellInstanceId,
+  getSheetInstanceId,
+  setCellTag,
 } from '../../utils/worksheetUtil.js';
 import Dialog from '../dialog/Index.jsx';
 import DropdownBox from '../dropdownBox/dropdownBox';
 import LineSepatator from '../lineSeparator/lineSeparator';
 import {
-    addTable,
-    BindingPathCellType,
-    checkHasBind,
-    getCellInfo,
-    getChanged,
-    getPath,
-    preview,
+  addTable,
+  BindingPathCellType,
+  checkHasBind,
+  getCellInfo,
+  getChanged,
+  getPath,
 } from './fun.js';
 import {
-    AddDatasourceBtn,
-    ConfirmDialogBox,
-    DatasourceBox,
-    DatasourceListOl,
-    DatasourceOptBox,
-    DatasourceOptBoxLeft,
-    DatasourceOptBoxRight,
-    DddSubDatasource,
-    DelDatasource,
-    InputField,
-    ListItemText,
-    OptBtnBox,
-    SaveBtn,
-    TextareaField,
+  AddDatasourceBtn,
+  ConfirmDialogBox,
+  DatasourceBox,
+  DatasourceListOl,
+  DatasourceOptBox,
+  DatasourceOptBoxLeft,
+  DatasourceOptBoxRight,
+  DddSubDatasource,
+  DelDatasource,
+  InputField,
+  ListItemText,
+  OptBtnBox,
+  SaveBtn,
+  TextareaField,
 } from './ui.jsx';
 
 //弹窗
@@ -451,35 +457,7 @@ export function DraggableDatasourceList() {
                         marginTop: 'auto',
                         borderTop: '1px solid #ababab',
                     }}
-                    onClick={function () {
-                        /* const sheet = spread.getActiveSheet();
-                        const spreadNS = GC.Spread.Sheets;
-                        let source = new spreadNS.Bindings.CellBindingSource({
-                            name: 'zona',
-                            age: 18,
-                            work: [
-                                {
-                                    startDate: '2001',
-                                    endDate: '2010',
-                                    companyName: 'A公司',
-                                },
-                                {
-                                    startDate: '2011',
-                                    endDate: '2020',
-                                    companyName: 'B公司',
-                                },
-                            ],
-                        });
-                        sheet.setDataSource(source); */
-                        preview({
-                            spread,
-                            state,
-                            dispatch,
-                        });
-                    }}
-                >
-                    测试预览
-                </span>
+                ></span>
             </div>
         </>
     );
