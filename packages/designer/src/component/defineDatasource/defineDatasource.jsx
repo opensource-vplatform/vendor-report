@@ -9,28 +9,34 @@ import {
   useSelector,
 } from 'react-redux';
 
+import Dialog from '@components/dialog/Index.jsx';
+import DropdownBox from '@components/dropdownBox/dropdownBox';
+import LineSepatator from '@components/lineSeparator/lineSeparator';
 import GC from '@grapecity/spread-sheets';
-
 import {
   deleteDsList,
   pushDsList,
   saveBindInfos,
   toggleActiveDs,
   updateDslist,
-} from '../../store/datasourceSlice/datasourceSlice';
+} from '@store/datasourceSlice/datasourceSlice';
+import {
+  setActive,
+  showTab,
+} from '@store/navSlice/navSlice';
+import { setData } from '@store/tableDesignSlice/tableDesignSlice';
 import {
   findTreeNodeById,
   genUUID,
   hasSameNode,
-} from '../../utils/commonUtil.js';
+} from '@utils/commonUtil.js';
+import { parseTable } from '@utils/tableUtil.js';
 import {
   getCellInstanceId,
   getSheetInstanceId,
   setCellTag,
-} from '../../utils/worksheetUtil.js';
-import Dialog from '../dialog/Index.jsx';
-import DropdownBox from '../dropdownBox/dropdownBox';
-import LineSepatator from '../lineSeparator/lineSeparator';
+} from '@utils/worksheetUtil.js';
+
 import {
   addTable,
   BindingPathCellType,
@@ -405,70 +411,80 @@ export function DraggableDatasourceList() {
 
             /* 松开鼠标，触发 drop */
             document.addEventListener('drop', function (event) {
-                // 阻止默认行为（drop的默认处理方式是当初链接处理）
-                event.preventDefault();
+                try {
+                    // 阻止默认行为（drop的默认处理方式是当初链接处理）
+                    event.preventDefault();
 
-                dragged.style.opacity = 1;
-                while (oldStyles.length > 0) {
-                    const { cell, value } = oldStyles.shift();
-                    cell.backColor(value);
+                    dragged.style.opacity = 1;
+                    while (oldStyles.length > 0) {
+                        const { cell, value } = oldStyles.shift();
+                        cell.backColor(value);
+                    }
+
+                    // 把拖拽元素移入目标区域
+                    //获取拖动物理在屏幕的位置
+                    const { spread, dsList } = cacheDatasRef.current;
+                    const { cell, row, col } = getCellInfo({ event, spread });
+                    if (!cell) {
+                        return true;
+                    }
+                    spread.suspendPaint();
+                    const sheet = spread.getActiveSheet();
+                    //获取拖动块的值
+                    const itemId = dragged.dataset.itemId;
+                    const current = findTreeNodeById(itemId, dsList);
+
+                    const dataPath = getPath(current, dsList);
+                    const spreadNS = GC.Spread.Sheets;
+
+                    const cellInstanceId = getCellInstanceId(sheet, row, col);
+                    const sheetInstanceId = getSheetInstanceId(sheet);
+
+                    if (current.type === 'entity') {
+                        addTable({
+                            columnsTemp: current.children,
+                            sheet,
+                            spreadNS,
+                            dispatch,
+                            row,
+                            col,
+                            cellInstanceId,
+                            sheetInstanceId,
+                            dataPath,
+                            itemId,
+                        });
+                        sheet.setActiveCell(row, col);
+                        //切换到表设计视图
+                        dispatch(showTab({ code: 'table' }));
+                        dispatch(setData({ data: parseTable(sheet) }));
+                        dispatch(setActive({ code: 'table' }));
+                    } else {
+                        const bindingPathCellType = new BindingPathCellType();
+                        cell.bindingPath(dataPath).cellType(
+                            bindingPathCellType
+                        );
+                        setCellTag(sheet, row, col, 'bindInfo', {
+                            bindType: 'cell',
+                            bindDsInstanceId: itemId,
+                        });
+                        dispatch(
+                            saveBindInfos({
+                                bindInfos: {
+                                    row,
+                                    col,
+                                    path: dataPath,
+                                    id: itemId,
+                                    bindType: 'cell',
+                                    cellInstanceId,
+                                    sheetInstanceId,
+                                },
+                            })
+                        );
+                    }
+                } catch (error) {
+                } finally {
+                    cacheDatasRef.current.spread.resumePaint();
                 }
-
-                // 把拖拽元素移入目标区域
-                //获取拖动物理在屏幕的位置
-                const { spread, dsList } = cacheDatasRef.current;
-                spread.suspendPaint();
-                const { cell, row, col } = getCellInfo({ event, spread });
-                if (!cell) {
-                    return;
-                }
-                debugger;
-                const sheet = spread.getActiveSheet();
-                //获取拖动块的值
-                const itemId = dragged.dataset.itemId;
-                const current = findTreeNodeById(itemId, dsList);
-
-                const dataPath = getPath(current, dsList);
-                const spreadNS = GC.Spread.Sheets;
-
-                const cellInstanceId = getCellInstanceId(sheet, row, col);
-                const sheetInstanceId = getSheetInstanceId(sheet);
-
-                if (current.type === 'entity') {
-                    addTable({
-                        columnsTemp: current.children,
-                        sheet,
-                        spreadNS,
-                        dispatch,
-                        row,
-                        col,
-                        cellInstanceId,
-                        sheetInstanceId,
-                        dataPath,
-                        itemId,
-                    });
-                } else {
-                    const bindingPathCellType = new BindingPathCellType();
-                    cell.bindingPath(dataPath).cellType(bindingPathCellType);
-                    setCellTag(sheet, row, col, 'bindInfo', {
-                        bindType: 'cell',
-                        bindDsInstanceId: itemId,
-                    });
-                    dispatch(
-                        saveBindInfos({
-                            bindInfos: {
-                                row,
-                                col,
-                                path: dataPath,
-                                id: itemId,
-                                bindType: 'cell',
-                                cellInstanceId,
-                                sheetInstanceId,
-                            },
-                        })
-                    );
-                }
-                spread.resumePaint();
             });
         }
     }, []);

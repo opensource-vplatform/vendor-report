@@ -47,7 +47,7 @@ export function addTable(params) {
         tableName,
         row,
         col,
-        1,
+        3,
         tableColumnsCount,
         spreadNS.Tables.TableThemes.light6
     );
