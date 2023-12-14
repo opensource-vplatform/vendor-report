@@ -135,18 +135,7 @@ export const datasourceSlice = createSlice({
                 }
             } */
         },
-        previewViewDatas: {
-            sheets: [
-                {
-                    sheetName: 'sheet1',
-                    rowCount: 20,
-                    colCount: 20,
-                    row: {},
-                    tables: [],
-                },
-            ],
-        },
-        isShowPreviewView: false,
+        previewViewDatas: {},
     },
     reducers: {
         pushDsList(state, { payload }) {
@@ -241,11 +230,31 @@ export const datasourceSlice = createSlice({
                 delete state.bindInfos[id][sheetInstanceId][cellInstanceId];
             }
         },
-        setPreviewViewDatas(state, { payload }) {
-            if (payload?.datas) {
-                state.previewViewDatas = payload.datas;
-            }
-            state.isShowPreviewView = !state.isShowPreviewView;
+        genPreviewDatas(state, { payload }) {
+            const datas = {};
+            state.finalDsList.forEach(function ({
+                type,
+                code,
+                name,
+                children,
+            }) {
+                if (type !== 'entity') {
+                    datas[code] = name + '1';
+                } else {
+                    datas[code] = [];
+                    if (Array.isArray(children)) {
+                        for (let i = 1; i <= 10; i++) {
+                            const instanceObject = {};
+                            children.forEach(function ({ code, name }) {
+                                instanceObject[code] = name + i;
+                            });
+                            datas[code].push(instanceObject);
+                        }
+                    }
+                }
+            });
+
+            state.previewViewDatas = datas;
         },
     },
 });
@@ -256,6 +265,6 @@ export const {
     deleteDsList,
     saveBindInfos,
     removeBindInfos,
-    setPreviewViewDatas,
+    genPreviewDatas,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

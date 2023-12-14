@@ -1,9 +1,18 @@
-import { useDispatch } from 'react-redux';
+import { useCallback } from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
+import GC from '@grapecity/spread-sheets';
+import {
+  SpreadSheets,
+  Worksheet,
+} from '@grapecity/spread-sheets-react';
 
-import PreviewView from './PreviewView';
 import { setMode } from './store/appSlice/appSlice';
 
 const Wrap = styled.div`
@@ -34,6 +43,22 @@ const ExcelWrap = styled.div`
 
 export default function () {
     const dispatch = useDispatch();
+    const {
+        datasourceSlice: { previewViewDatas },
+        appSlice: { spread: sourceSpread },
+    } = useSelector((state) => state);
+
+    const workbookInitializedHandler = useCallback(function (spread) {
+        const sourceJson = JSON.stringify(sourceSpread.toJSON());
+        spread.fromJSON(JSON.parse(sourceJson));
+        //设置数据源
+        spread.sheets.forEach(function (sheet) {
+            const source = new GC.Spread.Sheets.Bindings.CellBindingSource(
+                previewViewDatas
+            );
+            sheet.setDataSource(source);
+        });
+    });
     return (
         <Wrap>
             <Toolbar>
@@ -47,7 +72,9 @@ export default function () {
                 </Button>
             </Toolbar>
             <ExcelWrap>
-                <PreviewView></PreviewView>
+                <SpreadSheets workbookInitialized={workbookInitializedHandler}>
+                    <Worksheet></Worksheet>
+                </SpreadSheets>
             </ExcelWrap>
         </Wrap>
     );
