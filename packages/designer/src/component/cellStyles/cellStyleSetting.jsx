@@ -205,14 +205,13 @@ function CellStyleSetting(props) {
     };
     const handleCancel = () => {
         setIsOpen(false);
-        setDecimalPlacesValue(0);
+        setDecimalPlacesValue(2);
         setSelectedSymbol('');
         setSelectedTimeFormat('');
     };
     const handleClose = () => {
         setIsOpen(false);
-
-        setDecimalPlacesValue(0);
+        setDecimalPlacesValue(2);
         setSelectedSymbol('');
         setSelectedTimeFormat('');
     };
@@ -335,7 +334,7 @@ function CellStyleSetting(props) {
             onClose={handleClose}
         >
             <div className='tabBox'>
-                <Tabs value='数字'>
+                <Tabs>
                     {/* 可以抽成组件 <numberFormat>*/}
                     <Tab code='数字' title='数字'>
                         <p>分类：</p>
@@ -400,7 +399,9 @@ function CellStyleSetting(props) {
                                         style={{
                                             width: '253px',
                                             height: '25px',
-                                            margin: '5px 0px',
+                                        }}
+                                        optionStyle={{
+                                            width: '99%',
                                         }}
                                         onChange={handleSelectSymbolChange}
                                         value={selectedSymbol}
@@ -493,6 +494,9 @@ function CellStyleSetting(props) {
                                             width: '50%',
                                             height: '25px',
                                             margin: '5px 0px',
+                                        }}
+                                        optionStyle={{
+                                            width: '50%',
                                         }}
                                         onChange={handleLocaleType}
                                         value={locale}
