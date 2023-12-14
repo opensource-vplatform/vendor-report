@@ -19,6 +19,13 @@ const Wrap = styled.div`
     flex-direction: column;
 `;
 
+const Box = styled.div`
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+`;
+
 const SpreadWrap = styled.div`
     display: flex;
     height: 100%;
@@ -28,20 +35,23 @@ const SpreadWrap = styled.div`
 function Designer() {
     const { mode } = useSelector(({ appSlice }) => appSlice);
     return (
-        <Wrap>
-            {mode == 'edit' ? (
-                <Fragment>
+        <Fragment>
+            <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
+                <Wrap>
                     <Nav></Nav>
                     <SpreadWrap>
                         <DraggableDatasourceList></DraggableDatasourceList>
                         <Excel></Excel>
                     </SpreadWrap>
                     <CellStyleSetting></CellStyleSetting>
-                </Fragment>
-            ) : (
-                <Preview></Preview>
-            )}
-        </Wrap>
+                </Wrap>
+            </Box>
+            {mode == 'preview' ? (
+                <Wrap>
+                    <Preview></Preview>
+                </Wrap>
+            ) : null}
+        </Fragment>
     );
 }
 
