@@ -11,15 +11,17 @@ export const tableDesignSlice = createSlice({
         //汇总行
         showFooter: false,
         //镶边行
-        showHorizontalGridline: true,
+        bandRow: true,
         //镶边列
-        showVerticalGridline: true,
+        bandColumn: true,
         //第一列
-        newTabVisible: true,
+        highlightFirstColumn: false,
         //最后一列
-        tabStripVisible:true,
+        highlightLastColumn:true,
         //筛选按钮
-        filterButtonVisible:false
+        filterButtonVisible:false,
+        //汇总行工具
+        footerDropDownList:true
     },
     reducers: {
         setShowHeader(state,action){
@@ -28,8 +30,23 @@ export const tableDesignSlice = createSlice({
         setShowFooter(state,action){
             state.showFooter = action.payload.showFooter;
         },
+        setBandRow(state,action){
+            state.bandRow = action.payload.bandRow;
+        },
+        setBandColumn(state,action){
+            state.bandColumn = action.payload.bandColumn;
+        },
+        setHighlightFirstColumn(state,action){
+            state.highlightFirstColumn = action.payload.highlightFirstColumn;
+        },
+        setHighlightLastColumn(state,action){
+            state.highlightLastColumn = action.payload.highlightLastColumn;
+        },
         setFilterButtonVisible(state,action){
             state.filterButtonVisible = action.payload.filterButtonVisible;
+        },
+        setFooterDropDownList(state,action){
+            state.footerDropDownList = action.payload.footerDropDownList;
         },
         setData(state,action){
             Object.assign(state,action.payload.data)
@@ -45,6 +62,11 @@ export const {
     setData,
     setShowHeader,
     setShowFooter,
+    setBandRow,
+    setBandColumn,
+    setHighlightFirstColumn,
+    setHighlightLastColumn,
     setFilterButtonVisible,
+    setFooterDropDownList,
 } = tableDesignSlice.actions;
 export default tableDesignSlice.reducer;
