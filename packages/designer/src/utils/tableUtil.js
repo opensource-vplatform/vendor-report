@@ -15,7 +15,7 @@ export function parseTable(sheet) {
         bandColumn = false,
         highlightFirstColumn = false,
         highlightLastColumn = false,
-        filterButtonVisible = false
+        filterButtonVisible = false,
         footerDropDownList = false;
     if (table) {
         showHeader = table.showHeader();
