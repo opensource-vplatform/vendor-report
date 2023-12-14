@@ -93,7 +93,7 @@ function Tabs(props) {
         return activeCode;
     });
     const handleActive = (code) => {
-        if (code !== value) {
+        if (code !== active) {
             setActive(code);
             onChange && onChange(code);
         }

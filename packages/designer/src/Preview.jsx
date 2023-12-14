@@ -48,14 +48,6 @@ export default function () {
             </Toolbar>
             <ExcelWrap>
                 <PreviewView></PreviewView>
-                {/*  <SpreadSheets tabEditable={false} newTabVisible={false} allowContextMenu={false}>
-                    <Worksheet
-                        name='本地预览'
-                        autoGenerateColumns={false}
-                        rowCount={20}
-                        colCount={20}
-                    ></Worksheet>
-                </SpreadSheets> */}
             </ExcelWrap>
         </Wrap>
     );
