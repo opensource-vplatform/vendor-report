@@ -4,8 +4,8 @@ import {
   useDispatch,
   useSelector,
 } from 'react-redux';
-import styled from 'styled-components';
 
+import { CheckBox } from '@components/form/Index';
 import {
   GroupItem,
   HLayout,
@@ -21,46 +21,6 @@ import {
   setTabStripVisible,
 } from '@store/viewSlice/viewSlice';
 import { withBatchUpdate } from '@utils/spreadUtil';
-
-const Label = styled.label`
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 4px;
-    box-sizing: border-box;
-    &:hover {
-        background-color: #dadada;
-    }
-    &[data-disabled='true']{
-        background-color: transparent !important;
-        cursor:not-allowed;
-    }
-`;
-
-const Input = styled.input`
-    margin: 0px;
-    padding: 0px;
-`;
-
-const Title = styled.span`
-    margin-left: 12px;
-    font-size: 12px;
-`;
-
-function Switch(props) {
-    const { title, value, onChange,disabled } = props;
-    return (
-        <Label data-disabled={!!disabled}>
-            <Input
-                type='checkbox'
-                checked={!!value}
-                onChange={onChange}
-                disabled={!!disabled}
-            ></Input>
-            <Title>{title}</Title>
-        </Label>
-    );
-}
 
 export default function () {
     const dispatch = useDispatch();
@@ -96,7 +56,7 @@ export default function () {
             <HLayout>
                 <VGroupItem>
                     <ItemList>
-                        <Switch
+                        <CheckBox
                             title='行标题'
                             value={rowHeaderVisible}
                             onChange={(evt) => {
@@ -106,10 +66,10 @@ export default function () {
                                     })
                                 );
                             }}
-                        ></Switch>
+                        ></CheckBox>
                     </ItemList>
                     <ItemList>
-                        <Switch
+                        <CheckBox
                             title='列标题'
                             value={colHeaderVisible}
                             onChange={(evt) => {
@@ -119,12 +79,12 @@ export default function () {
                                     })
                                 );
                             }}
-                        ></Switch>
+                        ></CheckBox>
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
                     <ItemList>
-                        <Switch
+                        <CheckBox
                             title='垂直网格线'
                             value={showVerticalGridline}
                             onChange={(evt) => {
@@ -134,10 +94,10 @@ export default function () {
                                     })
                                 );
                             }}
-                        ></Switch>
+                        ></CheckBox>
                     </ItemList>
                     <ItemList>
-                        <Switch
+                        <CheckBox
                             title='水平网格线'
                             value={showHorizontalGridline}
                             onChange={(evt) => {
@@ -147,12 +107,12 @@ export default function () {
                                     })
                                 );
                             }}
-                        ></Switch>
+                        ></CheckBox>
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
                     <ItemList>
-                        <Switch
+                        <CheckBox
                             title='工作表选项卡'
                             value={tabStripVisible}
                             onChange={(evt) => {
@@ -162,10 +122,10 @@ export default function () {
                                     })
                                 );
                             }}
-                        ></Switch>
+                        ></CheckBox>
                     </ItemList>
                     <ItemList>
-                        <Switch
+                        <CheckBox
                             title='新建工作表'
                             value={newTabVisible}
                             disabled={!tabStripVisible}
@@ -176,7 +136,7 @@ export default function () {
                                     })
                                 );
                             }}
-                        ></Switch>
+                        ></CheckBox>
                     </ItemList>
                 </VGroupItem>
             </HLayout>

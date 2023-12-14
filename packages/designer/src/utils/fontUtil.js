@@ -43,7 +43,7 @@ export function setRangeBorder(params) {
 
 const toFontStr = function (params) {
     const {
-        fontFamily='',
+        fontFamily = '',
         fontStyle = '',
         fontVariant = '',
         fontWeight = '',
@@ -104,7 +104,7 @@ const parseFontStr = function (font) {
                         fontSize = parts[0];
                         if (fontSize.indexOf('px') !== -1) {
                             fontSize = px2pt(parseFloat(fontSize));
-                        }else if(fontSize.indexOf('pt') !== -1){
+                        } else if (fontSize.indexOf('pt') !== -1) {
                             fontSize = parseInt(fontSize);
                         }
                         if (parts.length > 1) {
@@ -123,7 +123,14 @@ const parseFontStr = function (font) {
             }
         }
     }
-    return { fontStyle, fontVariant, fontWeight, fontSize, lineHeight,fontFamily };
+    return {
+        fontStyle,
+        fontVariant,
+        fontWeight,
+        fontSize,
+        lineHeight,
+        fontFamily,
+    };
 };
 
 //解析激活状态的单元格字体
@@ -133,11 +140,11 @@ export function parseFont(sheet) {
         sheet.getActiveColumnIndex()
     );
     let wordWrap = !!style?.wordWrap,
-        textDecoration = style?.textDecoration||0,
+        textDecoration = style?.textDecoration || 0,
         textOrientation = style?.textOrientation,
         isVerticalText = !!style?.isVerticalText,
-        hAlign = style?.hAlign||0,
-        vAlign = style?.vAlign||0,
+        hAlign = style?.hAlign || 0,
+        vAlign = style?.vAlign || 0,
         backColor = style?.backColor,
         foreColor = style?.foreColor;
     const {
@@ -212,8 +219,8 @@ export function setAlign(params) {
         isVerticalText,
         wordWrap,
     } = params;
-    withBatchUpdate(spread, () => {
-        applyStyleToSelectedCell(spread, function (sheet, row, col) {
+    withBatchUpdate(spread, (sheet) => {
+        applyStyleToSelectedCell(sheet, function (sheet, row, col) {
             const style = sheet.getActualStyle(row, col);
             style.vAlign = vAlign;
             style.hAlign = hAlign;
@@ -250,12 +257,12 @@ export function setFont(params) {
         backColor,
         foreColor,
     } = params;
-    withBatchUpdate(spread, () => {
-        applyStyleToSelectedCell(spread, function (sheet, row, col) {
+    withBatchUpdate(spread, (sheet) => {
+        applyStyleToSelectedCell(sheet, function (sheet, row, col) {
             //需要实例化一个新的Style，否则字体设置无效
             const style = new GC.Spread.Sheets.Style();
             const preStyle = sheet.getStyle(row, col);
-            Object.assign(style,preStyle)
+            Object.assign(style, preStyle);
             const fontFamilyVal = dealFontFamily(fontFamily);
             const font = toFontStr({
                 fontFamily: fontFamilyVal,
@@ -278,8 +285,8 @@ export function setFont(params) {
  * @param {*} delta
  */
 export function setIndent(spread, delta) {
-    withBatchUpdate(spread, () => {
-        applyToSelectedCell(spread, (sheet, row, col) => {
+    withBatchUpdate(spread, (sheet) => {
+        applyToSelectedCell(sheet, (sheet, row, col) => {
             const style = sheet.getActualStyle(row, col);
             let oldIndent = style.textIndent;
             if (isNaN(oldIndent)) {
@@ -300,19 +307,16 @@ export function setIndent(spread, delta) {
  * @param {*} params
  */
 export function mergeCenter(spread) {
-    withBatchUpdate(spread, () => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            const selections = sheet.getSelections();
-            for (let i = 0; i < selections.length; i++) {
-                let { row, col, rowCount, colCount } = selections[i];
-                row = row === -1 ? 0 : row;
-                col = col === -1 ? 0 : col;
-                sheet.addSpan(row, col, rowCount, colCount);
-                const style = sheet.getActualStyle(row, col);
-                style.hAlign = 1;
-                sheet.setStyle(row, col, style);
-            }
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        for (let i = 0; i < selections.length; i++) {
+            let { row, col, rowCount, colCount } = selections[i];
+            row = row === -1 ? 0 : row;
+            col = col === -1 ? 0 : col;
+            sheet.addSpan(row, col, rowCount, colCount);
+            const style = sheet.getActualStyle(row, col);
+            style.hAlign = 1;
+            sheet.setStyle(row, col, style);
         }
     });
 }
@@ -322,22 +326,19 @@ export function mergeCenter(spread) {
  * @param {*} params
  */
 export function mergeAcross(spread) {
-    withBatchUpdate(spread, () => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            const selections = sheet.getSelections();
-            for (let i = 0; i < selections.length; i++) {
-                let { row, col, rowCount, colCount } = selections[i];
-                row = row === -1 ? 0 : row;
-                col = col === -1 ? 0 : col;
-                for (let m = 0; m < rowCount; m++) {
-                    for (let n = 0; n < colCount; n++) {
-                        sheet.removeSpan(row + m, col + n);
-                    }
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        for (let i = 0; i < selections.length; i++) {
+            let { row, col, rowCount, colCount } = selections[i];
+            row = row === -1 ? 0 : row;
+            col = col === -1 ? 0 : col;
+            for (let m = 0; m < rowCount; m++) {
+                for (let n = 0; n < colCount; n++) {
+                    sheet.removeSpan(row + m, col + n);
                 }
-                for (let j = 0; j < rowCount; j++) {
-                    sheet.addSpan(row + j, col, 1, colCount);
-                }
+            }
+            for (let j = 0; j < rowCount; j++) {
+                sheet.addSpan(row + j, col, 1, colCount);
             }
         }
     });
@@ -348,17 +349,14 @@ export function mergeAcross(spread) {
  * @param {*} params
  */
 export function mergeCells(spread) {
-    withBatchUpdate(spread, () => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            const selections = sheet.getSelections();
-            const selectionsLength = selections.length;
-            for (let i = 0; i < selectionsLength; i++) {
-                let { row, col, rowCount, colCount } = selections[i];
-                row = row === -1 ? 0 : row;
-                col = col === -1 ? 0 : col;
-                sheet.addSpan(row, col, rowCount, colCount);
-            }
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        const selectionsLength = selections.length;
+        for (let i = 0; i < selectionsLength; i++) {
+            let { row, col, rowCount, colCount } = selections[i];
+            row = row === -1 ? 0 : row;
+            col = col === -1 ? 0 : col;
+            sheet.addSpan(row, col, rowCount, colCount);
         }
     });
 }
@@ -368,44 +366,39 @@ export function mergeCells(spread) {
  * @param {*} params
  */
 export function unMergeCell(spread) {
-    withBatchUpdate(spread, () => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            const selections = sheet.getSelections();
-            for (let i = 0; i < selections.length; i++) {
-                let { row, col, rowCount, colCount } = selections[i];
-                row = row === -1 ? 0 : row;
-                col = col === -1 ? 0 : col;
-                for (let m = 0; m < rowCount; m++) {
-                    for (let n = 0; n < colCount; n++) {
-                        sheet.removeSpan(row + m, col + n);
-                    }
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        for (let i = 0; i < selections.length; i++) {
+            let { row, col, rowCount, colCount } = selections[i];
+            row = row === -1 ? 0 : row;
+            col = col === -1 ? 0 : col;
+            for (let m = 0; m < rowCount; m++) {
+                for (let n = 0; n < colCount; n++) {
+                    sheet.removeSpan(row + m, col + n);
                 }
             }
         }
     });
 }
 
-export function isUnderline(textDecoration){
+export function isUnderline(textDecoration) {
     return textDecoration == 1;
 }
 
-export function toUnderline(){
+export function toUnderline() {
     return 1;
 }
 
-export function isDoubleUnderline(textDecoration){
+export function isDoubleUnderline(textDecoration) {
     return textDecoration == 8;
 }
 
-export function toDoubleUnderline(){
+export function toDoubleUnderline() {
     return 8;
 }
 
-export function setBorderByType(spread,type){
-    withBatchUpdate(spread,()=>{
-        const sheet = spread.getActiveSheet();
-        if(!sheet)return;
+export function setBorderByType(spread, type) {
+    withBatchUpdate(spread, (sheet) => {
         const values = toBorders(type);
         values.forEach((value) => {
             setBorder({

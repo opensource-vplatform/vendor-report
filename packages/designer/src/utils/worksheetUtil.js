@@ -96,3 +96,20 @@ export function getCellInstanceId(sheetInstance, row, col) {
     //还没有实例id，则创建实例id并且输出示例id
     return setCellTag(sheetInstance, row, col)['instanceId'];
 }
+
+/**
+ * 是否在表格区域
+ */
+export function inTableArea(sheet,row,col){
+    const tables = sheet.tables.all();
+    if(tables&&tables.length>0){
+        for(let i=0,l=tables.length;i<l;i++){
+            const table = tables[i];
+            const range = table.range();
+            if(range.contains(row,col)){
+                return true;
+            }
+        }
+    }
+    return false;
+}

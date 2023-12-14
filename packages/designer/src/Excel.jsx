@@ -23,6 +23,9 @@ import { findTreeNodeById } from '@utils/commonUtil';
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
+import { setData } from './store/tableDesignSlice/tableDesignSlice';
+import { parseTable } from './utils/tableUtil';
+
 export default function () {
     const dispatch = useDispatch();
     let {
@@ -53,6 +56,7 @@ export default function () {
         dispatch(setFontStyles({ styles }));
         if(isBindingTable(sheet)){
             dispatch(showTab({code:'table'}));
+            dispatch(setData({data:parseTable(sheet)}));
             dispatch(setActive({code:'table'}))
         }else{
             dispatch(hideTab({code:'table'}))

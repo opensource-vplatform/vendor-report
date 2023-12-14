@@ -6,24 +6,22 @@
 export const withBatchUpdate = function (spread, updateHandler) {
     if (spread) {
         spread.suspendPaint();
-        try {
-            updateHandler(spread);
-        } finally {
-            spread.resumePaint();
+        const sheet = spread.getActiveSheet();
+        if (sheet) {
+            try {
+                updateHandler(sheet);
+            } finally {
+                spread.resumePaint();
+            }
         }
     }
 };
 
 /**
  * 将样式应用到选择的单元格
- * @param {*} spread 
- * @param {*} func 
- * @returns 
+ * @returns
  */
-export const applyStyleToSelectedCell = function (spread, func) {
-    if (!spread) return;
-    const sheet = spread.getActiveSheet();
-    if (!sheet) return;
+export const applyStyleToSelectedCell = function (sheet, func) {
     let i, j;
     const selections = sheet.getSelections();
     for (let k = 0; k < selections.length; k++) {
@@ -86,14 +84,9 @@ export const applyStyleToSelectedCell = function (spread, func) {
 
 /**
  * 将更新应用到选中的单元格
- * @param {*} spread 
- * @param {*} func 
- * @returns 
+ * @returns
  */
-export const applyToSelectedCell = function (spread, func) {
-    if (!spread) return;
-    const sheet = spread.getActiveSheet();
-    if (!sheet) return;
+export const applyToSelectedCell = function (sheet, func) {
     let i, j;
     const selections = sheet.getSelections();
     for (let k = 0; k < selections.length; k++) {

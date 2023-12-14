@@ -1,4 +1,4 @@
-import { getCellTag } from './worksheetUtil';
+import { inTableArea } from './worksheetUtil';
 
 /**
  * 是否绑定了表格
@@ -7,6 +7,5 @@ import { getCellTag } from './worksheetUtil';
 export function isBindingTable(sheet){
     const row = sheet.getActiveRowIndex();
     const col = sheet.getActiveColumnIndex();
-    const value = getCellTag(sheet,row,col,"bindType");
-    return value=="table";
+    return inTableArea(sheet,row,col);
 }
