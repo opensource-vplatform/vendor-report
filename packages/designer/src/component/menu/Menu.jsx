@@ -1,10 +1,8 @@
-import {
-  Fragment,
-  useState,
-} from 'react';
+import { Fragment } from 'react';
 
 import styled from 'styled-components';
 
+import Popper from '../popper/Popper';
 import {
   DividerMenuItem,
   MenuItem,
@@ -55,56 +53,43 @@ export default function (props) {
         children,
         value,
     } = props;
-    const [itemVisible, setItemVisible] = useState(false);
+    //const [itemVisible, setItemVisible] = useState(false);
     return (
-        <Fragment>
-            {itemVisible ? (
-                <Mask
-                    onClick={() => {
-                        setItemVisible(false);
-                    }}
-                ></Mask>
-            ) : null}
-            <Wrap
-                onClick={(evt) => {
-                    if (!evt.target.closest('.menu-list-wrap')) {
-                        setItemVisible(true);
-                    }
-                }}
-                style={style}
-            >
-                {children}
-                {itemVisible ? (
-                    <ItemList style={optionStyle} className='menu-list-wrap'>
-                        {datas.map(function (menu, index) {
-                            const key = menu.id || menu.value;
-                            return (
-                                <Fragment key={key}>
-                                    <MenuItem
-                                        active={value}
-                                        value={menu.value}
-                                        title={menu.title}
-                                        icon={menu.icon}
-                                        text={menu.text}
-                                        onClick={(newVal) => {
-                                            setItemVisible(false);
-                                            if(newVal != value){
-                                                onChange(newVal);
-                                            }else if(cancelAble){
-                                                onChange(cancelValue);
-                                            }
-                                        }}
-                                    ></MenuItem>
+        <Popper
+            style={style}
+            content={
+                <Fragment>
+                    {datas.map(function (menu, index) {
+                        const key = menu.id || menu.value;
+                        return (
+                            <Fragment key={key}>
+                                <MenuItem
+                                    active={value}
+                                    value={menu.value}
+                                    title={menu.title}
+                                    icon={menu.icon}
+                                    text={menu.text}
+                                    onClick={(newVal) => {
+                                        //setItemVisible(false);
+                                        if (newVal != value) {
+                                            onChange(newVal);
+                                        } else if (cancelAble) {
+                                            onChange(cancelValue);
+                                        }
+                                    }}
+                                ></MenuItem>
 
-                                    {lineIndexs.indexOf(index) >= 0 ? (
-                                        <DividerMenuItem></DividerMenuItem>
-                                    ) : null}
-                                </Fragment>
-                            );
-                        })}
-                    </ItemList>
-                ) : null}
-            </Wrap>
-        </Fragment>
+                                {lineIndexs.indexOf(index) >= 0 ? (
+                                    <DividerMenuItem></DividerMenuItem>
+                                ) : null}
+                            </Fragment>
+                        );
+                    })}
+                </Fragment>
+            }
+            contentStyle={optionStyle}
+        >
+            {children}
+        </Popper>
     );
 }
