@@ -16,6 +16,13 @@ export default function () {
                 <VItem
                     title='数据源'
                     desc='维护数据源信息'
+                    style={{
+                        marginLeft: 4,
+                        marginRight: 4,
+                        paddingLeft: 4,
+                        paddingRight: 4,
+                        paddingBottom: 4,
+                    }}
                     icon={
                         <DatasourceIcon
                             iconStyle={{ width: 28, height: 28 }}
