@@ -91,7 +91,7 @@ export function getPath(node, treeNodes) {
         return node.code;
     }
     const parent = findTreeNodeById(node.parentId, treeNodes);
-    if (parent && parent.type !== 'entity') {
+    if (parent && parent.type !== 'table') {
         return node.code;
     }
     return getPath(parent, treeNodes) + '.' + node.code;
@@ -185,12 +185,12 @@ export function checkHasBind(params) {
 
                         if (
                             path !== newPath ||
-                            (bindType !== 'table' && type === 'entity')
+                            (bindType !== 'table' && type === 'table')
                         ) {
                             //如果同步更改，则不中断迭代
                             if (sync) {
                                 //如果类型发生变化，则清除绑定
-                                if (bindType !== 'table' && type === 'entity') {
+                                if (bindType !== 'table' && type === 'table') {
                                     sheetInstance
                                         .getCell(row, col)
                                         .bindingPath('');
@@ -250,7 +250,7 @@ export function checkHasBind(params) {
                 }) {
                     if (_sheetInstanceId === sheetInstanceId) {
                         const hasChanged =
-                            bindType === 'table' && type !== 'entity';
+                            bindType === 'table' && type !== 'table';
                         if (hasChanged && !sync) {
                             return true;
                         }

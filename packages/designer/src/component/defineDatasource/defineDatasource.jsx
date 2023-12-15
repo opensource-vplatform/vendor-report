@@ -17,6 +17,7 @@ import DatasourceIcon from '@icons/data/datasource';
 import {
   deleteDsList,
   pushDsList,
+  removeBindInfosByCellInstanceId,
   saveBindInfos,
   setIsShowDatasource,
   toggleActiveDs,
@@ -63,26 +64,6 @@ import {
   SaveBtn,
   TextareaField,
 } from './ui.jsx';
-
-//清除动作。当触发清除动作的时候，需要调用接口清除已经绑定的数据源路径
-const clearContentsCommand = {
-    canUndo: false,
-    execute: function execute(spread, { selections }) {
-        const activeSheet = spread.getActiveSheet();
-        selections.forEach(function ({ col, row, colCount, rowCount }) {
-            const endRow = row + rowCount;
-            const endCol = col + colCount;
-            for (let rowIndex = row; rowIndex < endRow; rowIndex++) {
-                for (let colIndex = col; colIndex < endCol; colIndex++) {
-                    if (activeSheet.getBindingPath(rowIndex, colIndex)) {
-                        activeSheet.setBindingPath(rowIndex, colIndex, '');
-                    }
-                }
-            }
-        });
-        console.log(22222);
-    },
-};
 
 //弹窗
 function ConfirmDialog(props) {
@@ -155,13 +136,6 @@ function DatasourceTree(props) {
         dispatch(deleteDsList({ itemId }));
     };
 
-    const draggableClass = ` ${
-        draggable && parentType !== 'entity'
-            ? 'draggable'
-            : draggable
-              ? 'notDraggable'
-              : ''
-    }`;
     return (
         <DatasourceListOl
             onClick={listClickHandler}
@@ -170,6 +144,23 @@ function DatasourceTree(props) {
             {datas.map(function (dataItem) {
                 const { name, id, children, type } = dataItem;
                 datasObj[id] = dataItem;
+
+                let draggableClass = '';
+                let isDraggable = draggable;
+                if (draggable && parentType !== 'table') {
+                    draggableClass = 'draggable';
+                    if (
+                        type === 'table' &&
+                        (!Array.isArray(children) || children.length === 0)
+                    ) {
+                        draggableClass = 'notDraggable';
+                        isDraggable = false;
+                    }
+                } else if (draggable) {
+                    draggableClass = 'notDraggable';
+                    isDraggable = false;
+                }
+
                 return (
                     <li
                         className={`listItem ${draggableClass}`}
@@ -182,15 +173,15 @@ function DatasourceTree(props) {
                             } ${draggableClass}`}
                             data-item-id={id}
                             style={{ paddingLeft: indent + 'px' }}
-                            draggable={draggable && parentType !== 'entity'}
+                            draggable={isDraggable}
                             data-children-count={
-                                type === 'entity' && Array.isArray(children)
+                                type === 'table' && Array.isArray(children)
                                     ? children.length
                                     : 0
                             }
                         >
                             <div className='text'>{name || '-'}</div>
-                            {type === 'entity' && isShowAddSubDatasource ? (
+                            {type === 'table' && isShowAddSubDatasource ? (
                                 <DddSubDatasource
                                     data-not-allow={isNotAllow}
                                     onClick={addSubDatasourceClickHandler}
@@ -207,7 +198,7 @@ function DatasourceTree(props) {
                                 ''
                             )}
                         </ListItemText>
-                        {type === 'entity' ? (
+                        {type === 'table' ? (
                             <DatasourceTree
                                 datas={children}
                                 activeId={activeId}
@@ -216,7 +207,7 @@ function DatasourceTree(props) {
                                 parentId={id}
                                 isNotAllow={isNotAllow}
                                 draggable={draggable}
-                                parentType='entity'
+                                parentType='table'
                                 isShowAddSubDatasource={isShowAddSubDatasource}
                             ></DatasourceTree>
                         ) : (
@@ -285,15 +276,57 @@ export function DraggableDatasourceList() {
                 return;
             }
 
+            //清除动作。当触发清除动作的时候，需要调用接口清除已经绑定的数据源路径
             const commandManager = spread.commandManager();
-            commandManager.register(
+            commandManager.addListener(
                 'gc.spread.contextMenu.clearContents',
-                clearContentsCommand,
-                null,
-                false,
-                false,
-                false,
-                false
+                function ({ command: { selections } }) {
+                    const activeSheet = spread.getActiveSheet();
+                    Array.isArray(selections) &&
+                        selections.forEach(function ({
+                            col,
+                            row,
+                            colCount,
+                            rowCount,
+                        }) {
+                            const endRow = row + rowCount;
+                            const endCol = col + colCount;
+                            for (
+                                let rowIndex = row;
+                                rowIndex < endRow;
+                                rowIndex++
+                            ) {
+                                for (
+                                    let colIndex = col;
+                                    colIndex < endCol;
+                                    colIndex++
+                                ) {
+                                    if (
+                                        activeSheet.getBindingPath(
+                                            rowIndex,
+                                            colIndex
+                                        )
+                                    ) {
+                                        activeSheet.setBindingPath(
+                                            rowIndex,
+                                            colIndex,
+                                            ''
+                                        );
+                                        dispatch(
+                                            removeBindInfosByCellInstanceId({
+                                                cellInstanceId:
+                                                    getCellInstanceId(
+                                                        activeSheet,
+                                                        rowIndex,
+                                                        colIndex
+                                                    ),
+                                            })
+                                        );
+                                    }
+                                }
+                            }
+                        });
+                }
             );
         },
         [spread]
@@ -308,10 +341,13 @@ export function DraggableDatasourceList() {
             document.addEventListener(
                 'dragstart',
                 function (ev) {
-                    // 存储相关的拖拽元素
-                    dragged = ev.target;
-                    // 设置拖拽元素的透明度
-                    ev.target.style.opacity = 0.5;
+                    console.log(ev.target, '目标元素');
+                    if (ev?.target) {
+                        // 存储相关的拖拽元素
+                        dragged = ev.target;
+                        // 设置拖拽元素的透明度
+                        ev.target.style.opacity = 0.5;
+                    }
                 },
                 false
             );
@@ -320,7 +356,8 @@ export function DraggableDatasourceList() {
                 'dragend',
                 function (event) {
                     // 重设透明度
-                    dragged.style.opacity = 1;
+
+                    dragged && (dragged.style.opacity = 1);
                 },
                 false
             );
@@ -439,7 +476,7 @@ export function DraggableDatasourceList() {
                     const cellInstanceId = getCellInstanceId(sheet, row, col);
                     const sheetInstanceId = getSheetInstanceId(sheet);
 
-                    if (current.type === 'entity') {
+                    if (current.type === 'table') {
                         addTable({
                             columnsTemp: current.children,
                             sheet,
@@ -557,6 +594,13 @@ const initialDatasourceData = {
     parentId: '',
 };
 
+const initDatasourceTypeDatas = [
+    { value: 'text', text: '文本' },
+    { value: 'integer', text: '整数' },
+    { value: 'decimals', text: '小数' },
+    { value: 'table', text: '表' },
+];
+
 //编辑
 function Index(props) {
     const dispatch = useDispatch();
@@ -571,10 +615,12 @@ function Index(props) {
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
     }
-    const datasourceTypeDatas = [
-        { value: 'string', text: '字符串' },
-        { value: 'entity', text: '实体' },
-    ];
+
+    let datasourceTypeDatas = activeDs.parentId
+        ? initDatasourceTypeDatas.filter(function (item) {
+              return item.value !== 'table';
+          })
+        : [...initDatasourceTypeDatas];
 
     const isCanBeSaved = activeDs.code && activeDs.name;
     const isCanAdd = (isCanBeSaved && dsList.length > 0) || dsList.length === 0;
@@ -740,39 +786,31 @@ function Index(props) {
                             maxLength={80}
                         ></InputField>
                     </div>
-                    {activeDs.parentId ? (
-                        ''
-                    ) : (
-                        <>
-                            <div>类型</div>
-                            <div>
-                                <DropdownBox
-                                    datas={datasourceTypeDatas}
-                                    className='datasourceType'
-                                    style={{ minWidth: '500px' }}
-                                    release={true}
-                                    onChange={function (data) {
-                                        console.log(data);
-                                        const newData = {
-                                            ...activeDs,
-                                            type: data.value,
-                                        };
-                                        dispatch(updateDslist({ newData }));
-                                    }}
-                                >
-                                    <div className={`uiText show`}>
-                                        {activeDs.type === 'string'
-                                            ? '字符串'
-                                            : '实体'}
-                                    </div>
-                                    <div className='uiArrowBox'>
-                                        <span className='uiArrow'></span>
-                                    </div>
-                                </DropdownBox>
+                    <div>类型</div>
+                    <div>
+                        <DropdownBox
+                            datas={datasourceTypeDatas}
+                            className='datasourceType'
+                            style={{ minWidth: '500px' }}
+                            release={true}
+                            onChange={function (data) {
+                                console.log(data);
+                                const newData = {
+                                    ...activeDs,
+                                    type: data.value,
+                                    typeName: data.text,
+                                };
+                                dispatch(updateDslist({ newData }));
+                            }}
+                        >
+                            <div className={`uiText show`}>
+                                {activeDs.typeName}
                             </div>
-                        </>
-                    )}
-
+                            <div className='uiArrowBox'>
+                                <span className='uiArrow'></span>
+                            </div>
+                        </DropdownBox>
+                    </div>
                     <div>描述</div>
                     <div>
                         <TextareaField

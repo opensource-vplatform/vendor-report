@@ -14,7 +14,8 @@ export const datasourceSlice = createSlice({
             {
                 id: '6589cf29ae694fe1a7a6de70fbceac06',
                 value: '',
-                type: 'string',
+                type: 'table',
+                typeName: '文本',
                 desc: '必填',
                 code: 'name',
                 name: '姓名',
@@ -22,7 +23,8 @@ export const datasourceSlice = createSlice({
             {
                 id: '187ee2a13e0748f5b52342929db18325',
                 value: '',
-                type: 'string',
+                type: 'integer',
+                typeName: '整数',
                 desc: '年龄必须年满18岁',
                 code: 'age',
                 name: '年龄',
@@ -30,7 +32,8 @@ export const datasourceSlice = createSlice({
             {
                 id: 'c623ebe57c374eff9c243b63b3d73027',
                 value: '',
-                type: 'string',
+                type: 'text',
+                typeName: '文本',
                 desc: '性别',
                 code: 'sex',
                 name: '性别',
@@ -38,7 +41,8 @@ export const datasourceSlice = createSlice({
             {
                 id: '140a79cc0041403a9aa30898ba858ac5',
                 value: '',
-                type: 'entity',
+                type: 'table',
+                typeName: '表',
                 desc: '工作履历',
                 code: 'work',
                 name: '工作经历',
@@ -47,11 +51,15 @@ export const datasourceSlice = createSlice({
                         id: 'A001',
                         code: 'startDate',
                         name: '开始日期',
+                        type: 'text',
+                        typeName: '文本',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
                     {
                         id: 'B001',
                         code: 'endDate',
+                        type: 'text',
+                        typeName: '文本',
                         name: '结束日期',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
@@ -59,6 +67,8 @@ export const datasourceSlice = createSlice({
                         id: 'C001',
                         code: 'companyName',
                         name: '公司名称',
+                        type: 'text',
+                        typeName: '文本',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
                 ],
@@ -68,7 +78,8 @@ export const datasourceSlice = createSlice({
             {
                 id: '6589cf29ae694fe1a7a6de70fbceac06',
                 value: '',
-                type: 'string',
+                type: 'text',
+                typeName: '文本',
                 desc: '必填',
                 code: 'name',
                 name: '姓名',
@@ -76,7 +87,8 @@ export const datasourceSlice = createSlice({
             {
                 id: '187ee2a13e0748f5b52342929db18325',
                 value: '',
-                type: 'string',
+                type: 'integer',
+                typeName: '整数',
                 desc: '年龄必须年满18岁',
                 code: 'age',
                 name: '年龄',
@@ -84,7 +96,8 @@ export const datasourceSlice = createSlice({
             {
                 id: 'c623ebe57c374eff9c243b63b3d73027',
                 value: '',
-                type: 'string',
+                type: 'text',
+                typeName: '文本',
                 desc: '性别',
                 code: 'sex',
                 name: '性别',
@@ -92,7 +105,8 @@ export const datasourceSlice = createSlice({
             {
                 id: '140a79cc0041403a9aa30898ba858ac5',
                 value: '',
-                type: 'entity',
+                type: 'table',
+                typeName: '表',
                 desc: '工作履历',
                 code: 'work',
                 name: '工作经历',
@@ -101,11 +115,15 @@ export const datasourceSlice = createSlice({
                         id: 'A001',
                         code: 'startDate',
                         name: '开始日期',
+                        type: 'text',
+                        typeName: '文本',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
                     {
                         id: 'B001',
                         code: 'endDate',
+                        type: 'text',
+                        typeName: '文本',
                         name: '结束日期',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
@@ -113,6 +131,8 @@ export const datasourceSlice = createSlice({
                         id: 'C001',
                         code: 'companyName',
                         name: '公司名称',
+                        type: 'text',
+                        typeName: '文本',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
                 ],
@@ -239,7 +259,7 @@ export const datasourceSlice = createSlice({
                 name,
                 children,
             }) {
-                if (type !== 'entity') {
+                if (type !== 'table') {
                     datas[code] = name + '1';
                 } else {
                     datas[code] = [];
@@ -267,6 +287,14 @@ export const datasourceSlice = createSlice({
                 state.isShowDatasource = !state.isShowDatasource;
             }
         },
+        removeBindInfosByCellInstanceId(state, { payload }) {
+            const { cellInstanceId } = payload;
+            Object.entries(state.bindInfos).forEach(function ([id, sheetInfo]) {
+                Object.keys(sheetInfo).forEach(function (sheetInstanceId) {
+                    delete state.bindInfos[id][sheetInstanceId][cellInstanceId];
+                });
+            });
+        },
     },
 });
 export const {
@@ -278,5 +306,6 @@ export const {
     removeBindInfos,
     genPreviewDatas,
     setIsShowDatasource,
+    removeBindInfosByCellInstanceId,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;
