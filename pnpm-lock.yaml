@@ -32,6 +32,12 @@ importers:
       '@grapecity/spread-sheets':
         specifier: ^16.1.1
         version: 16.1.1
+      '@grapecity/spread-sheets-pdf':
+        specifier: ^16.2.6
+        version: 16.2.6
+      '@grapecity/spread-sheets-print':
+        specifier: ^16.2.6
+        version: 16.2.6
       '@grapecity/spread-sheets-react':
         specifier: ^16.1.1
         version: 16.1.1
@@ -523,6 +529,19 @@ packages:
 
   /@grapecity/spread-excelio@16.2.6:
     resolution: {integrity: sha512-P2wrATgeD8DHvGj0PuldIk6TttyApE/h+n9aIDr7Zm687JbqcoRTdMXo8c0x/ZtJeDnXHV10Y7fSINjtmkD3Lg==}
+    dependencies:
+      '@grapecity/spread-sheets': 16.2.6
+    dev: false
+
+  /@grapecity/spread-sheets-pdf@16.2.6:
+    resolution: {integrity: sha512-hMSdxgjDz8AGcYBEQqbcfdHyI34BkpqjGjL92zBu6tQBeJfxCQgJEICpTvh29bEJ/l5ElZt6AT+DwB7+/WCIxQ==}
+    dependencies:
+      '@grapecity/spread-sheets': 16.2.6
+      '@grapecity/spread-sheets-print': 16.2.6
+    dev: false
+
+  /@grapecity/spread-sheets-print@16.2.6:
+    resolution: {integrity: sha512-dnC5nI4Sm7AUolmzY32QaQ/xiFVIVQCiCxuY+YqDHPPP7WG7GrtF2fa0Ki525ZGtow1kCd2+VlwdlARDv/NQJg==}
     dependencies:
       '@grapecity/spread-sheets': 16.2.6
     dev: false

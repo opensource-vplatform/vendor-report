@@ -4,6 +4,7 @@ export const navSlice = createSlice({
     name: 'navSlice',
     initialState: {
         hideCodes: ['table'],
+        tableName: null,
         active: null,
     },
     reducers: {
@@ -43,7 +44,15 @@ export const navSlice = createSlice({
                 state.active = action.payload.code;
             }
         },
+        /**
+         * 设置表格名称
+         * @param {} state 
+         * @param {*} action 
+         */
+        setTableName(state, action){
+            state.tableName = action.payload.tableName;
+        }
     },
 });
-export const { setSpread, showTab, hideTab, setActive } = navSlice.actions;
+export const { setSpread, showTab, hideTab, setActive,setTableName } = navSlice.actions;
 export default navSlice.reducer;

@@ -10,6 +10,8 @@
   "dependencies": {
     "@grapecity/spread-excelio": "^16.2.6",
     "@grapecity/spread-sheets": "^16.1.1",
+    "@grapecity/spread-sheets-pdf": "^16.2.6",
+    "@grapecity/spread-sheets-print": "^16.2.6",
     "@grapecity/spread-sheets-react": "^16.1.1",
     "@grapecity/spread-sheets-resources-zh": "^16.1.1",
     "@reduxjs/toolkit": "^1.9.7",
