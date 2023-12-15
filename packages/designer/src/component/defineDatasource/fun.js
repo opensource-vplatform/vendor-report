@@ -68,7 +68,7 @@ export function addTable(params) {
 
         tableColumns.length > 0 && table.bindColumns(tableColumns);
     }
-
+    table.expandBoundRows(true);
     table.bindingPath(dataPath);
     dispatch(
         saveBindInfos({
