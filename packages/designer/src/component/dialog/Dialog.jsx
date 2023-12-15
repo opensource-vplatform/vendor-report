@@ -1,4 +1,8 @@
-import { createRef, Fragment, useState } from 'react';
+import {
+  createRef,
+  Fragment,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
@@ -27,6 +31,7 @@ const Wrap = styled.div`
     background-color: #f0f0f0;
     outline: none;
     font-weight: 400;
+    box-sizing: border-box;
 `;
 
 const TitleWrap = styled.div`

@@ -136,6 +136,7 @@ export const datasourceSlice = createSlice({
             } */
         },
         previewViewDatas: {},
+        isShowDatasource: false,
     },
     reducers: {
         pushDsList(state, { payload }) {
@@ -256,6 +257,16 @@ export const datasourceSlice = createSlice({
 
             state.previewViewDatas = datas;
         },
+        setIsShowDatasource(state, { payload }) {
+            if (
+                payload &&
+                Object.prototype.hasOwnProperty.call(payload, 'data')
+            ) {
+                state.isShowDatasource = payload.data;
+            } else {
+                state.isShowDatasource = !state.isShowDatasource;
+            }
+        },
     },
 });
 export const {
@@ -266,5 +277,6 @@ export const {
     saveBindInfos,
     removeBindInfos,
     genPreviewDatas,
+    setIsShowDatasource,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

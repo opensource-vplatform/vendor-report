@@ -13,10 +13,12 @@ import Dialog from '@components/dialog/Index.jsx';
 import DropdownBox from '@components/dropdownBox/dropdownBox';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import GC from '@grapecity/spread-sheets';
+import DatasourceIcon from '@icons/data/datasource';
 import {
   deleteDsList,
   pushDsList,
   saveBindInfos,
+  setIsShowDatasource,
   toggleActiveDs,
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
@@ -265,12 +267,9 @@ export function DraggableDatasourceList() {
     const state = useSelector((state) => state);
     const {
         fontSlice: { spread },
-        datasourceSlice: { dsList, bindInfos },
+        datasourceSlice: { dsList, bindInfos, isShowDatasource },
     } = state;
     const dispatch = useDispatch();
-    console.log('bindInfos==>', bindInfos);
-    const [opened, setOpened] = useState(false);
-
     const cacheDatasRef = useRef({
         hasBindEvent: false,
         spread,
@@ -490,13 +489,13 @@ export function DraggableDatasourceList() {
     }, []);
     return (
         <>
-            {opened ? (
+            {isShowDatasource ? (
                 <Dialog
                     open={true}
                     width='100%'
                     height='100%'
                     onClose={function () {
-                        setOpened(false);
+                        dispatch(setIsShowDatasource());
                     }}
                 >
                     <Index></Index>
@@ -512,19 +511,24 @@ export function DraggableDatasourceList() {
                     borderRight: '1px solid #ababab',
                 }}
             >
-                <span
+                <div
                     style={{
                         backgroundColor: '#f6f6f6',
                         borderBottom: '1px solid #ababab',
                         height: '32px',
                         lineHeight: '32px',
-                    }}
-                    onClick={function () {
-                        setOpened(!opened);
+                        display: 'flex',
+                        padding: '0 6px',
                     }}
                 >
-                    数据源
-                </span>
+                    <div style={{ width: '100%' }}>数据源</div>
+                    <DatasourceIcon
+                        onClick={function () {
+                            dispatch(setActive({ code: 'data' }));
+                            dispatch(setIsShowDatasource());
+                        }}
+                    ></DatasourceIcon>
+                </div>
                 <DatasourceList
                     isShowAddSubDatasource={false}
                     width={350}
