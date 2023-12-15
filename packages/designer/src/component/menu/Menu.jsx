@@ -57,6 +57,7 @@ export default function (props) {
     return (
         <Popper
             style={style}
+            //open={itemVisible}
             content={
                 <Fragment>
                     {datas.map(function (menu, index) {

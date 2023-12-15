@@ -21,7 +21,9 @@ export const tableDesignSlice = createSlice({
         //筛选按钮
         filterButtonVisible:false,
         //汇总行工具
-        footerDropDownList:true
+        footerDropDownList:true,
+        //表格样式
+        styleName:'None'
     },
     reducers: {
         setShowHeader(state,action){
@@ -48,6 +50,9 @@ export const tableDesignSlice = createSlice({
         setFooterDropDownList(state,action){
             state.footerDropDownList = action.payload.footerDropDownList;
         },
+        setStyleName(state,action){
+            state.styleName = action.payload.styleName;
+        },
         setData(state,action){
             Object.assign(state,action.payload.data)
         }
@@ -64,6 +69,7 @@ export const {
     setShowFooter,
     setBandRow,
     setBandColumn,
+    setStyleName,
     setHighlightFirstColumn,
     setHighlightLastColumn,
     setFilterButtonVisible,

@@ -27,8 +27,8 @@ const Title = styled.div`
 `;
 
 export default function(props){
-    const {title,desc='',icon,onClick} = props;
-    return <Wrap title={desc} onClick={onClick}>
+    const {title,desc='',icon,onClick,style={}} = props;
+    return <Wrap title={desc} onClick={onClick} style={style}>
         <IconWrap>
         {icon}
         </IconWrap>

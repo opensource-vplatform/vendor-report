@@ -1,7 +1,7 @@
 import { Group } from '@components/group/Index';
 
+import TableStyle from './style/TableStyle';
 import TableOptions from './TableOptions';
-import TableStyle from './TableStyle';
 
 export default function() {
     return (

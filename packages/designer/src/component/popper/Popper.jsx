@@ -37,7 +37,7 @@ const PopperContentWrap = styled.div`
 `;
 
 export default function (props) {
-    const { style = {},children, content = null,contentStyle={} } = props;
+    const { style = {},children,content = null,contentStyle={} } = props;
     const [contentVisible, setContentVisible] = useState(false);
     return (
         <Fragment>

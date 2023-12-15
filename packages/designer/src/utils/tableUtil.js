@@ -1,3 +1,5 @@
+import GC from '@grapecity/spread-sheets';
+
 import { withBatchUpdate } from './spreadUtil';
 
 const getTable = function (sheet) {
@@ -23,12 +25,29 @@ export function parseTable(sheet) {
         footerDropDownList = table.useFooterDropDownList();
         bandRow = table.bandRows();
         bandColumn = table.bandColumns();
-        const style = table.style();
-        highlightFirstColumn = style.highlightFirstColumnStyle();
-        highlightLastColumn = style.highlightLastColumnStyle();
+        //const style = table.style();
+        highlightFirstColumn = table.highlightFirstColumn();
+        highlightLastColumn = table.highlightLastColumn();
         filterButtonVisible = table.filterButtonVisible();
     }
     return { showHeader, showFooter,bandRow,bandColumn,highlightFirstColumn,highlightLastColumn,filterButtonVisible,footerDropDownList };
+}
+
+function getTableStyle(styleName) {
+    if (styleName) {
+        return GC.Spread.Sheets.Tables.TableThemes[styleName.toLowerCase()];
+    }
+    return null;
+}
+
+export function setTableStyleName(params){
+    const { spread, styleName } = params;
+    withBatchUpdate(spread, (sheet) => {
+        const table = getTable(sheet);
+        if (table) {
+            table.style(getTableStyle(styleName));
+        }
+    });
 }
 
 export function setTableStyles(params) {
@@ -41,10 +60,8 @@ export function setTableStyles(params) {
             table.useFooterDropDownList(footerDropDownList);
             table.bandColumns(bandColumn);
             table.bandRows(bandRow);
-            const style = table.style();
-            style.highlightFirstColumnStyle(highlightFirstColumn);
-            style.highlightLastColumnStyle(highlightLastColumn);
-            table.style(style);
+            table.highlightFirstColumn(highlightFirstColumn);
+            table.highlightLastColumn(highlightLastColumn);
             const {colCount} = table.range();
             for(let i=0,l=colCount;i<l;i++){
                 table.filterButtonVisible(i,filterButtonVisible);
