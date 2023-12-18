@@ -148,3 +148,21 @@ export const CustomFormats = [
     '[<=9999999]###-####;(###) ###-####',
     '# ?/8',
 ];
+
+export const IconType = {
+    // None: 'none',
+    Hair: 'hair',
+    Dotted: 'dotted',
+    DashDotDot: 'dashDotDot',
+    DashDot: 'dashDot',
+    Dashed: 'dashed',
+    Thin: 'thin',
+
+    MediumDashDotDot: 'mediumDashDotDot',
+    SlantedDashDot: 'slantedDashDot',
+    MediumDashDot: 'mediumDashDot',
+    MediumDashed: 'mediumDashed',
+    Medium: 'medium',
+    Thick: 'thick',
+    Double: 'double',
+};

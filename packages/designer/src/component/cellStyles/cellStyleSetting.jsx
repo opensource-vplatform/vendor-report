@@ -18,9 +18,26 @@ import {
     FractionType,
     SpecialFormats,
     CustomFormats,
+    IconType,
 } from './constant';
 import './CellStyleSetting.scss';
 import List from '../list/List';
+import Icon from './lineIcon';
+import ColorEditor from '@components/color/Index';
+import BackColor from '@icons/font/BackColor ';
+import ArrowDown from '@icons/arrow/ArrowDown';
+import BorderOutline from '@icons/border/BorderOutline';
+import BorderNone from '@icons/border/BorderNone';
+import BorderInside from '@icons/border/BorderInside';
+import BorderBottom from '@icons/border/BorderBottom';
+import BorderTop from '@icons/border/BorderTop';
+import LineHorizontalInner from '@icons/border/LineHorizontalInner';
+import DiagonalUpLine from '@icons/border/DiagonalUpLine';
+import DiagonalDownLine from '@icons/border/DiagonalDownLine';
+import BorderLeft from '@icons/border/BorderLeft';
+import BorderRight from '@icons/border/BorderRight';
+import LineVerticalInner from '@icons/border/LineVerticalInner';
+
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
@@ -36,6 +53,9 @@ function CellStyleSetting(props) {
     const [checkboxOfThousandSeparator, setCheckboxOfThousandSeparator] =
         useState(false);
     const [locale, setLocale] = useState('en_us');
+
+    const [lineColor, setLineColor] = useState('black');
+
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
 
     // 获取第一个选择区域的第一个单元格的值
@@ -208,12 +228,19 @@ function CellStyleSetting(props) {
         setDecimalPlacesValue(2);
         setSelectedSymbol('');
         setSelectedTimeFormat('');
+
+        // 还原单元格值 以及清空单元格式
+        // sheet.setValue(selections[0].row, selections[0].col, firstCellValue);
     };
     const handleClose = () => {
         setIsOpen(false);
         setDecimalPlacesValue(2);
         setSelectedSymbol('');
         setSelectedTimeFormat('');
+    };
+
+    const handleColorEditor = (color) => {
+        setLineColor(color);
     };
 
     useEffect(() => {
@@ -323,6 +350,7 @@ function CellStyleSetting(props) {
         selectedSymbol,
         selectedTimeFormat,
     ]);
+    console.log('1 :>> ', 1);
 
     return isOpen ? (
         <Index
@@ -511,13 +539,326 @@ function CellStyleSetting(props) {
                         </div>
                     </Tab>
                     <Tab code='对齐' title='对齐'>
-                        <p>Content for Sheet 2</p>
+                        <p>Content for 对齐</p>
                     </Tab>
                     <Tab code='字体' title='字体'>
                         <p>Content for Sheet 3</p>
                     </Tab>
                     <Tab code='边框' title='边框'>
-                        <p>Content for 边框</p>
+                        <div className='borderArea'>
+                            <div className='lineArea'>
+                                <fieldset
+                                    style={{
+                                        border: '1px solid lightgray',
+                                        padding: 0,
+                                    }}
+                                >
+                                    <legend>线条</legend>
+                                    <span>样式：</span>
+
+                                    <div className='lineStyle'>
+                                        <div className='lineStyleLeft'>
+                                            <Icon type={IconType.Hair} />
+                                            <Icon type={IconType.Dotted} />
+                                            <Icon type={IconType.DashDotDot} />
+                                            <Icon type={IconType.DashDot} />
+                                            <Icon type={IconType.Dashed} />
+                                            <Icon type={IconType.Thin} />
+                                            <Icon type={IconType.Thin} />
+                                        </div>
+                                        <div className='lineStyleRight'>
+                                            <Icon
+                                                type={IconType.MediumDashDotDot}
+                                            />
+                                            <Icon
+                                                type={IconType.SlantedDashDot}
+                                            />
+                                            <Icon
+                                                type={IconType.MediumDashDot}
+                                            />
+                                            <Icon
+                                                type={IconType.MediumDashed}
+                                            />
+                                            <Icon type={IconType.Medium} />
+                                            <Icon type={IconType.Thick} />
+                                            <Icon type={IconType.Double} />
+                                        </div>
+                                    </div>
+                                    <span>颜色：</span>
+                                    <div>
+                                        <ColorEditor
+                                            onChange={handleColorEditor}
+                                            value={lineColor}
+                                        >
+                                            <div className='lineColor'>
+                                                <div
+                                                    className='colorPreView'
+                                                    style={{
+                                                        backgroundColor:
+                                                            lineColor,
+                                                    }}
+                                                ></div>
+                                                <div className='arrowDownIcon'>
+                                                    <ArrowDown
+                                                        style={{
+                                                            width: 20,
+                                                            height: 23,
+                                                            margin: 0,
+                                                        }}
+                                                    ></ArrowDown>
+                                                </div>
+                                            </div>
+                                        </ColorEditor>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div className='preArea'>
+                                <fieldset
+                                    style={{
+                                        borderTop: '1px solid lightgray',
+                                        borderLeft: 0,
+                                        borderRight: 0,
+                                        borderBottom: 0,
+                                        fontSize: '12px',
+                                    }}
+                                >
+                                    <legend>预置</legend>
+                                </fieldset>
+                                <div className='presetArea'>
+                                    <div className='item'>
+                                        <BorderNone
+                                            iconStyle={{
+                                                width: '35px',
+                                                height: '35px',
+                                                backgroundColor: 'lightgray',
+                                            }}
+                                            icon='url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU2LjIgKDgxNjcyKSAtIGh0dHBzOi8vc2tldGNoLmNvbSAtLT4KICAgIDx0aXRsZT5Ob25lPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9Ik5vbmUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLnvJbnu4QtMTIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIuMDAwMDAwLCAzLjAwMDAwMCkiPgogICAgICAgICAgICA8cmVjdCBpZD0i55+p5b2iIiBmaWxsPSIjRkZGRkZGIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjciIGhlaWdodD0iMjciPjwvcmVjdD4KICAgICAgICAgICAgPHBhdGggZD0iTTI3LDI2IEwyNywyNyBMMjQsMjcgTDI0LDI2IEwyNiwyNiBMMjYsMjQgTDI3LDI0IEwyNywyNiBaIE0yNiwxIEwyNCwxIEwyNCwwIEwyNiwwIEwyNyw5LjE4NDg1MDk5ZS0xNyBMMjcsMyBMMjYsMyBMMjYsMSBaIE0xLDEzIEwzLDEzIEwzLDE0IEwxLDE0IEwxLDE1IEwtMS4xMzkwODg4MmUtMTMsMTUgTC0xLjEzNDY0NzkzZS0xMywxMiBMMSwxMiBMMSwxMyBaIE0xMywyNiBMMTMsMjQgTDE0LDI0IEwxNCwyNiBMMTUsMjYgTDE1LDI3IEwxMiwyNyBMMTIsMjYgTDEzLDI2IFogTS0xLjEzOTA4ODgyZS0xMywyNiBMLTEuMTM0NjQ3OTNlLTEzLDI0IEwxLDI0IEwxLDI2IEwzLDI2IEwzLDI3IEwtMS4xMzY4NjgzOGUtMTMsMjcgTC0xLjEzNjg2ODM4ZS0xMywyNiBaIE0xNCwxMyBMMTUsMTMgTDE1LDE0IEwxNCwxNCBMMTQsMTUgTDEzLDE1IEwxMywxNCBMMTIsMTQgTDEyLDEzIEwxMywxMyBMMTMsMTIgTDE0LDEyIEwxNCwxMyBaIE0yNiwxNCBMMjQsMTQgTDI0LDEzIEwyNiwxMyBMMjYsMTIgTDI3LDEyIEwyNywxNSBMMjYsMTUgTDI2LDE0IFogTTE0LDEgTDE0LDMgTDEzLDMgTDEzLDEgTDEyLDEgTDEyLDAgTDE1LDAgTDE1LDEgTDE0LDEgWiBNMSwxIEwxLDMgTC0xLjEzOTA4ODgyZS0xMywzIEwtMS4xMzYxMjgyM2UtMTMsMSBMLTEuMTM2ODY4MzhlLTEzLDAgTDMsMCBMMywxIEwxLDEgWiBNNCwwIEw3LDAgTDcsMSBMNCwxIEw0LDAgWiBNNCwyNiBMNywyNiBMNywyNyBMNCwyNyBMNCwyNiBaIE04LDAgTDExLDAgTDExLDEgTDgsMSBMOCwwIFogTTgsMjYgTDExLDI2IEwxMSwyNyBMOCwyNyBMOCwyNiBaIE0xNiwwIEwxOSwwIEwxOSwxIEwxNiwxIEwxNiwwIFogTTE2LDI2IEwxOSwyNiBMMTksMjcgTDE2LDI3IEwxNiwyNiBaIE0yMCwwIEwyMywwIEwyMywxIEwyMCwxIEwyMCwwIFogTTIwLDI2IEwyMywyNiBMMjMsMjcgTDIwLDI3IEwyMCwyNiBaIE0yNyw0IEwyNyw3IEwyNiw3IEwyNiw0IEwyNyw0IFogTTEsNCBMMSw3IEwtMS4xMzkwODg4MmUtMTMsNyBMLTEuMTM0NjQ3OTNlLTEzLDQgTDEsNCBaIE0xNCw0IEwxNCw3IEwxMyw3IEwxMyw0IEwxNCw0IFogTTIzLDE0IEwyMCwxNCBMMjAsMTMgTDIzLDEzIEwyMywxNCBaIE0yNyw4IEwyNywxMSBMMjYsMTEgTDI2LDggTDI3LDggWiBNMSw4IEwxLDExIEwtMS4xMzkwODg4MmUtMTMsMTEgTC0xLjEzNDY0NzkzZS0xMyw4IEwxLDggWiBNMTQsOCBMMTQsMTEgTDEzLDExIEwxMyw4IEwxNCw4IFogTTE5LDE0IEwxNiwxNCBMMTYsMTMgTDE5LDEzIEwxOSwxNCBaIE0yNywxNiBMMjcsMTkgTDI2LDE5IEwyNiwxNiBMMjcsMTYgWiBNMSwxNiBMMSwxOSBMLTEuMTM5MDg4ODJlLTEzLDE5IEwtMS4xMzQ2NDc5M2UtMTMsMTYgTDEsMTYgWiBNMTQsMTYgTDE0LDE5IEwxMywxOSBMMTMsMTYgTDE0LDE2IFogTTExLDE0IEw4LDE0IEw4LDEzIEwxMSwxMyBMMTEsMTQgWiBNMjcsMjAgTDI3LDIzIEwyNiwyMyBMMjYsMjAgTDI3LDIwIFogTTEsMjAgTDEsMjMgTC0xLjEzOTA4ODgyZS0xMywyMyBMLTEuMTM0NjQ3OTNlLTEzLDIwIEwxLDIwIFogTTE0LDIwIEwxNCwyMyBMMTMsMjMgTDEzLDIwIEwxNCwyMCBaIE03LDE0IEw0LDE0IEw0LDEzIEw3LDEzIEw3LDE0IFoiIGlkPSLlvaLnirbnu5PlkIgiIGZpbGw9IiNBOEE4QTgiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==)'
+                                        ></BorderNone>
+                                        <span>无</span>
+                                    </div>
+                                    <div className='item'>
+                                        <BorderOutline
+                                            iconStyle={{
+                                                width: '35px',
+                                                height: '35px',
+                                                backgroundColor: 'lightgray',
+                                            }}
+                                            icon='url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU2LjIgKDgxNjcyKSAtIGh0dHBzOi8vc2tldGNoLmNvbSAtLT4KICAgIDx0aXRsZT5PdXRsaW5lPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9Ik91dGxpbmUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLnvJbnu4QiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIuMDAwMDAwLCAzLjAwMDAwMCkiPgogICAgICAgICAgICA8cmVjdCBpZD0i55+p5b2iIiBmaWxsPSIjRkZGRkZGIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjciIGhlaWdodD0iMjciPjwvcmVjdD4KICAgICAgICAgICAgPHBhdGggZD0iTTI3LDI2IEwyNywyNyBMMjQsMjcgTDI0LDI2IEwyNiwyNiBMMjYsMjQgTDI3LDI0IEwyNywyNiBaIE0yNiwxIEwyNCwxIEwyNCwwIEwyNiwwIEwyNyw5LjE4NDg1MDk5ZS0xNyBMMjcsMyBMMjYsMyBMMjYsMSBaIE0xLDEzIEwzLDEzIEwzLDE0IEwxLDE0IEwxLDE1IEwtMi4yMjA0NDYwNWUtMTYsMTUgTDIuMjIwNDQ2MDVlLTE2LDEyIEwxLDEyIEwxLDEzIFogTTEzLDI2IEwxMywyNCBMMTQsMjQgTDE0LDI2IEwxNSwyNiBMMTUsMjcgTDEyLDI3IEwxMiwyNiBMMTMsMjYgWiBNLTIuMjIwNDQ2MDVlLTE2LDI2IEwyLjIyMDQ0NjA1ZS0xNiwyNCBMMSwyNCBMMSwyNiBMMywyNiBMMywyNyBMMCwyNyBMMCwyNiBaIE0xNCwxMyBMMTUsMTMgTDE1LDE0IEwxNCwxNCBMMTQsMTUgTDEzLDE1IEwxMywxNCBMMTIsMTQgTDEyLDEzIEwxMywxMyBMMTMsMTIgTDE0LDEyIEwxNCwxMyBaIE0yNiwxNCBMMjQsMTQgTDI0LDEzIEwyNiwxMyBMMjYsMTIgTDI3LDEyIEwyNywxNSBMMjYsMTUgTDI2LDE0IFogTTE0LDEgTDE0LDMgTDEzLDMgTDEzLDEgTDEyLDEgTDEyLDAgTDE1LDAgTDE1LDEgTDE0LDEgWiBNMSwxIEwxLDMgTC0yLjIyMDQ0NjA1ZS0xNiwzIEw3LjQwMTQ4NjgzZS0xNywxIEwwLDAgTDMsMCBMMywxIEwxLDEgWiBNNCwwIEw3LDAgTDcsMSBMNCwxIEw0LDAgWiBNNCwyNiBMNywyNiBMNywyNyBMNCwyNyBMNCwyNiBaIE04LDAgTDExLDAgTDExLDEgTDgsMSBMOCwwIFogTTgsMjYgTDExLDI2IEwxMSwyNyBMOCwyNyBMOCwyNiBaIE0xNiwwIEwxOSwwIEwxOSwxIEwxNiwxIEwxNiwwIFogTTE2LDI2IEwxOSwyNiBMMTksMjcgTDE2LDI3IEwxNiwyNiBaIE0yMCwwIEwyMywwIEwyMywxIEwyMCwxIEwyMCwwIFogTTIwLDI2IEwyMywyNiBMMjMsMjcgTDIwLDI3IEwyMCwyNiBaIE0yNyw0IEwyNyw3IEwyNiw3IEwyNiw0IEwyNyw0IFogTTEsNCBMMSw3IEwtMi4yMjA0NDYwNWUtMTYsNyBMMi4yMjA0NDYwNWUtMTYsNCBMMSw0IFogTTE0LDQgTDE0LDcgTDEzLDcgTDEzLDQgTDE0LDQgWiBNMjMsMTQgTDIwLDE0IEwyMCwxMyBMMjMsMTMgTDIzLDE0IFogTTI3LDggTDI3LDExIEwyNiwxMSBMMjYsOCBMMjcsOCBaIE0xLDggTDEsMTEgTC0yLjIyMDQ0NjA1ZS0xNiwxMSBMMi4yMjA0NDYwNWUtMTYsOCBMMSw4IFogTTE0LDggTDE0LDExIEwxMywxMSBMMTMsOCBMMTQsOCBaIE0xOSwxNCBMMTYsMTQgTDE2LDEzIEwxOSwxMyBMMTksMTQgWiBNMjcsMTYgTDI3LDE5IEwyNiwxOSBMMjYsMTYgTDI3LDE2IFogTTEsMTYgTDEsMTkgTC0yLjIyMDQ0NjA1ZS0xNiwxOSBMMi4yMjA0NDYwNWUtMTYsMTYgTDEsMTYgWiBNMTQsMTYgTDE0LDE5IEwxMywxOSBMMTMsMTYgTDE0LDE2IFogTTExLDE0IEw4LDE0IEw4LDEzIEwxMSwxMyBMMTEsMTQgWiBNMjcsMjAgTDI3LDIzIEwyNiwyMyBMMjYsMjAgTDI3LDIwIFogTTEsMjAgTDEsMjMgTC0yLjIyMDQ0NjA1ZS0xNiwyMyBMMi4yMjA0NDYwNWUtMTYsMjAgTDEsMjAgWiBNMTQsMjAgTDE0LDIzIEwxMywyMyBMMTMsMjAgTDE0LDIwIFogTTcsMTQgTDQsMTQgTDQsMTMgTDcsMTMgTDcsMTQgWiIgaWQ9IuW9oueKtue7k+WQiOWkh+S7vS0zIiBmaWxsPSIjQThBOEE4Ij48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0wLDAgTDI3LDAgTDI3LDI3IEwwLDI3IEwwLDAgWiBNMSwxIEwxLDI2IEwyNiwyNiBMMjYsMSBMMSwxIFoiIGlkPSLlvaLnirbnu5PlkIgiIGZpbGw9IiMzNjdGQzkiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==)'
+                                        ></BorderOutline>
+                                        <span>外边框</span>
+                                    </div>
+                                    <div className='item'>
+                                        <BorderInside
+                                            iconStyle={{
+                                                width: '35px',
+                                                height: '35px',
+                                                backgroundColor: 'lightgray',
+                                            }}
+                                        ></BorderInside>
+                                        <span>内边框</span>
+                                    </div>
+                                </div>
+                                <fieldset
+                                    style={{
+                                        borderTop: '1px solid lightgray',
+                                        borderLeft: 0,
+                                        borderRight: 0,
+                                        borderBottom: 0,
+                                        fontSize: '12px',
+                                    }}
+                                >
+                                    <legend>边框</legend>
+                                </fieldset>
+                                <div className='preShowArea'>
+                                    <div className='preShowAreaLeft'>
+                                        <div
+                                            style={{
+                                                width: 32,
+                                                height: 32,
+                                                border: '1px solid lightgray',
+                                                margin: 0,
+                                            }}
+                                        >
+                                            <BorderTop
+                                                style={{ margin: 0 }}
+                                                iconStyle={{
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    backgroundColor: 'white',
+                                                }}
+                                            ></BorderTop>
+                                        </div>
+                                        <div
+                                            style={{
+                                                width: 32,
+                                                height: 32,
+                                                border: '1px solid lightgray',
+                                                margin: 0,
+                                            }}
+                                        >
+                                            <LineHorizontalInner
+                                                style={{ margin: 0 }}
+                                                iconStyle={{
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    backgroundColor: 'white',
+                                                }}
+                                            ></LineHorizontalInner>
+                                        </div>
+                                        <div
+                                            style={{
+                                                width: 32,
+                                                height: 32,
+                                                border: '1px solid lightgray',
+                                                margin: 0,
+                                            }}
+                                        >
+                                            <BorderBottom
+                                                style={{ margin: 0 }}
+                                                iconStyle={{
+                                                    width: '18px',
+                                                    height: '18px',
+                                                    backgroundColor: 'white',
+                                                }}
+                                            ></BorderBottom>
+                                        </div>
+                                    </div>
+                                    <div className='preShowAreaRight'>
+                                        <div
+                                            style={{
+                                                width: 180,
+                                                height: 100,
+                                                border: '1px solid black',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                // borderLeft: 0,
+                                                // borderRight:0,
+                                                // borderTop:0,
+                                                // borderBottom:0,
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    width: 150,
+                                                    height: 80,
+                                                    border: '1px solid black',
+                                                    // borderLeft: 0,
+                                                    // borderRight:0,
+                                                    // borderTop:0,
+                                                    // borderBottom:0,
+                                                }}
+                                            >
+                                                <span>文本</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='preShowAreaBottom'>
+                                    <div
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            border: '1px solid lightgray',
+                                            margin: 0,
+                                            position: 'absolute',
+                                            left: 8,
+                                        }}
+                                    >
+                                        <DiagonalUpLine
+                                            style={{ margin: 0 }}
+                                            iconStyle={{
+                                                width: '18px',
+                                                height: '18px',
+                                                backgroundColor: 'white',
+                                            }}
+                                        ></DiagonalUpLine>
+                                    </div>
+                                    <div
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            border: '1px solid lightgray',
+                                            margin: 0,
+                                            position: 'absolute',
+                                            left: 60,
+                                        }}
+                                    >
+                                        <BorderLeft
+                                            style={{ margin: 0 }}
+                                            iconStyle={{
+                                                width: '18px',
+                                                height: '18px',
+                                                backgroundColor: 'white',
+                                            }}
+                                        ></BorderLeft>
+                                    </div>
+                                    <div
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            border: '1px solid lightgray',
+                                            margin: 0,
+                                            position: 'absolute',
+                                            left: 150,
+                                        }}
+                                    >
+                                        <LineVerticalInner
+                                            style={{ margin: 0 }}
+                                            iconStyle={{
+                                                width: '18px',
+                                                height: '18px',
+                                                backgroundColor: 'white',
+                                            }}
+                                        ></LineVerticalInner>
+                                    </div>
+                                    <div
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            border: '1px solid lightgray',
+                                            margin: 0,
+                                            position: 'absolute',
+                                            left: 230,
+                                        }}
+                                    >
+                                        <BorderRight
+                                            style={{ margin: 0 }}
+                                            iconStyle={{
+                                                width: '18px',
+                                                height: '18px',
+                                                backgroundColor: 'white',
+                                            }}
+                                        ></BorderRight>
+                                    </div>
+                                    <div
+                                        style={{
+                                            width: 32,
+                                            height: 32,
+                                            border: '1px solid lightgray',
+                                            margin: 0,
+                                            position: 'absolute',
+                                            left: 280,
+                                        }}
+                                    >
+                                        <DiagonalDownLine
+                                            style={{ margin: 0 }}
+                                            iconStyle={{
+                                                width: '18px',
+                                                height: '18px',
+                                                backgroundColor: 'white',
+                                            }}
+                                        ></DiagonalDownLine>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='bottomArea'>
+                            单击预置选项、预览草图及上面的按钮可以添加边框样式
+                        </div>
                     </Tab>
                     <Tab code='保护' title='保护'>
                         <p>Content for 保护 </p>
