@@ -401,3 +401,160 @@ export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
         super.paint(ctx, value, x, y, w, h, style, context);
     }
 }
+
+const decorationContainerClass = 'decorationContainer';
+const decorationContainerSelector = '.decorationContainer';
+const decorationSelector = '.decoration';
+const decorationClass = 'decoration';
+
+//获取一个元素相对于文档主体的偏移量
+function getOffsetFromBody(element) {
+    let offsetLeft = 0,
+        offsetTop = 0;
+
+    for (let currentEle = element; currentEle; ) {
+        offsetLeft += currentEle.offsetLeft;
+        offsetTop += currentEle.offsetTop;
+        currentEle = currentEle.offsetParent;
+    }
+
+    return {
+        offsetLeft,
+        offsetTop,
+    };
+}
+
+function getCanvasGcuiElement(spread) {
+    return spread.getHost().querySelector('canvas[gcuielement]');
+}
+
+export function getCellRanges(spread, cellRange) {
+    const activeSheet = spread.getActiveSheet();
+    const cellRanges = [];
+
+    const canvasGcuiEleOffsetInfo = getOffsetFromBody(
+        getCanvasGcuiElement(spread)
+    );
+
+    for (let a = 0; a <= 2; a++) {
+        for (let i = 0; i <= 2; i++) {
+            //获取视图中左列的索引
+            let letColumnIndex = activeSheet.getViewportLeftColumn(i);
+            //获取视图中右列的索引
+            let rightColumnIndex = activeSheet.getViewportRightColumn(i);
+            //获取视图中第一行的索引
+            let topRowIndex = activeSheet.getViewportTopRow(a);
+            //获取视图底部行索引
+            let bottomRowIndex = activeSheet.getViewportBottomRow(a);
+
+            console.log(
+                letColumnIndex,
+                rightColumnIndex,
+                topRowIndex,
+                bottomRowIndex,
+                '索引'
+            );
+
+            let d = new GC.Spread.Sheets.Range(
+                topRowIndex,
+                letColumnIndex,
+                bottomRowIndex - topRowIndex + 1,
+                rightColumnIndex - letColumnIndex + 1
+            );
+
+            //获取两个单元格区域的交集
+            const intersect = cellRange.getIntersect(
+                d,
+                Math.max(d.rowCount, cellRange.rowCount),
+                Math.max(d.colCount, cellRange.colCount)
+            );
+
+            if (intersect) {
+                const cellRange = new GC.Spread.Sheets.Rect(0, 0, 0, 0);
+                const rangeRect = activeSheet.getRangeRect(a, i, intersect);
+                cellRange.x = rangeRect.x + canvasGcuiEleOffsetInfo.offsetLeft;
+                cellRange.y = rangeRect.y + canvasGcuiEleOffsetInfo.offsetTop;
+                cellRange.width = rangeRect.width - 2;
+                cellRange.height = rangeRect.height - 2;
+                cellRanges.push(cellRange);
+            }
+        }
+    }
+    return cellRanges;
+}
+
+export function highlightBlock(spread, cellRange) {
+    const cellRanges = getCellRanges(spread, cellRange);
+
+    _createHighlightOneBlock();
+
+    if (cellRanges && !(cellRanges.length <= 0)) {
+        const container = document.querySelector(decorationContainerSelector);
+        if (container)
+            for (let n = 0; n < cellRanges.length; n++) {
+                let decoration = void 0;
+                if (9 <= n) {
+                    (decoration = document.createElement('div')).classList.add(
+                        decorationClass
+                    );
+                    container.appendChild(decoration);
+                } else {
+                    decoration =
+                        container.querySelectorAll(decorationSelector)[n];
+                }
+                let r = cellRanges[n],
+                    a = document.body,
+                    i = 0,
+                    l = 0;
+                if (a && a.style) {
+                    const s = getOffsetFromBody(a);
+                    i = s.offsetTop;
+                    l = s.offsetLeft;
+                }
+
+                decoration.style.width = r.width + 'px';
+                decoration.style.height = r.height + 'px';
+                decoration.style.left = r.x - l + 'px';
+                decoration.style.top = r.y - i + 'px';
+            }
+    }
+}
+
+//函数的作用是创建一个用于高亮显示的装饰容器，并将其添加到文档中。
+function _createHighlightOneBlock() {
+    let container = document.querySelector(decorationContainerSelector);
+    if (!container) {
+        container = document.createElement('div');
+        container.classList.add(decorationContainerClass);
+        document.body.appendChild(container);
+
+        //容器样式
+        container.style.position = 'absolute';
+        container.style.top = 0;
+        container.style.left = 0;
+        container.style.botton = 0;
+        container.style.right = 0;
+        container.style.pointerEvent = 'none';
+
+        //为什么是9个？
+        for (let n = 0; n < 9; n++) {
+            const decoration = document.createElement('div');
+            decoration.classList.add(decorationClass);
+
+            //样式
+            decoration.style.border = '1px solid blue';
+            decoration.style.outline = 'none';
+            decoration.style.position = 'absolute';
+            decoration.style.zIndex = 1000;
+            decoration.style.boxShadow = '0px 0px 4px 0px #007eff';
+
+            container.appendChild(decoration);
+        }
+    }
+}
+
+//移除装饰容器
+export function removeHighlightOneBlock() {
+    const container = document.querySelector(decorationContainerSelector);
+    container && container.remove();
+}

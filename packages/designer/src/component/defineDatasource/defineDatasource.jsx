@@ -47,6 +47,8 @@ import {
   getCellInfo,
   getChanged,
   getPath,
+  highlightBlock,
+  removeHighlightOneBlock,
 } from './fun.js';
 import {
   AddDatasourceBtn,
@@ -335,9 +337,6 @@ export function DraggableDatasourceList() {
         if (!cacheDatasRef.current.hasBindEvent) {
             cacheDatasRef.current.hasBindEvent = true;
             let dragged = null;
-            const oldStyles = [];
-            let lastRow = null,
-                lastCol = null;
             document.addEventListener(
                 'dragstart',
                 function (ev) {
@@ -372,46 +371,15 @@ export function DraggableDatasourceList() {
                     if (!cell) {
                         return;
                     }
+                    const childrenCount = Number(dragged.dataset.childrenCount);
 
-                    if (lastRow === row && lastCol === col) {
-                        return;
-                    }
-                    //还原样式
-                    while (oldStyles.length > 0) {
-                        const { cell, value } = oldStyles.shift();
-                        cell.backColor(value);
-                    }
-                    lastCol = col;
-                    lastRow = row;
-
-                    //存储旧样式
-                    oldStyles.push({
-                        cell,
-                        value: cell.backColor(),
+                    const cellRange = new GC.Spread.Sheets.Range(
                         row,
                         col,
-                    });
-
-                    cell.backColor('#F7A711');
-
-                    const childrenCount = Number(dragged.dataset.childrenCount);
-                    if (childrenCount > 0) {
-                        for (let i = 1; i < childrenCount; i++) {
-                            const activeSheet = spread.getActiveSheet();
-                            const newCol = col + i;
-                            const cell = activeSheet.getCell(row, newCol);
-                            //存储旧样式
-                            oldStyles.push({
-                                cell,
-                                value: cell.backColor(),
-                                row,
-                                newCol,
-                            });
-
-                            cell.backColor('#F7A711');
-                        }
-                        return;
-                    }
+                        1,
+                        childrenCount > 0 ? childrenCount : 1
+                    );
+                    highlightBlock(spread, cellRange);
                 },
                 false
             );
@@ -452,10 +420,6 @@ export function DraggableDatasourceList() {
                     event.preventDefault();
 
                     dragged.style.opacity = 1;
-                    while (oldStyles.length > 0) {
-                        const { cell, value } = oldStyles.shift();
-                        cell.backColor(value);
-                    }
 
                     // 把拖拽元素移入目标区域
                     //获取拖动物理在屏幕的位置
@@ -520,6 +484,7 @@ export function DraggableDatasourceList() {
                 } catch (error) {
                 } finally {
                     cacheDatasRef.current.spread.resumePaint();
+                    removeHighlightOneBlock();
                 }
             });
         }
