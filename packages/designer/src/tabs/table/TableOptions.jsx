@@ -17,10 +17,12 @@ import { setTableStyles } from '@utils/tableUtil';
 import {
   setBandColumn,
   setBandRow,
+  setColumnMerge,
   setFilterButtonVisible,
   setFooterDropDownList,
   setHighlightFirstColumn,
   setHighlightLastColumn,
+  setRowMerge,
   setShowFooter,
   setShowHeader,
 } from '../../store/tableDesignSlice/tableDesignSlice';
@@ -37,6 +39,8 @@ export default function () {
         highlightLastColumn,
         filterButtonVisible,
         footerDropDownList,
+        rowMerge,
+        columnMerge,
     } = useSelector(({ tableDesignSlice }) => tableDesignSlice);
     useEffect(() => {
         setTableStyles({
@@ -178,6 +182,36 @@ export default function () {
                                 dispatch(
                                     setFooterDropDownList({
                                         footerDropDownList: evt.target.checked,
+                                    })
+                                );
+                            }}
+                        ></CheckBox>
+                    </ItemList>
+                </VGroupItem>
+                <VGroupItem>
+                    <ItemList>
+                        <CheckBox
+                            title='行合并'
+                            desc='勾选此项，同行数据存在连续相同时，将合并成一个单元格'
+                            value={rowMerge}
+                            onChange={(evt) => {
+                                dispatch(
+                                    setRowMerge({
+                                        rowMerge: evt.target.checked,
+                                    })
+                                );
+                            }}
+                        ></CheckBox>
+                    </ItemList>
+                    <ItemList>
+                        <CheckBox
+                            title='列合并'
+                            desc='勾选此项，同列数据存在连续相同时，将合并成一个单元格'
+                            value={columnMerge}
+                            onChange={(evt) => {
+                                dispatch(
+                                    setColumnMerge({
+                                        columnMerge: evt.target.checked,
                                     })
                                 );
                             }}

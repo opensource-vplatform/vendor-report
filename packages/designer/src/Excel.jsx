@@ -31,7 +31,6 @@ export default function () {
     let {
         datasourceSlice: { dsList },
     } = useSelector((state) => state);
-    const spreadBackColor = 'aliceblue';
     const sheetName = 'Person Address';
     const autoGenerateColumns = false;
     const handleValueChanged = useCallback((type, args) => {
@@ -75,7 +74,6 @@ export default function () {
     });
     return (
         <SpreadSheets
-            backColor={spreadBackColor}
             workbookInitialized={handleWorkbookInitialized}
             enterCell={handleEnterCell}
             activeSheetChanged={handleActiveSheetChanged}

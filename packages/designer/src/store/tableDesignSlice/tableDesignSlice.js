@@ -23,7 +23,11 @@ export const tableDesignSlice = createSlice({
         //汇总行工具
         footerDropDownList:true,
         //表格样式
-        styleName:'None'
+        styleName:'None',
+        //数据行合并
+        rowMerge: false,
+        //数据列合并
+        columnMerge: false,
     },
     reducers: {
         setShowHeader(state,action){
@@ -53,6 +57,12 @@ export const tableDesignSlice = createSlice({
         setStyleName(state,action){
             state.styleName = action.payload.styleName;
         },
+        setRowMerge(state,action){
+            state.rowMerge = action.payload.rowMerge;
+        },
+        setColumnMerge(state,action){
+            state.columnMerge = action.payload.columnMerge;
+        },
         setData(state,action){
             Object.assign(state,action.payload.data)
         }
@@ -70,6 +80,8 @@ export const {
     setBandRow,
     setBandColumn,
     setStyleName,
+    setRowMerge,
+    setColumnMerge,
     setHighlightFirstColumn,
     setHighlightLastColumn,
     setFilterButtonVisible,
