@@ -42,10 +42,11 @@ const IconDiv = styled.div`
 `;
 
 function Icon(props) {
-    const type = props.type;
+    const { type, color } = props;
     const data = iconData[type];
     const icSt = {};
     icSt.backgroundImage = data;
+    icSt.backgroundColor = color;
     return <IconDiv style={icSt}></IconDiv>;
 }
 

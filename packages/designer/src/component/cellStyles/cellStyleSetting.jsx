@@ -24,7 +24,6 @@ import './CellStyleSetting.scss';
 import List from '../list/List';
 import Icon from './lineIcon';
 import ColorEditor from '@components/color/Index';
-import BackColor from '@icons/font/BackColor ';
 import ArrowDown from '@icons/arrow/ArrowDown';
 import BorderOutline from '@icons/border/BorderOutline';
 import BorderNone from '@icons/border/BorderNone';
@@ -558,30 +557,64 @@ function CellStyleSetting(props) {
 
                                     <div className='lineStyle'>
                                         <div className='lineStyleLeft'>
-                                            <Icon type={IconType.Hair} />
-                                            <Icon type={IconType.Dotted} />
-                                            <Icon type={IconType.DashDotDot} />
-                                            <Icon type={IconType.DashDot} />
-                                            <Icon type={IconType.Dashed} />
-                                            <Icon type={IconType.Thin} />
-                                            <Icon type={IconType.Thin} />
+                                            <Icon
+                                                type={IconType.Hair}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.Dotted}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.DashDotDot}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.DashDot}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.Dashed}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.Thin}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.Thin}
+                                                color={lineColor}
+                                            />
                                         </div>
                                         <div className='lineStyleRight'>
                                             <Icon
                                                 type={IconType.MediumDashDotDot}
+                                                color={lineColor}
                                             />
                                             <Icon
                                                 type={IconType.SlantedDashDot}
+                                                color={lineColor}
                                             />
                                             <Icon
                                                 type={IconType.MediumDashDot}
+                                                color={lineColor}
                                             />
                                             <Icon
                                                 type={IconType.MediumDashed}
+                                                color={lineColor}
                                             />
-                                            <Icon type={IconType.Medium} />
-                                            <Icon type={IconType.Thick} />
-                                            <Icon type={IconType.Double} />
+                                            <Icon
+                                                type={IconType.Medium}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.Thick}
+                                                color={lineColor}
+                                            />
+                                            <Icon
+                                                type={IconType.Double}
+                                                color={lineColor}
+                                            />
                                         </div>
                                     </div>
                                     <span>颜色：</span>
