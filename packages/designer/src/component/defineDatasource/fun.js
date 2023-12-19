@@ -428,9 +428,9 @@ function getCanvasGcuiElement(spread) {
     return spread.getHost().querySelector('canvas[gcuielement]');
 }
 
-export function getCellRanges(spread, cellRange) {
+export function getCellRacts(spread, cellRange) {
     const activeSheet = spread.getActiveSheet();
-    const cellRanges = [];
+    const cellRacts = [];
 
     const canvasGcuiEleOffsetInfo = getOffsetFromBody(
         getCanvasGcuiElement(spread)
@@ -470,28 +470,29 @@ export function getCellRanges(spread, cellRange) {
             );
 
             if (intersect) {
-                const cellRange = new GC.Spread.Sheets.Rect(0, 0, 0, 0);
+                debugger;
+                const cellRact = new GC.Spread.Sheets.Rect(0, 0, 0, 0);
                 const rangeRect = activeSheet.getRangeRect(a, i, intersect);
-                cellRange.x = rangeRect.x + canvasGcuiEleOffsetInfo.offsetLeft;
-                cellRange.y = rangeRect.y + canvasGcuiEleOffsetInfo.offsetTop;
-                cellRange.width = rangeRect.width - 2;
-                cellRange.height = rangeRect.height - 2;
-                cellRanges.push(cellRange);
+                cellRact.x = rangeRect.x + canvasGcuiEleOffsetInfo.offsetLeft;
+                cellRact.y = rangeRect.y + canvasGcuiEleOffsetInfo.offsetTop;
+                cellRact.width = rangeRect.width - 2;
+                cellRact.height = rangeRect.height - 2;
+                cellRacts.push(cellRact);
             }
         }
     }
-    return cellRanges;
+    return cellRacts;
 }
 
 export function highlightBlock(spread, cellRange) {
-    const cellRanges = getCellRanges(spread, cellRange);
-
+    const cellRacts = getCellRacts(spread, cellRange);
+    console.log(cellRacts, 'cellRanges');
     _createHighlightOneBlock();
 
-    if (cellRanges && !(cellRanges.length <= 0)) {
+    if (cellRacts && cellRacts.length > 0) {
         const container = document.querySelector(decorationContainerSelector);
         if (container)
-            for (let n = 0; n < cellRanges.length; n++) {
+            for (let n = 0; n < cellRacts.length; n++) {
                 let decoration = void 0;
                 if (9 <= n) {
                     (decoration = document.createElement('div')).classList.add(
@@ -502,7 +503,7 @@ export function highlightBlock(spread, cellRange) {
                     decoration =
                         container.querySelectorAll(decorationSelector)[n];
                 }
-                let r = cellRanges[n],
+                let r = cellRacts[n],
                     a = document.body,
                     i = 0,
                     l = 0;

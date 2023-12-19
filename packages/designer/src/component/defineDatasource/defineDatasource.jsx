@@ -257,11 +257,12 @@ export function DatasourceList(props) {
 
 //可拖拽树形数据源列表
 export function DraggableDatasourceList() {
-    const state = useSelector((state) => state);
-    const {
-        fontSlice: { spread },
-        datasourceSlice: { dsList, bindInfos, isShowDatasource },
-    } = state;
+    const { spread } = useSelector(({ fontSlice }) => fontSlice);
+
+    const { dsList, isShowDatasource } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
+
     const dispatch = useDispatch();
     const cacheDatasRef = useRef({
         hasBindEvent: false,
@@ -573,10 +574,13 @@ function Index(props) {
     const cacheDatasRef = useRef({
         updated: [],
     });
-    let {
-        fontSlice: { spread },
-        datasourceSlice: { dsList, bindInfos, activeDs, finalDsList },
-    } = useSelector((state) => state);
+
+    let { spread } = useSelector(({ fontSlice }) => fontSlice);
+
+    let { dsList, bindInfos, activeDs, finalDsList } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
+
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
     }
