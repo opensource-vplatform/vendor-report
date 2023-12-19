@@ -59,11 +59,7 @@ const DataNavItem = WithNavItem(DataTab);
 
 export default function () {
     const dispatch = useDispatch();
-    const state = useSelector((state) => state);
-    const {
-        navSlice: { active, hideCodes },
-        fontSlice: { spread },
-    } = state;
+    const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     return (
         <Tabs
             value={active}

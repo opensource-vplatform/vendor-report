@@ -28,9 +28,7 @@ import { parseTable } from './utils/tableUtil';
 
 export default function () {
     const dispatch = useDispatch();
-    let {
-        datasourceSlice: { dsList },
-    } = useSelector((state) => state);
+    let { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
     const sheetName = 'Person Address';
     const autoGenerateColumns = false;
     const handleValueChanged = useCallback((type, args) => {
@@ -53,13 +51,13 @@ export default function () {
         const sheet = args.sheet;
         const styles = parseFont(sheet);
         dispatch(setFontStyles({ styles }));
-        if(isBindingTable(sheet)){
-            dispatch(showTab({code:'table'}));
-            dispatch(setData({data:parseTable(sheet)}));
-            dispatch(setActive({code:'table'}))
-        }else{
-            dispatch(hideTab({code:'table'}))
-            dispatch(setActive({code:null}))
+        if (isBindingTable(sheet)) {
+            dispatch(showTab({ code: 'table' }));
+            dispatch(setData({ data: parseTable(sheet) }));
+            dispatch(setActive({ code: 'table' }));
+        } else {
+            dispatch(hideTab({ code: 'table' }));
+            dispatch(setActive({ code: null }));
         }
     });
     const handleActiveSheetChanged = useCallback((type, args) => {
@@ -67,7 +65,7 @@ export default function () {
         const styles = parseFont(sheet);
         dispatch(setFontStyles({ styles }));
         dispatch(resetView());
-        dispatch(hideTab({code:'table'}))
+        dispatch(hideTab({ code: 'table' }));
     });
     const handleWorkbookInitialized = useCallback((spread) => {
         dispatch(setSpread({ spread }));
