@@ -1,6 +1,6 @@
-import GC from '@grapecity/spread-sheets';
 import { toBorders } from '@metadatas/border';
 import { getFontSizeValues } from '@metadatas/font';
+import { getNamespace } from '@utils/spreadUtil';
 
 import {
   applyStyleToSelectedCell,
@@ -260,6 +260,7 @@ export function setFont(params) {
     withBatchUpdate(spread, (sheet) => {
         applyStyleToSelectedCell(sheet, function (sheet, row, col) {
             //需要实例化一个新的Style，否则字体设置无效
+            const GC = getNamespace();
             const style = new GC.Spread.Sheets.Style();
             const preStyle = sheet.getStyle(row, col);
             Object.assign(style, preStyle);

@@ -7,11 +7,11 @@ import {
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import GC from '@grapecity/spread-sheets';
 import {
-  SpreadSheets,
+  Workbook,
   Worksheet,
-} from '@grapecity/spread-sheets-react';
+} from '@components/spread/Index';
+import { getNamespace } from '@utils/spreadUtil';
 
 import { setMode } from './store/appSlice/appSlice';
 
@@ -53,6 +53,7 @@ export default function () {
         const sourceJson = JSON.stringify(sourceSpread.toJSON());
         spread.fromJSON(JSON.parse(sourceJson));
         spread.sheets.forEach(function (sheet) {
+            const GC = getNamespace();
             const source = new GC.Spread.Sheets.Bindings.CellBindingSource(
                 JSON.parse(JSON.stringify(previewViewDatas))
             );
@@ -73,9 +74,9 @@ export default function () {
                 </Button>
             </Toolbar>
             <ExcelWrap>
-                <SpreadSheets workbookInitialized={workbookInitializedHandler}>
+                <Workbook inited={workbookInitializedHandler}>
                     <Worksheet></Worksheet>
-                </SpreadSheets>
+                </Workbook>
             </ExcelWrap>
         </Wrap>
     );

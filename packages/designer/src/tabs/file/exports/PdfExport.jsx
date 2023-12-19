@@ -1,16 +1,15 @@
-import '@grapecity/spread-sheets-print';
-import '@grapecity/spread-sheets-pdf';
-
 import {
   Fragment,
   useState,
 } from 'react';
 
 import { useSelector } from 'react-redux';
+import resourceManager from 'resource-manager-js';
 import styled from 'styled-components';
 
 import Error from '@components/error/Index';
 import Select from '@components/select/Index';
+import { download } from '@utils/fileUtil';
 
 import {
   DetailDesc,
@@ -24,6 +23,7 @@ import {
   IconTitle,
   ImportButtonWrap,
 } from '../Components';
+import WaitMsg from '../WaitMsg';
 
 const Wrap = styled.div`
     display: flex;
@@ -91,26 +91,33 @@ function Index(props) {
             showWarn(true);
             return;
         } else {
-            console.log(pdf);
-            spread.savePDF(
-                (data) => {
-                    setLoading(false);
-                    download(data,filename + '.pdf');
-                    closeHandler();
-                },
-                (err) => {
-                    setLoading(false);
-                    setErrMessage(err.message || err);
-                },
-                {
-                    author: data.auther,
-                    creator: data.application,
-                    keywords: data.keyword,
-                    subject: data.subject,
-                    title: data.title,
-                },
-                data.sheetIndex == null ? undefined : data.sheetIndex
-            );
+            setLoading(true);
+            resourceManager
+                .loadScript([
+                    'public/spreadjs/plugins/gc.spread.sheets.print.min.js',
+                    'public/spreadjs/plugins/gc.spread.sheets.pdf.min.js',
+                ])
+                .then(() => {
+                    spread.savePDF(
+                        (data) => {
+                            setLoading(false);
+                            download(data, filename + '.pdf');
+                            closeHandler();
+                        },
+                        (err) => {
+                            setLoading(false);
+                            setErrMessage(err.message || err);
+                        },
+                        {
+                            author: data.auther,
+                            creator: data.application,
+                            keywords: data.keyword,
+                            subject: data.subject,
+                            title: data.title,
+                        },
+                        data.sheetIndex == null ? undefined : data.sheetIndex
+                    );
+                });
         }
     };
     return (

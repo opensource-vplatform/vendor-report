@@ -4,10 +4,11 @@ import {
 } from 'react';
 
 import { useSelector } from 'react-redux';
+import resourceManager from 'resource-manager-js';
 
 import Error from '@components/error/Index';
-import { IO } from '@grapecity/spread-excelio';
 import { download } from '@utils/fileUtil';
+import { getNamespace } from '@utils/spreadUtil';
 
 import {
   DetailDesc,
@@ -41,33 +42,41 @@ export default function (props) {
             showWarn(true);
             return;
         } else {
-            const excelIO = new IO();
-            const json = JSON.stringify(spread.toJSON());
-            setLoading(true);
-            excelIO.save(json, 
-                (blob) => {
-                    setLoading(false);
-                    download(blob,filename + '.xlsx');
-                    closeHandler();
-                },
-                (err) => {
-                    setLoading(false);
-                    setErrMessage(err.message || err);
-                },
-                {
-                    columnHeadersAsFrozenRows: false,
-                    includeAutoMergedCells: false,
-                    includeBindingSource: false,
-                    includeCalcModelCache: false,
-                    includeEmptyRegionCells: true,
-                    includeFormulas: !cfg.ignoreFormula,
-                    includeStyles: !cfg.ignoreStyle,
-                    includeUnusedNames: true,
-                    password: undefined,
-                    rowHeadersAsFrozenColumns: false,
-                    saveAsView: false,
-                }
-            );
+            resourceManager
+                .loadScript([
+                    'public/spreadjs/plugins/gc.spread.excelio.min.js',
+                ])
+                .then(() => {
+                    const GC = getNamespace();
+                    const excelIO = new GC.Spread.Excel.IO();
+                    const json = JSON.stringify(spread.toJSON());
+                    setLoading(true);
+                    excelIO.save(
+                        json,
+                        (blob) => {
+                            setLoading(false);
+                            download(blob, filename + '.xlsx');
+                            closeHandler();
+                        },
+                        (err) => {
+                            setLoading(false);
+                            setErrMessage(err.message || err);
+                        },
+                        {
+                            columnHeadersAsFrozenRows: false,
+                            includeAutoMergedCells: false,
+                            includeBindingSource: false,
+                            includeCalcModelCache: false,
+                            includeEmptyRegionCells: true,
+                            includeFormulas: !cfg.ignoreFormula,
+                            includeStyles: !cfg.ignoreStyle,
+                            includeUnusedNames: true,
+                            password: undefined,
+                            rowHeadersAsFrozenColumns: false,
+                            saveAsView: false,
+                        }
+                    );
+                });
         }
     };
     return (

@@ -12,7 +12,6 @@ import {
 import Dialog from '@components/dialog/Index.jsx';
 import DropdownBox from '@components/dropdownBox/dropdownBox';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
-import GC from '@grapecity/spread-sheets';
 import DatasourceIcon from '@icons/data/datasource';
 import {
   deleteDsList,
@@ -33,6 +32,7 @@ import {
   genUUID,
   hasSameNode,
 } from '@utils/commonUtil.js';
+import { getNamespace } from '@utils/spreadUtil';
 import { parseTable } from '@utils/tableUtil.js';
 import {
   getCellInstanceId,
@@ -373,7 +373,7 @@ export function DraggableDatasourceList() {
                         return;
                     }
                     const childrenCount = Number(dragged.dataset.childrenCount);
-
+                    const GC = getNamespace();
                     const cellRange = new GC.Spread.Sheets.Range(
                         row,
                         col,
@@ -436,6 +436,7 @@ export function DraggableDatasourceList() {
                     const current = findTreeNodeById(itemId, dsList);
 
                     const dataPath = getPath(current, dsList);
+                    const GC = getNamespace();
                     const spreadNS = GC.Spread.Sheets;
 
                     const cellInstanceId = getCellInstanceId(sheet, row, col);

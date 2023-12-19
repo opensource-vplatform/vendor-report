@@ -6,9 +6,9 @@ import {
 } from 'react-redux';
 
 import {
-  SpreadSheets,
+  Workbook,
   Worksheet,
-} from '@grapecity/spread-sheets-react';
+} from '@components/spread/Index';
 import { setSpread } from '@store/appSlice/appSlice';
 import { updateDslist } from '@store/datasourceSlice/datasourceSlice';
 import { setFontStyles } from '@store/fontSlice/fontSlice';
@@ -71,18 +71,13 @@ export default function () {
         dispatch(setSpread({ spread }));
     });
     return (
-        <SpreadSheets
-            workbookInitialized={handleWorkbookInitialized}
+        <Workbook
+            inited={handleWorkbookInitialized}
             enterCell={handleEnterCell}
             activeSheetChanged={handleActiveSheetChanged}
             valueChanged={handleValueChanged}
         >
-            <Worksheet
-                name={sheetName}
-                autoGenerateColumns={autoGenerateColumns}
-                rowCount={20}
-                colCount={20}
-            ></Worksheet>
-        </SpreadSheets>
+            <Worksheet name={sheetName} rowCount={20} colCount={20}></Worksheet>
+        </Workbook>
     );
 }

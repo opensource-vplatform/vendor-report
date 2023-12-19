@@ -7,7 +7,7 @@ import {
 import { useSelector } from 'react-redux';
 
 import Error from '@components/error/Index';
-import { IO } from '@grapecity/spread-excelio';
+import { getNamespace } from '@utils/spreadUtil';
 
 import {
   DetailDesc,
@@ -55,7 +55,8 @@ function ExcelImport(props) {
                     ignoreStyle: cfg.ignoreStyle,
                 };
                 reader.onload = () => {
-                    const excelIo = new IO();
+                    const GC = getNamespace();
+                    const excelIo = new GC.Spread.Excel.IO();
                     excelIo.open(
                         reader.result,
                         (json) => {

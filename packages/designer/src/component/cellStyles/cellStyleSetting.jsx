@@ -1,41 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import GC from '@grapecity/spread-sheets';
+import './CellStyleSetting.scss';
+
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
+import ColorEditor from '@components/color/Index';
+import Select from '@components/Select/Index';
+import ArrowDown from '@icons/arrow/ArrowDown';
+import BorderBottom from '@icons/border/BorderBottom';
+import BorderInside from '@icons/border/BorderInside';
+import BorderLeft from '@icons/border/BorderLeft';
+import BorderNone from '@icons/border/BorderNone';
+import BorderOutline from '@icons/border/BorderOutline';
+import BorderRight from '@icons/border/BorderRight';
+import BorderTop from '@icons/border/BorderTop';
+import DiagonalDownLine from '@icons/border/DiagonalDownLine';
+import DiagonalUpLine from '@icons/border/DiagonalUpLine';
+import LineHorizontalInner from '@icons/border/LineHorizontalInner';
+import LineVerticalInner from '@icons/border/LineVerticalInner';
+
+import Button from '../button/Index';
 import Index from '../dialog/Index';
+import Integer from '../integer/Index';
+import List from '../list/List';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
-import Integer from '../integer/Index';
-import Button from '../button/Index';
-import Select from '@components/Select/Index';
 import {
-    Categories,
-    FormatNumber,
-    AccountingSymbol,
-    LocaleType,
-    TimeFormats,
-    DateFormats,
-    CurrencyNegativeNumbers,
-    FractionType,
-    SpecialFormats,
-    CustomFormats,
-    IconType,
+  AccountingSymbol,
+  Categories,
+  CurrencyNegativeNumbers,
+  CustomFormats,
+  DateFormats,
+  FormatNumber,
+  FractionType,
+  IconType,
+  LocaleType,
+  SpecialFormats,
+  TimeFormats,
 } from './constant';
-import './CellStyleSetting.scss';
-import List from '../list/List';
 import Icon from './lineIcon';
-import ColorEditor from '@components/color/Index';
-import ArrowDown from '@icons/arrow/ArrowDown';
-import BorderOutline from '@icons/border/BorderOutline';
-import BorderNone from '@icons/border/BorderNone';
-import BorderInside from '@icons/border/BorderInside';
-import BorderBottom from '@icons/border/BorderBottom';
-import BorderTop from '@icons/border/BorderTop';
-import LineHorizontalInner from '@icons/border/LineHorizontalInner';
-import DiagonalUpLine from '@icons/border/DiagonalUpLine';
-import DiagonalDownLine from '@icons/border/DiagonalDownLine';
-import BorderLeft from '@icons/border/BorderLeft';
-import BorderRight from '@icons/border/BorderRight';
-import LineVerticalInner from '@icons/border/LineVerticalInner';
 
 function CellStyleSetting(props) {
     let firstCellValue = null;

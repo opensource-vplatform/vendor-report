@@ -3,30 +3,18 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="framework" content="react-spread">
-  <script>(function (w, d, s, l, i) {
-      w[l] = w[l] || []; w[l].push({
-        'gtm.start':
-          new Date().getTime(), event: 'gtm.js'
-      }); var f = d.getElementsByTagName(s)[0],
-        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-    })(window, document, 'script', 'dataLayer', 'GTM-WFNBSLH');
-  </script>
   <link rel="icon" type="image/png" href="public/logo.png">
   <link rel="stylesheet" href="public/fonts.css">
   <link rel="stylesheet" href="public/styles.css">
-  <title>SpreadJS</title>
+  <link rel="stylesheet" href="public/spreadjs/styles/gc.spread.sheets.excel2013white.16.2.6.css">
+  <script type="text/javascript" src="public/spreadjs/gc.spread.sheets.all.16.2.6.min.js"></script>
+  <script type="text/javascript" src="public/spreadjs/resources/zh/gc.spread.sheets.resources.zh.16.2.6.min.js"></script>
+  <title>同望Web报表设计器</title>
 </head>
 
 <body>
-  <noscript>
-    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WFNBSLH" height="0" width="0"
-      style="display:none;visibility:hidden">
-    </iframe>
-  </noscript>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

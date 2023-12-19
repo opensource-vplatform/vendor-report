@@ -1,6 +1,7 @@
-import GC from '@grapecity/spread-sheets';
-
-import { withBatchUpdate } from './spreadUtil';
+import {
+  getNamespace,
+  withBatchUpdate,
+} from './spreadUtil';
 
 const getTable = function (sheet) {
     return sheet.tables.find(
@@ -35,6 +36,7 @@ export function parseTable(sheet) {
 
 function getTableStyle(styleName) {
     if (styleName) {
+        const GC = getNamespace();
         return GC.Spread.Sheets.Tables.TableThemes[styleName.toLowerCase()];
     }
     return null;

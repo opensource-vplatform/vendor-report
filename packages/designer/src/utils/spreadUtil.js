@@ -114,3 +114,10 @@ export const applyToSelectedCell = function (sheet, func) {
         }
     }
 };
+
+/**
+ * 获取命令空间
+ */
+export const getNamespace = function(){
+    return window.GC;
+}

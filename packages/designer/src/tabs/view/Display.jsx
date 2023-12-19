@@ -58,6 +58,7 @@ export default function () {
                     <ItemList>
                         <CheckBox
                             title='行标题'
+                            desc='显示、隐藏行标题'
                             value={rowHeaderVisible}
                             onChange={(evt) => {
                                 dispatch(
@@ -71,6 +72,7 @@ export default function () {
                     <ItemList>
                         <CheckBox
                             title='列标题'
+                            desc='显示、隐藏列标题'
                             value={colHeaderVisible}
                             onChange={(evt) => {
                                 dispatch(
@@ -86,6 +88,7 @@ export default function () {
                     <ItemList>
                         <CheckBox
                             title='垂直网格线'
+                            desc='显示、隐藏垂直网格线'
                             value={showVerticalGridline}
                             onChange={(evt) => {
                                 dispatch(
@@ -99,6 +102,7 @@ export default function () {
                     <ItemList>
                         <CheckBox
                             title='水平网格线'
+                            desc='显示、隐藏水平网格线'
                             value={showHorizontalGridline}
                             onChange={(evt) => {
                                 dispatch(
@@ -114,6 +118,7 @@ export default function () {
                     <ItemList>
                         <CheckBox
                             title='工作表选项卡'
+                            desc='显示、隐藏工作表选项卡'
                             value={tabStripVisible}
                             onChange={(evt) => {
                                 dispatch(
@@ -127,6 +132,7 @@ export default function () {
                     <ItemList>
                         <CheckBox
                             title='新建工作表'
+                            desc='显示、隐藏新增工作表图标，使用此功能需显示工作选项卡'
                             value={newTabVisible}
                             disabled={!tabStripVisible}
                             onChange={(evt) => {

@@ -1,4 +1,4 @@
-import GC from '@grapecity/spread-sheets';
+import { getNamespace } from '@utils/spreadUtil';
 
 import {
   removeBindInfos,
@@ -317,6 +317,7 @@ export function checkHasBind(params) {
                             }
                             if (isInsert && sync) {
                                 sheetInstance.tables.remove(table);
+                                const GC = getNamespace();
                                 addTable({
                                     columnsTemp: children,
                                     sheet: sheetInstance,
@@ -453,7 +454,7 @@ export function getCellRacts(spread, cellRange) {
                 bottomRowIndex,
                 '索引'
             );
-
+            const GC = getNamespace();
             let d = new GC.Spread.Sheets.Range(
                 topRowIndex,
                 letColumnIndex,
