@@ -575,10 +575,11 @@ function Index(props) {
         updated: [],
     });
 
-    let {
-        fontSlice: { spread },
-        datasourceSlice: { dsList, bindInfos, activeDs, finalDsList },
-    } = useSelector((state) => state);
+    let { spread } = useSelector(({ fontSlice }) => fontSlice);
+
+    let { dsList, bindInfos, activeDs, finalDsList } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
 
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
