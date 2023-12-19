@@ -68,6 +68,19 @@ export default function () {
         dispatch(hideTab({ code: 'table' }));
     });
     const handleWorkbookInitialized = useCallback((spread) => {
+        const menuDatas = spread.contextMenu.menuData;
+        for(let i=0,l=menuDatas.length;i<l;i++){
+            const menu = menuDatas[i];
+            if(menu.name == "gc.spread.tableDelete" && menu.workArea=="table"){
+                menu.subMenu.push({
+                    command: "tableDeleteAllForContextMenu",
+                    iconClass: "gc-spread-deleteComment",
+                    name:"gc.spread.tableDeleteAll",
+                    text: "整表"
+                });
+                break;
+            }
+        }
         dispatch(setSpread({ spread }));
     });
     return (
