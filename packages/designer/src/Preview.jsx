@@ -43,10 +43,11 @@ const ExcelWrap = styled.div`
 
 export default function () {
     const dispatch = useDispatch();
-    const {
-        datasourceSlice: { previewViewDatas },
-        appSlice: { spread: sourceSpread },
-    } = useSelector((state) => state);
+    const { previewViewDatas } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
+
+    const { spread: sourceSpread } = useSelector(({ appSlice }) => appSlice);
 
     const workbookInitializedHandler = useCallback(function (spread) {
         const sourceJson = JSON.stringify(sourceSpread.toJSON());

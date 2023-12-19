@@ -72,3 +72,14 @@ function _deepCopy(obj, cache = new WeakMap()) {
 export function deepCopy(obj) {
     return _deepCopy(obj);
 }
+
+export function genValueByType(name, type, index) {
+    switch (type) {
+        case 'integer':
+            return index;
+        case 'decimals':
+            return index + Math.floor(Math.random() * 100) / 100;
+        default:
+            return name + index;
+    }
+}

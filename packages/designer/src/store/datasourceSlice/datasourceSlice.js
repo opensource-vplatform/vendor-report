@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   deepCopy,
   findTreeNodeById,
+  genValueByType,
 } from '../../utils/commonUtil.js';
 
 export const datasourceSlice = createSlice({
@@ -71,6 +72,22 @@ export const datasourceSlice = createSlice({
                         typeName: '文本',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
+                    {
+                        id: 'D001',
+                        code: 'workingYears',
+                        name: '工龄',
+                        type: 'integer',
+                        typeName: '整数',
+                        parentId: '140a79cc0041403a9aa30898ba858ac5',
+                    },
+                    {
+                        id: 'E001',
+                        code: 'averagePay',
+                        name: '平均工资',
+                        type: 'decimals',
+                        typeName: '小数',
+                        parentId: '140a79cc0041403a9aa30898ba858ac5',
+                    },
                 ],
             },
         ],
@@ -133,6 +150,22 @@ export const datasourceSlice = createSlice({
                         name: '公司名称',
                         type: 'text',
                         typeName: '文本',
+                        parentId: '140a79cc0041403a9aa30898ba858ac5',
+                    },
+                    {
+                        id: 'D001',
+                        code: 'workingYears',
+                        name: '工龄',
+                        type: 'integer',
+                        typeName: '整数',
+                        parentId: '140a79cc0041403a9aa30898ba858ac5',
+                    },
+                    {
+                        id: 'E001',
+                        code: 'averagePay',
+                        name: '平均工资',
+                        type: 'decimals',
+                        typeName: '小数',
                         parentId: '140a79cc0041403a9aa30898ba858ac5',
                     },
                 ],
@@ -260,14 +293,18 @@ export const datasourceSlice = createSlice({
                 children,
             }) {
                 if (type !== 'table') {
-                    datas[code] = name + '1';
+                    datas[code] = genValueByType(name, type, 1);
                 } else {
                     datas[code] = [];
                     if (Array.isArray(children)) {
                         for (let i = 1; i <= 10; i++) {
                             const instanceObject = {};
-                            children.forEach(function ({ code, name }) {
-                                instanceObject[code] = name + i;
+                            children.forEach(function ({ code, name, type }) {
+                                instanceObject[code] = genValueByType(
+                                    name,
+                                    type,
+                                    i
+                                );
                             });
                             datas[code].push(instanceObject);
                         }

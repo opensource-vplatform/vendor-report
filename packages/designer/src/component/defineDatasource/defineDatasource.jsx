@@ -649,6 +649,7 @@ function Index(props) {
             setIsShowConfirmDialog(true);
         } else {
             dispatch(updateDslist({ newData, isSave: true }));
+            dispatch(setIsShowDatasource());
         }
     };
 
@@ -692,6 +693,7 @@ function Index(props) {
                             ...activeDs,
                         };
                         dispatch(updateDslist({ newData, isSave: true }));
+                        dispatch(setIsShowDatasource());
                         checkHasBind({
                             dispatch,
                             spread,

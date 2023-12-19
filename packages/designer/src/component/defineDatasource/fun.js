@@ -271,7 +271,6 @@ export function checkHasBind(params) {
                             }
 
                             let columnHasChange = false;
-                            debugger;
                             //字段发生变化
                             table.BSt.forEach(function (tableColumn, index) {
                                 if (
@@ -470,7 +469,6 @@ export function getCellRacts(spread, cellRange) {
             );
 
             if (intersect) {
-                debugger;
                 const cellRact = new GC.Spread.Sheets.Rect(0, 0, 0, 0);
                 const rangeRect = activeSheet.getRangeRect(a, i, intersect);
                 cellRact.x = rangeRect.x + canvasGcuiEleOffsetInfo.offsetLeft;
@@ -527,7 +525,6 @@ function _createHighlightOneBlock() {
     if (!container) {
         container = document.createElement('div');
         container.classList.add(decorationContainerClass);
-        document.body.appendChild(container);
 
         //容器样式
         container.style.position = 'absolute';
@@ -551,6 +548,8 @@ function _createHighlightOneBlock() {
 
             container.appendChild(decoration);
         }
+
+        document.body.appendChild(container);
     }
 }
 
