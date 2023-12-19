@@ -83,6 +83,30 @@ export const DateFormats = [
     'm/d/yyyy;@',
     '[$-409]d-mmm-yyyy;@',
 ];
+export const DateFormatsChina = [
+    'yyyy/M/d',
+    'yyyy年M月d日',
+    'yyyy-M-d',
+    'yy/M/d',
+    'yy-M-d',
+    'yyyy/MM/dd',
+    'yyyy年MM月dd日',
+    'yyyy-MM-dd',
+    'yy/MM/dd',
+    'yy-MM-dd',
+    'yyyy年MM月',
+    'yyyy年MM月dd日',
+    'yyyy年MM月dd日 HH:mm',
+    'yyyy/MM/dd HH:mm',
+    'yyyy-MM-dd HH:mm',
+    'yy/MM/dd HH:mm',
+    'yy-MM-dd HH:mm',
+    'yyyy年MM月dd日 HH:mm:ss',
+    'yyyy/MM/dd HH:mm:ss',
+    'yyyy-MM-dd HH:mm:ss',
+    'yy/MM/dd HH:mm:ss',
+    'yy-MM-dd HH:mm:ss',
+];
 
 export const FractionType = [
     '分母为一位数(1/4)',

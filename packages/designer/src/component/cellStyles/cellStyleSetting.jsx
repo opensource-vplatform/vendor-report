@@ -1,14 +1,8 @@
 import './CellStyleSetting.scss';
 
-import React, {
-  useEffect,
-  useState,
-} from 'react';
+import React, { useEffect, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import ColorEditor from '@components/color/Index';
 import Select from '@components/Select/Index';
@@ -32,17 +26,18 @@ import List from '../list/List';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
 import {
-  AccountingSymbol,
-  Categories,
-  CurrencyNegativeNumbers,
-  CustomFormats,
-  DateFormats,
-  FormatNumber,
-  FractionType,
-  IconType,
-  LocaleType,
-  SpecialFormats,
-  TimeFormats,
+    AccountingSymbol,
+    Categories,
+    CurrencyNegativeNumbers,
+    CustomFormats,
+    DateFormats,
+    DateFormatsChina,
+    FormatNumber,
+    FractionType,
+    IconType,
+    LocaleType,
+    SpecialFormats,
+    TimeFormats,
 } from './constant';
 import Icon from './lineIcon';
 
@@ -479,7 +474,13 @@ function CellStyleSetting(props) {
                                         <List
                                             width='480px'
                                             height='130px'
-                                            values={Object.values(DateFormats)}
+                                            values={
+                                                locale === 'en_us'
+                                                    ? Object.values(DateFormats)
+                                                    : Object.values(
+                                                          DateFormatsChina
+                                                      )
+                                            }
                                             selectedValue={selectedTimeFormat}
                                             onChange={handleTimeFormatChange}
                                         />
