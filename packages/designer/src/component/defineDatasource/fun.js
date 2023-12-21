@@ -23,29 +23,44 @@ function setCornerMark(params) {
         position = 1,
         color = 'red',
         size = 8,
+        setType = 'toggle' /* toggle | onlyAdd | onlyRemove */,
     } = params;
     let style = sheet.getStyle(row, col);
     if (!style) {
         style = new GC.Spread.Sheets.Style();
     }
-    style.decoration = {
-        cornerFold: {
-            size,
-            position,
-            color,
-            markType: 'table',
-        },
-    };
+    if (
+        style?.decoration?.cornerFold?.markType === 'table' &&
+        (setType === 'toggle' || setType === 'onlyRemove')
+    ) {
+        delete style.decoration.cornerFold;
+    } else if (setType === 'toggle' || setType === 'onlyAdd') {
+        style.decoration = {
+            cornerFold: {
+                size,
+                position,
+                color,
+                markType: 'table',
+            },
+        };
+    }
     sheet.setStyle(row, col, style);
 }
 
-function setTableCornerMarks(params) {
-    const { sheet, row, col, tableColumnsCount } = params;
+export function setTableCornerMarks(params) {
+    const {
+        sheet,
+        row,
+        col,
+        rowCount,
+        colCount,
+        setType = 'toggle' /* toggle | onlyAdd | onlyRemove */,
+    } = params;
 
     const startRow = row;
     const startCol = col;
-    const endRow = row + 2;
-    const endCol = col + tableColumnsCount - 1;
+    const endRow = row + rowCount - 1;
+    const endCol = col + colCount - 1;
     const cornerMarkColor = 'blue';
     const cornerMarkSize = 8;
 
@@ -57,6 +72,7 @@ function setTableCornerMarks(params) {
         color: cornerMarkColor,
         position: 1,
         size: cornerMarkSize,
+        setType,
     });
 
     //右上角
@@ -67,6 +83,7 @@ function setTableCornerMarks(params) {
         color: cornerMarkColor,
         position: 2,
         size: cornerMarkSize,
+        setType,
     });
 
     //左下角
@@ -77,6 +94,7 @@ function setTableCornerMarks(params) {
         color: cornerMarkColor,
         position: 4,
         size: cornerMarkSize,
+        setType,
     });
 
     //右下角
@@ -87,6 +105,7 @@ function setTableCornerMarks(params) {
         color: cornerMarkColor,
         position: 8,
         size: cornerMarkSize,
+        setType,
     });
 }
 
@@ -126,7 +145,8 @@ export function addTable(params) {
         sheet,
         row,
         col,
-        tableColumnsCount,
+        rowCount: 3,
+        colCount: tableColumnsCount,
     });
 
     if (Array.isArray(columnsTemp)) {

@@ -35,6 +35,7 @@ import {
     getPath,
     highlightBlock,
     removeHighlightOneBlock,
+    setTableCornerMarks,
 } from './fun.js';
 import {
     AddDatasourceBtn,
@@ -336,6 +337,30 @@ export function DraggableDatasourceList() {
                             }
                         });
                 }
+            );
+
+            let markWithRedBgCommand = {
+                canUndo: false,
+                execute: function (spread, infos, c /* boolean */) {
+                    debugger;
+                    const sheet = spread.getActiveSheet();
+                    const table = sheet.tables.findByName(infos.tableName);
+                    setTableCornerMarks({
+                        setType: 'onlyRemove',
+                        sheet,
+                        ...table.range(),
+                    });
+                    sheet.tables.remove(table);
+                },
+            };
+            commandManager.register(
+                'tableDeleteAllForContextMenu',
+                markWithRedBgCommand,
+                null,
+                false,
+                false,
+                false,
+                false
             );
         },
         [spread]
