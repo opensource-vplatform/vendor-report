@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import appSlice from './appSlice/appSlice';
+import borderSlice from './borderSlice/borderSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
 import fontSlice from './fontSlice/fontSlice';
 import navSlice from './navSlice/navSlice';
@@ -14,12 +15,19 @@ const serializableCheck = {
     // Ignore these field paths in all actions
     ignoredActionPaths: ['meta.arg', 'payload.spread'],
     // Ignore these paths in the state
-    ignoredPaths: ['appSlice.spread', 'fontSlice.spread','viewSlice.spread','tableDesignSlice.spread'],
+    ignoredPaths: [
+        'appSlice.spread',
+        'fontSlice.spread',
+        'viewSlice.spread',
+        'tableDesignSlice.spread',
+        'borderSlice.spread',
+    ],
 };
 
 export default configureStore({
     reducer: {
         appSlice,
+        borderSlice,
         fontSlice,
         datasourceSlice,
         viewSlice,

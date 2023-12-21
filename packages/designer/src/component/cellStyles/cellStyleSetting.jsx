@@ -1,6 +1,6 @@
 import './CellStyleSetting.scss';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -18,7 +18,7 @@ import DiagonalDownLine from '@icons/border/DiagonalDownLine';
 import DiagonalUpLine from '@icons/border/DiagonalUpLine';
 import LineHorizontalInner from '@icons/border/LineHorizontalInner';
 import LineVerticalInner from '@icons/border/LineVerticalInner';
-
+import CanvasBorderArea from './canvasBorderArea';
 import Button from '../button/Index';
 import Index from '../dialog/Index';
 import Integer from '../integer/Index';
@@ -40,11 +40,14 @@ import {
     TimeFormats,
 } from './constant';
 import Icon from './lineIcon';
+import { setBorderByType } from '@utils/fontUtil.js';
+import { setborderColor } from '@store/borderSlice/borderSlice';
 
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
     const [isOpen, setIsOpen] = useState(false);
+    const [isMoreCell, setIsMoreCell] = useState('');
 
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
     const [selectedValue, setSelectedCategoriesValue] = useState('general');
@@ -55,21 +58,32 @@ function CellStyleSetting(props) {
     );
     const [checkboxOfThousandSeparator, setCheckboxOfThousandSeparator] =
         useState(false);
-    const [locale, setLocale] = useState('en_us');
+    const [locale, setLocale] = useState('zh_cn');
 
     const [lineColor, setLineColor] = useState('black');
+    const [borderTop, setBorderTop] = useState(false);
+    const [borderLeft, setBorderLeft] = useState(false);
+    const [borderRight, setBorderRight] = useState(false);
+    const [borderBottom, setBorderBottom] = useState(false);
+    const [diagonalUpLine, setDiagonalUpLine] = useState(false);
+    const [diagonalDownLine, setDiagonalDownLine] = useState(false);
+    const [lineHorizontalInner, setLineHorizontalInner] = useState(false);
+    const [lineVerticalInner, setLineVerticalInner] = useState(false);
 
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
 
     // 获取第一个选择区域的第一个单元格的值
-    const activeSheet = spread?.getActiveSheet();
-    const selections = activeSheet?.getSelections();
-    if (selections?.length > 0) {
-        const selection = selections[0];
-        const startRow = selection.row;
-        const startColumn = selection.col;
-        firstCellValue = activeSheet.getValue(startRow, startColumn);
-    }
+    useEffect(() => {
+        const activeSheet = spread?.getActiveSheet();
+        const selections = activeSheet?.getSelections();
+
+        if (selections?.length > 0) {
+            const selection = selections[0];
+            const startRow = selection.row;
+            const startColumn = selection.col;
+            firstCellValue = activeSheet.getValue(startRow, startColumn);
+        }
+    }, [spread]);
 
     let commandManager = spread?.commandManager();
 
@@ -92,6 +106,16 @@ function CellStyleSetting(props) {
         canUndo: false,
         execute: function () {
             setIsOpen(!isOpen);
+
+            // 判断所取单元格是否多个
+            const activeSheet = spread?.getActiveSheet();
+            const selections = activeSheet?.getSelections();
+            const { colCount, rowCount } = selections[0];
+            if (colCount === 1 && rowCount === 1) {
+                setIsMoreCell(false);
+            } else {
+                setIsMoreCell(true);
+            }
         },
     };
 
@@ -225,6 +249,14 @@ function CellStyleSetting(props) {
     const handleOK = () => {
         setIsOpen(false);
         setSelectedCategoriesValue('general');
+        borderTop && setBorderByType(spread, 'topBorder');
+        borderBottom && setBorderByType(spread, 'bottomBorder');
+        borderLeft && setBorderByType(spread, 'leftBorder');
+        borderRight && setBorderByType(spread, 'rightBorder');
+        lineHorizontalInner && setBorderByType(spread, 'lineHorizontalInner');
+        lineVerticalInner && setBorderByType(spread, 'lineVerticalInner');
+        diagonalDownLine && setBorderByType(spread, 'diagonalDownLine');
+        diagonalUpLine && setBorderByType(spread, 'diagonalUpLine');
     };
     const handleCancel = () => {
         setIsOpen(false);
@@ -244,6 +276,34 @@ function CellStyleSetting(props) {
 
     const handleColorEditor = (color) => {
         setLineColor(color);
+        dispatch(setborderColor({ color: color }));
+    };
+
+    // 处理边框
+    const handlePreBorderNone = () => {
+        setBorderBottom(false);
+        setBorderTop(false);
+        setBorderLeft(false);
+        setBorderRight(false);
+        setLineHorizontalInner(false);
+        setLineVerticalInner(false);
+        setDiagonalDownLine(false);
+        setDiagonalUpLine(false);
+    };
+    const handlePreBorderInside = () => {
+        if (!isMoreCell) {
+            setLineHorizontalInner(false);
+            setLineVerticalInner(false);
+        } else {
+            setLineHorizontalInner(true);
+            setLineVerticalInner(true);
+        }
+    };
+    const handleBorderOutline = () => {
+        setBorderBottom(true);
+        setBorderTop(true);
+        setBorderLeft(true);
+        setBorderRight(true);
     };
 
     useEffect(() => {
@@ -353,14 +413,13 @@ function CellStyleSetting(props) {
         selectedSymbol,
         selectedTimeFormat,
     ]);
-    console.log('1 :>> ', 1);
 
     return isOpen ? (
         <Index
             title='设置单元格格式'
             width='730px'
             height='630px'
-            open={true}
+            open={isOpen}
             mask={true}
             onClose={handleClose}
         >
@@ -670,6 +729,7 @@ function CellStyleSetting(props) {
                                 <div className='presetArea'>
                                     <div className='item'>
                                         <BorderNone
+                                            onClick={handlePreBorderNone}
                                             iconStyle={{
                                                 width: '35px',
                                                 height: '35px',
@@ -681,6 +741,7 @@ function CellStyleSetting(props) {
                                     </div>
                                     <div className='item'>
                                         <BorderOutline
+                                            onClick={handleBorderOutline}
                                             iconStyle={{
                                                 width: '35px',
                                                 height: '35px',
@@ -692,6 +753,7 @@ function CellStyleSetting(props) {
                                     </div>
                                     <div className='item'>
                                         <BorderInside
+                                            onClick={handlePreBorderInside}
                                             iconStyle={{
                                                 width: '35px',
                                                 height: '35px',
@@ -720,11 +782,19 @@ function CellStyleSetting(props) {
                                                 height: 32,
                                                 border: '1px solid lightgray',
                                                 margin: 0,
+                                                backgroundColor: borderTop
+                                                    ? 'lightGrey'
+                                                    : 'white',
                                             }}
                                         >
                                             <BorderTop
+                                                onClick={() =>
+                                                    setBorderTop(!borderTop)
+                                                }
                                                 style={{ margin: 0 }}
                                                 iconStyle={{
+                                                    padding: '2px',
+                                                    margin: '5px',
                                                     width: '18px',
                                                     height: '18px',
                                                     backgroundColor: 'white',
@@ -737,11 +807,22 @@ function CellStyleSetting(props) {
                                                 height: 32,
                                                 border: '1px solid lightgray',
                                                 margin: 0,
+                                                backgroundColor:
+                                                    lineHorizontalInner
+                                                        ? 'lightGrey'
+                                                        : 'white',
                                             }}
                                         >
                                             <LineHorizontalInner
+                                                onClick={() =>
+                                                    setLineHorizontalInner(
+                                                        !lineHorizontalInner
+                                                    )
+                                                }
                                                 style={{ margin: 0 }}
                                                 iconStyle={{
+                                                    padding: '2px',
+                                                    margin: '5px',
                                                     width: '18px',
                                                     height: '18px',
                                                     backgroundColor: 'white',
@@ -754,11 +835,21 @@ function CellStyleSetting(props) {
                                                 height: 32,
                                                 border: '1px solid lightgray',
                                                 margin: 0,
+                                                backgroundColor: borderBottom
+                                                    ? 'lightGrey'
+                                                    : 'white',
                                             }}
                                         >
                                             <BorderBottom
+                                                onClick={() =>
+                                                    setBorderBottom(
+                                                        !borderBottom
+                                                    )
+                                                }
                                                 style={{ margin: 0 }}
                                                 iconStyle={{
+                                                    padding: '2px',
+                                                    margin: '5px',
                                                     width: '18px',
                                                     height: '18px',
                                                     backgroundColor: 'white',
@@ -775,10 +866,6 @@ function CellStyleSetting(props) {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                // borderLeft: 0,
-                                                // borderRight:0,
-                                                // borderTop:0,
-                                                // borderBottom:0,
                                             }}
                                         >
                                             <div
@@ -786,16 +873,46 @@ function CellStyleSetting(props) {
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
+                                                    position: 'relative',
                                                     width: 150,
                                                     height: 80,
-                                                    border: '1px solid black',
-                                                    // borderLeft: 0,
-                                                    // borderRight:0,
-                                                    // borderTop:0,
-                                                    // borderBottom:0,
+                                                    borderLeft: borderLeft
+                                                        ? `1px solid ${lineColor}`
+                                                        : 0,
+                                                    borderRight: borderRight
+                                                        ? `1px solid ${lineColor}`
+                                                        : 0,
+                                                    borderTop: borderTop
+                                                        ? `1px solid ${lineColor}`
+                                                        : 0,
+                                                    borderBottom: borderBottom
+                                                        ? `1px solid ${lineColor}`
+                                                        : 0,
                                                 }}
                                             >
-                                                <span>文本</span>
+                                                <CanvasBorderArea
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        width: '100%',
+                                                        height: '100%',
+                                                    }}
+                                                    diagonalDownLine={
+                                                        diagonalDownLine
+                                                    }
+                                                    diagonalUpLine={
+                                                        diagonalUpLine
+                                                    }
+                                                    lineHorizontalInner={
+                                                        lineHorizontalInner
+                                                    }
+                                                    lineVerticalInner={
+                                                        lineVerticalInner
+                                                    }
+                                                    isMoreCell={isMoreCell}
+                                                    lineColor={lineColor}
+                                                ></CanvasBorderArea>
                                             </div>
                                         </div>
                                     </div>
@@ -809,11 +926,21 @@ function CellStyleSetting(props) {
                                             margin: 0,
                                             position: 'absolute',
                                             left: 8,
+                                            backgroundColor: diagonalUpLine
+                                                ? 'lightGrey'
+                                                : 'white',
                                         }}
                                     >
                                         <DiagonalUpLine
+                                            onClick={() =>
+                                                setDiagonalUpLine(
+                                                    !diagonalUpLine
+                                                )
+                                            }
                                             style={{ margin: 0 }}
                                             iconStyle={{
+                                                padding: '2px',
+                                                margin: '5px',
                                                 width: '18px',
                                                 height: '18px',
                                                 backgroundColor: 'white',
@@ -828,11 +955,19 @@ function CellStyleSetting(props) {
                                             margin: 0,
                                             position: 'absolute',
                                             left: 60,
+                                            backgroundColor: borderLeft
+                                                ? 'lightGrey'
+                                                : 'white',
                                         }}
                                     >
                                         <BorderLeft
+                                            onClick={() =>
+                                                setBorderLeft(!borderLeft)
+                                            }
                                             style={{ margin: 0 }}
                                             iconStyle={{
+                                                padding: '2px',
+                                                margin: '5px',
                                                 width: '18px',
                                                 height: '18px',
                                                 backgroundColor: 'white',
@@ -847,11 +982,21 @@ function CellStyleSetting(props) {
                                             margin: 0,
                                             position: 'absolute',
                                             left: 150,
+                                            backgroundColor: lineVerticalInner
+                                                ? 'lightGrey'
+                                                : 'white',
                                         }}
                                     >
                                         <LineVerticalInner
+                                            onClick={() =>
+                                                setLineVerticalInner(
+                                                    !lineVerticalInner
+                                                )
+                                            }
                                             style={{ margin: 0 }}
                                             iconStyle={{
+                                                padding: '2px',
+                                                margin: '5px',
                                                 width: '18px',
                                                 height: '18px',
                                                 backgroundColor: 'white',
@@ -866,11 +1011,19 @@ function CellStyleSetting(props) {
                                             margin: 0,
                                             position: 'absolute',
                                             left: 230,
+                                            backgroundColor: borderRight
+                                                ? 'lightGrey'
+                                                : 'white',
                                         }}
                                     >
                                         <BorderRight
+                                            onClick={() =>
+                                                setBorderRight(!borderRight)
+                                            }
                                             style={{ margin: 0 }}
                                             iconStyle={{
+                                                padding: '2px',
+                                                margin: '5px',
                                                 width: '18px',
                                                 height: '18px',
                                                 backgroundColor: 'white',
@@ -885,11 +1038,21 @@ function CellStyleSetting(props) {
                                             margin: 0,
                                             position: 'absolute',
                                             left: 280,
+                                            backgroundColor: diagonalDownLine
+                                                ? 'lightGrey'
+                                                : 'white',
                                         }}
                                     >
                                         <DiagonalDownLine
+                                            onClick={() =>
+                                                setDiagonalDownLine(
+                                                    !diagonalDownLine
+                                                )
+                                            }
                                             style={{ margin: 0 }}
                                             iconStyle={{
+                                                padding: '2px',
+                                                margin: '5px',
                                                 width: '18px',
                                                 height: '18px',
                                                 backgroundColor: 'white',

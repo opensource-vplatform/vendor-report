@@ -13,7 +13,7 @@ import BorderTopBottom from '@icons/border/BorderTopBottom';
 import BorderTopDoubleBottom from '@icons/border/BorderTopDoubleBottom';
 import BorderTopThickBottom from '@icons/border/BorderTopThickBottom';
 
-export const getBorderEnums = function(){
+export const getBorderEnums = function () {
     return [
         {
             value: 'bottomBorder',
@@ -100,7 +100,7 @@ export const getBorderEnums = function(){
             icon: <BorderOther></BorderOther>,
         },
     ];
-}
+};
 
 const borderOptionMap = {
     bottomBorder: [
@@ -228,7 +228,7 @@ const borderOptionMap = {
             },
             options: {
                 top: true,
-                bottom:true,
+                bottom: true,
             },
         },
     ],
@@ -242,7 +242,8 @@ const borderOptionMap = {
             options: {
                 top: true,
             },
-        },{
+        },
+        {
             lineborder: {
                 color: 'black',
                 level: undefined,
@@ -263,7 +264,8 @@ const borderOptionMap = {
             options: {
                 top: true,
             },
-        },{
+        },
+        {
             lineborder: {
                 color: 'black',
                 level: undefined,
@@ -274,9 +276,57 @@ const borderOptionMap = {
             },
         },
     ],
+    diagonalDownLine: [
+        {
+            lineborder: {
+                color: 'black',
+                level: undefined,
+                style: 1,
+            },
+            options: {
+                diagonalDown: true,
+            },
+        },
+    ],
+    diagonalUpLine: [
+        {
+            lineborder: {
+                color: 'black',
+                level: undefined,
+                style: 1,
+            },
+            options: {
+                diagonalUp: true,
+            },
+        },
+    ],
+    lineHorizontalInner: [
+        {
+            lineborder: {
+                color: 'black',
+                level: undefined,
+                style: 1,
+            },
+            options: {
+                innerHorizontal: true,
+            },
+        },
+    ],
+    lineVerticalInner: [
+        {
+            lineborder: {
+                color: 'black',
+                level: undefined,
+                style: 1,
+            },
+            options: {
+                innerVertical: true,
+            },
+        },
+    ],
     moreBorders: [],
 };
 
-export const toBorders = function(type){
+export const toBorders = function (type) {
     return borderOptionMap[type];
-}
+};
