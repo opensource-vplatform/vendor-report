@@ -1,19 +1,94 @@
 import { getNamespace } from '@utils/spreadUtil';
 
 import {
-  removeBindInfos,
-  saveBindInfos,
+    removeBindInfos,
+    saveBindInfos,
 } from '../../store/datasourceSlice/datasourceSlice';
+import { findTreeNodeById, genUUID } from '../../utils/commonUtil.js';
 import {
-  findTreeNodeById,
-  genUUID,
-} from '../../utils/commonUtil.js';
-import {
-  getCellInstanceId,
-  getCellTag,
-  getSheetInstanceId,
-  setCellTag,
+    getCellInstanceId,
+    getCellTag,
+    getSheetInstanceId,
+    setCellTag,
 } from '../../utils/worksheetUtil.js';
+
+const GC = getNamespace();
+
+//设置角标
+function setCornerMark(params) {
+    const {
+        sheet,
+        row = 0,
+        col = 0,
+        position = 1,
+        color = 'red',
+        size = 8,
+    } = params;
+    let style = sheet.getStyle(row, col);
+    if (!style) {
+        style = new GC.Spread.Sheets.Style();
+    }
+    style.decoration = {
+        cornerFold: {
+            size,
+            position,
+            color,
+            markType: 'table',
+        },
+    };
+    sheet.setStyle(row, col, style);
+}
+
+function setTableCornerMarks(params) {
+    const { sheet, row, col, tableColumnsCount } = params;
+
+    const startRow = row;
+    const startCol = col;
+    const endRow = row + 2;
+    const endCol = col + tableColumnsCount - 1;
+    const cornerMarkColor = 'blue';
+    const cornerMarkSize = 8;
+
+    //左上角
+    setCornerMark({
+        sheet,
+        row: startRow,
+        col: startCol,
+        color: cornerMarkColor,
+        position: 1,
+        size: cornerMarkSize,
+    });
+
+    //右上角
+    setCornerMark({
+        sheet,
+        row: startRow,
+        col: endCol,
+        color: cornerMarkColor,
+        position: 2,
+        size: cornerMarkSize,
+    });
+
+    //左下角
+    setCornerMark({
+        sheet,
+        row: endRow,
+        col: startCol,
+        color: cornerMarkColor,
+        position: 4,
+        size: cornerMarkSize,
+    });
+
+    //右下角
+    setCornerMark({
+        sheet,
+        row: endRow,
+        col: endCol,
+        color: cornerMarkColor,
+        position: 8,
+        size: cornerMarkSize,
+    });
+}
 
 export function addTable(params) {
     const {
@@ -43,16 +118,16 @@ export function addTable(params) {
     }
 
     const tableName = `tableName_${genUUID()}`;
-    const table = sheet.tables.add(
-        tableName,
+    const table = sheet.tables.add(tableName, row, col, 3, tableColumnsCount);
+    table.autoGenerateColumns(false);
+
+    //设置表格的四个角标
+    setTableCornerMarks({
+        sheet,
         row,
         col,
-        3,
         tableColumnsCount,
-        spreadNS.Tables.TableThemes.light6
-    );
-
-    table.autoGenerateColumns(false);
+    });
 
     if (Array.isArray(columnsTemp)) {
         const tableColumns = [];
@@ -67,6 +142,10 @@ export function addTable(params) {
         });
 
         tableColumns.length > 0 && table.bindColumns(tableColumns);
+        const { colCount } = table.range();
+        for (let i = 0, l = colCount; i < l; i++) {
+            table.filterButtonVisible(i, false);
+        }
     }
     table.expandBoundRows(true);
     table.bindingPath(dataPath);
@@ -317,7 +396,6 @@ export function checkHasBind(params) {
                             }
                             if (isInsert && sync) {
                                 sheetInstance.tables.remove(table);
-                                const GC = getNamespace();
                                 addTable({
                                     columnsTemp: children,
                                     sheet: sheetInstance,
@@ -454,7 +532,6 @@ export function getCellRacts(spread, cellRange) {
                 bottomRowIndex,
                 '索引'
             );
-            const GC = getNamespace();
             let d = new GC.Spread.Sheets.Range(
                 topRowIndex,
                 letColumnIndex,
