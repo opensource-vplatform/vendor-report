@@ -19,6 +19,7 @@ import ViewTab from '@tabs/view/Index';
 
 import { setMode } from './store/appSlice/appSlice';
 import { genPreviewDatas } from './store/datasourceSlice/datasourceSlice';
+import Formula from './tabs/formula/Index';
 
 const FileTabTitle = styled.a`
     padding: 6px 12px 6px 12px;
@@ -56,6 +57,7 @@ const ViewNavItem = WithNavItem(ViewTab);
 const TestNavItem = WithNavItem(TestTab);
 const TableNavItem = WithNavItem(TableTab);
 const DataNavItem = WithNavItem(DataTab);
+const FormulaNavItem = WithNavItem(Formula);
 
 export default function () {
     const dispatch = useDispatch();
@@ -86,6 +88,7 @@ export default function () {
                 }}
             ></FileNavItem>
             <StartNavItem code='start' title='开始'></StartNavItem>
+            <FormulaNavItem code='formula' title='公式'></FormulaNavItem>
             <DataNavItem code='data' title='数据'></DataNavItem>
             <ViewNavItem code='view' title='视图'></ViewNavItem>
             <TableNavItem code='table' title='表设计'></TableNavItem>

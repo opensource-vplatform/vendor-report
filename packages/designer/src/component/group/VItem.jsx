@@ -5,8 +5,9 @@ const Wrap = styled.div`
     flex-direction: column;
     height: 100%;
     cursor: pointer;
+    align-items: center;
     &:hover{
-        background-color: lightgray;
+        background-color: #dadada;
     }
 `;
 
