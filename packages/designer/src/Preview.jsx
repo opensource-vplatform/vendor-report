@@ -1,16 +1,10 @@
 import { useCallback } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import {
-  Workbook,
-  Worksheet,
-} from '@components/spread/Index';
+import { Workbook, Worksheet } from '@components/spread/Index';
 import { getNamespace } from '@utils/spreadUtil';
 
 import { setMode } from './store/appSlice/appSlice';
@@ -41,6 +35,14 @@ const ExcelWrap = styled.div`
     height: 100%;
 `;
 
+function replacer(key, value) {
+    //删除角标信息
+    if (key === 'cornerFold' && value?.markType === 'table') {
+        return undefined;
+    }
+    return value;
+}
+
 export default function () {
     const dispatch = useDispatch();
     const { previewViewDatas } = useSelector(
@@ -50,7 +52,7 @@ export default function () {
     const { spread: sourceSpread } = useSelector(({ appSlice }) => appSlice);
 
     const workbookInitializedHandler = useCallback(function (spread) {
-        const sourceJson = JSON.stringify(sourceSpread.toJSON());
+        const sourceJson = JSON.stringify(sourceSpread.toJSON(), replacer);
         spread.fromJSON(JSON.parse(sourceJson));
         spread.sheets.forEach(function (sheet) {
             const GC = getNamespace();

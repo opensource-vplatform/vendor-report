@@ -1,0 +1,19 @@
+{
+    "name": "@toone/report-plugin-jasperreport",
+    "version": "1.0.0",
+    "description": "集成jasperreport报表",
+    "main": "index.js",
+    "scripts": {
+      "dev": "vite --host",
+      "build": "vite build"
+    },
+    "dependencies": {
+
+    },
+    "devDependencies": {
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+  }
+  

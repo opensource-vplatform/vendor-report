@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import {
-  deepCopy,
-  findTreeNodeById,
-  genValueByType,
+    deepCopy,
+    findTreeNodeById,
+    genValueByType,
 } from '../../utils/commonUtil.js';
 
 export const datasourceSlice = createSlice({
@@ -188,6 +188,18 @@ export const datasourceSlice = createSlice({
                 }
             } */
         },
+        sheetInfos: {
+            /*  [表单实例id]:{
+                [单元格实例Id]：{
+                    rornerMarkInfo:{
+                        row:1,
+                        col:1,
+                        value:true
+                    },
+                    ...
+                }
+            } */
+        },
         previewViewDatas: {},
         isShowDatasource: false,
     },
@@ -332,6 +344,19 @@ export const datasourceSlice = createSlice({
                 });
             });
         },
+        saveSheetInfo(state, { payload }) {
+            const { cellInstanceId, sheetInstanceId, key, value } =
+                payload.sheetInfos;
+
+            if (!state['sheetInfos'][sheetInstanceId]) {
+                state['sheetInfos'][sheetInstanceId] = {};
+            }
+
+            if (!state['sheetInfos'][sheetInstanceId][cellInstanceId]) {
+                state['sheetInfos'][sheetInstanceId][cellInstanceId] = {};
+            }
+            state['sheetInfos'][sheetInstanceId][cellInstanceId][key] = value;
+        },
     },
 });
 export const {
@@ -344,5 +369,6 @@ export const {
     genPreviewDatas,
     setIsShowDatasource,
     removeBindInfosByCellInstanceId,
+    saveSheetInfo,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

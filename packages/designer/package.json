@@ -1,5 +1,5 @@
 {
-  "name": "report-designer",
+  "name": "@toone/report-designer",
   "version": "1.0.0",
   "description": "报表设计器",
   "main": "index.js",
