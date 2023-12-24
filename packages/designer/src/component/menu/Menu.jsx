@@ -51,6 +51,7 @@ export default function (props) {
         //取消选择值
         cancelValue = undefined,
         children,
+        frozien=0,
         value,
     } = props;
     //const [itemVisible, setItemVisible] = useState(false);
