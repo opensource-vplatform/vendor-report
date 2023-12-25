@@ -41,12 +41,15 @@ import {
 } from './constant';
 import Icon from './lineIcon';
 import { setBorderByType } from '@utils/fontUtil.js';
-import { setborderColor } from '@store/borderSlice/borderSlice';
+import {
+    setBorderColor,
+    setTabValueCellSetting,
+    setIsOpenCellSetting,
+} from '@store/borderSlice/borderSlice';
 
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
-    const [isOpen, setIsOpen] = useState(false);
     const [isMoreCell, setIsMoreCell] = useState('');
 
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
@@ -69,8 +72,12 @@ function CellStyleSetting(props) {
     const [diagonalDownLine, setDiagonalDownLine] = useState(false);
     const [lineHorizontalInner, setLineHorizontalInner] = useState(false);
     const [lineVerticalInner, setLineVerticalInner] = useState(false);
+    const [lineType, setLineType] = useState(1);
 
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
+    const { color, tabValueCellSetting, isOpenCellSetting } = useSelector(
+        ({ borderSlice }) => borderSlice
+    );
 
     // 获取第一个选择区域的第一个单元格的值
     useEffect(() => {
@@ -105,8 +112,7 @@ function CellStyleSetting(props) {
     let formatCellsCommand = {
         canUndo: false,
         execute: function () {
-            setIsOpen(!isOpen);
-
+            dispatch(setIsOpenCellSetting(!isOpenCellSetting));
             // 判断所取单元格是否多个
             const activeSheet = spread?.getActiveSheet();
             const selections = activeSheet?.getSelections();
@@ -129,6 +135,9 @@ function CellStyleSetting(props) {
         false,
         false
     );
+    const handleTabChange = (tabValue) => {
+        // console.log('tabValue :>> ', tabValue);
+    };
 
     const handleSelectCategoriesChange = (value) => {
         const keys = Object.keys(Categories);
@@ -247,39 +256,83 @@ function CellStyleSetting(props) {
     }
 
     const handleOK = () => {
-        setIsOpen(false);
+        dispatch(setIsOpenCellSetting(false));
+        dispatch(setTabValueCellSetting('数字'));
+
         setSelectedCategoriesValue('general');
-        borderTop && setBorderByType(spread, 'topBorder');
-        borderBottom && setBorderByType(spread, 'bottomBorder');
-        borderLeft && setBorderByType(spread, 'leftBorder');
-        borderRight && setBorderByType(spread, 'rightBorder');
-        lineHorizontalInner && setBorderByType(spread, 'lineHorizontalInner');
-        lineVerticalInner && setBorderByType(spread, 'lineVerticalInner');
-        diagonalDownLine && setBorderByType(spread, 'diagonalDownLine');
-        diagonalUpLine && setBorderByType(spread, 'diagonalUpLine');
+
+        borderTop && setBorderByType(spread, 'topBorder', lineColor, lineType);
+        borderBottom &&
+            setBorderByType(spread, 'bottomBorder', lineColor, lineType);
+        borderLeft &&
+            setBorderByType(spread, 'leftBorder', lineColor, lineType);
+        borderRight &&
+            setBorderByType(spread, 'rightBorder', lineColor, lineType);
+        lineHorizontalInner &&
+            setBorderByType(spread, 'lineHorizontalInner', lineColor, lineType);
+        lineVerticalInner &&
+            setBorderByType(spread, 'lineVerticalInner', lineColor, lineType);
+        diagonalDownLine &&
+            setBorderByType(spread, 'diagonalDownLine', lineColor, lineType);
+        diagonalUpLine &&
+            setBorderByType(spread, 'diagonalUpLine', lineColor, lineType);
+
+        // 初始化
+        setBorderBottom(false);
+        setBorderTop(false);
+        setBorderLeft(false);
+        setBorderRight(false);
+        setLineHorizontalInner(false);
+        setLineVerticalInner(false);
+        setDiagonalDownLine(false);
+        setDiagonalUpLine(false);
+        setLineColor('black');
     };
     const handleCancel = () => {
-        setIsOpen(false);
+        dispatch(setIsOpenCellSetting(false));
+        dispatch(setTabValueCellSetting('数字'));
         setDecimalPlacesValue(2);
         setSelectedSymbol('');
         setSelectedTimeFormat('');
 
         // 还原单元格值 以及清空单元格式
         // sheet.setValue(selections[0].row, selections[0].col, firstCellValue);
+
+        // 初始化
+        setBorderBottom(false);
+        setBorderTop(false);
+        setBorderLeft(false);
+        setBorderRight(false);
+        setLineHorizontalInner(false);
+        setLineVerticalInner(false);
+        setDiagonalDownLine(false);
+        setDiagonalUpLine(false);
+        setLineColor('black');
     };
     const handleClose = () => {
-        setIsOpen(false);
+        dispatch(setIsOpenCellSetting(false));
+        dispatch(setTabValueCellSetting('数字'));
         setDecimalPlacesValue(2);
         setSelectedSymbol('');
         setSelectedTimeFormat('');
+
+        // 初始化
+        setBorderBottom(false);
+        setBorderTop(false);
+        setBorderLeft(false);
+        setBorderRight(false);
+        setLineHorizontalInner(false);
+        setLineVerticalInner(false);
+        setDiagonalDownLine(false);
+        setDiagonalUpLine(false);
+        setLineColor('black');
     };
 
     const handleColorEditor = (color) => {
         setLineColor(color);
-        dispatch(setborderColor({ color: color }));
+        dispatch(setBorderColor({ color: color }));
     };
 
-    // 处理边框
     const handlePreBorderNone = () => {
         setBorderBottom(false);
         setBorderTop(false);
@@ -414,17 +467,17 @@ function CellStyleSetting(props) {
         selectedTimeFormat,
     ]);
 
-    return isOpen ? (
+    return isOpenCellSetting ? (
         <Index
             title='设置单元格格式'
             width='730px'
             height='630px'
-            open={isOpen}
+            open={isOpenCellSetting}
             mask={true}
             onClose={handleClose}
         >
             <div className='tabBox'>
-                <Tabs>
+                <Tabs value={tabValueCellSetting} onChange={handleTabChange}>
                     {/* 可以抽成组件 <numberFormat>*/}
                     <Tab code='数字' title='数字'>
                         <p>分类：</p>
@@ -626,64 +679,166 @@ function CellStyleSetting(props) {
 
                                     <div className='lineStyle'>
                                         <div className='lineStyleLeft'>
-                                            <Icon
-                                                type={IconType.Hair}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.Dotted}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.DashDotDot}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.DashDot}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.Dashed}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.Thin}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.Thin}
-                                                color={lineColor}
-                                            />
+                                            <div
+                                                onClick={() => {
+                                                    setLineType(IconType.Hair);
+                                                }}
+                                            >
+                                                <Icon
+                                                    type={IconType.Hair}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(IconType.Dotted)
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.Dotted}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(
+                                                        IconType.DashDotDot
+                                                    )
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.DashDotDot}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(
+                                                        IconType.DashDot
+                                                    )
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.DashDot}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(IconType.Dashed)
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.Dashed}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(IconType.Thin)
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.Thin}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(IconType.Thin)
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.Thin}
+                                                    color={lineColor}
+                                                />
+                                            </div>
                                         </div>
                                         <div className='lineStyleRight'>
-                                            <Icon
-                                                type={IconType.MediumDashDotDot}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.SlantedDashDot}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.MediumDashDot}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.MediumDashed}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.Medium}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.Thick}
-                                                color={lineColor}
-                                            />
-                                            <Icon
-                                                type={IconType.Double}
-                                                color={lineColor}
-                                            />
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(
+                                                        IconType.MediumDashDotDot
+                                                    )
+                                                }
+                                            >
+                                                <Icon
+                                                    type={
+                                                        IconType.MediumDashDotDot
+                                                    }
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(
+                                                        IconType.SlantedDashDot
+                                                    )
+                                                }
+                                            >
+                                                <Icon
+                                                    type={
+                                                        IconType.SlantedDashDot
+                                                    }
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(
+                                                        IconType.MediumDashDot
+                                                    )
+                                                }
+                                            >
+                                                <Icon
+                                                    type={
+                                                        IconType.MediumDashDot
+                                                    }
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(
+                                                        IconType.MediumDashed
+                                                    )
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.MediumDashed}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(IconType.Medium)
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.Medium}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(IconType.Thick)
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.Thick}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
+                                                onClick={() =>
+                                                    setLineType(IconType.Double)
+                                                }
+                                            >
+                                                <Icon
+                                                    type={IconType.Double}
+                                                    color={lineColor}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                     <span>颜色：</span>

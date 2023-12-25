@@ -8,11 +8,21 @@ export const borderSlice = createSlice({
         spread: null,
         //边框颜色
         borderColor: 'black',
+        tabValueCellSetting: '数字',
+        isOpenCellSetting: false,
     },
     reducers: {
-        setborderColor(state, action) {
+        setBorderColor(state, action) {
             const color = action.payload.color;
             state.borderColor = color;
+        },
+        setTabValueCellSetting(state, action) {
+            const tabValue = action.payload;
+            state.tabValueCellSetting = tabValue;
+        },
+        setIsOpenCellSetting(state, action) {
+            const isOpen = action.payload;
+            state.isOpenCellSetting = isOpen;
         },
     },
     extraReducers: (builder) => {
@@ -21,5 +31,6 @@ export const borderSlice = createSlice({
         });
     },
 });
-export const { setborderColor } = borderSlice.actions;
+export const { setBorderColor, setTabValueCellSetting, setIsOpenCellSetting } =
+    borderSlice.actions;
 export default borderSlice.reducer;

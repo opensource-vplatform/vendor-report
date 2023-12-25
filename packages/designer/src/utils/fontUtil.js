@@ -3,9 +3,9 @@ import { getFontSizeValues } from '@metadatas/font';
 import { getNamespace } from '@utils/spreadUtil';
 
 import {
-  applyStyleToSelectedCell,
-  applyToSelectedCell,
-  withBatchUpdate,
+    applyStyleToSelectedCell,
+    applyToSelectedCell,
+    withBatchUpdate,
 } from './spreadUtil';
 
 const tempSpan = document.createElement('span');
@@ -398,9 +398,9 @@ export function toDoubleUnderline() {
     return 8;
 }
 
-export function setBorderByType(spread, type) {
+export function setBorderByType(spread, type, color, lineType) {
     withBatchUpdate(spread, (sheet) => {
-        const values = toBorders(type);
+        const values = toBorders(type, color, lineType);
         values.forEach((value) => {
             setBorder({
                 value,

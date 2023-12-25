@@ -12,7 +12,7 @@ import BorderTop from '@icons/border/BorderTop';
 import BorderTopBottom from '@icons/border/BorderTopBottom';
 import BorderTopDoubleBottom from '@icons/border/BorderTopDoubleBottom';
 import BorderTopThickBottom from '@icons/border/BorderTopThickBottom';
-
+import { useSelector } from 'react-redux';
 export const getBorderEnums = function () {
     return [
         {
@@ -326,7 +326,16 @@ const borderOptionMap = {
     ],
     moreBorders: [],
 };
-
-export const toBorders = function (type) {
-    return borderOptionMap[type];
+export const toBorders = function (type, color, lineType) {
+    // 不指定边框颜色 则默认黑色
+    if (color === undefined) color = 'black';
+    if (lineType === undefined) lineType = 1;
+    return borderOptionMap[type].map((option) => ({
+        ...option,
+        lineborder: {
+            ...option.lineborder,
+            color,
+            style: lineType,
+        },
+    }));
 };
