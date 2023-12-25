@@ -31,6 +31,7 @@ const PopperContentWrap = styled.div`
     min-width: 40px;
     max-height: 350px;
     overflow-y: auto;
+    overflow-x: hidden;
     list-style-type: none;
     z-index: 2001;
     width: max-content;

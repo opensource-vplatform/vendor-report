@@ -8,7 +8,7 @@ const Button = styled.button`
     min-width: 80px;
     &:hover{
         background-color: #e0eef9;
-        border: solid 1px #1f88d8;
+        border: solid 1px #5292f7;
     }
 `;
 

@@ -9,34 +9,15 @@ import {
 } from './MenuItem';
 
 const Wrap = styled.div`
-    position: relative;
-    align-items: center;
-    cursor: pointer;
-    font-size: 12px;
+    display: flex;
+    flex-direction: column;
 `;
 
-const Mask = styled.div`
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 2000;
-`;
-
-const ItemList = styled.ul`
-    position: absolute;
-    background: white;
-    top: 26px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid lightgray;
-    min-width: 40px;
-    max-height: 350px;
+const ScrollWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
     overflow-y: auto;
-    list-style-type: none;
-    z-index: 2001;
-    width: max-content;
 `;
 
 export default function (props) {
@@ -51,45 +32,111 @@ export default function (props) {
         //取消选择值
         cancelValue = undefined,
         children,
-        frozien=0,
+        frozien = 0,
         value,
     } = props;
-    //const [itemVisible, setItemVisible] = useState(false);
+    let headerItems = null,
+        tailItems = null;
+    let contentStyle = undefined;
+    if (frozien != 0) {
+        contentStyle = {
+            ...optionStyle,
+            overflowX: 'visible',
+            overflowY: 'visible',
+        };
+        (headerItems = []), (tailItems = []);
+        const headIndex = frozien > 0 ? frozien : datas.length + frozien;
+        datas.forEach((data, index) => {
+            if (index < headIndex) {
+                headerItems.push(data);
+            } else {
+                tailItems.push(data);
+            }
+        });
+    } else {
+        headerItems = datas;
+        contentStyle = optionStyle;
+    }
     return (
         <Popper
             style={style}
-            //open={itemVisible}
             content={
                 <Fragment>
-                    {datas.map(function (menu, index) {
-                        const key = menu.id || menu.value;
-                        return (
-                            <Fragment key={key}>
-                                <MenuItem
-                                    active={value}
-                                    value={menu.value}
-                                    title={menu.title}
-                                    icon={menu.icon}
-                                    text={menu.text}
-                                    onClick={(newVal) => {
-                                        //setItemVisible(false);
-                                        if (newVal != value) {
-                                            onChange(newVal);
-                                        } else if (cancelAble) {
-                                            onChange(cancelValue);
-                                        }
-                                    }}
-                                ></MenuItem>
+                    {headerItems != null ? (
+                        <Wrap
+                            style={{
+                                overflowX: 'hidden',
+                                overflowY: frozien > 0 ? 'visible' : 'auto',
+                                maxHeight: 350-(tailItems ? tailItems.length*34:0)
+                            }}
+                        >
+                            {headerItems.map(function (menu, index) {
+                                const key = menu.id || menu.value;
+                                return (
+                                    <Fragment key={key}>
+                                        <MenuItem
+                                            active={value}
+                                            value={menu.value}
+                                            title={menu.title}
+                                            icon={menu.icon}
+                                            text={menu.text}
+                                            onClick={(newVal) => {
+                                                //setItemVisible(false);
+                                                if (newVal != value) {
+                                                    onChange(newVal);
+                                                } else if (cancelAble) {
+                                                    onChange(cancelValue);
+                                                }
+                                            }}
+                                        ></MenuItem>
 
-                                {lineIndexs.indexOf(index) >= 0 ? (
-                                    <DividerMenuItem></DividerMenuItem>
-                                ) : null}
-                            </Fragment>
-                        );
-                    })}
+                                        {lineIndexs.indexOf(index) >= 0 ? (
+                                            <DividerMenuItem></DividerMenuItem>
+                                        ) : null}
+                                    </Fragment>
+                                );
+                            })}
+                        </Wrap>
+                    ) : null}
+                    {tailItems != null ? (
+                        <Wrap
+                            style={{
+                                overflowX: 'hidden',
+                                overflowY: frozien < 0 ? 'visible' : 'auto',
+                                maxHeight: 350-(headerItems ? headerItems.length*34:0)
+                            }}
+                        >
+                            {tailItems.map(function (menu, index) {
+                                const key = menu.id || menu.value;
+                                return (
+                                    <Fragment key={key}>
+                                        <MenuItem
+                                            active={value}
+                                            value={menu.value}
+                                            title={menu.title}
+                                            icon={menu.icon}
+                                            text={menu.text}
+                                            onClick={(newVal) => {
+                                                //setItemVisible(false);
+                                                if (newVal != value) {
+                                                    onChange(newVal);
+                                                } else if (cancelAble) {
+                                                    onChange(cancelValue);
+                                                }
+                                            }}
+                                        ></MenuItem>
+
+                                        {lineIndexs.indexOf(index) >= 0 ? (
+                                            <DividerMenuItem></DividerMenuItem>
+                                        ) : null}
+                                    </Fragment>
+                                );
+                            })}
+                        </Wrap>
+                    ) : null}
                 </Fragment>
             }
-            contentStyle={optionStyle}
+            contentStyle={contentStyle}
         >
             {children}
         </Popper>

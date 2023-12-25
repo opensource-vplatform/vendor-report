@@ -1,6 +1,7 @@
-import React from 'react';
-import { useState } from 'react';
 import './list.scss';
+
+import React, { useState } from 'react';
+
 const List = ({
     values, // 数据源：数组类型
     objDatas = null, //数据源拓展：可传对象
@@ -9,6 +10,8 @@ const List = ({
     selectedValue,
     onChange,
     isHasInput = false,
+    onDoubleClick=()=>{},
+    style={},
     className = {},
 }) => {
     const [filterText, setFilterText] = useState(selectedValue);
@@ -19,7 +22,7 @@ const List = ({
     };
 
     return (
-        <div style={{ width, height, margin: '5px 0px' }}>
+        <div style={{ width, height, margin: '5px 0px',...style }}>
             {isHasInput && (
                 <input
                     className='listInput'
@@ -38,6 +41,7 @@ const List = ({
                             key={value + index}
                             className={itemClassName}
                             onClick={() => handleItemClick(value)}
+                            onDoubleClick={onDoubleClick}
                         >
                             {value}
                         </div>

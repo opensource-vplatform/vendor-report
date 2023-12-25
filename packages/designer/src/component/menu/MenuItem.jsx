@@ -4,22 +4,26 @@ import styled from 'styled-components';
 
 import LineSepatator from '../lineSeparator/lineSeparator';
 
-const MenuItemWrap = styled.li`
+const MenuItemWrap = styled.div`
     height: 30px;
     display: flex;
     align-items: center;
-    padding: 0.2em 0.8em;
+    margin: 2px 2px;
     cursor: pointer;
     &:hover{
-        background-color: lightgray;
+        background-color: #dadada;
     }
     &[data-selected='true']{
-        background-color: lightgray;
+        background-color: #dadada;
     }
 `;
 
+const Title = styled.span`
+    padding: 8px 10px;
+`;
+
 const IconWrap = styled.div`
-    margin-right: 8px;
+    margin-right: 0px;
 `;
 
 const WithMenuItem = function (Component) {
@@ -42,11 +46,11 @@ const WithMenuItem = function (Component) {
 
 export const MenuItem = WithMenuItem(function (props) {
     const {text,icon} = props;
-    return (<Fragment>{icon ? <IconWrap>{icon}</IconWrap>:null}<span>{text}</span></Fragment>);
+    return (<Fragment>{icon ? <IconWrap>{icon}</IconWrap>:null}<Title>{text}</Title></Fragment>);
 });
 
 export const DividerMenuItem = function(){
-    return (<li>
+    return (<div style={{marginTop:2,marginBottom:2}}>
         <LineSepatator type='horizontal'></LineSepatator>
-    </li>)
+    </div>)
 }

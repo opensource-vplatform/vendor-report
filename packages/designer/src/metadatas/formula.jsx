@@ -1,51 +1,48 @@
 const CATALOGS = [
     {
-        code: 'database',
-        name: '数据库',
+        code: 'financial',
+        name: '财务',
     },
     {
         code: 'dateAndTime',
         name: '日期与时间',
     },
     {
-        code: 'engineering',
-        name: '工程',
+        code: 'mathAndTrigonometry',
+        name: '数学与三角函数',
     },
     {
-        code: 'financial',
-        name: '财务',
-    },
-    {
-        code: 'information',
-        name: '信息',
-    },
-    {
-        code: 'logical',
-        name: '逻辑',
+        code: 'statistical',
+        name: '统计',
     },
     {
         code: 'lookupAndReference',
         name: '查找与引用',
     },
     {
-        code: 'mathAndTrigonometry',
-        name: '数学与三角函数',
-    },
-    {
-        code: 'statistics',
-        name: '统计',
+        code: 'database',
+        name: '数据库',
     },
     {
         code: 'text',
         name: '文本',
     },
     {
-        code: 'web',
-        name: 'Web',
+        code: 'logical',
+        name: '逻辑',
     },
     {
-        code: 'sum',
-        name: '求和',
+        code: 'information',
+        name: '信息',
+    },
+    {
+        code: 'engineering',
+        name: '工程',
+    },
+
+    {
+        code: 'web',
+        name: 'Web',
     },
 ];
 
@@ -9461,6 +9458,10 @@ export const getFormulasByCatalog = function (catalog) {
 export const getFormulaMetadata = function (code) {
     return FORMULA_METADATAS[code];
 };
+
+export const getFormulaMetadatas = function(){
+    return FORMULA_METADATAS;
+}
 
 export const getCatalogs = function () {
     return CATALOGS;
