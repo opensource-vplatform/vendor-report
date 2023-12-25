@@ -680,11 +680,24 @@ function CellStyleSetting(props) {
                                     <div className='lineStyle'>
                                         <div className='lineStyleLeft'>
                                             <div
+                                                style={{ textAlign: 'center' }}
+                                                onClick={() =>
+                                                    setLineType(IconType.None)
+                                                }
+                                            >
+                                                <Icon
+                                                    lineType={lineType}
+                                                    type={IconType.None}
+                                                    color={lineColor}
+                                                />
+                                            </div>
+                                            <div
                                                 onClick={() => {
                                                     setLineType(IconType.Hair);
                                                 }}
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.Hair}
                                                     color={lineColor}
                                                 />
@@ -695,6 +708,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.Dotted}
                                                     color={lineColor}
                                                 />
@@ -707,6 +721,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.DashDotDot}
                                                     color={lineColor}
                                                 />
@@ -719,6 +734,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.DashDot}
                                                     color={lineColor}
                                                 />
@@ -729,6 +745,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.Dashed}
                                                     color={lineColor}
                                                 />
@@ -739,16 +756,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
-                                                    type={IconType.Thin}
-                                                    color={lineColor}
-                                                />
-                                            </div>
-                                            <div
-                                                onClick={() =>
-                                                    setLineType(IconType.Thin)
-                                                }
-                                            >
-                                                <Icon
+                                                    lineType={lineType}
                                                     type={IconType.Thin}
                                                     color={lineColor}
                                                 />
@@ -763,6 +771,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={
                                                         IconType.MediumDashDotDot
                                                     }
@@ -777,6 +786,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={
                                                         IconType.SlantedDashDot
                                                     }
@@ -791,6 +801,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={
                                                         IconType.MediumDashDot
                                                     }
@@ -805,6 +816,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.MediumDashed}
                                                     color={lineColor}
                                                 />
@@ -815,6 +827,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.Medium}
                                                     color={lineColor}
                                                 />
@@ -825,6 +838,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.Thick}
                                                     color={lineColor}
                                                 />
@@ -835,6 +849,7 @@ function CellStyleSetting(props) {
                                                 }
                                             >
                                                 <Icon
+                                                    lineType={lineType}
                                                     type={IconType.Double}
                                                     color={lineColor}
                                                 />

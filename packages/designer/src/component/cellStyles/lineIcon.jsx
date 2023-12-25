@@ -42,12 +42,20 @@ const IconDiv = styled.div`
 `;
 
 function Icon(props) {
-    const { type, color } = props;
+    const { type, color, lineType } = props;
     const data = iconData[type];
     const icSt = {};
+    const selectedStyle =
+        lineType === type
+            ? {
+                  border: '1px solid black',
+                  cursor: 'pointer',
+              }
+            : {};
     icSt.backgroundImage = data;
     icSt.backgroundColor = color;
-    return <IconDiv style={icSt}></IconDiv>;
+    if (type === 0) return <div style={selectedStyle}>None</div>;
+    return <IconDiv style={{ ...icSt, ...selectedStyle }}></IconDiv>;
 }
 
 export default Icon;

@@ -174,7 +174,7 @@ export const CustomFormats = [
 ];
 
 export const IconType = {
-    // None: 'none',
+    None: 0,
     Hair: 7,
     Dotted: 4,
     DashDotDot: 11,
