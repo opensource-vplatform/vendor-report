@@ -1,72 +1,57 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Dialog from '@components/dialog/Index.jsx';
 import DropdownBox from '@components/dropdownBox/dropdownBox';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import DatasourceIcon from '@icons/data/datasource';
 import {
-  deleteDsList,
-  pushDsList,
-  removeBindInfosByCellInstanceId,
-  saveBindInfos,
-  setIsShowDatasource,
-  toggleActiveDs,
-  updateDslist,
+    deleteDsList,
+    pushDsList,
+    removeBindInfosByCellInstanceId,
+    saveBindInfos,
+    setIsShowDatasource,
+    toggleActiveDs,
+    updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import {
-  setActive,
-  showTab,
-} from '@store/navSlice/navSlice';
+import { setActive, showTab } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
-import {
-  findTreeNodeById,
-  genUUID,
-  hasSameNode,
-} from '@utils/commonUtil.js';
+import { findTreeNodeById, genUUID, hasSameNode } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
-import { parseTable } from '@utils/tableUtil.js';
+import { parseTable, setTableCornerMarks } from '@utils/tableUtil.js';
 import {
-  getCellInstanceId,
-  getSheetInstanceId,
-  setCellTag,
+    getCellInstanceId,
+    getSheetInstanceId,
+    setCellTag,
 } from '@utils/worksheetUtil.js';
 
 import { testTransform } from '../../../../plugins/transform.js';
 import {
-  addTable,
-  BindingPathCellType,
-  checkHasBind,
-  getCellInfo,
-  getChanged,
-  getPath,
-  highlightBlock,
-  removeHighlightOneBlock,
-  setTableCornerMarks,
+    addTable,
+    BindingPathCellType,
+    checkHasBind,
+    getCellInfo,
+    getChanged,
+    getPath,
+    highlightBlock,
+    removeHighlightOneBlock,
 } from './fun.js';
 import {
-  AddDatasourceBtn,
-  ConfirmDialogBox,
-  DatasourceBox,
-  DatasourceListOl,
-  DatasourceOptBox,
-  DatasourceOptBoxLeft,
-  DatasourceOptBoxRight,
-  DddSubDatasource,
-  DelDatasource,
-  InputField,
-  ListItemText,
-  OptBtnBox,
-  SaveBtn,
-  TextareaField,
+    AddDatasourceBtn,
+    ConfirmDialogBox,
+    DatasourceBox,
+    DatasourceListOl,
+    DatasourceOptBox,
+    DatasourceOptBoxLeft,
+    DatasourceOptBoxRight,
+    DddSubDatasource,
+    DelDatasource,
+    InputField,
+    ListItemText,
+    OptBtnBox,
+    SaveBtn,
+    TextareaField,
 } from './ui.jsx';
 
 //弹窗
@@ -261,7 +246,7 @@ export function DatasourceList(props) {
 export function DraggableDatasourceList() {
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
 
-    const { dsList, isShowDatasource,finalDsList } = useSelector(
+    const { dsList, isShowDatasource, finalDsList } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
 
@@ -599,7 +584,7 @@ export function DraggableDatasourceList() {
 
                         testTransform({
                             spreadJsonData: spread.toJSON(),
-                            dsList:finalDsList,
+                            dsList: finalDsList,
                         });
                     }}
                 >
