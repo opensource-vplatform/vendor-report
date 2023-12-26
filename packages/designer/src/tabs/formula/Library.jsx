@@ -25,7 +25,8 @@ import {
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,
 } from '../../utils/formulaUtil';
-import FormulaDialog from './FormulaDialog';
+import FormulaSelector from './FormulaSelector';
+import FormulaSetting from './FormulaSetting';
 
 const INSERT_FORMULA_ITEM_ID = 'insert_$_formula';
 
@@ -123,23 +124,45 @@ const OtherItem = WithFormulIcon('其他函数', OtherIcon, () => []);
 
 export default function () {
     const [data, setData] = useState({
-        showDailog: false,
+        showSelector: false,
+        showSetting: false,
+        formula: null,
         catalog: null,
     });
-    const handleShowDialog = () => {
+    const handleShowSelector = () => {
         setData((data) => {
             return {
                 ...data,
-                showDailog: true,
+                showSelector: true,
             };
         });
     };
 
-    const handleHideDialog = () => {
+    const handleHideSelector = () => {
         setData((data) => {
             return {
                 ...data,
-                showDailog: false,
+                showSelector: false,
+            };
+        });
+    };
+
+    const handleFormulaSelect = (formula)=>{
+        setData((data) => {
+            return {
+                ...data,
+                formula,
+                showSetting:true,
+                showSelector: false,
+            };
+        });
+    }
+
+    const handleHideSetting = () => {
+        setData((data) => {
+            return {
+                ...data,
+                showSetting: false,
             };
         });
     };
@@ -151,7 +174,7 @@ export default function () {
                     return {
                         ...data,
                         catalog,
-                        showDailog:true
+                        showSelector:true
                     }
                 });
             }
@@ -159,8 +182,11 @@ export default function () {
     };
     return (
         <Fragment>
-            {data.showDailog ? (
-                <FormulaDialog onClose={handleHideDialog}></FormulaDialog>
+            {data.showSelector ? (
+                <FormulaSelector onClose={handleHideSelector} onSelect={handleFormulaSelect}></FormulaSelector>
+            ) : null}
+            {data.showSetting ? (
+                <FormulaSetting code={data.formula} onClose={handleHideSetting}></FormulaSetting>
             ) : null}
             <GroupItem title='函数库'>
                 <HLayout>
@@ -179,7 +205,7 @@ export default function () {
                                     iconStyle={{ width: 28, height: 28 }}
                                 ></FormulaIcon>
                             }
-                            onClick={handleShowDialog}
+                            onClick={handleShowSelector}
                         ></VItem>
                     </VGroupItem>
                     <HLayout>

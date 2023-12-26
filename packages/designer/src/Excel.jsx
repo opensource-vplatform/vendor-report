@@ -1,26 +1,34 @@
-import { useCallback } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useContext,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import { Workbook, Worksheet } from '@components/spread/Index';
+import {
+  Workbook,
+  Worksheet,
+} from '@components/spread/Index';
 import { setSpread } from '@store/appSlice/appSlice';
 import { updateDslist } from '@store/datasourceSlice/datasourceSlice';
 import { setFontStyles } from '@store/fontSlice/fontSlice';
-import { hideTab, setActive, showTab } from '@store/navSlice/navSlice';
+import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
-import { isBindingTable } from '@utils/bindingUtil';
 import { findTreeNodeById } from '@utils/commonUtil';
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
-import { setData } from './store/tableDesignSlice/tableDesignSlice';
-import { parseTable } from './utils/tableUtil';
+import DesignerContext from './DesignerContext';
 
 export default function () {
     const dispatch = useDispatch();
-    let { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
+    const context = useContext(DesignerContext);
+    const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
     const sheetName = 'Person Address';
-    const autoGenerateColumns = false;
     const handleValueChanged = useCallback((type, args) => {
         const { sheet, row, col, newValue } = args;
         const bindInfo = getCellTag(sheet, row, col, 'bindInfo');
@@ -37,19 +45,12 @@ export default function () {
             );
         }
     });
-    const handleEnterCell = useCallback((type, args) => {
+    const handleEnterCell = (type, args) => {
         const sheet = args.sheet;
         const styles = parseFont(sheet);
         dispatch(setFontStyles({ styles }));
-        if (isBindingTable(sheet)) {
-            dispatch(showTab({ code: 'table' }));
-            dispatch(setData({ data: parseTable(sheet) }));
-            dispatch(setActive({ code: 'table' }));
-        } else {
-            dispatch(hideTab({ code: 'table' }));
-            dispatch(setActive({ code: null }));
-        }
-    });
+        context.handleSelectionChange();
+    };
     const handleActiveSheetChanged = useCallback((type, args) => {
         const sheet = args.newSheet;
         const styles = parseFont(sheet);
@@ -81,13 +82,19 @@ export default function () {
         dispatch(setSpread({ spread }));
     });
     return (
-        <Workbook
-            inited={handleWorkbookInitialized}
-            enterCell={handleEnterCell}
-            activeSheetChanged={handleActiveSheetChanged}
-            valueChanged={handleValueChanged}
-        >
-            <Worksheet name={sheetName} rowCount={20} colCount={20}></Worksheet>
-        </Workbook>
+        <Fragment>
+            <Workbook
+                inited={handleWorkbookInitialized}
+                enterCell={handleEnterCell}
+                activeSheetChanged={handleActiveSheetChanged}
+                valueChanged={handleValueChanged}
+            >
+                <Worksheet
+                    name={sheetName}
+                    rowCount={20}
+                    colCount={20}
+                ></Worksheet>
+            </Workbook>
+        </Fragment>
     );
 }

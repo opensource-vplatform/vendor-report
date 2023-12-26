@@ -1,57 +1,76 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import Dialog from '@components/dialog/Index.jsx';
 import DropdownBox from '@components/dropdownBox/dropdownBox';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import DatasourceIcon from '@icons/data/datasource';
 import {
-    deleteDsList,
-    pushDsList,
-    removeBindInfosByCellInstanceId,
-    saveBindInfos,
-    setIsShowDatasource,
-    toggleActiveDs,
-    updateDslist,
+  deleteDsList,
+  pushDsList,
+  removeBindInfosByCellInstanceId,
+  saveBindInfos,
+  setIsShowDatasource,
+  toggleActiveDs,
+  updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import { setActive, showTab } from '@store/navSlice/navSlice';
-import { setData } from '@store/tableDesignSlice/tableDesignSlice';
-import { findTreeNodeById, genUUID, hasSameNode } from '@utils/commonUtil.js';
-import { getNamespace } from '@utils/spreadUtil';
-import { parseTable, setTableCornerMarks } from '@utils/tableUtil.js';
 import {
-    getCellInstanceId,
-    getSheetInstanceId,
-    setCellTag,
+  setActive,
+  showTab,
+} from '@store/navSlice/navSlice';
+import { setData } from '@store/tableDesignSlice/tableDesignSlice';
+import {
+  findTreeNodeById,
+  genUUID,
+  hasSameNode,
+} from '@utils/commonUtil.js';
+import { getNamespace } from '@utils/spreadUtil';
+import {
+  parseTable,
+  setTableCornerMarks,
+} from '@utils/tableUtil.js';
+import {
+  getCellInstanceId,
+  getSheetInstanceId,
+  setCellTag,
 } from '@utils/worksheetUtil.js';
 
 import { testTransform } from '../../../../plugins/transform.js';
+import DesignerContext from '../../DesignerContext.jsx';
 import {
-    addTable,
-    BindingPathCellType,
-    checkHasBind,
-    getCellInfo,
-    getChanged,
-    getPath,
-    highlightBlock,
-    removeHighlightOneBlock,
+  addTable,
+  BindingPathCellType,
+  checkHasBind,
+  getCellInfo,
+  getChanged,
+  getPath,
+  highlightBlock,
+  removeHighlightOneBlock,
 } from './fun.js';
 import {
-    AddDatasourceBtn,
-    ConfirmDialogBox,
-    DatasourceBox,
-    DatasourceListOl,
-    DatasourceOptBox,
-    DatasourceOptBoxLeft,
-    DatasourceOptBoxRight,
-    DddSubDatasource,
-    DelDatasource,
-    InputField,
-    ListItemText,
-    OptBtnBox,
-    SaveBtn,
-    TextareaField,
+  AddDatasourceBtn,
+  ConfirmDialogBox,
+  DatasourceBox,
+  DatasourceListOl,
+  DatasourceOptBox,
+  DatasourceOptBoxLeft,
+  DatasourceOptBoxRight,
+  DddSubDatasource,
+  DelDatasource,
+  InputField,
+  ListItemText,
+  OptBtnBox,
+  SaveBtn,
+  TextareaField,
 } from './ui.jsx';
 
 //弹窗
@@ -250,6 +269,7 @@ export function DraggableDatasourceList() {
         ({ datasourceSlice }) => datasourceSlice
     );
 
+    const context = useContext(DesignerContext);
     const dispatch = useDispatch();
     const cacheDatasRef = useRef({
         hasBindEvent: false,
@@ -351,6 +371,8 @@ export function DraggableDatasourceList() {
                         ...table.range(),
                     });
                     sheet.tables.remove(table);
+                    //删除表格后，需隐藏表设计页签
+                    context.handleSelectionChange();
                 },
             };
             commandManager.register(

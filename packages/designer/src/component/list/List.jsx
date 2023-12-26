@@ -1,6 +1,12 @@
 import './list.scss';
 
-import React, { useState } from 'react';
+import React, {
+  createRef,
+  useEffect,
+  useState,
+} from 'react';
+
+import { scrollIntoView } from '@utils/domUtil';
 
 const List = ({
     values, // 数据源：数组类型
@@ -10,19 +16,34 @@ const List = ({
     selectedValue,
     onChange,
     isHasInput = false,
-    onDoubleClick=()=>{},
-    style={},
+    onDoubleClick = () => {},
+    style = {},
     className = {},
 }) => {
     const [filterText, setFilterText] = useState(selectedValue);
-
+    const listDom = createRef(null);
     const handleItemClick = (value) => {
         onChange(value);
         setFilterText(value);
     };
-
+    useEffect(() => {
+        //将选中的元素滚动到可视范围内
+        const dom = listDom.current;
+        if (dom) {
+            const children = dom.children;
+            if (children && children.length > 0) {
+                for (let index = 0; index < children.length; index++) {
+                    const child = children[index];
+                    if (child.className == 'listItemSelected') {
+                        scrollIntoView(child,true);
+                        break;
+                    }
+                }
+            }
+        }
+    }, [selectedValue]);
     return (
-        <div style={{ width, height, margin: '5px 0px',...style }}>
+        <div style={{ width, height, margin: '5px 0px', ...style }}>
             {isHasInput && (
                 <input
                     className='listInput'
@@ -30,7 +51,7 @@ const List = ({
                     value={filterText}
                 />
             )}
-            <div className='list'>
+            <div className='list' ref={listDom}>
                 {values?.map((value, index) => {
                     const isSelected = selectedValue === value;
                     const itemClassName = isSelected

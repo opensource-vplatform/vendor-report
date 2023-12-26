@@ -19,6 +19,7 @@ export const navSlice = createSlice({
             const index = hideCodes.indexOf(code);
             if(index!=-1){
                 hideCodes.splice(index,1);
+                state.hideCodes = [...hideCodes];
             }
         },
         /**
@@ -32,6 +33,7 @@ export const navSlice = createSlice({
             const index = hideCodes.indexOf(code);
             if(index==-1){
                 hideCodes.push(code);
+                state.hideCodes = [...hideCodes];
             }
         },
         /**

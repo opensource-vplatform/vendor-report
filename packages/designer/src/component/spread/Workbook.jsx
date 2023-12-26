@@ -29,38 +29,49 @@ export default function (props) {
     const [data] = useState({ spread: null });
     const el = createRef(null);
     useEffect(() => {
-        if (el.current && !data.spread) {
-            const GC = getNamespace();
-            const spread = new GC.Spread.Sheets.Workbook(el.current, {
-                sheetCount: 0,
-            });
+        if (el.current) {
+            let spread = null;
+            const unInited = !data.spread; 
+            if(unInited){
+                const GC = getNamespace();
+                spread = new GC.Spread.Sheets.Workbook(el.current, {
+                    sheetCount: 0,
+                });
+                data.spread = spread;
+            }else{
+                spread = data.spread;
+            }
             spread.suspendPaint();
+            spread.suspendEvent();
             try {
+                if(unInited){
+                    if (children) {
+                        const sheetList = Array.isArray(children)
+                            ? children
+                            : [children];
+                        sheetList.forEach((sheet, index) => {
+                            const {
+                                name = `sheet${index + 1}`,
+                                rowCount = 20,
+                                colCount = 20,
+                            } = sheet.props;
+                            const workSheet = new GC.Spread.Sheets.Worksheet(name);
+                            workSheet.setRowCount(rowCount);
+                            workSheet.setColumnCount(colCount);
+                            spread.addSheet(index, workSheet);
+                        });
+                    }
+                    inited && inited(spread);
+                }
+                spread.unbindAll();
                 bindEvent(spread, 'EnterCell', enterCell);
                 bindEvent(spread, 'ActiveSheetChanged', activeSheetChanged);
                 bindEvent(spread, 'ValueChanged', valueChanged);
-                if (children) {
-                    const sheetList = Array.isArray(children)
-                        ? children
-                        : [children];
-                    sheetList.forEach((sheet, index) => {
-                        const {
-                            name = `sheet${index + 1}`,
-                            rowCount = 20,
-                            colCount = 20,
-                        } = sheet.props;
-                        const workSheet = new GC.Spread.Sheets.Worksheet(name);
-                        workSheet.setRowCount(rowCount);
-                        workSheet.setColumnCount(colCount);
-                        spread.addSheet(index, workSheet);
-                    });
-                }
-                data.spread = spread;
-                inited && inited(spread);
             } finally {
                 spread.resumePaint();
+                spread.resumeEvent();
             }
         }
-    }, []);
+    }, [inited, enterCell, activeSheetChanged, valueChanged]);
     return <Wrap ref={el}></Wrap>;
 }

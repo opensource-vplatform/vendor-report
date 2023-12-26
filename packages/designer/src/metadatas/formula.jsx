@@ -9455,6 +9455,10 @@ export const getFormulasByCatalog = function (catalog) {
     return CATALOG_FORMULA_MAP[catalog];
 };
 
+export const getCatalogFormulaMap = function(){
+    return CATALOG_FORMULA_MAP;
+}
+
 export const getFormulaMetadata = function (code) {
     return FORMULA_METADATAS[code];
 };
