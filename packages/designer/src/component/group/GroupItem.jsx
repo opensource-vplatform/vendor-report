@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const GroupItemWrap = styled.div`
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     padding: 0px 2px;
     height: 106px;
     border-right: 1px solid lightgray;
@@ -57,6 +57,7 @@ function Index(props) {
     const { title, onMore, children } = props;
     return (
         <GroupItemWrap>
+            <Content>{children}</Content>
             <GroupItemLabelWrap>
                 <GroupItemLabel>{title}</GroupItemLabel>
                 {onMore ? (
@@ -65,7 +66,6 @@ function Index(props) {
                     </MoreIconButton>
                 ) : null}
             </GroupItemLabelWrap>
-            <Content>{children}</Content>
         </GroupItemWrap>
     );
 }

@@ -5,7 +5,6 @@ import {
 
 import styled from 'styled-components';
 
-import Button from '@components/Button/Index';
 import Dialog from '@components/dialog/Index';
 import { Highlight } from '@components/highlight/Index';
 import Select from '@components/select/Index';
@@ -20,6 +19,11 @@ import {
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,
 } from '../../utils/formulaUtil';
+import {
+  ButtonWrap,
+  FormulaButton,
+  FormulaDesc,
+} from './Components';
 import FormulaExample from './FormulaExample';
 
 const Wrap = styled.div`
@@ -63,22 +67,6 @@ const Title = styled.div`
     padding: 8px 0px;
 `;
 
-const ButtonWrap = styled.div`
-    width: 100%;
-    padding: 8px 0px 0px 0px;
-    margin: 0px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row-reverse;
-`;
-
-const FormulaDesc = styled.div`
-    margin-top: 4px;
-    margin-left: 8px;
-    font-size: 12px;
-    min-height: 50px;
-`;
-
 const formulaMetadataToListData = function (metadatas) {
     const result = [];
     metadatas.forEach((metadata) => {
@@ -88,8 +76,7 @@ const formulaMetadataToListData = function (metadatas) {
 };
 
 export default function (props) {
-    const { value, onClose, catalog = null,onSelect } = props;
-    const btnStyle = { width: 80, height: 32 };
+    const { value, onClose, catalog = null, onSelect } = props;
     const filterRef = createRef(null);
     const [data, setData] = useState(() => {
         let catalogs = getCatalogs();
@@ -174,9 +161,9 @@ export default function (props) {
             }
         }
     };
-    const handleFormulaSelect = ()=>{
+    const handleFormulaSelect = () => {
         onSelect(data.formula);
-    }
+    };
     const metadata = getFormulaMetadata(data.formula);
     return (
         <Dialog title='插入函数' onClose={onClose}>
@@ -187,20 +174,20 @@ export default function (props) {
                         <TextArea
                             placeholder='请输入一条简短说明来描述您想做什么，然后单击“转到”'
                             ref={filterRef}
-                            onKeyDown={(evt)=>{
-                                if(evt.code=="Enter"){
+                            onKeyDown={(evt) => {
+                                if (evt.code == 'Enter') {
                                     handleFilter();
                                     evt.preventDefault();
                                     return false;
                                 }
                             }}
                         ></TextArea>
-                        <Button
-                            style={{ ...btnStyle, marginLeft: 8 }}
+                        <FormulaButton
+                            style={{ marginLeft: 8 }}
                             onClick={handleFilter}
                         >
                             转到
-                        </Button>
+                        </FormulaButton>
                     </Item>
                     <Item
                         style={{
@@ -249,7 +236,12 @@ export default function (props) {
                     </Item>
                     <FormulaExample
                         code={data.formula}
-                        metadata={metadata}
+                        style={{marginTop: 8}}
+                        argNames={
+                            metadata && metadata.args
+                                ? metadata.args.map((arg) => arg.name)
+                                : []
+                        }
                         highlight={data.filter}
                     ></FormulaExample>
                     <FormulaDesc>
@@ -260,15 +252,13 @@ export default function (props) {
                     </FormulaDesc>
                 </Content>
                 <ButtonWrap>
-                    <Button style={btnStyle} onClick={onClose}>
-                        取消
-                    </Button>
-                    <Button
-                        style={{ ...btnStyle, marginRight: 8 }}
+                    <FormulaButton onClick={onClose}>取消</FormulaButton>
+                    <FormulaButton
+                        style={{ marginRight: 8 }}
                         onClick={handleFormulaSelect}
                     >
                         确定
-                    </Button>
+                    </FormulaButton>
                 </ButtonWrap>
             </Wrap>
         </Dialog>

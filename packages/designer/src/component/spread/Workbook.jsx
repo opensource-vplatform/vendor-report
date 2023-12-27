@@ -24,7 +24,7 @@ const bindEvent = function (spread, typeName, handler) {
 };
 
 export default function (props) {
-    const { inited, enterCell, activeSheetChanged, valueChanged, children } =
+    const { inited, enterCell, activeSheetChanged, valueChanged,selectionChanged,selectionChanging, children } =
         props;
     const [data] = useState({ spread: null });
     const el = createRef(null);
@@ -67,11 +67,13 @@ export default function (props) {
                 bindEvent(spread, 'EnterCell', enterCell);
                 bindEvent(spread, 'ActiveSheetChanged', activeSheetChanged);
                 bindEvent(spread, 'ValueChanged', valueChanged);
+                bindEvent(spread,'SelectionChanged',selectionChanged);
+                bindEvent(spread,'SelectionChanging',selectionChanging);
             } finally {
                 spread.resumePaint();
                 spread.resumeEvent();
             }
         }
-    }, [inited, enterCell, activeSheetChanged, valueChanged]);
+    }, [inited, enterCell, activeSheetChanged, valueChanged,selectionChanged,selectionChanging]);
     return <Wrap ref={el}></Wrap>;
 }

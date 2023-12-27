@@ -28,7 +28,7 @@ const Title = styled.div`
 `;
 
 export default function(props){
-    const {title,desc='',icon,onClick,style={}} = props;
+    const {title,desc='',icon,onClick,style={},children} = props;
     return <Wrap title={desc} onClick={onClick} style={style}>
         <IconWrap>
         {icon}
@@ -36,5 +36,6 @@ export default function(props){
         <TitleWrap>
             <Title>{title}</Title>
         </TitleWrap>
+        {children}
     </Wrap>
 }

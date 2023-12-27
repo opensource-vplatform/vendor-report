@@ -17,6 +17,22 @@ export const withBatchUpdate = function (spread, updateHandler) {
     }
 };
 
+export const withBatchCalcUpdate = function (spread, updateHandler) {
+    if (spread) {
+        spread.suspendPaint();
+        spread.suspendCalcService();
+        const sheet = spread.getActiveSheet();
+        if (sheet) {
+            try {
+                updateHandler(sheet);
+            } finally {
+                spread.resumeCalcService(false);
+                spread.resumePaint();
+            }
+        }
+    }
+};
+
 /**
  * 将样式应用到选择的单元格
  * @returns
@@ -118,6 +134,45 @@ export const applyToSelectedCell = function (sheet, func) {
 /**
  * 获取命令空间
  */
-export const getNamespace = function(){
+export const getNamespace = function () {
     return window.GC;
-}
+};
+
+export const SelectionTypes = {
+    Mixture: 4,
+    OnlyCells: 3,
+    OnlyColumn: 2,
+    OnlyRow: 1,
+    Sheet: 0,
+};
+
+/**
+ * 获取选择类型
+ * @param {} selections
+ */
+export const getSelectionType = function (selections) {
+    let type = null;
+    for (let index = 0; index < selections.length; index++) {
+        const selection = selections[index];
+        if (-1 === selection.col && -1 === selection.row)
+            return SelectionTypes.Sheet;
+        if (-1 === selection.row) {
+            if (type === null) {
+                type = SelectionTypes.OnlyColumn;
+            } else if (type !== SelectionTypes.OnlyColumn) {
+                return SelectionTypes.Mixture;
+            }
+        } else if (-1 === selection.col) {
+            if (type === null) {
+                type = SelectionTypes.OnlyRow;
+            } else if (type !== SelectionTypes.OnlyRow) {
+                return SelectionTypes.Mixture;
+            }
+        } else if (type === null) {
+            type = SelectionTypes.OnlyCells;
+        } else if (type !== SelectionTypes.OnlyCells) {
+            return SelectionTypes.Mixture;
+        }
+    }
+    return type;
+};

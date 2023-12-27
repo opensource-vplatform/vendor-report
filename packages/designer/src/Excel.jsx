@@ -23,6 +23,10 @@ import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
 import DesignerContext from './DesignerContext';
+import {
+  EVENTS,
+  fire,
+} from './event/EventManager';
 
 export default function () {
     const dispatch = useDispatch();
@@ -81,6 +85,18 @@ export default function () {
         }
         dispatch(setSpread({ spread }));
     });
+    const handleSelectionChanged = useCallback((type, data) => {
+        fire({
+            event: EVENTS.SelectionChanged,
+            args: data,
+        });
+    });
+    const handleSelectionChanging = useCallback((type,data)=>{
+        fire({
+            event: EVENTS.SelectionChanging,
+            args: data,
+        });
+    });
     return (
         <Fragment>
             <Workbook
@@ -88,6 +104,8 @@ export default function () {
                 enterCell={handleEnterCell}
                 activeSheetChanged={handleActiveSheetChanged}
                 valueChanged={handleValueChanged}
+                selectionChanged={handleSelectionChanged}
+                selectionChanging={handleSelectionChanging}
             >
                 <Worksheet
                     name={sheetName}

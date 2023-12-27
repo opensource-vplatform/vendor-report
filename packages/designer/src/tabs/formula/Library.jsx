@@ -3,6 +3,9 @@ import {
   useState,
 } from 'react';
 
+import { useSelector } from 'react-redux';
+import styled from 'styled-components';
+
 import {
   GroupItem,
   HLayout,
@@ -10,6 +13,7 @@ import {
   VItem,
 } from '@components/group/Index';
 import Menu from '@components/menu/Index';
+import ArrowDownIcon from '@icons/arrow/ArrowDown';
 import EmptyIcon from '@icons/base/Empty';
 import CalculationIcon from '@icons/formula/Calculation';
 import DateIcon from '@icons/formula/Date';
@@ -24,6 +28,7 @@ import TextIcon from '@icons/formula/Text';
 import {
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,
+  setAutoFormula,
 } from '../../utils/formulaUtil';
 import FormulaSelector from './FormulaSelector';
 import FormulaSetting from './FormulaSetting';
@@ -67,21 +72,25 @@ const WithFormulIcon = function (title, Icon, formulaMetadatas) {
                 <VItem
                     title={title}
                     style={{
-                        marginLeft: 1,
-                        marginRight: 1,
                         paddingLeft: 4,
                         paddingRight: 4,
-                        paddingBottom: 4,
                     }}
                     icon={<Icon iconStyle={{ width: 28, height: 28 }}></Icon>}
-                ></VItem>
+                >
+                    <ArrowDownIcon
+                        style={{
+                            width: 16,
+                            height: 16,
+                        }}
+                    ></ArrowDownIcon>
+                </VItem>
             </Menu>
         );
     };
 };
 
 const CalculationItem = WithFormulIcon(
-    '求和',
+    '自动求和',
     CalculationIcon,
     getFormulaMetadatasByCatalog('sum')
 );
@@ -122,7 +131,74 @@ const MathItem = WithFormulIcon(
 );
 const OtherItem = WithFormulIcon('其他函数', OtherIcon, () => []);
 
+const Wrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    cursor: pointer;
+    align-items: center;
+`;
+
+const IconWrap = styled.div`
+    padding: 4px;
+`;
+
+const TitleWrap = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    &:hover {
+        background-color: #dadada;
+    }
+`;
+
+const Title = styled.div`
+    align-self: center;
+    font-size: 10px;
+    width: 100%;
+    text-align: center;
+`;
+
+function AutoSumItem(props) {
+    const { onChange } = props;
+    return (
+        <Wrap
+            style={{
+                paddingLeft: 4,
+                paddingRight: 4,
+            }}
+        >
+            <IconWrap onClick={()=>onChange('SUM')}>
+                <CalculationIcon
+                    iconStyle={{ width: 28, height: 28 }}
+                ></CalculationIcon>
+            </IconWrap>
+            <Menu
+                datas={formulaMetadataToDatas(
+                    getFormulaMetadatasByCatalog('sum')
+                )}
+                frozien={-1}
+                optionStyle={{ marginTop: -6, marginLeft: 0 }}
+                {...props}
+            >
+                <TitleWrap>
+                    <Title>自动求和</Title>
+                    <ArrowDownIcon
+                        style={{
+                            marginTop: 2,
+                            marginBottom: 2,
+                            width: 16,
+                            height: 16,
+                        }}
+                    ></ArrowDownIcon>
+                </TitleWrap>
+            </Menu>
+        </Wrap>
+    );
+}
+
 export default function () {
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     const [data, setData] = useState({
         showSelector: false,
         showSetting: false,
@@ -147,16 +223,16 @@ export default function () {
         });
     };
 
-    const handleFormulaSelect = (formula)=>{
+    const handleFormulaSelect = (formula) => {
         setData((data) => {
             return {
                 ...data,
                 formula,
-                showSetting:true,
+                showSetting: true,
                 showSelector: false,
             };
         });
-    }
+    };
 
     const handleHideSetting = () => {
         setData((data) => {
@@ -168,25 +244,47 @@ export default function () {
     };
 
     const handleMenuChange = (catalog) => {
-        return (menu)=>{
+        return (menu) => {
             if (menu == INSERT_FORMULA_ITEM_ID) {
-                setData(data=>{
+                setData((data) => {
                     return {
                         ...data,
                         catalog,
-                        showSelector:true
-                    }
+                        showSelector: true,
+                    };
                 });
             }
-        }
+        };
+    };
+
+    const handleCalculationFormula = (catalog) => {
+        return (menu) => {
+            if (menu == INSERT_FORMULA_ITEM_ID) {
+                setData((data) => {
+                    return {
+                        ...data,
+                        catalog,
+                        showSelector: true,
+                    };
+                });
+            } else {
+                setAutoFormula(spread, menu);
+            }
+        };
     };
     return (
         <Fragment>
             {data.showSelector ? (
-                <FormulaSelector onClose={handleHideSelector} onSelect={handleFormulaSelect}></FormulaSelector>
+                <FormulaSelector
+                    onClose={handleHideSelector}
+                    onSelect={handleFormulaSelect}
+                ></FormulaSelector>
             ) : null}
             {data.showSetting ? (
-                <FormulaSetting code={data.formula} onClose={handleHideSetting}></FormulaSetting>
+                <FormulaSetting
+                    code={data.formula}
+                    onClose={handleHideSetting}
+                ></FormulaSetting>
             ) : null}
             <GroupItem title='函数库'>
                 <HLayout>
@@ -209,17 +307,33 @@ export default function () {
                         ></VItem>
                     </VGroupItem>
                     <HLayout>
-                        <CalculationItem
+                        <AutoSumItem
+                            onChange={handleCalculationFormula('all')}
+                        ></AutoSumItem>
+                        <RecentItem
                             onChange={handleMenuChange('recent')}
-                        ></CalculationItem>
-                        <RecentItem onChange={handleMenuChange('recent')}></RecentItem>
-                        <FinanceItem onChange={handleMenuChange('financial')}></FinanceItem>
-                        <LogicItem onChange={handleMenuChange('logical')}></LogicItem>
-                        <TextItem onChange={handleMenuChange('text')}></TextItem>
-                        <DateItem onChange={handleMenuChange('dateAndTime')}></DateItem>
-                        <SearchItem onChange={handleMenuChange('lookupAndReference')}></SearchItem>
-                        <MathItem onChange={handleMenuChange('mathAndTrigonometry')}></MathItem>
-                        <OtherItem onChange={handleMenuChange('all')}></OtherItem>
+                        ></RecentItem>
+                        <FinanceItem
+                            onChange={handleMenuChange('financial')}
+                        ></FinanceItem>
+                        <LogicItem
+                            onChange={handleMenuChange('logical')}
+                        ></LogicItem>
+                        <TextItem
+                            onChange={handleMenuChange('text')}
+                        ></TextItem>
+                        <DateItem
+                            onChange={handleMenuChange('dateAndTime')}
+                        ></DateItem>
+                        <SearchItem
+                            onChange={handleMenuChange('lookupAndReference')}
+                        ></SearchItem>
+                        <MathItem
+                            onChange={handleMenuChange('mathAndTrigonometry')}
+                        ></MathItem>
+                        <OtherItem
+                            onChange={handleMenuChange('all')}
+                        ></OtherItem>
                     </HLayout>
                 </HLayout>
             </GroupItem>
