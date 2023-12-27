@@ -1,17 +1,9 @@
-import {
-  Fragment,
-  useState,
-} from 'react';
+import { Fragment, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  GroupItem,
-  HLayout,
-  VGroupItem,
-  VItem,
-} from '@components/group/Index';
+import { GroupItem, HLayout, VGroupItem, VItem } from '@components/group/Index';
 import Menu from '@components/menu/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
 import EmptyIcon from '@icons/base/Empty';
@@ -26,9 +18,9 @@ import SearchIcon from '@icons/formula/Search';
 import TextIcon from '@icons/formula/Text';
 
 import {
-  getFormulaMetadatasByCatalog,
-  getRecentFormulaMetadatas,
-  setAutoFormula,
+    getFormulaMetadatasByCatalog,
+    getRecentFormulaMetadatas,
+    setAutoFormula,
 } from '../../utils/formulaUtil';
 import FormulaSelector from './FormulaSelector';
 import FormulaSetting from './FormulaSetting';
@@ -168,7 +160,7 @@ function AutoSumItem(props) {
                 paddingRight: 4,
             }}
         >
-            <IconWrap onClick={()=>onChange('SUM')}>
+            <IconWrap onClick={() => onChange('SUM')}>
                 <CalculationIcon
                     iconStyle={{ width: 28, height: 28 }}
                 ></CalculationIcon>
@@ -251,6 +243,14 @@ export default function () {
                         ...data,
                         catalog,
                         showSelector: true,
+                    };
+                });
+            } else {
+                setData((data) => {
+                    return {
+                        ...data,
+                        formula: menu,
+                        showSetting: true,
                     };
                 });
             }

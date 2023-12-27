@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { memo, useEffect, useRef } from 'react';
 
 import RangeIcon from '@icons/formula/Range';
 
@@ -30,10 +31,10 @@ const InputWrap = styled.div`
     border: 1px solid #d3d3d3;
     height: 100%;
     background-color: white;
-    &:hover{
+    &:hover {
         border: solid 1px #5292f7;
     }
-    &:focus-within{
+    &:focus-within {
         border: solid 1px #5292f7;
     }
 `;
@@ -45,20 +46,20 @@ const Input = styled.input`
     padding-top: 1px;
     padding-bottom: 1px;
     align-self: center;
-    outline:none;
+    outline: none;
 `;
 
-export default function (params) {
-    const {title,onIconClick} = params;
+export default memo(function (params) {
+    const { id, title, onIconClick, onFocus } = params;
     return (
         <Wrap>
             <Title>{title}:</Title>
             <InputArea>
                 <InputWrap>
-                    <Input></Input>
+                    <Input data-id={id} onFocus={onFocus}></Input>
                     <RangeIcon onClick={onIconClick}></RangeIcon>
                 </InputWrap>
             </InputArea>
         </Wrap>
     );
-}
+});
