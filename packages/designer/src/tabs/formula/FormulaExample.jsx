@@ -11,6 +11,7 @@ const Wrap = styled.div`
     min-height: 22px;
     display: flex;
     align-items: center;
+    max-width:400px;
 `;
 
 const FormulaWrap = styled.span`
@@ -18,7 +19,6 @@ const FormulaWrap = styled.span`
 `;
 
 const FormulaArgWrap = styled.span`
-    max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

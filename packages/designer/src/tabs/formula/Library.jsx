@@ -17,14 +17,18 @@ import ArrowDownIcon from '@icons/arrow/ArrowDown';
 import EmptyIcon from '@icons/base/Empty';
 import CalculationIcon from '@icons/formula/Calculation';
 import DateIcon from '@icons/formula/Date';
+import EngineeringIcon from '@icons/formula/Engineering';
 import FinanceIcon from '@icons/formula/Finance';
 import FormulaIcon from '@icons/formula/Formula';
+import InformationIcon from '@icons/formula/Information';
 import LogicIcon from '@icons/formula/Logic';
 import MathIcon from '@icons/formula/Math';
 import OtherIcon from '@icons/formula/Other';
 import RecentIcon from '@icons/formula/Recent';
 import SearchIcon from '@icons/formula/Search';
+import StatisticalIcon from '@icons/formula/Statistical';
 import TextIcon from '@icons/formula/Text';
+import WebIcon from '@icons/formula/Web';
 
 import {
   getFormulaMetadatasByCatalog,
@@ -43,7 +47,7 @@ const formulaMetadataToDatas = function (formulaMetadatas) {
         formulaMetadatas.forEach((metadata) => {
             datas.push({
                 value: metadata.code,
-                title: metadata.title,
+                title: metadata.desc,
                 text: metadata.code,
                 icon: <EmptyIcon></EmptyIcon>,
             });
@@ -58,80 +62,123 @@ const formulaMetadataToDatas = function (formulaMetadatas) {
     return datas;
 };
 
-const WithFormulIcon = function (title, Icon, formulaMetadatas) {
+const WithFormulaMetadataIcon = function (title, Icon, formulaMetadatas) {
     return (props) => {
         const metadatas =
             typeof formulaMetadatas == 'function'
                 ? formulaMetadatas()
                 : formulaMetadatas;
         return metadatas.length == 0 ? null : (
-            <Menu
+            <FormulaItemIcon
+                title={title}
+                icon={Icon}
                 datas={formulaMetadataToDatas(metadatas)}
-                frozien={-1}
-                optionStyle={{ marginTop: 45, marginLeft: 4 }}
                 {...props}
-            >
-                <VItem
-                    title={title}
-                    style={{
-                        paddingLeft: 4,
-                        paddingRight: 4,
-                    }}
-                    icon={<Icon iconStyle={{ width: 28, height: 28 }}></Icon>}
-                >
-                    <ArrowDownIcon
-                        style={{
-                            width: 16,
-                            height: 16,
-                        }}
-                    ></ArrowDownIcon>
-                </VItem>
-            </Menu>
+            ></FormulaItemIcon>
         );
     };
 };
 
-const CalculationItem = WithFormulIcon(
-    '自动求和',
-    CalculationIcon,
-    getFormulaMetadatasByCatalog('sum')
-);
-const RecentItem = WithFormulIcon(
+const FormulaItemIcon = function (props) {
+    const { title, datas } = props;
+    const Icon = props.icon;
+    return (
+        <Menu
+            datas={datas}
+            frozien={-1}
+            optionStyle={{ marginTop: 45, marginLeft: 4 }}
+            {...props}
+        >
+            <VItem
+                title={title}
+                style={{
+                    paddingLeft: 4,
+                    paddingRight: 4,
+                }}
+                icon={<Icon iconStyle={{ width: 28, height: 28 }}></Icon>}
+            >
+                <ArrowDownIcon
+                    style={{
+                        width: 16,
+                        height: 16,
+                    }}
+                ></ArrowDownIcon>
+            </VItem>
+        </Menu>
+    );
+};
+
+const WithFormulaIcon = function(title,icon,datas){
+    return (props)=>{
+        return <FormulaItemIcon title={title} icon={icon} datas={datas} {...props}></FormulaItemIcon>
+    }
+}
+
+const RecentItem = WithFormulaMetadataIcon(
     '最近使用',
     RecentIcon,
     getRecentFormulaMetadatas
 );
-const FinanceItem = WithFormulIcon(
+const FinanceItem = WithFormulaMetadataIcon(
     '财务',
     FinanceIcon,
     getFormulaMetadatasByCatalog('financial')
 );
-const LogicItem = WithFormulIcon(
+const LogicItem = WithFormulaMetadataIcon(
     '逻辑',
     LogicIcon,
     getFormulaMetadatasByCatalog('logical')
 );
-const TextItem = WithFormulIcon(
+const TextItem = WithFormulaMetadataIcon(
     '文本',
     TextIcon,
     getFormulaMetadatasByCatalog('financial')
 );
-const DateItem = WithFormulIcon(
+const DateItem = WithFormulaMetadataIcon(
     '日期和时间',
     DateIcon,
     getFormulaMetadatasByCatalog('financial')
 );
-const SearchItem = WithFormulIcon(
+const SearchItem = WithFormulaMetadataIcon(
     '查找与引用',
     SearchIcon,
     getFormulaMetadatasByCatalog('financial')
 );
-const MathItem = WithFormulIcon(
+const MathItem = WithFormulaMetadataIcon(
     '数学和三角函数',
     MathIcon,
     getFormulaMetadatasByCatalog('financial')
 );
-const OtherItem = WithFormulIcon('其他函数', OtherIcon, () => []);
+const OtherItem = WithFormulaIcon('其他函数', OtherIcon, [
+    {
+        value: 'statistical',
+        title: '统计',
+        text: '统计',
+        children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('statistical')),
+        icon: <StatisticalIcon></StatisticalIcon>
+    },
+    {
+        value: 'engineering',
+        title: '工程',
+        text: '工程',
+        children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('engineering')),
+        icon: <EngineeringIcon></EngineeringIcon>,
+    },
+    {
+        value: 'information',
+        title: '信息',
+        text: '信息',
+        children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('information')),
+        icon: <InformationIcon></InformationIcon>,
+    },
+    {
+        value: 'web',
+        title: 'Web',
+        text: 'Web',
+        children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('web')),
+        icon: <WebIcon></WebIcon>,
+    },
+]);
 
 const Wrap = styled.div`
     display: flex;

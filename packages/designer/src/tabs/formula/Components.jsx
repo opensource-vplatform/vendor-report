@@ -15,7 +15,7 @@ export const FormulaDesc = styled.div`
     margin-top: 4px;
     margin-left: 8px;
     font-size: 12px;
-    min-height: 50px;
+    min-height: 65px;
 `;
 
 export const FormulaButton = function(props){

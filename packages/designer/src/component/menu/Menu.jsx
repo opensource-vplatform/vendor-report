@@ -20,6 +20,10 @@ const ScrollWrap = styled.div`
     overflow-y: auto;
 `;
 
+const hasChildren = function(item){
+    return item.children && item.children.length>0
+}
+
 export default function (props) {
     const {
         datas,
@@ -72,6 +76,7 @@ export default function (props) {
                         >
                             {headerItems.map(function (menu, index) {
                                 const key = menu.id || menu.value;
+                                const isParent = hasChildren(menu);
                                 return (
                                     <Fragment key={key}>
                                         <MenuItem
@@ -80,11 +85,14 @@ export default function (props) {
                                             title={menu.title}
                                             icon={menu.icon}
                                             text={menu.text}
+                                            children={menu.children}
                                             onClick={(newVal) => {
-                                                if (newVal != value) {
-                                                    onChange(newVal);
-                                                } else if (cancelAble) {
-                                                    onChange(cancelValue);
+                                                if(!isParent){
+                                                    if (newVal != value) {
+                                                        onChange(newVal);
+                                                    } else if (cancelAble) {
+                                                        onChange(cancelValue);
+                                                    }
                                                 }
                                             }}
                                         ></MenuItem>
