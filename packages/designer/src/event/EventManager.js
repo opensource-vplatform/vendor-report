@@ -15,33 +15,54 @@ const check = function (params) {
         throw Error(`不支持[${event}]事件，请检查！`);
     }
 };
+const checkId = function(params){
+    const { id } = params;
+    if (id === undefined) {
+        throw Error(`未传递id值，请检查！`);
+    }
+}
 
+/**
+ * {
+ *  [event]:{
+ *      [id]:handler
+ *  } 
+ * }
+ */
 const EVENT_HANDLER_MAP = {};
 
 /**
  * 绑定事件
- * @param {event: 事件名称,handler:事件回调} params
+ * @param {
+ *  id: 回调唯一标识，标识相同会被覆盖，取消绑定时使用该标识定位回调
+ *  event: 事件名称,
+ *  handler:事件回调
+ *  } params
  */
 export const bind = function (params) {
     check(params);
-    const { event, handler } = params;
-    const handlers = EVENT_HANDLER_MAP[event] || [];
-    if (handlers.indexOf(handler) == -1) {
-        handlers.push(handler);
-    }
+    checkId(params);
+    const { id,event, handler } = params;
+    const handlers = EVENT_HANDLER_MAP[event] || {};
+    handlers[id] = handler
     EVENT_HANDLER_MAP[event] = handlers;
 };
 
 /**
  * 取消绑定事件
- * @param {event:事件名称,handler:事件回调} params 
+ * @param {
+ *  id: 回调唯一标识
+ *  event:事件名称
+ * } params 
  */
 export const unbind = function (params) {
     check(params);
-    const { event, handler } = params;
+    checkId(params);
+    const { id, event } = params;
     const handlers = EVENT_HANDLER_MAP[event];
-    if (handlers&&handlers.indexOf(handler) !== -1) {
-        handlers.splice(handlers.indexOf(handler),1);
+    if (handlers) {
+        handlers[id] = undefined;
+        delete handlers[id];
     }
 };
 
@@ -53,9 +74,8 @@ export const fire = function (params) {
     check(params);
     const {event,args} = params;
     const handlers = EVENT_HANDLER_MAP[event];
-    if(handlers&&handlers.length>0){
-        for (let index = 0; index < handlers.length; index++) {
-            const handler = handlers[index];
+    if(handlers){
+        for(let [id,handler] of Object.entries(handlers)){
             try{
                 handler(args);
             }catch(e){

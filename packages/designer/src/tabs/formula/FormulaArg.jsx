@@ -1,7 +1,12 @@
-import styled from 'styled-components';
-import { memo, useEffect, useRef } from 'react';
+import {
+  memo,
+  useEffect,
+  useRef,
+} from 'react';
 
-import RangeIcon from '@icons/formula/Range';
+import styled from 'styled-components';
+
+import ToRangeIcon from '@icons/formula/ToRange';
 
 const Wrap = styled.div`
     display: flex;
@@ -50,14 +55,34 @@ const Input = styled.input`
 `;
 
 export default memo(function (params) {
-    const { id, title, onIconClick, onFocus } = params;
+    const {
+        id,
+        value,
+        title,
+        onIconClick,
+        onFocus,
+        focus = false,
+        onInput,
+    } = params;
+    const ref = useRef();
+    useEffect(() => {
+        if (focus && ref.current) {
+            ref.current.focus();
+        }
+    }, [value]);
     return (
         <Wrap>
             <Title>{title}:</Title>
             <InputArea>
                 <InputWrap>
-                    <Input data-id={id} onFocus={onFocus}></Input>
-                    <RangeIcon onClick={onIconClick}></RangeIcon>
+                    <Input
+                        ref={ref}
+                        data-id={id}
+                        onFocus={onFocus}
+                        onInput={onInput}
+                        value={value}
+                    ></Input>
+                    <ToRangeIcon onClick={(evt)=>{onIconClick(evt,id)}}></ToRangeIcon>
                 </InputWrap>
             </InputArea>
         </Wrap>

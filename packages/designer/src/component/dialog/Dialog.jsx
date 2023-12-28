@@ -88,6 +88,7 @@ function Index(props) {
         height = 'auto',
         open = true,
         mask = true,
+        closable = true,
         onClose,
     } = props;
     const dialogEl = createRef(null);
@@ -136,7 +137,9 @@ function Index(props) {
                     <Title>{title}</Title>
                     <CloseButton
                         onClick={() => {
-                            setOpened(false);
+                            if(closable){
+                                setOpened(false);
+                            }
                             if (onClose) {
                                 onClose();
                             }

@@ -1,9 +1,17 @@
-import { Fragment, useState } from 'react';
+import {
+  Fragment,
+  useState,
+} from 'react';
 
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { GroupItem, HLayout, VGroupItem, VItem } from '@components/group/Index';
+import {
+  GroupItem,
+  HLayout,
+  VGroupItem,
+  VItem,
+} from '@components/group/Index';
 import Menu from '@components/menu/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
 import EmptyIcon from '@icons/base/Empty';
@@ -14,13 +22,15 @@ import FormulaIcon from '@icons/formula/Formula';
 import LogicIcon from '@icons/formula/Logic';
 import MathIcon from '@icons/formula/Math';
 import OtherIcon from '@icons/formula/Other';
+import RecentIcon from '@icons/formula/Recent';
 import SearchIcon from '@icons/formula/Search';
 import TextIcon from '@icons/formula/Text';
 
 import {
-    getFormulaMetadatasByCatalog,
-    getRecentFormulaMetadatas,
-    setAutoFormula,
+  getFormulaMetadatasByCatalog,
+  getRecentFormulaMetadatas,
+  setAutoFormula,
+  updateRecentFormula,
 } from '../../utils/formulaUtil';
 import FormulaSelector from './FormulaSelector';
 import FormulaSetting from './FormulaSetting';
@@ -88,7 +98,7 @@ const CalculationItem = WithFormulIcon(
 );
 const RecentItem = WithFormulIcon(
     '最近使用',
-    CalculationIcon,
+    RecentIcon,
     getRecentFormulaMetadatas
 );
 const FinanceItem = WithFormulIcon(
@@ -246,6 +256,7 @@ export default function () {
                     };
                 });
             } else {
+                updateRecentFormula(menu);
                 setData((data) => {
                     return {
                         ...data,

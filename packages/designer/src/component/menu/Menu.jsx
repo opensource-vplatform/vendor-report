@@ -81,7 +81,6 @@ export default function (props) {
                                             icon={menu.icon}
                                             text={menu.text}
                                             onClick={(newVal) => {
-                                                //setItemVisible(false);
                                                 if (newVal != value) {
                                                     onChange(newVal);
                                                 } else if (cancelAble) {
@@ -89,7 +88,6 @@ export default function (props) {
                                                 }
                                             }}
                                         ></MenuItem>
-
                                         {lineIndexs.indexOf(index) >= 0 ? (
                                             <DividerMenuItem></DividerMenuItem>
                                         ) : null}
