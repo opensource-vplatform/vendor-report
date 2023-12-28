@@ -50,7 +50,7 @@ import {
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
-    const [isMoreCell, setIsMoreCell] = useState('');
+    const [isMoreCell, setIsMoreCell] = useState(false);
 
     const [decimalPlacesValue, setDecimalPlacesValue] = useState(2);
     const [selectedValue, setSelectedCategoriesValue] = useState('general');
@@ -61,6 +61,7 @@ function CellStyleSetting(props) {
     );
     const [checkboxOfThousandSeparator, setCheckboxOfThousandSeparator] =
         useState(false);
+
     const [locale, setLocale] = useState('zh_cn');
 
     const [lineColor, setLineColor] = useState('black');
@@ -73,6 +74,17 @@ function CellStyleSetting(props) {
     const [lineHorizontalInner, setLineHorizontalInner] = useState(false);
     const [lineVerticalInner, setLineVerticalInner] = useState(false);
     const [lineType, setLineType] = useState(1);
+
+    const [isWrapText, setIsWrapText] = useState(false);
+    const [isShrinkToFit, setIsShrinkToFit] = useState(false);
+    const [isMergeCells, setIsMergeCells] = useState(false);
+    const [isShowEllipsis, setIsShowEllipsis] = useState(false);
+    const [indentValue, setIndentValue] = useState(0);
+    const directions = [
+        -90, -75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75, 90,
+    ];
+    const [rotatable, setRotatable] = useState(false);
+    const [startDeg, setStartDeg] = useState(0);
 
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
     const { color, tabValueCellSetting, isOpenCellSetting } = useSelector(
@@ -142,7 +154,8 @@ function CellStyleSetting(props) {
     const handleSelectCategoriesChange = (value) => {
         const keys = Object.keys(Categories);
         const selectedOptionValue = keys.find((k) => Categories[k] === value);
-        setSelectedCategoriesValue(selectedOptionValue.toString());
+        selectedOptionValue &&
+            setSelectedCategoriesValue(selectedOptionValue.toString());
     };
     const handleNegativeNumbers = (value) => {
         setSelectedTimeFormat(value);
@@ -357,6 +370,76 @@ function CellStyleSetting(props) {
         setBorderTop(true);
         setBorderLeft(true);
         setBorderRight(true);
+    };
+
+    // 处理自动换行
+    const handleWrapText = (event) => {
+        setIsWrapText(event.target.checked);
+    };
+    const handleShrinkToFit = (event) => {
+        setIsShrinkToFit(event.target.checked);
+    };
+    const handleMergeCells = (event) => {
+        setIsMergeCells(event.target.checked);
+    };
+    const handleShowEllipsis = (event) => {
+        setIsShowEllipsis(event.target.checked);
+    };
+    // 处理缩减位数
+    const handleIndent = (value) => {
+        setIndentValue(value);
+    };
+    // 处理旋转角度
+    const handleDegChange = (value) => {
+        setStartDeg(value);
+    };
+
+    const handleMouseDown = (e) => {
+        setRotatable(true);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!rotatable) return;
+
+        // 计算旋转角度
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const deltaX = x - centerX;
+        const deltaY = y - centerY;
+
+        const radian = Math.atan2(deltaY, deltaX);
+        const degree = radian * (180 / Math.PI);
+        if (degree > -90 && degree < 90) {
+            setStartDeg(degree);
+        }
+    };
+    const handlePointerClick = (e) => {
+        // 计算旋转角度
+        const rect = e.target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const deltaX = x - centerX;
+        const deltaY = y - centerY;
+
+        const radian = Math.atan2(deltaY, deltaX);
+        const degree = radian * (180 / Math.PI);
+        if (degree > -90 && degree < 90) {
+            setStartDeg(degree);
+        }
+    };
+
+    const handleMouseUp = () => {
+        setRotatable(false);
+        console.log('1 :>> ', 1);
     };
 
     useEffect(() => {
@@ -660,7 +743,187 @@ function CellStyleSetting(props) {
                         </div>
                     </Tab>
                     <Tab code='对齐' title='对齐'>
-                        <p>Content for 对齐</p>
+                        <div className='alignment'>
+                            <div className='leftalignment'>
+                                <div className='textAlignment'>
+                                    <fieldset
+                                        style={{
+                                            borderTop: '1px solid lightgray',
+                                            borderLeft: 0,
+                                            borderRight: 0,
+                                            borderBottom: 0,
+                                            fontSize: '12px',
+                                        }}
+                                    >
+                                        <legend>文本对齐方式</legend>
+                                    </fieldset>
+                                    <div className='items'>
+                                        <div className='textItemLeft'>
+                                            <div className='textItem'>
+                                                <span> 水平对齐: </span>
+                                                <Select
+                                                    datas={AccountingSymbol}
+                                                    style={{
+                                                        width: '160px',
+                                                        height: '24px',
+                                                    }}
+                                                    optionStyle={{
+                                                        width: '99%',
+                                                    }}
+                                                    onChange={
+                                                        handleSelectSymbolChange
+                                                    }
+                                                    value={selectedSymbol}
+                                                />
+                                            </div>
+                                            <div className='textItem'>
+                                                <span> 垂直对齐: </span>
+                                                <Select
+                                                    datas={AccountingSymbol}
+                                                    style={{
+                                                        width: '160px',
+                                                        height: '24px',
+                                                    }}
+                                                    optionStyle={{
+                                                        width: '99%',
+                                                    }}
+                                                    onChange={
+                                                        handleSelectSymbolChange
+                                                    }
+                                                    value={selectedSymbol}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className='textItemRight'>
+                                            <span> 缩减：</span>
+                                            <Integer
+                                                style={{
+                                                    width: '120px',
+                                                    height: '24px',
+                                                }}
+                                                max={255}
+                                                min={0}
+                                                value={indentValue}
+                                                onChange={(indentValue) =>
+                                                    handleIndent(indentValue)
+                                                }
+                                            ></Integer>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className='textControl'>
+                                    <fieldset
+                                        style={{
+                                            borderTop: '1px solid lightgray',
+                                            borderLeft: 0,
+                                            borderRight: 0,
+                                            borderBottom: 0,
+                                            fontSize: '12px',
+                                        }}
+                                    >
+                                        <legend>文本控制</legend>
+                                    </fieldset>
+                                    <div className='controlItem'>
+                                        <input
+                                            className='chekbox'
+                                            type='checkbox'
+                                            checked={isWrapText}
+                                            onChange={handleWrapText}
+                                        ></input>
+                                        <span>自动换行</span>
+                                    </div>
+                                    <div className='controlItem'>
+                                        <input
+                                            className='chekbox'
+                                            type='checkbox'
+                                            checked={isShrinkToFit}
+                                            onChange={handleShrinkToFit}
+                                        ></input>
+                                        <span>缩小字体填充</span>
+                                    </div>
+                                    <div className='controlItem'>
+                                        <input
+                                            className='chekbox'
+                                            type='checkbox'
+                                            checked={isMergeCells}
+                                            onChange={handleMergeCells}
+                                        ></input>
+                                        <span>合并单元格</span>
+                                    </div>
+                                    <div className='controlItem'>
+                                        <input
+                                            className='chekbox'
+                                            type='checkbox'
+                                            checked={isShowEllipsis}
+                                            onChange={handleShowEllipsis}
+                                        ></input>
+                                        <span>显示省略号</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='orientation'>
+                                <fieldset
+                                    style={{
+                                        border: '1px solid lightgray',
+                                        fontSize: '12px',
+                                        width: 160,
+                                    }}
+                                >
+                                    <legend>方向</legend>
+                                    <div className='orientationTopItem'>
+                                        <div className='orientationText'>
+                                            <span>文本</span>
+                                        </div>
+                                        <div
+                                            className='pointer'
+                                            onMouseDown={handleMouseDown}
+                                            onMouseUp={handleMouseUp}
+                                            onMouseMove={handleMouseMove}
+                                            onClick={handlePointerClick}
+                                        >
+                                            <div className='fixed-points'>
+                                                <div
+                                                    draggable={false}
+                                                    className='pointsText'
+                                                    style={{
+                                                        userSelect: 'none',
+                                                        transform: `rotate(${startDeg}deg)`,
+                                                        transformOrigin:
+                                                            'left center',
+                                                    }}
+                                                >
+                                                    文本——
+                                                </div>
+                                                {directions.map((deg) => (
+                                                    <div
+                                                        key={deg}
+                                                        className='fixed-point'
+                                                        style={{
+                                                            transform: `rotate(${deg}deg)translateX(${
+                                                                130 / 2
+                                                            }px)`,
+                                                        }}
+                                                    ></div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='orientationBottomItem'>
+                                        <Integer
+                                            style={{
+                                                width: '80px',
+                                                height: '20px',
+                                            }}
+                                            max={90}
+                                            min={-90}
+                                            value={startDeg}
+                                            onChange={handleDegChange}
+                                        ></Integer>
+                                        <span>度</span>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
                     </Tab>
                     <Tab code='字体' title='字体'>
                         <p>Content for Sheet 3</p>

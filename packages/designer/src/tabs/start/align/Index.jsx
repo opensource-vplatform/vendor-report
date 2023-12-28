@@ -1,16 +1,13 @@
 import { useEffect } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
-  GroupItem,
-  HLayout,
-  ItemList,
-  VGroupItem,
+    GroupItem,
+    HLayout,
+    ItemList,
+    VGroupItem,
 } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Index';
@@ -27,26 +24,29 @@ import DecreaseIndent from '@icons/indent/DecreaseIndent.jsx';
 import IncreaseIndent from '@icons/indent/IncreaseIndent.jsx';
 import MergeCenter from '@icons/merge/MergeCenter';
 import {
-  directionToStyles,
-  getWordDirections,
-  valueToEnum,
+    directionToStyles,
+    getWordDirections,
+    valueToEnum,
 } from '@metadatas/direction';
 import { getMergeTypes } from '@metadatas/merge';
 import {
-  setHAlign,
-  setTextOrientation,
-  setVAlign,
-  setWordWrap,
+    setHAlign,
+    setTextOrientation,
+    setVAlign,
+    setWordWrap,
 } from '@store/fontSlice/fontSlice.js';
 import {
-  mergeAcross,
-  mergeCells,
-  mergeCenter,
-  setAlign,
-  setIndent,
-  unMergeCell,
+    mergeAcross,
+    mergeCells,
+    mergeCenter,
+    setAlign,
+    setIndent,
+    unMergeCell,
 } from '@utils/fontUtil.js';
-
+import {
+    setTabValueCellSetting,
+    setIsOpenCellSetting,
+} from '@store/borderSlice/borderSlice';
 const Label = styled.span`
     font-size: 12px;
 `;
@@ -126,6 +126,11 @@ export default function FontAlign() {
     };
     //设置文字方向
     const handleTextOrientation = (value) => {
+        if (value === 'directionSetting') {
+            dispatch(setTabValueCellSetting('对齐'));
+            dispatch(setIsOpenCellSetting(true));
+            return;
+        }
         const styles = directionToStyles(value);
         styles && dispatch(setTextOrientation(styles));
     };

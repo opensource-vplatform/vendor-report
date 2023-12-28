@@ -1,3 +1,4 @@
+import React from 'react';
 import { IconType } from './constant';
 import styled from 'styled-components';
 const iconData = {
