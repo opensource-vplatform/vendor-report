@@ -39,7 +39,7 @@ export const getBorderEnums = function () {
             text: '右边框',
             icon: <BorderRight></BorderRight>,
         },
-        "divider",
+        'divider',
         {
             value: 'noBorder',
             title: '无框线',
@@ -64,7 +64,7 @@ export const getBorderEnums = function () {
             text: '粗匣框线',
             icon: <BorderThickBox></BorderThickBox>,
         },
-        "divider",
+        'divider',
         {
             value: 'bottomDoubleBorder',
             title: '双底框线',
@@ -99,7 +99,7 @@ export const getBorderEnums = function () {
             value: 'moreBorders',
             title: '其他边框...',
             text: '其他边框...',
-            frozen:true,
+            frozen: true,
             icon: <BorderOther></BorderOther>,
         },
     ];
@@ -330,15 +330,17 @@ const borderOptionMap = {
     moreBorders: [],
 };
 export const toBorders = function (type, color, lineType) {
-    // 不指定边框颜色 则默认黑色
-    if (color === undefined) color = 'black';
-    if (lineType === undefined) lineType = 1;
-    return borderOptionMap[type].map((option) => ({
-        ...option,
-        lineborder: {
-            ...option.lineborder,
-            color,
-            style: lineType,
-        },
-    }));
+    // 不定制边框颜色线条 则直接返回边框类型
+    if (lineType === undefined && color === undefined) {
+        return borderOptionMap[type];
+    } else {
+        return borderOptionMap[type].map((option) => ({
+            ...option,
+            lineborder: {
+                ...option.lineborder,
+                color,
+                style: lineType,
+            },
+        }));
+    }
 };
