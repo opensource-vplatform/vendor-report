@@ -37,6 +37,7 @@ export const getWordDirections = function () {
             text: '向下旋转文字',
             icon: <DownwardRotation></DownwardRotation>,
         },
+        'divider',
         {
             value: 'directionSetting',
             title: '设置单元格对齐方式',

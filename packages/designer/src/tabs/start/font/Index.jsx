@@ -219,10 +219,8 @@ export default function () {
                 ></BorderBottom>
                 <Menu
                     datas={borders}
-                    lineIndexs={[3, 7, 12]}
                     optionStyle={{ left: -24 }}
-                    frozien={-1}
-                    onChange={handleBorder}
+                    onNodeClick={handleBorder}
                 >
                     <ArrowDown tips='边框'></ArrowDown>
                 </Menu>

@@ -1,6 +1,7 @@
 import {
   createRef,
   Fragment,
+  useEffect,
   useState,
 } from 'react';
 
@@ -89,6 +90,7 @@ function Index(props) {
         open = true,
         mask = true,
         closable = true,
+        anchor=false,
         onClose,
     } = props;
     const dialogEl = createRef(null);
@@ -106,6 +108,17 @@ function Index(props) {
             elStyle.transform = 'unset';
         }
     };
+    useEffect(()=>{
+        if(anchor){
+            const wrapEl = dialogEl.current;
+            if(wrapEl){
+                const {left,top} = wrapEl.getBoundingClientRect();
+                wrapEl.style.top = `${top}px`;
+                wrapEl.style.left = `${left}px`;
+                wrapEl.style.transform = "none";
+            }
+        }
+    },[]);
     return opened ? (
         <Fragment>
             {mask ? <Mask></Mask> : null}

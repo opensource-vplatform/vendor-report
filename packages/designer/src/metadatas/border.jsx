@@ -12,7 +12,7 @@ import BorderTop from '@icons/border/BorderTop';
 import BorderTopBottom from '@icons/border/BorderTopBottom';
 import BorderTopDoubleBottom from '@icons/border/BorderTopDoubleBottom';
 import BorderTopThickBottom from '@icons/border/BorderTopThickBottom';
-import { useSelector } from 'react-redux';
+
 export const getBorderEnums = function () {
     return [
         {
@@ -39,6 +39,7 @@ export const getBorderEnums = function () {
             text: '右边框',
             icon: <BorderRight></BorderRight>,
         },
+        "divider",
         {
             value: 'noBorder',
             title: '无框线',
@@ -63,6 +64,7 @@ export const getBorderEnums = function () {
             text: '粗匣框线',
             icon: <BorderThickBox></BorderThickBox>,
         },
+        "divider",
         {
             value: 'bottomDoubleBorder',
             title: '双底框线',
@@ -97,6 +99,7 @@ export const getBorderEnums = function () {
             value: 'moreBorders',
             title: '其他边框...',
             text: '其他边框...',
+            frozen:true,
             icon: <BorderOther></BorderOther>,
         },
     ];
