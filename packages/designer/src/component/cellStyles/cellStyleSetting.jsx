@@ -316,18 +316,24 @@ function CellStyleSetting(props) {
         } else {
             unMergeCell(spread);
         }
-        setShowEllipsis(spread, isShowEllipsis);
-        setShrinkToFit(spread, isShrinkToFit);
-        setIndentByCounter(spread, indentValue);
+        textHAlignValue !== '分散对齐' &&
+            setShowEllipsis(spread, isShowEllipsis);
 
-        dispatch(
-            setTextOrientation({
-                textOrientation: startDeg,
-                isVerticalText: false,
-            })
-        );
+        textHAlignValue !== '分散对齐' && setShrinkToFit(spread, isShrinkToFit);
+
+        textHAlignValue !== '跨列居中' &&
+            setIndentByCounter(spread, indentValue);
+
+        textHAlignValue !== '跨列居中' &&
+            dispatch(
+                setTextOrientation({
+                    textOrientation: startDeg,
+                    isVerticalText: false,
+                })
+            );
         switch (textHAlignValue) {
             case '常规':
+                if (startDeg < 0) return;
                 dispatch(setHAlign({ hAlign: 0 }));
                 break;
             case '靠左':
@@ -478,46 +484,70 @@ function CellStyleSetting(props) {
     const handleMouseDown = (e) => {
         setRotatable(true);
     };
-
+    const handleMouseLeave = () => {
+        setRotatable(false);
+    };
     const handleMouseMove = (e) => {
         if (!rotatable) return;
-
+        e.stopPropagation();
         // 计算旋转角度
-        const rect = e.target.getBoundingClientRect();
+        // 获取相对容器坐标 解决鼠标获取div变化导致指针横跳
+        const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        console.log('deltaX000 :>> ', centerX);
-        console.log('deltaY000 :>> ', centerY);
+
+        // 使用 Math.atan2 计算角度
         const deltaX = x - centerX;
-        const deltaY = y - centerY;
+        const deltaY = centerY - y;
 
         const radian = Math.atan2(deltaY, deltaX);
         let degree = radian * (180 / Math.PI);
 
-        if (degree > -90 && degree < 90) {
+        // 将角度限制在指定范围内
+        if (degree < -90) {
+            degree += 360; // 将负角度转换为正角度
+        }
+
+        // 设置最小和最大角度，可以根据实际需要进行调整
+        const minDegree = 90;
+        const maxDegree = -90;
+
+        if (degree >= maxDegree && degree <= minDegree) {
+            degree = Math.round(degree);
             setStartDeg(degree);
         }
     };
     const handlePointerClick = (e) => {
+        e.stopPropagation();
         // 计算旋转角度
-        const rect = e.target.getBoundingClientRect();
+        const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
 
+        // 使用 Math.atan2 计算角度
         const deltaX = x - centerX;
-        const deltaY = y - centerY;
-        // console.log('deltaX :>> ', deltaX);
-        // console.log('deltaY :>> ', deltaY);
+        const deltaY = centerY - y;
+
         const radian = Math.atan2(deltaY, deltaX);
         let degree = radian * (180 / Math.PI);
 
-        if (degree > -90 && degree < 90) {
+        // 将角度限制在指定范围内
+        if (degree < -90) {
+            degree += 360; // 将负角度转换为正角度
+        }
+
+        // 设置最小和最大角度，可以根据实际需要进行调整
+        const minDegree = 90;
+        const maxDegree = -90;
+
+        if (degree >= maxDegree && degree <= minDegree) {
+            degree = Math.round(degree);
             setStartDeg(degree);
         }
     };
@@ -882,7 +912,13 @@ function CellStyleSetting(props) {
                                                 />
                                             </div>
                                         </div>
-                                        <div className='textItemRight'>
+                                        <div
+                                            className={
+                                                textHAlignValue === '跨列居中'
+                                                    ? 'disabledIndent'
+                                                    : 'textItemRight'
+                                            }
+                                        >
                                             <span> 缩减：</span>
                                             <Integer
                                                 style={{
@@ -920,7 +956,19 @@ function CellStyleSetting(props) {
                                         ></input>
                                         <span>自动换行</span>
                                     </div>
-                                    <div className='controlItem'>
+                                    <div
+                                        className='controlItem'
+                                        style={{
+                                            pointerEvents:
+                                                textHAlignValue === '分散对齐'
+                                                    ? 'none'
+                                                    : 'unset',
+                                            opacity:
+                                                textHAlignValue === '分散对齐'
+                                                    ? 0.6
+                                                    : 1,
+                                        }}
+                                    >
                                         <input
                                             className='chekbox'
                                             type='checkbox'
@@ -938,7 +986,19 @@ function CellStyleSetting(props) {
                                         ></input>
                                         <span>合并单元格</span>
                                     </div>
-                                    <div className='controlItem'>
+                                    <div
+                                        className='controlItem'
+                                        style={{
+                                            pointerEvents:
+                                                textHAlignValue === '分散对齐'
+                                                    ? 'none'
+                                                    : 'unset',
+                                            opacity:
+                                                textHAlignValue === '分散对齐'
+                                                    ? 0.6
+                                                    : 1,
+                                        }}
+                                    >
                                         <input
                                             className='chekbox'
                                             type='checkbox'
@@ -949,7 +1009,19 @@ function CellStyleSetting(props) {
                                     </div>
                                 </div>
                             </div>
-                            <div className='orientation'>
+                            <div
+                                className='orientation'
+                                style={{
+                                    pointerEvents:
+                                        textHAlignValue === '跨列居中'
+                                            ? 'none'
+                                            : 'unset',
+                                    opacity:
+                                        textHAlignValue === '跨列居中'
+                                            ? 0.6
+                                            : 1,
+                                }}
+                            >
                                 <fieldset
                                     style={{
                                         border: '1px solid lightgray',
@@ -969,13 +1041,14 @@ function CellStyleSetting(props) {
                                                 onMouseUp={handleMouseUp}
                                                 onMouseMove={handleMouseMove}
                                                 onClick={handlePointerClick}
+                                                onMouseLeave={handleMouseLeave}
                                             >
                                                 <div
                                                     draggable={false}
                                                     className='pointsText'
                                                     style={{
                                                         userSelect: 'none',
-                                                        transform: `rotate(${startDeg}deg)`,
+                                                        transform: `rotate(${-startDeg}deg)`,
                                                         transformOrigin:
                                                             'left center',
                                                     }}
@@ -990,6 +1063,11 @@ function CellStyleSetting(props) {
                                                             transform: `rotate(${deg}deg)translateX(${
                                                                 130 / 2
                                                             }px)`,
+                                                            background:
+                                                                startDeg ===
+                                                                -deg
+                                                                    ? 'red'
+                                                                    : 'black',
                                                         }}
                                                     ></div>
                                                 ))}
