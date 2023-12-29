@@ -45,7 +45,7 @@ const FormulaWrap = styled.div`
 const FormulaTitle = styled.div`
     margin-top: -8px;
     margin-left: 8px;
-    width: 5px;
+    width: max-content;
     overflow: visible;
     background-color: #f0f0f0;
 `;
@@ -244,6 +244,7 @@ export default function (props) {
                     title='函数参数'
                     mask={false}
                     onClose={handleDialogClose}
+                    anchor={true}
                     closable={false}
                 >
                     <Wrap>

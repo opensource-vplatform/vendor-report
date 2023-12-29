@@ -36,6 +36,7 @@ const InputWrap = styled.div`
     border: 1px solid #d3d3d3;
     height: 100%;
     background-color: white;
+    cursor:text;
     &:hover {
         border: solid 1px #5292f7;
     }
@@ -70,11 +71,16 @@ export default memo(function (params) {
             ref.current.focus();
         }
     }, [value]);
+    const handleWrapClick = ()=>{
+        if(ref.current){
+            ref.current.focus();
+        }
+    }
     return (
         <Wrap>
             <Title>{title}:</Title>
             <InputArea>
-                <InputWrap>
+                <InputWrap onClick={handleWrapClick}>
                     <Input
                         ref={ref}
                         data-id={id}

@@ -30,6 +30,7 @@ import StatisticalIcon from '@icons/formula/Statistical';
 import TextIcon from '@icons/formula/Text';
 import WebIcon from '@icons/formula/Web';
 
+import { getFormulaMetadata } from '../../metadatas/formula';
 import {
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,
@@ -40,6 +41,14 @@ import FormulaSelector from './FormulaSelector';
 import FormulaSetting from './FormulaSetting';
 
 const INSERT_FORMULA_ITEM_ID = 'insert_$_formula';
+
+const INSERT_FORMULA_MENU_ITEM = {
+    value: INSERT_FORMULA_ITEM_ID,
+    title: '插入函数',
+    text: '插入函数',
+    frozen: true,
+    icon: <FormulaIcon></FormulaIcon>,
+};
 
 const formulaMetadataToDatas = function (formulaMetadatas) {
     const datas = [];
@@ -52,12 +61,7 @@ const formulaMetadataToDatas = function (formulaMetadatas) {
                 icon: <EmptyIcon></EmptyIcon>,
             });
         });
-        datas.push({
-            value: INSERT_FORMULA_ITEM_ID,
-            title: '插入函数',
-            text: '插入函数',
-            icon: <FormulaIcon></FormulaIcon>,
-        });
+        datas.push(INSERT_FORMULA_MENU_ITEM);
     }
     return datas;
 };
@@ -178,6 +182,7 @@ const OtherItem = WithFormulaIcon('其他函数', OtherIcon, [
         children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('web')),
         icon: <WebIcon></WebIcon>,
     },
+    INSERT_FORMULA_MENU_ITEM
 ]);
 
 const Wrap = styled.div`
@@ -209,7 +214,7 @@ const Title = styled.div`
 `;
 
 function AutoSumItem(props) {
-    const { onChange } = props;
+    const { onNodeClick } = props;
     return (
         <Wrap
             style={{
@@ -217,7 +222,7 @@ function AutoSumItem(props) {
                 paddingRight: 4,
             }}
         >
-            <IconWrap onClick={() => onChange('SUM')}>
+            <IconWrap onClick={() => onNodeClick('SUM')}>
                 <CalculationIcon
                     iconStyle={{ width: 28, height: 28 }}
                 ></CalculationIcon>
@@ -255,6 +260,9 @@ export default function () {
         catalog: null,
     });
     const handleShowSelector = () => {
+        if(data.showSetting||data.showSetting){
+            return data;
+        }
         setData((data) => {
             return {
                 ...data,
@@ -303,20 +311,26 @@ export default function () {
                     };
                 });
             } else {
-                updateRecentFormula(menu);
-                setData((data) => {
-                    return {
-                        ...data,
-                        formula: menu,
-                        showSetting: true,
-                    };
-                });
+                const metadata = getFormulaMetadata(menu);
+                if(metadata){
+                    updateRecentFormula(menu);
+                    setData((data) => {
+                        return {
+                            ...data,
+                            formula: menu,
+                            showSetting: true,
+                        };
+                    });
+                }
             }
         };
     };
 
     const handleCalculationFormula = (catalog) => {
         return (menu) => {
+            if(data.showSetting||data.showSetting){
+                return data;
+            }
             if (menu == INSERT_FORMULA_ITEM_ID) {
                 setData((data) => {
                     return {
@@ -366,31 +380,31 @@ export default function () {
                     </VGroupItem>
                     <HLayout>
                         <AutoSumItem
-                            onChange={handleCalculationFormula('all')}
+                            onNodeClick={handleCalculationFormula('all')}
                         ></AutoSumItem>
                         <RecentItem
-                            onChange={handleMenuChange('recent')}
+                            onNodeClick={handleMenuChange('recent')}
                         ></RecentItem>
                         <FinanceItem
-                            onChange={handleMenuChange('financial')}
+                            onNodeClick={handleMenuChange('financial')}
                         ></FinanceItem>
                         <LogicItem
-                            onChange={handleMenuChange('logical')}
+                            onNodeClick={handleMenuChange('logical')}
                         ></LogicItem>
                         <TextItem
-                            onChange={handleMenuChange('text')}
+                            onNodeClick={handleMenuChange('text')}
                         ></TextItem>
                         <DateItem
-                            onChange={handleMenuChange('dateAndTime')}
+                            onNodeClick={handleMenuChange('dateAndTime')}
                         ></DateItem>
                         <SearchItem
-                            onChange={handleMenuChange('lookupAndReference')}
+                            onNodeClick={handleMenuChange('lookupAndReference')}
                         ></SearchItem>
                         <MathItem
-                            onChange={handleMenuChange('mathAndTrigonometry')}
+                            onNodeClick={handleMenuChange('mathAndTrigonometry')}
                         ></MathItem>
                         <OtherItem
-                            onChange={handleMenuChange('all')}
+                            onNodeClick={handleMenuChange('all')}
                         ></OtherItem>
                     </HLayout>
                 </HLayout>
