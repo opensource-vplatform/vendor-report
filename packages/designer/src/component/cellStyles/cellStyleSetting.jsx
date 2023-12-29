@@ -319,7 +319,8 @@ function CellStyleSetting(props) {
         textHAlignValue !== '分散对齐' &&
             setShowEllipsis(spread, isShowEllipsis);
 
-        textHAlignValue !== '分散对齐' && setShrinkToFit(spread, isShrinkToFit);
+        (textHAlignValue !== '分散对齐' || !isWrapText) &&
+            setShrinkToFit(spread, isShrinkToFit);
 
         textHAlignValue !== '跨列居中' &&
             setIndentByCounter(spread, indentValue);
@@ -960,11 +961,13 @@ function CellStyleSetting(props) {
                                         className='controlItem'
                                         style={{
                                             pointerEvents:
-                                                textHAlignValue === '分散对齐'
+                                                textHAlignValue ===
+                                                    '分散对齐' || isWrapText
                                                     ? 'none'
                                                     : 'unset',
                                             opacity:
-                                                textHAlignValue === '分散对齐'
+                                                textHAlignValue ===
+                                                    '分散对齐' || isWrapText
                                                     ? 0.6
                                                     : 1,
                                         }}
