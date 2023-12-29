@@ -14,31 +14,45 @@ import {
 
 const CATALOG_MAP_FORMULA_METADATA = {};
 
-export const getFormulaMetadatasByCatalog = function (catalog) {
-    let cache = CATALOG_MAP_FORMULA_METADATA[catalog];
-    if (!cache) {
-        const formulaMetadatas = [];
-        if (catalog == 'all') {
-            const metadatas = getFormulaMetadatas();
-            for (let [code, metadata] of Object.entries(metadatas)) {
+const getAllFormulaMetadatas = function () {
+    const formulaMetadatas = [];
+    const metadatas = getFormulaMetadatas();
+    for (let [code, metadata] of Object.entries(metadatas)) {
+        formulaMetadatas.push({
+            ...metadata,
+            code,
+        });
+    }
+    return formulaMetadatas;
+};
+
+const getFormulaMetadatasWithCatalog = function (catalog) {
+    const formulaMetadatas = [];
+    const formlaCodes = getFormulasByCatalog(catalog);
+    if (formlaCodes && formlaCodes.length > 0) {
+        formlaCodes.forEach((code) => {
+            const metadata = getFormulaMetadata(code);
+            if (metadata) {
                 formulaMetadatas.push({
                     ...metadata,
                     code,
                 });
             }
+        });
+    }
+    return formulaMetadatas;
+};
+
+export const getFormulaMetadatasByCatalog = function (catalog) {
+    let cache = CATALOG_MAP_FORMULA_METADATA[catalog];
+    if (!cache) {
+        let formulaMetadatas = [];
+        if (catalog == 'all') {
+            formulaMetadatas = getAllFormulaMetadatas();
+        } else if (catalog == 'recent') {
+            formulaMetadatas = getRecentFormulaMetadatas();
         } else {
-            const formlaCodes = getFormulasByCatalog(catalog);
-            if (formlaCodes && formlaCodes.length > 0) {
-                formlaCodes.forEach((code) => {
-                    const metadata = getFormulaMetadata(code);
-                    if (metadata) {
-                        formulaMetadatas.push({
-                            ...metadata,
-                            code,
-                        });
-                    }
-                });
-            }
+            formulaMetadatas = getFormulaMetadatasWithCatalog(catalog);
         }
         cache = formulaMetadatas;
         CATALOG_MAP_FORMULA_METADATA[catalog] = cache;

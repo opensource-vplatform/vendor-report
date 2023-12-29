@@ -1,7 +1,7 @@
 import BaseIcon from '../base/BaseIcon';
 
 /**
- * 填充颜色
+ * 计算
  * @param {} props 
  * @returns 
  */

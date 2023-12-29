@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useMemo, useState } from 'react';
+import { Fragment } from 'react';
 
 import styled from 'styled-components';
 
@@ -18,7 +18,15 @@ const Empty = styled.div`
     align-items: center;
     justify-content: center;
 `;
-
+/**
+ * 生成下一个名称
+ * name->name1
+ * name1->name2
+ * [name]->[name1]
+ * [name1]->[name2]
+ * @param {*} name
+ * @returns
+ */
 const nextName = function (name) {
     let nameStr = name.trim();
     const isBrack = nameStr.startsWith('[') && nameStr.endsWith(']');
@@ -47,17 +55,26 @@ const nextName = function (name) {
 };
 
 export default function (props) {
-    const { metadata } = props;
+    const { data,setData } = props;
     let children = null;
-    const [data, setData] = useState(() => {
+    /*const [data, setData] = useState(() => {
         const args = metadata.args || [];
         return {
             current: 0,
             args: args.map((arg) => {
-                return { ...arg };
+                return { ...arg, exp: '' };
             }),
         };
-    });
+    });*/
+    const handleIconClick = (evt,id)=>{
+        setData(data=>{
+            return {
+                ...data,
+                current:id,
+                mode:'rangSelect'
+            }
+        });
+    }
     const handleArgFocus = (evt) => {
         const target = evt.target;
         const index = parseInt(target.dataset.id);
@@ -84,13 +101,25 @@ export default function (props) {
                 }
                 return {
                     ...data,
+                    current: index,
                     args: [...newArgs, ...dynamicArgs],
                 };
             } else {
-                return data;
+                return { ...data, current: index };
             }
         });
     };
+    const handleInput = (evt)=>{
+        const target = evt.target;
+        const current = data.current;
+        const arg = data.args[current];
+        const newArg = {...arg,exp:target.value};
+        data.args[current] = newArg;
+        setData({
+            ...data,
+            args:data.args
+        });
+    }
     if (data.args.length == 0) {
         children = <Empty>该函数不需要参数。</Empty>;
     } else {
@@ -100,7 +129,11 @@ export default function (props) {
                     <FormulaArg
                         title={arg.name}
                         id={index}
+                        focus={data.current == index}
+                        value={arg.exp}
+                        onIconClick = {handleIconClick}
                         onFocus={handleArgFocus}
+                        onInput={handleInput}
                     ></FormulaArg>
                 </Fragment>
             );

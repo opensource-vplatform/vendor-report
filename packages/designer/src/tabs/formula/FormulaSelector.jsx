@@ -18,6 +18,7 @@ import {
   filterFormula,
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,
+  updateRecentFormula,
 } from '../../utils/formulaUtil';
 import {
   ButtonWrap,
@@ -162,6 +163,7 @@ export default function (props) {
         }
     };
     const handleFormulaSelect = () => {
+        updateRecentFormula(data.formula);
         onSelect(data.formula);
     };
     const metadata = getFormulaMetadata(data.formula);
