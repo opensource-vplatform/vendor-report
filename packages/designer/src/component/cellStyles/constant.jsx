@@ -173,6 +173,19 @@ export const CustomFormats = [
     '# ?/8',
 ];
 
+export const TextAlignmentHorizontal = [
+    { value: '常规', title: '常规', text: '常规' },
+    { value: '靠左', title: '靠左', text: '靠左' },
+    { value: '靠右', title: '靠右', text: '靠右' },
+    { value: '跨列居中', title: '跨列居中', text: '跨列居中' },
+    { value: '分散对齐', title: '分散对齐', text: '分散对齐' },
+];
+export const TextAlignmentVertical = [
+    { value: '靠上', title: '靠上', text: '靠上' },
+    { value: '居中', title: '居中', text: '居中' },
+    { value: '靠下', title: '靠下', text: '靠下' },
+];
+
 export const IconType = {
     None: 0,
     Hair: 7,

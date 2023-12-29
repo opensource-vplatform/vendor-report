@@ -304,6 +304,21 @@ export function setIndent(spread, delta) {
 }
 
 /**
+ * 设置缩进值(不叠加历史缩进值)
+ * @param {*} spread
+ * @param {*} delta
+ */
+export function setIndentByCounter(spread, indentNumber) {
+    withBatchUpdate(spread, (sheet) => {
+        applyToSelectedCell(sheet, (sheet, row, col) => {
+            const style = sheet.getActualStyle(row, col);
+            style.textIndent = indentNumber;
+            sheet.setStyle(row, col, style);
+        });
+    });
+}
+
+/**
  * 合并居中
  * @param {*} params
  */

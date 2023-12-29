@@ -38,14 +38,31 @@ import {
     LocaleType,
     SpecialFormats,
     TimeFormats,
+    TextAlignmentHorizontal,
+    TextAlignmentVertical,
 } from './constant';
 import Icon from './lineIcon';
-import { setBorderByType } from '@utils/fontUtil.js';
+import {
+    setBorderByType,
+    mergeCells,
+    unMergeCell,
+    setAlign,
+    setIndentByCounter,
+} from '@utils/fontUtil.js';
 import {
     setBorderColor,
     setTabValueCellSetting,
     setIsOpenCellSetting,
 } from '@store/borderSlice/borderSlice';
+
+import {
+    setHAlign,
+    setTextOrientation,
+    setVAlign,
+    setWordWrap,
+} from '@store/fontSlice/fontSlice.js';
+
+import { setShowEllipsis, setShrinkToFit } from '@utils/borderUtil.js';
 
 function CellStyleSetting(props) {
     let firstCellValue = null;
@@ -80,6 +97,8 @@ function CellStyleSetting(props) {
     const [isMergeCells, setIsMergeCells] = useState(false);
     const [isShowEllipsis, setIsShowEllipsis] = useState(false);
     const [indentValue, setIndentValue] = useState(0);
+    const [textHAlignValue, setTextHAlignValue] = useState('常规');
+    const [textVAlignValue, setTextVAlignValue] = useState('靠上');
     const directions = [
         -90, -75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75, 90,
     ];
@@ -290,6 +309,60 @@ function CellStyleSetting(props) {
         diagonalUpLine &&
             setBorderByType(spread, 'diagonalUpLine', lineColor, lineType);
 
+        dispatch(setWordWrap({ wordWrap: isWrapText }));
+
+        if (isMergeCells) {
+            mergeCells(spread);
+        } else {
+            unMergeCell(spread);
+        }
+        setShowEllipsis(spread, isShowEllipsis);
+        setShrinkToFit(spread, isShrinkToFit);
+        setIndentByCounter(spread, indentValue);
+
+        dispatch(
+            setTextOrientation({
+                textOrientation: startDeg,
+                isVerticalText: false,
+            })
+        );
+        switch (textHAlignValue) {
+            case '常规':
+                dispatch(setHAlign({ hAlign: 0 }));
+                break;
+            case '靠左':
+                dispatch(setHAlign({ hAlign: 0 }));
+                break;
+            case '居中':
+                dispatch(setHAlign({ hAlign: 1 }));
+                break;
+            case '靠右':
+                dispatch(setHAlign({ hAlign: 2 }));
+                break;
+            case '跨列居中':
+                dispatch(setHAlign({ hAlign: 4 }));
+                break;
+            case '分散对齐':
+                dispatch(setHAlign({ hAlign: 3 }));
+                break;
+            default:
+                break;
+        }
+        switch (textVAlignValue) {
+            case '靠上':
+                dispatch(setVAlign({ vAlign: 0 }));
+                break;
+            case '居中':
+                dispatch(setVAlign({ vAlign: 1 }));
+                break;
+            case '靠下':
+                dispatch(setVAlign({ vAlign: 2 }));
+                break;
+
+            default:
+                break;
+        }
+
         // 初始化
         setBorderBottom(false);
         setBorderTop(false);
@@ -385,6 +458,14 @@ function CellStyleSetting(props) {
     const handleShowEllipsis = (event) => {
         setIsShowEllipsis(event.target.checked);
     };
+
+    const handleSelectTextHAlign = (value) => {
+        setTextHAlignValue(value);
+    };
+    const handleSelectTextVAlign = (value) => {
+        setTextVAlignValue(value);
+    };
+
     // 处理缩减位数
     const handleIndent = (value) => {
         setIndentValue(value);
@@ -408,12 +489,14 @@ function CellStyleSetting(props) {
 
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-
+        console.log('deltaX000 :>> ', centerX);
+        console.log('deltaY000 :>> ', centerY);
         const deltaX = x - centerX;
         const deltaY = y - centerY;
 
         const radian = Math.atan2(deltaY, deltaX);
-        const degree = radian * (180 / Math.PI);
+        let degree = radian * (180 / Math.PI);
+
         if (degree > -90 && degree < 90) {
             setStartDeg(degree);
         }
@@ -429,9 +512,11 @@ function CellStyleSetting(props) {
 
         const deltaX = x - centerX;
         const deltaY = y - centerY;
-
+        // console.log('deltaX :>> ', deltaX);
+        // console.log('deltaY :>> ', deltaY);
         const radian = Math.atan2(deltaY, deltaX);
-        const degree = radian * (180 / Math.PI);
+        let degree = radian * (180 / Math.PI);
+
         if (degree > -90 && degree < 90) {
             setStartDeg(degree);
         }
@@ -439,7 +524,6 @@ function CellStyleSetting(props) {
 
     const handleMouseUp = () => {
         setRotatable(false);
-        console.log('1 :>> ', 1);
     };
 
     useEffect(() => {
@@ -762,7 +846,9 @@ function CellStyleSetting(props) {
                                             <div className='textItem'>
                                                 <span> 水平对齐: </span>
                                                 <Select
-                                                    datas={AccountingSymbol}
+                                                    datas={
+                                                        TextAlignmentHorizontal
+                                                    }
                                                     style={{
                                                         width: '160px',
                                                         height: '24px',
@@ -771,15 +857,17 @@ function CellStyleSetting(props) {
                                                         width: '99%',
                                                     }}
                                                     onChange={
-                                                        handleSelectSymbolChange
+                                                        handleSelectTextHAlign
                                                     }
-                                                    value={selectedSymbol}
+                                                    value={textHAlignValue}
                                                 />
                                             </div>
                                             <div className='textItem'>
                                                 <span> 垂直对齐: </span>
                                                 <Select
-                                                    datas={AccountingSymbol}
+                                                    datas={
+                                                        TextAlignmentVertical
+                                                    }
                                                     style={{
                                                         width: '160px',
                                                         height: '24px',
@@ -788,9 +876,9 @@ function CellStyleSetting(props) {
                                                         width: '99%',
                                                     }}
                                                     onChange={
-                                                        handleSelectSymbolChange
+                                                        handleSelectTextVAlign
                                                     }
-                                                    value={selectedSymbol}
+                                                    value={textVAlignValue}
                                                 />
                                             </div>
                                         </div>
@@ -874,14 +962,14 @@ function CellStyleSetting(props) {
                                         <div className='orientationText'>
                                             <span>文本</span>
                                         </div>
-                                        <div
-                                            className='pointer'
-                                            onMouseDown={handleMouseDown}
-                                            onMouseUp={handleMouseUp}
-                                            onMouseMove={handleMouseMove}
-                                            onClick={handlePointerClick}
-                                        >
-                                            <div className='fixed-points'>
+                                        <div className='pointer'>
+                                            <div
+                                                className='fixed-points'
+                                                onMouseDown={handleMouseDown}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseMove={handleMouseMove}
+                                                onClick={handlePointerClick}
+                                            >
                                                 <div
                                                     draggable={false}
                                                     className='pointsText'
