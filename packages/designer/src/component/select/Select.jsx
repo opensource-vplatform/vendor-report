@@ -63,15 +63,17 @@ export default function (props) {
     useEffect(() => {
         setData(valueToData(value,datas));
     }, [value]);
-    const handleChange = useCallback((value)=>{
-        setData(valueToData(value,datas));
-        onChange&&onChange(value);
+    const handleChange = useCallback((val)=>{
+        if(val!==value){
+            setData(valueToData(val,datas));
+            onChange&&onChange(val);
+        }
     });
     return (
         <Menu
             datas={datas}
             optionStyle={optionStyle}
-            onChange={handleChange}
+            onNodeClick={handleChange}
             lineIndexs={lineIndexs}
             cancelAble={cancelAble}
             cancelValue={cancelValue}
