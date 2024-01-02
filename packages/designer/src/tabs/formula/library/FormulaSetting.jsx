@@ -15,13 +15,13 @@ import {
   bind,
   EVENTS,
   unbind,
-} from '../../event/EventManager';
-import { withBatchUpdate } from '../../utils/spreadUtil';
+} from '../../../event/EventManager';
+import { withBatchUpdate } from '../../../utils/spreadUtil';
 import {
   ButtonWrap,
   FormulaButton,
   FormulaDesc,
-} from './Components';
+} from '../Components';
 import FormulaArgs from './FormulaArgs';
 import FormulaExample from './FormulaExample';
 import RangSelector from './RangSelector';

@@ -9,22 +9,22 @@ import Dialog from '@components/dialog/Index';
 import { Highlight } from '@components/highlight/Index';
 import Select from '@components/select/Index';
 
-import List from '../../component/list/List';
+import List from '../../../component/list/List';
 import {
   getCatalogs,
   getFormulaMetadata,
-} from '../../metadatas/formula';
+} from '../../../metadatas/formula';
 import {
   filterFormula,
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,
   updateRecentFormula,
-} from '../../utils/formulaUtil';
+} from '../../../utils/formulaUtil';
 import {
   ButtonWrap,
   FormulaButton,
   FormulaDesc,
-} from './Components';
+} from '../Components';
 import FormulaExample from './FormulaExample';
 
 const Wrap = styled.div`

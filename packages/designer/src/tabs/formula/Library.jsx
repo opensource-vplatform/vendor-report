@@ -29,16 +29,17 @@ import SearchIcon from '@icons/formula/Search';
 import StatisticalIcon from '@icons/formula/Statistical';
 import TextIcon from '@icons/formula/Text';
 import WebIcon from '@icons/formula/Web';
-
-import { getFormulaMetadata } from '../../metadatas/formula';
+import { getFormulaMetadata } from '@metadatas/formula';
 import {
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,
   setAutoFormula,
   updateRecentFormula,
-} from '../../utils/formulaUtil';
-import FormulaSelector from './FormulaSelector';
-import FormulaSetting from './FormulaSetting';
+} from '@utils/formulaUtil';
+
+import { WithIconMenu } from './Components';
+import FormulaSelector from './library/FormulaSelector';
+import FormulaSetting from './library/FormulaSetting';
 
 const INSERT_FORMULA_ITEM_ID = 'insert_$_formula';
 
@@ -66,113 +67,65 @@ const formulaMetadataToDatas = function (formulaMetadatas) {
     return datas;
 };
 
-const WithFormulaMetadataIcon = function (title, Icon, formulaMetadatas) {
-    return (props) => {
-        const metadatas =
-            typeof formulaMetadatas == 'function'
-                ? formulaMetadatas()
-                : formulaMetadatas;
-        return metadatas.length == 0 ? null : (
-            <FormulaItemIcon
-                title={title}
-                icon={Icon}
-                datas={formulaMetadataToDatas(metadatas)}
-                {...props}
-            ></FormulaItemIcon>
-        );
-    };
-};
-
-const FormulaItemIcon = function (props) {
-    const { title, datas } = props;
-    const Icon = props.icon;
-    return (
-        <Menu
-            datas={datas}
-            frozien={-1}
-            optionStyle={{ marginTop: 45, marginLeft: 4 }}
-            {...props}
-        >
-            <VItem
-                title={title}
-                style={{
-                    paddingLeft: 4,
-                    paddingRight: 4,
-                }}
-                icon={<Icon iconStyle={{ width: 28, height: 28 }}></Icon>}
-            >
-                <ArrowDownIcon
-                    style={{
-                        width: 16,
-                        height: 16,
-                    }}
-                ></ArrowDownIcon>
-            </VItem>
-        </Menu>
-    );
-};
-
-const WithFormulaIcon = function(title,icon,datas){
-    return (props)=>{
-        return <FormulaItemIcon title={title} icon={icon} datas={datas} {...props}></FormulaItemIcon>
-    }
-}
-
-const RecentItem = WithFormulaMetadataIcon(
-    '最近使用',
-    RecentIcon,
-    getRecentFormulaMetadatas
+const RecentItem = WithIconMenu('最近使用', RecentIcon, () =>
+    formulaMetadataToDatas(getRecentFormulaMetadatas())
 );
-const FinanceItem = WithFormulaMetadataIcon(
+const FinanceItem = WithIconMenu(
     '财务',
     FinanceIcon,
-    getFormulaMetadatasByCatalog('financial')
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
 );
-const LogicItem = WithFormulaMetadataIcon(
+const LogicItem = WithIconMenu(
     '逻辑',
     LogicIcon,
-    getFormulaMetadatasByCatalog('logical')
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('logical'))
 );
-const TextItem = WithFormulaMetadataIcon(
+const TextItem = WithIconMenu(
     '文本',
     TextIcon,
-    getFormulaMetadatasByCatalog('financial')
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
 );
-const DateItem = WithFormulaMetadataIcon(
+const DateItem = WithIconMenu(
     '日期和时间',
     DateIcon,
-    getFormulaMetadatasByCatalog('financial')
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
 );
-const SearchItem = WithFormulaMetadataIcon(
+const SearchItem = WithIconMenu(
     '查找与引用',
     SearchIcon,
-    getFormulaMetadatasByCatalog('financial')
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
 );
-const MathItem = WithFormulaMetadataIcon(
+const MathItem = WithIconMenu(
     '数学和三角函数',
     MathIcon,
-    getFormulaMetadatasByCatalog('financial')
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
 );
-const OtherItem = WithFormulaIcon('其他函数', OtherIcon, [
+const OtherItem = WithIconMenu('其他函数', OtherIcon, [
     {
         value: 'statistical',
         title: '统计',
         text: '统计',
-        children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('statistical')),
-        icon: <StatisticalIcon></StatisticalIcon>
+        children: formulaMetadataToDatas(
+            getFormulaMetadatasByCatalog('statistical')
+        ),
+        icon: <StatisticalIcon></StatisticalIcon>,
     },
     {
         value: 'engineering',
         title: '工程',
         text: '工程',
-        children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('engineering')),
+        children: formulaMetadataToDatas(
+            getFormulaMetadatasByCatalog('engineering')
+        ),
         icon: <EngineeringIcon></EngineeringIcon>,
     },
     {
         value: 'information',
         title: '信息',
         text: '信息',
-        children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('information')),
+        children: formulaMetadataToDatas(
+            getFormulaMetadatasByCatalog('information')
+        ),
         icon: <InformationIcon></InformationIcon>,
     },
     {
@@ -182,7 +135,7 @@ const OtherItem = WithFormulaIcon('其他函数', OtherIcon, [
         children: formulaMetadataToDatas(getFormulaMetadatasByCatalog('web')),
         icon: <WebIcon></WebIcon>,
     },
-    INSERT_FORMULA_MENU_ITEM
+    INSERT_FORMULA_MENU_ITEM,
 ]);
 
 const Wrap = styled.div`
@@ -260,7 +213,7 @@ export default function () {
         catalog: null,
     });
     const handleShowSelector = () => {
-        if(data.showSetting||data.showSetting){
+        if (data.showSetting || data.showSetting) {
             return data;
         }
         setData((data) => {
@@ -312,7 +265,7 @@ export default function () {
                 });
             } else {
                 const metadata = getFormulaMetadata(menu);
-                if(metadata){
+                if (metadata) {
                     updateRecentFormula(menu);
                     setData((data) => {
                         return {
@@ -328,7 +281,7 @@ export default function () {
 
     const handleCalculationFormula = (catalog) => {
         return (menu) => {
-            if(data.showSetting||data.showSetting){
+            if (data.showSetting || data.showSetting) {
                 return data;
             }
             if (menu == INSERT_FORMULA_ITEM_ID) {
@@ -401,7 +354,9 @@ export default function () {
                             onNodeClick={handleMenuChange('lookupAndReference')}
                         ></SearchItem>
                         <MathItem
-                            onNodeClick={handleMenuChange('mathAndTrigonometry')}
+                            onNodeClick={handleMenuChange(
+                                'mathAndTrigonometry'
+                            )}
                         ></MathItem>
                         <OtherItem
                             onNodeClick={handleMenuChange('all')}

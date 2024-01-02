@@ -5,6 +5,7 @@ const IconWrap = styled.label`
     display: flex;
     cursor:pointer;
     align-items: center;
+
     &:hover {
         background-color: #dadada;
     }
@@ -17,14 +18,10 @@ const IconWrap = styled.label`
     }
 `;
 
-const Icon = styled.div`
-    height: 8px;
-    width: 8px;
-    padding: 4px;
-    margin: 4px;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 100%;
+const Icon = styled.svg`
+    height: 24px;
+    width: 24px;
+    fill: currentColor;
 `;
 
 function Index(pros) {
@@ -39,7 +36,7 @@ function Index(pros) {
         <IconWrap title={tips} onClick={onClick} style={st} data-disabled={disabled}>
             <Icon
                 style={icSt}
-            ></Icon>
+            ><path d={icon}></path></Icon>
             {children}
         </IconWrap>
     );
