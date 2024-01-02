@@ -54,7 +54,7 @@ function tableMerge(params) {
         let direction = GCsheets.AutoMerge.AutoMergeDirection.column; //1
         let mode = GCsheets.AutoMerge.AutoMergeMode.free; //0
         let sheetArea = GCsheets.SheetArea.viewport; //3
-        let selectionMode = GCsheets.AutoMerge.SelectionMode.source; //0
+        let selectionMode = GCsheets.AutoMerge.SelectionMode.merged; //0
 
         if (rowMerge && columnMerge) {
             direction = GCsheets.AutoMerge.AutoMergeDirection.rowColumn; //值等于4。在行方向上优先于列方向应用自动合并
