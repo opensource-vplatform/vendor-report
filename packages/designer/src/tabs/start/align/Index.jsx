@@ -1,16 +1,13 @@
 import { useEffect } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
-  GroupItem,
-  HLayout,
-  ItemList,
-  VGroupItem,
+    GroupItem,
+    HLayout,
+    ItemList,
+    VGroupItem,
 } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Index';
@@ -27,28 +24,28 @@ import DecreaseIndent from '@icons/indent/DecreaseIndent.jsx';
 import IncreaseIndent from '@icons/indent/IncreaseIndent.jsx';
 import MergeCenter from '@icons/merge/MergeCenter';
 import {
-  directionToStyles,
-  getWordDirections,
-  valueToEnum,
+    directionToStyles,
+    getWordDirections,
+    valueToEnum,
 } from '@metadatas/direction';
 import { getMergeTypes } from '@metadatas/merge';
 import {
-  setIsOpenCellSetting,
-  setTabValueCellSetting,
+    setIsOpenCellSetting,
+    setTabValueCellSetting,
 } from '@store/borderSlice/borderSlice';
 import {
-  setHAlign,
-  setTextOrientation,
-  setVAlign,
-  setWordWrap,
+    setHAlign,
+    setTextOrientation,
+    setVAlign,
+    setWordWrap,
 } from '@store/fontSlice/fontSlice.js';
 import {
-  mergeAcross,
-  mergeCells,
-  mergeCenter,
-  setAlign,
-  setIndent,
-  unMergeCell,
+    mergeAcross,
+    mergeCells,
+    mergeCenter,
+    setAlign,
+    setIndent,
+    unMergeCell,
 } from '@utils/fontUtil.js';
 
 const Label = styled.span`
@@ -152,7 +149,13 @@ export default function FontAlign() {
         });
     }, [vAlign, hAlign, textOrientation, isVerticalText, wordWrap]);
     return (
-        <GroupItem title='对齐方式' onMore={() => {}}>
+        <GroupItem
+            title='对齐方式'
+            onMore={() => {
+                dispatch(setTabValueCellSetting('对齐'));
+                dispatch(setIsOpenCellSetting(true));
+            }}
+        >
             <HLayout>
                 <VGroupItem>
                     <ItemList>

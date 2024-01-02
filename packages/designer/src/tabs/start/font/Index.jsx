@@ -1,15 +1,9 @@
 import { useEffect } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import ColorEditor from '@components/color/Index';
-import {
-  GroupItem,
-  ItemList,
-} from '@components/group/Index';
+import { GroupItem, ItemList } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Menu.jsx';
 import Select from '@components/select/Index';
@@ -24,34 +18,30 @@ import ForeColor from '@icons/font/ForeColor';
 import Italic from '@icons/font/Italic';
 import Underline from '@icons/font/Underline';
 import { getBorderEnums } from '@metadatas/border';
+import { getFontFamilies, getFontSizes } from '@metadatas/font';
 import {
-  getFontFamilies,
-  getFontSizes,
-} from '@metadatas/font';
-import {
-  setIsOpenCellSetting,
-  setTabValueCellSetting,
+    setIsOpenCellSetting,
+    setTabValueCellSetting,
 } from '@store/borderSlice/borderSlice';
 import {
-  setBackColor,
-  setFontFamily,
-  setFontSize,
-  setFontStyle,
-  setFontWeight,
-  setForeColor,
-  setTextDecoration,
+    setBackColor,
+    setFontFamily,
+    setFontSize,
+    setFontStyle,
+    setFontWeight,
+    setForeColor,
+    setTextDecoration,
 } from '@store/fontSlice/fontSlice.js';
 import {
-  decreasedFontSize,
-  increasedFontSize,
-  isDoubleUnderline,
-  isUnderline,
-  setBorderByType,
-  setFont,
-  toDoubleUnderline,
-  toUnderline,
+    decreasedFontSize,
+    increasedFontSize,
+    isDoubleUnderline,
+    isUnderline,
+    setBorderByType,
+    setFont,
+    toDoubleUnderline,
+    toUnderline,
 } from '@utils/fontUtil.js';
-
 export default function () {
     const dispatch = useDispatch();
     const {
@@ -165,7 +155,13 @@ export default function () {
         foreColor,
     ]);
     return (
-        <GroupItem title='字体' onMore={() => {}}>
+        <GroupItem
+            title='字体'
+            onMore={() => {
+                dispatch(setTabValueCellSetting('边框'));
+                dispatch(setIsOpenCellSetting(true));
+            }}
+        >
             <ItemList>
                 <Select
                     datas={fontFamilies}
