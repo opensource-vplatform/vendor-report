@@ -1,18 +1,81 @@
 let textFieldIndex = 0;
-function getStyle(params) {
-    const { row, col, dataTable } = params;
-    return dataTable?.[row]?.[col]?.['style'];
-}
-
 let defaultHeight = 20;
 let defaultWidth = 62;
+
+function getStyle(params) {
+    const { row, col, dataTable } = params;
+    const baseStyle = dataTable?.[row]?.[col]?.['style'] || {};
+    const { rowCount, colCount } = getCellRange(params);
+
+    //如果单元格纵向合并，则获取合并区域的末尾行单元格下边框的样式作为合并区域的下边框样式
+    if (rowCount > 1) {
+        const bottomStyle =
+            dataTable?.[row + rowCount - 1]?.[col]?.['style'] || {};
+        if (bottomStyle.hasOwnProperty('borderBottom')) {
+            baseStyle.borderBottom = bottomStyle.borderBottom;
+        }
+    }
+
+    //如果单元格纵向合并，则获取合并区域的末尾列单元格右边框的样式作为合并区域的右边框样式
+    if (colCount > 1) {
+        const rightStyle =
+            dataTable?.[row]?.[col + colCount - 1]?.['style'] || {};
+        if (rightStyle.hasOwnProperty('borderRight')) {
+            baseStyle.borderRight = rightStyle.borderRight;
+        }
+    }
+    return { ...baseStyle };
+}
+
+function getCellRange(params) {
+    const { row, col, spans = [] } = params;
+    return (
+        spans.find(function ({ row: _row, col: _col }) {
+            return _row === row && _col === col;
+        }) || {
+            row,
+            col,
+            rowCount: 1,
+            colCount: 1,
+        }
+    );
+}
+
+//获取单元格宽高
+function getExtent(params) {
+    const { rowsSize, columnsSize } = params;
+
+    const { row, col, rowCount, colCount } = getCellRange(params);
+
+    //单元格高度
+    let height = 0;
+    let startRow = row;
+    let endRow = row + rowCount;
+    while (startRow < endRow) {
+        height += rowsSize?.[startRow++]?.size || defaultHeight;
+    }
+
+    //单元格宽度
+    let width = 0;
+    let startCol = col;
+    let endCol = col + colCount;
+    while (startCol < endCol) {
+        width += columnsSize?.[startCol++]?.size || defaultWidth;
+    }
+
+    return {
+        height,
+        width,
+    };
+}
+
 function getRect(params) {
-    const { row, col, rowsSize, columnsSize } = params;
-    const height = rowsSize?.[row]?.size || defaultHeight;
-    const width = columnsSize?.[col]?.size || defaultWidth;
+    const { row, col, rowsSize, columnsSize, boxStartRow = 0 } = params;
+
+    const { height, width } = getExtent(params);
 
     let y = 0;
-    let rowIndex = 0;
+    let rowIndex = boxStartRow;
     while (rowIndex < row) {
         y += rowsSize?.[rowIndex++]?.size || defaultHeight;
     }
@@ -46,7 +109,7 @@ function calculateHeight(params) {
     return height;
 }
 
-function gengenFields(params) {
+function genFields(params) {
     const fields = [];
     const { tables } = params;
 
@@ -104,7 +167,7 @@ function genFieldDescription(params) {
     return {
         fieldDescription: {
             props: {},
-            value: dataField,
+            staticValue: dataField,
         },
     };
 }
@@ -133,7 +196,7 @@ function genParameter(params) {
         parameter: {
             props: {
                 name: code,
-                isForPrompting: 'false',
+                isForPrompting: true,
                 class: getType(type),
             },
         },
@@ -212,41 +275,70 @@ function genColumnFooter(params) {
     return {
         columnFooter: {
             childrens: [band],
+            rect: band.band.bandRect,
         },
     };
 }
 
-//以表格作为参照，表格结束行作为底部的开始行
-function genColumnFooterBand(params) {
-    const { tables, dataTable, rowsSize } = params;
-    const { row, rowCount } = tables[0];
-    const endRow = row + rowCount;
-
+//适用头部和尾部
+function _genBand(params) {
+    const { dataTable, rowsSize, condition } = params;
     const childrens = [];
 
     //标记band的起始行与结束行
-    let footerStartRow = null;
-    let footerEndRow = null;
+    let boxStartRow = null;
+    let boxEndRow = null;
+
+    //标记band的其实列与结束列
+    let boxEndCol = null;
+    let boxStartCol = null;
 
     Object.entries(dataTable).forEach(function ([_row_, value]) {
         const _row = Number(_row_);
-        if (_row > endRow) {
+        if (condition(_row)) {
             Object.entries(value).forEach(function ([
                 col,
                 { value, bindingPath, style },
             ]) {
                 if (value || bindingPath) {
-                    if (footerStartRow === null) {
-                        footerStartRow = _row;
+                    const _col = Number(col);
+
+                    //起始行
+                    if (boxStartRow === null) {
+                        boxStartRow = _row;
                     }
-                    footerEndRow = _row;
-                    const textField = genTextField({
+
+                    //结束行
+                    boxEndRow = _row;
+
+                    //结束列
+                    if (boxEndCol === null) {
+                        boxEndCol = _col;
+                    }
+                    if (_col > boxEndCol) {
+                        boxEndCol = _col;
+                    }
+
+                    //起始列
+                    if (boxStartCol === null) {
+                        boxStartCol = _col;
+                    }
+                    if (_col < boxStartCol) {
+                        boxStartCol = _col;
+                    }
+
+                    const _params = {
                         ...params,
                         row: _row,
-                        col: Number(col),
-                        style,
+                        col: _col,
                         dataField: bindingPath,
-                    });
+                        staticValue: value,
+                        boxStartRow,
+                    };
+
+                    _params.style = getStyle(_params);
+
+                    const textField = genTextField(_params);
                     childrens.push(textField);
                 }
             });
@@ -255,8 +347,8 @@ function genColumnFooterBand(params) {
 
     //计算band高度
     const height = calculateHeight({
-        startRow: footerStartRow,
-        endRow: footerEndRow,
+        startRow: boxStartRow,
+        endRow: boxEndRow,
         rowsSize,
     });
 
@@ -264,8 +356,26 @@ function genColumnFooterBand(params) {
         band: {
             props: { height, isSplitAllowed: 'false' },
             childrens,
+            bandRect: {
+                startRow: boxStartRow,
+                startCol: boxStartCol,
+                endRow: boxEndRow,
+                endCol: boxEndCol,
+            },
         },
     };
+}
+
+//以表格作为参照，表格结束行作为底部的开始行
+function genColumnFooterBand(params) {
+    const { tables } = params;
+    const { row, rowCount } = tables[0];
+    const endRow = row + rowCount - 1;
+    function condition(row) {
+        return row > endRow;
+    }
+    debugger;
+    return _genBand({ ...params, condition });
 }
 
 //头部
@@ -274,59 +384,20 @@ function genPageHeader(params) {
     return {
         pageHeader: {
             childrens: [band],
+            rect: band.band.bandRect,
         },
     };
 }
 
 //以表格作为参照，表格开始行作为头部的结束行
 function genPageHeaderBand(params) {
-    const { tables, dataTable, rowsSize } = params;
-    const { row } = tables[0];
+    const { tables } = params;
+    const { row: endRow } = tables[0];
+    function condition(row) {
+        return row < endRow;
+    }
 
-    const childrens = [];
-
-    //标记头部的起始行与结束行
-    let headerStartRow = null;
-    let headerEndRow = null;
-
-    Object.entries(dataTable).forEach(function ([_row_, value]) {
-        const _row = Number(_row_);
-        if (_row < row) {
-            Object.entries(value).forEach(function ([
-                col,
-                { value, bindingPath, style },
-            ]) {
-                if (value || bindingPath) {
-                    if (headerStartRow === null) {
-                        headerStartRow = _row;
-                    }
-                    headerEndRow = _row;
-                    const textField = genTextField({
-                        ...params,
-                        row: _row,
-                        col: Number(col),
-                        style,
-                        dataField: bindingPath,
-                    });
-                    childrens.push(textField);
-                }
-            });
-        }
-    });
-
-    //计算band高度
-    const height = calculateHeight({
-        startRow: headerStartRow,
-        endRow: headerEndRow,
-        rowsSize,
-    });
-
-    return {
-        band: {
-            props: { height, isSplitAllowed: 'false' },
-            childrens,
-        },
-    };
+    return _genBand({ ...params, condition });
 }
 
 //详情
@@ -335,13 +406,14 @@ function genDetail(params) {
     return {
         detail: {
             childrens: [band],
+            rect: band.band.bandRect,
         },
     };
 }
 
 function genDetailBand(params) {
     const { tables, rowsSize } = params;
-    const { row, col, rowCount, bindingPath, columns } = tables[0];
+    const { row, col, rowCount, colCount, bindingPath, columns } = tables[0];
     const childrens = [];
     columns.forEach(function ({ dataField }, index) {
         const _col = col + index;
@@ -350,6 +422,8 @@ function genDetailBand(params) {
             row,
             col: _col,
             dataField,
+            boxStartRow: row,
+            type: 'F',
         };
         _params.style = getStyle(_params);
         const textField = genTextField(_params);
@@ -359,7 +433,8 @@ function genDetailBand(params) {
     //计算band高度
     const height = calculateHeight({
         startRow: row,
-        endRow: row + rowCount - 1,
+        endRow: row,
+        //endRow: row + rowCount - 1,
         rowsSize,
     });
 
@@ -367,6 +442,12 @@ function genDetailBand(params) {
         band: {
             props: { height, isSplitAllowed: 'false' },
             childrens,
+            bandRect: {
+                startRow: row,
+                startCol: col,
+                endRow: row + rowCount - 1,
+                endCol: col + colCount - 1,
+            },
         },
     };
 }
@@ -392,24 +473,8 @@ function genTextField(params) {
 }
 
 function genReportElement(params) {
-    const { row, col, style, rowsSize, columnsSize } = params;
-    const rect = getRect({
-        row,
-        col,
-        rowsSize,
-        columnsSize,
-    });
-    /*  {
-        mode: 'Transparent',
-        x: '0',
-        y: '0',
-        width: '40',
-        height: '15',
-        forecolor: '#000000',
-        backcolor: '#FFFFFF',
-        key: 'textField-14',
-        stretchType: 'RelativeToBandHeight',
-    } */
+    const { style } = params;
+    const rect = getRect(params);
     const props = {
         mode: 'Transparent',
         ...rect,
@@ -424,7 +489,7 @@ function genReportElement(params) {
 
         Object.keys(keys).forEach(function (key) {
             if (style[key]) {
-                props[key] = style[key];
+                props[key.toLowerCase()] = style[key];
             }
         });
     }
@@ -438,36 +503,27 @@ function genReportElement(params) {
 function genBox(params) {
     const { style } = params;
 
-    /*  {
-        topBorder: 'None',
-        topBorderColor: '#000000',
-        leftBorder: '1Point',
-        leftBorderColor: '#000000',
-        leftPadding: '1',
-        rightBorder: 'Thin',
-        rightBorderColor: '#000000',
-        rightPadding: '1',
-        bottomBorder: 'Thin',
-        bottomBorderColor: '#000000',
-        bottomPadding: '3',
-    } */
+    //边框相关默认值
     const defaultBorderColor = '#000000';
+    const defaultBorder = 'None';
+    const defaultPadding = '1';
+
     const props = {
         //上
-        topBorder: 'None',
+        topBorder: defaultBorder,
         topBorderColor: defaultBorderColor,
         //左
-        leftBorder: 'None', //
+        leftBorder: defaultBorder, //
         leftBorderColor: defaultBorderColor,
-        leftPadding: '1',
+        leftPadding: defaultPadding,
         //右
-        rightBorder: 'None',
+        rightBorder: defaultBorder,
         rightBorderColor: defaultBorderColor,
-        rightPadding: '1',
+        rightPadding: defaultPadding,
         //下
-        bottomBorder: 'None',
+        bottomBorder: defaultBorder,
         bottomBorderColor: defaultBorderColor,
-        bottomPadding: '1',
+        bottomPadding: defaultPadding,
     };
 
     //边框的线条样式
@@ -526,7 +582,7 @@ function genTextElement(params) {
         0: 'Left', //单元格内容左对齐
         1: 'Center', //单元格内容居中
         2: 'Right', //单元格内容右对齐
-        3: 'General', //水平对齐基于值类型
+        3: 'Left', //水平对齐基于值类型 不支持General
         4: 'CenterContinuous', //单元格内容跨列居中
     };
     const defaultHorizonAlign = 'Left';
@@ -549,13 +605,19 @@ function genTextElement(params) {
 
 function genFont(params) {
     const { style } = params;
-    let fontName = 'Calibri';
-    let size = '14.6667';
-    if (style?.font) {
-        const fontArr = style?.font.split(' ');
-        fontName = fontArr[1];
-        if (fontArr[0].endsWith('px') || fontArr[0].endsWith('pt')) {
-            size = fontArr[0].slice(0, -2);
+    let fontName = 'Calibri'; //中文有异常
+    //let size = '14.6667';//不支持的字体大小
+    let size = '11';
+    const font = style?.font;
+    if (font) {
+        //字体大小
+        const fontSizeReg = /\b(?<size>\d+)\.?\d*?(?:pt|px)/;
+        size = font.match(fontSizeReg)?.groups?.size || '1';
+
+        //字体
+        const match = font.match(/"([^"]+)"/) || font.match(/(\S+)$/);
+        if (match) {
+            fontName = match[1];
         }
     }
     const props = {
@@ -573,13 +635,77 @@ function genFont(params) {
 }
 
 function genTextFieldExpression(params) {
-    const { dataField: value } = params;
+    const { dataField, staticValue, type } = params;
     return {
         textFieldExpression: {
             props: { class: 'java.lang.String' },
-            value,
+            dataField,
+            staticValue,
+            type,
         },
     };
+}
+
+//报表宽高，边距等
+function getJasperReportRect(params) {
+    const { columnsSize, pageHeader, detail, columnFooter } = params;
+
+    const pageHeaderRect = pageHeader.pageHeader.rect;
+    const detailRect = detail.detail.rect;
+    const columnFooterRect = columnFooter.columnFooter.rect;
+    const leftMargin = 42;
+    const rightMargin = 42;
+    const topMargin = 42;
+    const bottomMargin = 42;
+
+    const { endCol } = [pageHeaderRect, detailRect, columnFooterRect].reduce(
+        function (pre, { endRow, endCol }) {
+            if (endCol && endCol > pre.endCol) {
+                pre.endCol = endCol;
+            }
+
+            if (endRow && endRow > pre.endRow) {
+                pre.endRow = endRow;
+            }
+
+            return pre;
+        },
+        {
+            startRow: 0,
+            startCol: 0,
+            endRow: 0,
+            endCol: 0,
+        }
+    );
+
+    let colIndex = 0;
+    let pageWidth = leftMargin + rightMargin;
+
+    while (colIndex <= endCol) {
+        pageWidth += columnsSize?.[colIndex++]?.size || defaultWidth;
+    }
+
+    return {
+        pageWidth,
+        topMargin,
+        rightMargin,
+        bottomMargin,
+        leftMargin,
+    };
+}
+
+//报表名称
+let nameIndex = 1;
+function genJasperReportName() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const d = now.getDate();
+    let name = `报表${year}${month}${d}${nameIndex
+        .toString()
+        .padStart(4, '0')}`;
+    nameIndex++;
+    return name;
 }
 
 function genJasperReport(params) {
@@ -603,10 +729,20 @@ function genJasperReport(params) {
         summary,
     ]; */
     const parameters = genParameters(params);
-    const fields = gengenFields(params);
+    const fields = genFields(params);
     const pageHeader = genPageHeader(params);
     const detail = genDetail(params);
     const columnFooter = genColumnFooter(params);
+
+    const { pageWidth, topMargin, rightMargin, bottomMargin, leftMargin } =
+        getJasperReportRect({
+            columnsSize: params.columnsSize,
+            pageHeader,
+            detail,
+            columnFooter,
+        });
+
+    const name = genJasperReportName();
 
     const childrens = [
         ...parameters,
@@ -616,18 +752,18 @@ function genJasperReport(params) {
         columnFooter,
     ];
     const props = {
-        name: 'rpt2018_01-1',
+        name,
         columnCount: '1',
         printOrder: 'Vertical',
         orientation: 'Landscape',
-        pageWidth: '842',
-        pageHeight: '586',
-        columnWidth: '758',
+        pageWidth,
+        /* pageHeight: '1586', */
+        /*  columnWidth: '1758', */
         columnSpacing: '0',
-        leftMargin: '42',
-        rightMargin: '42',
-        topMargin: '70',
-        bottomMargin: '42',
+        leftMargin,
+        rightMargin,
+        topMargin,
+        bottomMargin,
         whenNoDataType: 'AllSectionsNoDetail',
         isTitleNewPage: 'false',
         isSummaryNewPage: 'false',
@@ -644,7 +780,7 @@ function genJRXML(jsonData) {
     let jrxml = '';
     Object.entries(jsonData).forEach(function ([
         tagName,
-        { props = {}, childrens, value },
+        { props = {}, childrens, dataField, staticValue, type = 'P' },
     ]) {
         //开始标签
         let startTag = Object.entries(props).reduce(function (
@@ -664,8 +800,10 @@ function genJRXML(jsonData) {
             });
         }
 
-        if (value) {
-            startTag += `<![CDATA[$F{${value}}]]>`;
+        if (dataField) {
+            startTag += `<![CDATA[$${type}{${dataField}}]]>`;
+        } else if (staticValue) {
+            startTag += `<![CDATA["${staticValue}"]]>`;
         }
 
         //结束标签
@@ -685,6 +823,7 @@ export function testTransform(params) {
         columns: columnsSize,
         rows: rowsSize,
         data: { dataTable },
+        spans,
     } = sheet;
 
     const jasperReport = genJasperReport({
@@ -693,6 +832,7 @@ export function testTransform(params) {
         columnsSize,
         rowsSize,
         dsList,
+        spans,
     });
 
     const JRXML = genJRXML(jasperReport);

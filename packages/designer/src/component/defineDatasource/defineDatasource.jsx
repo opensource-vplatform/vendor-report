@@ -1,76 +1,58 @@
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Dialog from '@components/dialog/Index.jsx';
 import DropdownBox from '@components/dropdownBox/dropdownBox';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import DatasourceIcon from '@icons/data/datasource';
 import {
-  deleteDsList,
-  pushDsList,
-  removeBindInfosByCellInstanceId,
-  saveBindInfos,
-  setIsShowDatasource,
-  toggleActiveDs,
-  updateDslist,
+    deleteDsList,
+    pushDsList,
+    removeBindInfosByCellInstanceId,
+    saveBindInfos,
+    setIsShowDatasource,
+    toggleActiveDs,
+    updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import {
-  setActive,
-  showTab,
-} from '@store/navSlice/navSlice';
+import { setActive, showTab } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
-import {
-  findTreeNodeById,
-  genUUID,
-  hasSameNode,
-} from '@utils/commonUtil.js';
+import { findTreeNodeById, genUUID, hasSameNode } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
+import { parseTable, setTableCornerMarks } from '@utils/tableUtil.js';
 import {
-  parseTable,
-  setTableCornerMarks,
-} from '@utils/tableUtil.js';
-import {
-  getCellInstanceId,
-  getSheetInstanceId,
-  setCellTag,
+    getCellInstanceId,
+    getSheetInstanceId,
+    setCellTag,
 } from '@utils/worksheetUtil.js';
 
 import { testTransform } from '../../../../plugins/transform.js';
 import DesignerContext from '../../DesignerContext.jsx';
 import {
-  addTable,
-  BindingPathCellType,
-  checkHasBind,
-  getCellInfo,
-  getChanged,
-  getPath,
-  highlightBlock,
-  removeHighlightOneBlock,
+    addTable,
+    BindingPathCellType,
+    checkHasBind,
+    getCellInfo,
+    getChanged,
+    getPath,
+    highlightBlock,
+    removeHighlightOneBlock,
 } from './fun.js';
 import {
-  AddDatasourceBtn,
-  ConfirmDialogBox,
-  DatasourceBox,
-  DatasourceListOl,
-  DatasourceOptBox,
-  DatasourceOptBoxLeft,
-  DatasourceOptBoxRight,
-  DddSubDatasource,
-  DelDatasource,
-  InputField,
-  ListItemText,
-  OptBtnBox,
-  SaveBtn,
-  TextareaField,
+    AddDatasourceBtn,
+    ConfirmDialogBox,
+    DatasourceBox,
+    DatasourceListOl,
+    DatasourceOptBox,
+    DatasourceOptBoxLeft,
+    DatasourceOptBoxRight,
+    DddSubDatasource,
+    DelDatasource,
+    InputField,
+    ListItemText,
+    OptBtnBox,
+    SaveBtn,
+    TextareaField,
 } from './ui.jsx';
 
 //弹窗
@@ -563,6 +545,8 @@ export function DraggableDatasourceList() {
             <div
                 style={{
                     display: 'flex',
+                    height: '100%',
+                    overflow: 'auto',
                     flexDirection: 'column',
                     textAlign: 'center',
                     borderRight: '1px solid #ababab',
@@ -586,16 +570,24 @@ export function DraggableDatasourceList() {
                         }}
                     ></DatasourceIcon>
                 </div>
-                <DatasourceList
-                    isShowAddSubDatasource={false}
-                    width={350}
-                    draggable={true}
-                ></DatasourceList>
+                <div
+                    style={{
+                        flex: 1,
+                        height: '100%',
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                    }}
+                >
+                    <DatasourceList
+                        isShowAddSubDatasource={false}
+                        width={350}
+                        draggable={true}
+                    ></DatasourceList>
+                </div>
                 <span
                     style={{
                         height: '27px',
                         background: '#f6f6f6',
-                        marginTop: 'auto',
                         borderTop: '1px solid #ababab',
                     }}
                     onClick={function () {

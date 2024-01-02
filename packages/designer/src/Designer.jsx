@@ -1,25 +1,13 @@
-import React, {
-  Fragment,
-  useState,
-} from 'react';
+import React, { Fragment, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled, { createGlobalStyle } from 'styled-components';
 
-import {
-  hideTab,
-  setActive,
-  showTab,
-} from '@store/navSlice/navSlice';
+import { hideTab, setActive, showTab } from '@store/navSlice/navSlice';
 import { isBindingTable } from '@utils/bindingUtil';
 
 import CellStyleSetting from './component/cellStyles/cellStyleSetting';
-import {
-  DraggableDatasourceList,
-} from './component/defineDatasource/defineDatasource';
+import { DraggableDatasourceList } from './component/defineDatasource/defineDatasource';
 import DesignerContext from './DesignerContext';
 import Excel from './Excel';
 import Nav from './Nav';
@@ -73,8 +61,8 @@ const SpreadWrap = styled.div`
 
 function Designer() {
     const dispatch = useDispatch();
-    const { mode,spread } = useSelector(({ appSlice }) => appSlice);
-    const { active,hideCodes}  = useSelector(({navSlice})=>navSlice);
+    const { mode, spread } = useSelector(({ appSlice }) => appSlice);
+    const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     const [data] = useState({});
     data.spread = spread;
     data.active = active;
@@ -89,11 +77,11 @@ function Designer() {
                     //表格设计被隐藏，需要显示出来
                     dispatch(showTab({ code: 'table' }));
                 }
-            } else if(data.hideCodes.indexOf('table')==-1){
+            } else if (data.hideCodes.indexOf('table') == -1) {
                 //不在表格区域，且存在表设计页签，需要隐藏表设计页签
                 dispatch(hideTab({ code: 'table' }));
             }
-            if (!inTable&&data.active == 'table') {
+            if (!inTable && data.active == 'table') {
                 dispatch(setActive({ code: 'start' }));
             }
         },
@@ -105,7 +93,11 @@ function Designer() {
                 <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
                     <Wrap>
                         <Nav></Nav>
-                        <SpreadWrap>
+                        <SpreadWrap
+                            style={{
+                                overflow: 'hidden',
+                            }}
+                        >
                             <DraggableDatasourceList></DraggableDatasourceList>
                             <Excel></Excel>
                         </SpreadWrap>

@@ -221,7 +221,60 @@ export const datasourceSlice = createSlice({
             }
         },
         genPreviewDatas(state, { payload }) {
-            const datas = {};
+            function mergeColumnDatas(params) {
+                const {
+                    instanceObject,
+                    mergeInfos,
+                    i,
+                    datas,
+                    code,
+                    type = 'column',
+                } = params;
+                const data = { ...instanceObject };
+                //第一列
+                const key1 = mergeInfos[0].key;
+                const value1 = mergeInfos[0].values;
+                if (i <= 5) {
+                    if (value1[0] === null || value1[0] === undefined) {
+                        value1[0] = data[key1];
+                    }
+                    data[key1] = value1[0];
+                } else {
+                    if (value1[1] === null || value1[1] === undefined) {
+                        value1[1] = data[key1];
+                    }
+                    data[key1] = value1[1];
+                }
+
+                //第二列
+                const key2 = mergeInfos[1].key;
+                const value2 = mergeInfos[1].values;
+                if (i <= 3) {
+                    if (value2[0] === null || value2[0] === undefined) {
+                        value2[0] = data[key2];
+                    }
+                    data[key2] = value2[0];
+                } else if (i <= 6) {
+                    if (value2[1] === null || value2[1] === undefined) {
+                        value2[1] = data[key2];
+                    }
+                    data[key2] = value2[1];
+                } else {
+                    if (value2[2] === null || value2[2] === undefined) {
+                        value2[2] = data[key2];
+                    }
+                    data[key2] = value2[2];
+                }
+                datas.mergeDatas[type][code].push(data);
+            }
+
+            const datas = {
+                mergeDatas: {
+                    row: {},
+                    column: {},
+                    rowColumn: {},
+                },
+            };
             state.finalDsList.forEach(function ({
                 type,
                 code,
@@ -232,16 +285,84 @@ export const datasourceSlice = createSlice({
                     datas[code] = genValueByType(name, type, 1);
                 } else {
                     datas[code] = [];
+                    datas.mergeDatas.row[code] = [];
+                    datas.mergeDatas.column[code] = [];
+                    datas.mergeDatas.rowColumn[code] = [];
+
                     if (Array.isArray(children)) {
+                        const mergeInfos = [];
+                        const rowColumnMergeInfos = [];
                         for (let i = 1; i <= 10; i++) {
                             const instanceObject = {};
-                            children.forEach(function ({ code, name, type }) {
+
+                            const rowInstanceObject = {};
+                            let preType = '';
+                            let preData = '';
+
+                            children.forEach(function (
+                                { code, name, type },
+                                index
+                            ) {
+                                //普通数据
                                 instanceObject[code] = genValueByType(
                                     name,
                                     type,
                                     i
                                 );
+
+                                //需要合并的列
+                                if (index < 2 && mergeInfos.length < 3) {
+                                    mergeInfos.push({
+                                        key: code,
+                                        values: [],
+                                    });
+                                    rowColumnMergeInfos.push({
+                                        key: code,
+                                        values: [],
+                                    });
+                                }
+
+                                //处理行合并数据
+                                let rowData = instanceObject[code];
+                                if (i === 1) {
+                                    if (preType && preType === type) {
+                                        rowData = preData;
+                                    } else {
+                                        rowData = instanceObject[code];
+                                    }
+                                    preType = type;
+                                    preData = rowData;
+                                }
+                                rowInstanceObject[code] = rowData;
                             });
+
+                            //列合并数据
+                            mergeColumnDatas({
+                                mergeInfos,
+                                instanceObject,
+                                i,
+                                datas,
+                                code,
+                            });
+
+                            if (i === 1) {
+                                datas.mergeDatas.rowColumn[code].push(
+                                    rowInstanceObject
+                                );
+                            } else {
+                                mergeColumnDatas({
+                                    mergeInfos: rowColumnMergeInfos,
+                                    instanceObject,
+                                    i,
+                                    datas,
+                                    code,
+                                    type: 'rowColumn',
+                                });
+                            }
+
+                            //行合并数据
+                            datas.mergeDatas.row[code].push(rowInstanceObject);
+
                             datas[code].push(instanceObject);
                         }
                     }
