@@ -176,6 +176,7 @@ export const CustomFormats = [
 export const TextAlignmentHorizontal = [
     { value: '常规', title: '常规', text: '常规' },
     { value: '靠左', title: '靠左', text: '靠左' },
+    { value: '居中', title: '居中', text: '居中' },
     { value: '靠右', title: '靠右', text: '靠右' },
     { value: '跨列居中', title: '跨列居中', text: '跨列居中' },
     { value: '分散对齐', title: '分散对齐', text: '分散对齐' },
