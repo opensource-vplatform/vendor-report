@@ -158,7 +158,7 @@ export default function () {
         <GroupItem
             title='字体'
             onMore={() => {
-                dispatch(setTabValueCellSetting('边框'));
+                dispatch(setTabValueCellSetting('字体'));
                 dispatch(setIsOpenCellSetting(true));
             }}
         >

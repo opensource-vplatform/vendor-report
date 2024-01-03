@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { applyToSelectedCell, withBatchUpdate } from './spreadUtil';
 /**
- * 设置显示省略号
+ * 设置超出显示省略号
  * @param {*} spread
  * @param {*} delta
  */
@@ -15,6 +15,11 @@ export function setShowEllipsis(spread, isShow) {
     });
 }
 
+/**
+ * 设置缩小填充
+ * @param {*} spread
+ * @param {*} delta
+ */
 export function setShrinkToFit(spread, isSet) {
     withBatchUpdate(spread, (sheet) => {
         applyToSelectedCell(sheet, (sheet, row, col) => {

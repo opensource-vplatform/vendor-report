@@ -12,7 +12,7 @@ export const fontSlice = createSlice({
         fontWeight: 'normal',
         fontVariant: 'normal',
         lineHeight: 'normal',
-        textDecoration:undefined,
+        textDecoration: undefined,
         vAlign: null,
         hAlign: null,
         isVerticalText: false,
@@ -50,21 +50,22 @@ export const fontSlice = createSlice({
         setFontSize(state, action) {
             state.fontSize = action.payload.fontSize;
         },
-        setTextDecoration(state, action){
+        setTextDecoration(state, action) {
             state.textDecoration = action.payload.textDecoration;
         },
-        setBackColor(state, action){
+        setBackColor(state, action) {
             state.backColor = action.payload.backColor;
         },
-        setForeColor(state, action){
+        setForeColor(state, action) {
             state.foreColor = action.payload.foreColor;
         },
-        setFontStyles(state,action){
+        setFontStyles(state, action) {
             const styles = action.payload.styles;
-            if(styles){
-                Object.assign(state,styles);
+            if (styles) {
+                Object.assign(state, styles);
             }
-        }
+            console.log('state :>> ', state.hAlign);
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(setSpread, (state, action) => {

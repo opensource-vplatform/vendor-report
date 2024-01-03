@@ -97,18 +97,27 @@ function CellStyleSetting(props) {
     const [isMergeCells, setIsMergeCells] = useState(false);
     const [isShowEllipsis, setIsShowEllipsis] = useState(false);
     const [indentValue, setIndentValue] = useState(0);
-    const [textHAlignValue, setTextHAlignValue] = useState('常规');
-    const [textVAlignValue, setTextVAlignValue] = useState('靠上');
+    const [textHAlignValue, setTextHAlignValue] = useState(3);
+    const [textVAlignValue, setTextVAlignValue] = useState(0);
     const directions = [
         -90, -75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75, 90,
     ];
     const [rotatable, setRotatable] = useState(false);
     const [startDeg, setStartDeg] = useState(0);
 
-    const { spread } = useSelector(({ fontSlice }) => fontSlice);
-    const { color, tabValueCellSetting, isOpenCellSetting } = useSelector(
-        ({ borderSlice }) => borderSlice
-    );
+    const fontStyle = useSelector(({ fontSlice }) => fontSlice);
+    const borderStyle = useSelector(({ borderSlice }) => borderSlice);
+
+    const {
+        spread,
+        hAlign,
+        vAlign,
+        wordWrap,
+        textOrientation,
+        isVerticalText,
+    } = fontStyle;
+
+    const { color, tabValueCellSetting, isOpenCellSetting } = borderStyle;
 
     // 获取第一个选择区域的第一个单元格的值
     useEffect(() => {
@@ -167,7 +176,7 @@ function CellStyleSetting(props) {
         false
     );
     const handleTabChange = (tabValue) => {
-        // console.log('tabValue :>> ', tabValue);
+        //
     };
 
     const handleSelectCategoriesChange = (value) => {
@@ -316,59 +325,21 @@ function CellStyleSetting(props) {
         } else {
             unMergeCell(spread);
         }
-        textHAlignValue !== '分散对齐' &&
-            setShowEllipsis(spread, isShowEllipsis);
+        setShowEllipsis(spread, isShowEllipsis);
 
-        (textHAlignValue !== '分散对齐' || !isWrapText) &&
-            setShrinkToFit(spread, isShrinkToFit);
+        !isWrapText && setShrinkToFit(spread, isShrinkToFit);
 
-        textHAlignValue !== '跨列居中' &&
-            setIndentByCounter(spread, indentValue);
+        textHAlignValue !== 4 && setIndentByCounter(spread, indentValue);
 
-        textHAlignValue !== '跨列居中' &&
+        textHAlignValue !== 4 &&
             dispatch(
                 setTextOrientation({
                     textOrientation: startDeg,
                     isVerticalText: false,
                 })
             );
-        switch (textHAlignValue) {
-            case '常规':
-                if (startDeg < 0) return;
-                dispatch(setHAlign({ hAlign: 0 }));
-                break;
-            case '靠左':
-                dispatch(setHAlign({ hAlign: 0 }));
-                break;
-            case '居中':
-                dispatch(setHAlign({ hAlign: 1 }));
-                break;
-            case '靠右':
-                dispatch(setHAlign({ hAlign: 2 }));
-                break;
-            case '跨列居中':
-                dispatch(setHAlign({ hAlign: 4 }));
-                break;
-            case '分散对齐':
-                dispatch(setHAlign({ hAlign: 3 }));
-                break;
-            default:
-                break;
-        }
-        switch (textVAlignValue) {
-            case '靠上':
-                dispatch(setVAlign({ vAlign: 0 }));
-                break;
-            case '居中':
-                dispatch(setVAlign({ vAlign: 1 }));
-                break;
-            case '靠下':
-                dispatch(setVAlign({ vAlign: 2 }));
-                break;
-
-            default:
-                break;
-        }
+        dispatch(setHAlign({ hAlign: textHAlignValue }));
+        dispatch(setVAlign({ vAlign: textVAlignValue }));
 
         // 初始化
         setBorderBottom(false);
@@ -452,16 +423,19 @@ function CellStyleSetting(props) {
         setBorderRight(true);
     };
 
-    // 处理自动换行
+    // 自动换行
     const handleWrapText = (event) => {
         setIsWrapText(event.target.checked);
     };
+    // 缩小填充
     const handleShrinkToFit = (event) => {
         setIsShrinkToFit(event.target.checked);
     };
+    // 合并单元格
     const handleMergeCells = (event) => {
         setIsMergeCells(event.target.checked);
     };
+    // 显示省略号
     const handleShowEllipsis = (event) => {
         setIsShowEllipsis(event.target.checked);
     };
@@ -890,7 +864,7 @@ function CellStyleSetting(props) {
                                                     onChange={
                                                         handleSelectTextHAlign
                                                     }
-                                                    value={textHAlignValue}
+                                                    value={hAlign}
                                                 />
                                             </div>
                                             <div className='textItem'>
@@ -909,13 +883,13 @@ function CellStyleSetting(props) {
                                                     onChange={
                                                         handleSelectTextVAlign
                                                     }
-                                                    value={textVAlignValue}
+                                                    value={vAlign}
                                                 />
                                             </div>
                                         </div>
                                         <div
                                             className={
-                                                textHAlignValue === '跨列居中'
+                                                textHAlignValue === 4
                                                     ? 'disabledIndent'
                                                     : 'textItemRight'
                                             }
@@ -960,16 +934,10 @@ function CellStyleSetting(props) {
                                     <div
                                         className='controlItem'
                                         style={{
-                                            pointerEvents:
-                                                textHAlignValue ===
-                                                    '分散对齐' || isWrapText
-                                                    ? 'none'
-                                                    : 'unset',
-                                            opacity:
-                                                textHAlignValue ===
-                                                    '分散对齐' || isWrapText
-                                                    ? 0.6
-                                                    : 1,
+                                            pointerEvents: isWrapText
+                                                ? 'none'
+                                                : 'unset',
+                                            opacity: isWrapText ? 0.6 : 1,
                                         }}
                                     >
                                         <input
@@ -989,19 +957,7 @@ function CellStyleSetting(props) {
                                         ></input>
                                         <span>合并单元格</span>
                                     </div>
-                                    <div
-                                        className='controlItem'
-                                        style={{
-                                            pointerEvents:
-                                                textHAlignValue === '分散对齐'
-                                                    ? 'none'
-                                                    : 'unset',
-                                            opacity:
-                                                textHAlignValue === '分散对齐'
-                                                    ? 0.6
-                                                    : 1,
-                                        }}
-                                    >
+                                    <div className='controlItem'>
                                         <input
                                             className='chekbox'
                                             type='checkbox'
@@ -1016,13 +972,10 @@ function CellStyleSetting(props) {
                                 className='orientation'
                                 style={{
                                     pointerEvents:
-                                        textHAlignValue === '跨列居中'
+                                        textHAlignValue === 4
                                             ? 'none'
                                             : 'unset',
-                                    opacity:
-                                        textHAlignValue === '跨列居中'
-                                            ? 0.6
-                                            : 1,
+                                    opacity: textHAlignValue === 4 ? 0.6 : 1,
                                 }}
                             >
                                 <fieldset
