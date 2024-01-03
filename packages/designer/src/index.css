@@ -1,12 +1,4 @@
-html,body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-}
 #root{
   width: 100%;
-  height: calc(100% - 10px);
-  height: 100vh;
-  display: flex;
+  height: 100%;
 }

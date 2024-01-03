@@ -94,8 +94,8 @@ function Index(props) {
             setLoading(true);
             resourceManager
                 .loadScript([
-                    'public/spreadjs/plugins/gc.spread.sheets.print.min.js',
-                    'public/spreadjs/plugins/gc.spread.sheets.pdf.min.js',
+                    'spreadjs/plugins/gc.spread.sheets.print.min.js',
+                    'spreadjs/plugins/gc.spread.sheets.pdf.min.js',
                 ])
                 .then(() => {
                     spread.savePDF(

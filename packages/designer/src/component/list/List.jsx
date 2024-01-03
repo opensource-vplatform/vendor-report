@@ -6,7 +6,62 @@ import React, {
   useState,
 } from 'react';
 
+import styled from 'styled-components';
+
 import { scrollIntoView } from '@utils/domUtil';
+
+const Wrap = styled.div`
+    margin: 5px 0px;
+`;
+
+const Input = styled.input`
+    height: 25px;
+    width: 97%;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    border: 1px solid lightgray;
+    &:focus-visible {
+        outline: unset;
+    }
+`;
+
+const ListWrap = styled.div`
+    border: 1px solid lightgray;
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+`;
+
+const ListItem = styled.div`
+    height: 30px;
+    width: auto;
+    margin: 2px;
+    padding-left: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 12px;
+    &:hover,
+    :active {
+        background-color: #dbdbdb;
+    }
+    &:[data-selected='true'] {
+        height: 30px;
+        width: auto;
+        margin: 2px;
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 12px;
+        background-color: #dbdbdb;
+    }
+    &:[data-style='red'] {
+        color: red;
+    }
+`;
 
 const List = ({
     values, // 数据源：数组类型
@@ -18,7 +73,6 @@ const List = ({
     isHasInput = false,
     onDoubleClick = () => {},
     style = {},
-    className = {},
 }) => {
     const [filterText, setFilterText] = useState(selectedValue);
     const listDom = createRef(null);
@@ -43,52 +97,43 @@ const List = ({
         }
     }, [selectedValue]);
     return (
-        <div style={{ width, height, margin: '5px 0px', ...style }}>
+        <Wrap style={{ width, height, ...style }}>
             {isHasInput && (
-                <input
-                    className='listInput'
+                <Input
                     onChange={(e) => setFilterText(e.target.value)}
                     value={filterText}
                 />
             )}
-            <div className='list' ref={listDom}>
+            <ListWrap ref={listDom}>
                 {values?.map((value, index) => {
                     const isSelected = selectedValue === value;
-                    const itemClassName = isSelected
-                        ? 'listItemSelected'
-                        : 'listItem';
                     return (
-                        <div
+                        <ListItem
                             key={value + index}
-                            className={itemClassName}
+                            data-selected = {isSelected}
                             onClick={() => handleItemClick(value)}
                             onDoubleClick={onDoubleClick}
                         >
                             {value}
-                        </div>
+                        </ListItem>
                     );
                 })}
                 {objDatas &&
                     Object.keys(objDatas).map((key) => {
                         const isSelected = selectedValue === key;
-                        const itemClassName = isSelected
-                            ? 'listItemSelected'
-                            : 'listItem';
-                        const isRedNumClassName = key.includes('red')
-                            ? 'redNumer'
-                            : null;
                         return (
-                            <div
+                            <ListItem
                                 key={key}
-                                className={`${itemClassName} ${isRedNumClassName}`}
+                                data-selected = {isSelected}
+                                data-style={key.includes('red') ? 'red':''}
                                 onClick={() => handleItemClick(key)}
                             >
                                 {objDatas[key]}
-                            </div>
+                            </ListItem>
                         );
                     })}
-            </div>
-        </div>
+            </ListWrap>
+        </Wrap>
     );
 };
 

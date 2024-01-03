@@ -3,8 +3,6 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="framework" content="react-spread" />
-        <link rel="icon" type="image/png" href="logo.png" />
         <link rel="stylesheet" href="styles.css" />
         <link
             rel="stylesheet"
@@ -18,12 +16,14 @@
             type="text/javascript"
             src="spreadjs/resources/zh/gc.spread.sheets.resources.zh.16.2.6.min.js"
         ></script>
+        <script src="./index-90948ce3.umd.js"></script>
         <title>同望Web报表设计器</title>
-
     </head>
-
     <body>
         <div id="app"></div>
-        <script type="module" src="src/main.jsx"></script>
+        <script>
+            var designer = new TOONE.ReportDesigner({});
+            designer.mount(document.getElementById('app'));
+        </script>
     </body>
 </html>

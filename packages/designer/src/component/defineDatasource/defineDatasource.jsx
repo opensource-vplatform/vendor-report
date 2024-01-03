@@ -3,8 +3,8 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Dialog from '@components/dialog/Index.jsx';
-import DropdownBox from '@components/dropdownBox/dropdownBox';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
+import Select from '@components/select/Index';
 import DatasourceIcon from '@icons/data/datasource';
 import {
     deleteDsList,
@@ -818,28 +818,23 @@ function Index(props) {
                     </div>
                     <div>类型</div>
                     <div>
-                        <DropdownBox
+                        <Select
                             datas={datasourceTypeDatas}
                             className='datasourceType'
-                            style={{ minWidth: '500px' }}
-                            release={true}
-                            onChange={function (data) {
-                                console.log(data);
-                                const newData = {
-                                    ...activeDs,
-                                    type: data.value,
-                                    typeName: data.text,
-                                };
-                                dispatch(updateDslist({ newData }));
+                            style={{ minWidth:500,width:502,height:30,borderRadius:4 }}
+                            optionStyle={{ minWidth:500,width:506 }}
+                            value={activeDs.type}
+                            onChange={function (value) {
+                                dispatch(
+                                    updateDslist({
+                                        newData: {
+                                            ...activeDs,
+                                            type: value,
+                                        },
+                                    })
+                                );
                             }}
-                        >
-                            <div className={`uiText show`}>
-                                {activeDs.typeName}
-                            </div>
-                            <div className='uiArrowBox'>
-                                <span className='uiArrow'></span>
-                            </div>
-                        </DropdownBox>
+                        ></Select>
                     </div>
                     <div>描述</div>
                     <div>

@@ -14,7 +14,6 @@ import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
-import TestTab from '@tabs/test/Index';
 import ViewTab from '@tabs/view/Index';
 
 import { setMode } from './store/appSlice/appSlice';
@@ -54,7 +53,6 @@ const WithNavItem = function (Component) {
 const FileNavItem = WithNavItem(FileTab);
 const StartNavItem = WithNavItem(StartTab);
 const ViewNavItem = WithNavItem(ViewTab);
-const TestNavItem = WithNavItem(TestTab);
 const TableNavItem = WithNavItem(TableTab);
 const DataNavItem = WithNavItem(DataTab);
 const FormulaNavItem = WithNavItem(Formula);
@@ -92,7 +90,6 @@ export default function () {
             <DataNavItem code='data' title='数据'></DataNavItem>
             <ViewNavItem code='view' title='视图'></ViewNavItem>
             <TableNavItem code='table' title='表设计'></TableNavItem>
-            <TestNavItem code='test' title='测试组件'></TestNavItem>
         </Tabs>
     );
 }

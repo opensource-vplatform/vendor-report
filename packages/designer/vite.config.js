@@ -12,6 +12,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
+    build: {
+        target: 'es2015',
+        lib: {
+            name: 'TOONE',
+            entry: 'src/Index.jsx',
+            fileName: 'index-[hash]',
+            formats: ['umd'],
+        },
+    },
+    define: {
+        'process.env': {},
+    },
     resolve: {
         alias: [
             {
@@ -33,13 +45,16 @@ export default defineConfig({
             {
                 find: '@hooks',
                 replacement: resolve(__dirname, 'src/hooks'),
-            },{
+            },
+            {
                 find: '@metadatas',
                 replacement: resolve(__dirname, 'src/metadatas'),
-            },{
+            },
+            {
                 find: '@utils',
                 replacement: resolve(__dirname, 'src/utils'),
-            },{
+            },
+            {
                 find: '@tabs',
                 replacement: resolve(__dirname, 'src/tabs'),
             },
