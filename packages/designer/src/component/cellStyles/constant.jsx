@@ -204,3 +204,16 @@ export const IconType = {
     Thick: 5,
     Double: 6,
 };
+
+export const FontStyle = {
+    normal: '常规',
+    italic: '倾斜',
+    bold: '加粗',
+    bolditalic: '加粗 倾斜',
+};
+
+export const UnderlineStyle = [
+    { value: '无', title: '无', text: '无' },
+    { value: '单下划线', title: '单下划线', text: '单下划线' },
+    { value: '双下划线', title: '双下划线', text: '双下划线' },
+];

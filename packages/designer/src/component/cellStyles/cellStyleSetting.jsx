@@ -40,6 +40,8 @@ import {
     TimeFormats,
     TextAlignmentHorizontal,
     TextAlignmentVertical,
+    FontStyle,
+    UnderlineStyle,
 } from './constant';
 import Icon from './lineIcon';
 import {
@@ -63,6 +65,9 @@ import {
 } from '@store/fontSlice/fontSlice.js';
 
 import { setShowEllipsis, setShrinkToFit } from '@utils/borderUtil.js';
+
+import { getFontFamilies, getFontSizes } from '@metadatas/font';
+import { setFontSize } from '../../store/fontSlice/fontSlice';
 
 function CellStyleSetting(props) {
     let firstCellValue = null;
@@ -105,9 +110,18 @@ function CellStyleSetting(props) {
     const [rotatable, setRotatable] = useState(false);
     const [startDeg, setStartDeg] = useState(0);
 
+    // 字体面板
+    const [selectedFontFamily, setSelectedFontFamily] = useState('微软雅黑');
+    const [selectedFontSize, setSelectedFontSize] = useState(11);
+    const [selectedFontStyle, setSelectedFontStyle] = useState('常规');
+    const [selectedUnderlineStyle, setSelectedUnderlineStyle] = useState('无');
+    const [fontColor, setFontColor] = useState('black');
+    const [isStrickout, setIsStrickout] = useState(false);
+    const fontFamilies = getFontFamilies();
+    const fontSizes = getFontSizes();
+
     const fontStyle = useSelector(({ fontSlice }) => fontSlice);
     const borderStyle = useSelector(({ borderSlice }) => borderSlice);
-
     const {
         spread,
         hAlign,
@@ -118,6 +132,14 @@ function CellStyleSetting(props) {
     } = fontStyle;
 
     const { color, tabValueCellSetting, isOpenCellSetting } = borderStyle;
+
+    const fontFamiliesToListData = function (metadatas) {
+        const result = [];
+        metadatas.forEach((metadata) => {
+            result.push(metadata.value);
+        });
+        return result;
+    };
 
     // 获取第一个选择区域的第一个单元格的值
     useEffect(() => {
@@ -392,7 +414,7 @@ function CellStyleSetting(props) {
         setLineColor('black');
     };
 
-    const handleColorEditor = (color) => {
+    const handleColorEditorforBorder = (color) => {
         setLineColor(color);
         dispatch(setBorderColor({ color: color }));
     };
@@ -530,6 +552,33 @@ function CellStyleSetting(props) {
     const handleMouseUp = () => {
         setRotatable(false);
     };
+
+    // 字体面板
+    const handleFontFamily = (value) => {
+        setSelectedFontFamily(value);
+    };
+    const handleFontSize = (value) => {
+        setSelectedFontSize(value);
+    };
+    const handleFontStyle = (value) => {
+        const keys = Object.keys(FontStyle);
+        const selectedOptionValue = keys.find((k) => FontStyle[k] === value);
+        selectedOptionValue &&
+            setSelectedFontStyle(selectedOptionValue.toString());
+    };
+    const handleUnderlineStyle = (value) => {
+        setSelectedUnderlineStyle(value);
+    };
+    const handleColorEditorforFont = (color) => {
+        setFontColor(color);
+    };
+    const handleIsStrickout = (event) => {
+        setIsStrickout(event.target.checked);
+    };
+
+    useEffect(() => {
+        console.log('object :>> ', selectedFontStyle);
+    }, [selectedFontStyle]);
 
     useEffect(() => {
         let tempValue = firstCellValue ? firstCellValue : '12345';
@@ -797,6 +846,7 @@ function CellStyleSetting(props) {
                                             values={Object.values(
                                                 CustomFormats
                                             )}
+                                            isHasInput={true}
                                             selectedValue={selectedTimeFormat}
                                             onChange={handleTimeFormatChange}
                                         />
@@ -1048,7 +1098,168 @@ function CellStyleSetting(props) {
                         </div>
                     </Tab>
                     <Tab code='字体' title='字体'>
-                        <p>Content for Sheet 3</p>
+                        <div className='fontTop'>
+                            <div className='fontList'>
+                                <span>字体:</span>
+                                <List
+                                    width='320px'
+                                    height='150px'
+                                    isHasInput={true}
+                                    values={fontFamiliesToListData(
+                                        fontFamilies
+                                    )}
+                                    selectedValue={selectedFontFamily}
+                                    onChange={handleFontFamily}
+                                />
+                            </div>
+                            <div className='fontStyle'>
+                                <span>字形:</span>
+                                <List
+                                    width='160px'
+                                    height='150px'
+                                    isHasInput={true}
+                                    values={Object.values(FontStyle)}
+                                    selectedValue={FontStyle[selectedFontStyle]}
+                                    onChange={handleFontStyle}
+                                />
+                            </div>
+                            <div className='fontSize'>
+                                <span>字号:</span>
+                                <List
+                                    width='160px'
+                                    height='150px'
+                                    isHasInput={true}
+                                    values={fontFamiliesToListData(fontSizes)}
+                                    selectedValue={selectedFontSize}
+                                    onChange={handleFontSize}
+                                />
+                            </div>
+                        </div>
+                        <div className='fontMiddle'>
+                            <div className='fontLeft'>
+                                <div>
+                                    <span>下划线:</span>
+                                    <Select
+                                        datas={UnderlineStyle}
+                                        style={{
+                                            height: '25px',
+                                            width: ' 318px',
+                                        }}
+                                        optionStyle={{
+                                            width: '100%',
+                                        }}
+                                        onChange={handleUnderlineStyle}
+                                        value={selectedUnderlineStyle}
+                                    ></Select>
+                                </div>
+                                <div className='effect'>
+                                    <fieldset
+                                        style={{
+                                            border: '1px solid lightgray',
+                                            fontSize: '12px',
+                                            width: 318,
+                                            height: 100,
+                                            padding: 0,
+                                            marginTop: 5,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <legend>特殊效果</legend>
+                                        <div className='strikethrough'>
+                                            <input
+                                                type='checkbox'
+                                                checked={isStrickout}
+                                                onChange={handleIsStrickout}
+                                            ></input>
+                                            <span>删除线</span>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+
+                            <div className='fontRight'>
+                                <div className='fontColor'>
+                                    <span>颜色:</span>
+                                    <ColorEditor
+                                        style={{ width: '188px' }}
+                                        onChange={handleColorEditorforFont}
+                                        value={fontColor}
+                                    >
+                                        <div className='lineColor'>
+                                            <div
+                                                className='colorPreView'
+                                                style={{
+                                                    backgroundColor: fontColor,
+                                                }}
+                                            ></div>
+                                            <div className='arrowDownIcon'>
+                                                <ArrowDown
+                                                    style={{
+                                                        width: 20,
+                                                        height: 23,
+                                                        margin: 0,
+                                                    }}
+                                                ></ArrowDown>
+                                            </div>
+                                        </div>
+                                    </ColorEditor>
+                                </div>
+                                <div>
+                                    <fieldset
+                                        style={{
+                                            border: '1px solid lightgray',
+                                            fontSize: '12px',
+                                            height: 100,
+                                            padding: 0,
+                                            marginTop: 5,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        <legend>预览</legend>
+                                        <div
+                                            style={{
+                                                fontFamily: selectedFontFamily,
+                                                fontWeight:
+                                                    selectedFontStyle.includes(
+                                                        'bold'
+                                                    )
+                                                        ? 'bold'
+                                                        : 'normal',
+                                                fontSize:
+                                                    selectedFontSize + 'pt',
+                                                color: fontColor,
+                                                fontStyle:
+                                                    selectedFontStyle.includes(
+                                                        'italic'
+                                                    )
+                                                        ? 'italic'
+                                                        : 'normal',
+                                                textDecorationLine: `${
+                                                    isStrickout
+                                                        ? 'line-through'
+                                                        : ''
+                                                } ${
+                                                    selectedUnderlineStyle ===
+                                                    '单下划线'
+                                                        ? 'underline'
+                                                        : ''
+                                                }`,
+                                                borderBottom:
+                                                    selectedUnderlineStyle ===
+                                                    '双下划线'
+                                                        ? '3px double rgb(0, 0, 0)'
+                                                        : 'unset',
+                                            }}
+                                        >
+                                            AaBbCcYyZz
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
                     </Tab>
                     <Tab code='边框' title='边框'>
                         <div className='borderArea'>
@@ -1244,7 +1455,10 @@ function CellStyleSetting(props) {
                                     <span>颜色：</span>
                                     <div>
                                         <ColorEditor
-                                            onChange={handleColorEditor}
+                                            style={{ width: '188px' }}
+                                            onChange={
+                                                handleColorEditorforBorder
+                                            }
                                             value={lineColor}
                                         >
                                             <div className='lineColor'>

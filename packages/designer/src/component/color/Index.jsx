@@ -1,18 +1,12 @@
-import {
-  Fragment,
-  useState,
-} from 'react';
+import { Fragment, useState } from 'react';
 
 import styled from 'styled-components';
 
 import PalletIcon from '@icons/color/Pallet';
+import { getCustomColors, getStandarColors } from '@metadatas/color';
 import {
-  getCustomColors,
-  getStandarColors,
-} from '@metadatas/color';
-import {
-  getCustomColors as getLocalCustomColors,
-  updateCustomColor as updateLocalCustomColor,
+    getCustomColors as getLocalCustomColors,
+    updateCustomColor as updateLocalCustomColor,
 } from '@utils/colorUtil';
 
 import ColorDialog from './ColorDialog';
@@ -96,7 +90,7 @@ const Divider = styled.div`
 `;
 
 export default function (props) {
-    const { children, onChange, nonable = true,value } = props;
+    const { children, onChange, nonable = true, value, style = {} } = props;
     const [visible, setVisible] = useState(false);
     const [dialogVisible, setDialogVisible] = useState(false);
     const customerColors = getCustomColors();
@@ -112,7 +106,9 @@ export default function (props) {
     });
     return (
         <Fragment>
-            {visible ? <Mask key='mask' onClick={() => setVisible(false)}></Mask> : null}
+            {visible ? (
+                <Mask key='mask' onClick={() => setVisible(false)}></Mask>
+            ) : null}
             <Wrap
                 key='wrap'
                 onClick={(evt) => {
@@ -123,7 +119,7 @@ export default function (props) {
             >
                 {children}
                 {visible ? (
-                    <Dialog className='colorDialog'>
+                    <Dialog style={style} className='colorDialog'>
                         <Title>自定义</Title>
                         <Content>
                             {customerColors.map((colors, index) => {
