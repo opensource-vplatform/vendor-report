@@ -13,11 +13,17 @@ import {
     saveBindInfos,
     setIsShowDatasource,
     toggleActiveDs,
+    updateActiveSheetTablePath,
     updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive, showTab } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
-import { findTreeNodeById, genUUID, hasSameNode } from '@utils/commonUtil.js';
+import {
+    findTreeNodeById,
+    genUUID,
+    getActiveSheetTablesPath,
+    hasSameNode,
+} from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
 import { parseTable, setTableCornerMarks } from '@utils/tableUtil.js';
 import {
@@ -95,6 +101,7 @@ function DatasourceTree(props) {
         width,
         draggable = false,
         parentType,
+        activeSheetTablePath = {},
     } = props;
     if (!Array.isArray(datas)) {
         return '';
@@ -132,7 +139,7 @@ function DatasourceTree(props) {
             style={{ width: width + 'px' }}
         >
             {datas.map(function (dataItem) {
-                const { name, id, children, type } = dataItem;
+                const { name, id, children, type, code } = dataItem;
                 datasObj[id] = dataItem;
 
                 let draggableClass = '';
@@ -141,7 +148,9 @@ function DatasourceTree(props) {
                     draggableClass = 'draggable';
                     if (
                         type === 'table' &&
-                        (!Array.isArray(children) || children.length === 0)
+                        (!Array.isArray(children) ||
+                            children.length === 0 ||
+                            activeSheetTablePath[code])
                     ) {
                         draggableClass = 'notDraggable';
                         isDraggable = false;
@@ -199,6 +208,7 @@ function DatasourceTree(props) {
                                 draggable={draggable}
                                 parentType='table'
                                 isShowAddSubDatasource={isShowAddSubDatasource}
+                                activeSheetTablePath={activeSheetTablePath}
                             ></DatasourceTree>
                         ) : (
                             ''
@@ -219,7 +229,7 @@ export function DatasourceList(props) {
         width,
         draggable,
     } = props;
-    let { dsList, activeDs, finalDsList } = useSelector(
+    let { dsList, activeDs, finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
     if (draggable) {
@@ -239,6 +249,7 @@ export function DatasourceList(props) {
             isNotAllow={isNotAllow}
             draggable={draggable}
             isShowAddSubDatasource={isShowAddSubDatasource}
+            activeSheetTablePath={activeSheetTablePath}
         ></DatasourceTree>
     );
 }
@@ -338,13 +349,18 @@ export function DraggableDatasourceList() {
                                 }
                             }
                         });
+
+                    //清除表格后需要重新保存数据源是否已经绑定
+                    const tablePaths = getActiveSheetTablesPath({
+                        sheet: activeSheet,
+                    });
+                    dispatch(updateActiveSheetTablePath({ tablePaths }));
                 }
             );
 
-            let markWithRedBgCommand = {
+            let tableDeleteAllCommand = {
                 canUndo: false,
                 execute: function (spread, infos, c /* boolean */) {
-                    debugger;
                     const sheet = spread.getActiveSheet();
                     const table = sheet.tables.findByName(infos.tableName);
                     setTableCornerMarks({
@@ -355,11 +371,17 @@ export function DraggableDatasourceList() {
                     sheet.tables.remove(table);
                     //删除表格后，需隐藏表设计页签
                     context.handleSelectionChange();
+
+                    //删除表格后需要重新保存数据源是否已经绑定
+                    const tablePaths = getActiveSheetTablesPath({
+                        sheet,
+                    });
+                    dispatch(updateActiveSheetTablePath({ tablePaths }));
                 },
             };
             commandManager.register(
                 'tableDeleteAllForContextMenu',
-                markWithRedBgCommand,
+                tableDeleteAllCommand,
                 null,
                 false,
                 false,
@@ -709,6 +731,10 @@ function Index(props) {
         } else {
             dispatch(updateDslist({ newData, isSave: true }));
             dispatch(setIsShowDatasource());
+            //更新后表格后需要重新保存数据源是否已经绑定
+            const sheet = spread.getActiveSheet();
+            const tablePaths = getActiveSheetTablesPath({ sheet });
+            dispatch(updateActiveSheetTablePath({ tablePaths }));
         }
     };
 
@@ -761,7 +787,10 @@ function Index(props) {
                             updated: cacheDatasRef.current.updated,
                             sync: true,
                         });
-                        console.log('你确定了');
+                        //更新后表格后需要重新保存数据源是否已经绑定
+                        const sheet = spread.getActiveSheet();
+                        const tablePaths = getActiveSheetTablesPath({ sheet });
+                        dispatch(updateActiveSheetTablePath({ tablePaths }));
                     }}
                 ></ConfirmDialog>
             ) : (

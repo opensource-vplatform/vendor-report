@@ -112,22 +112,15 @@ export const datasourceSlice = createSlice({
                 }
             } */
         },
-        sheetInfos: {
-            /*  [表单实例id]:{
-                [单元格实例Id]：{
-                    rornerMarkInfo:{
-                        row:1,
-                        col:1,
-                        value:true
-                    },
-                    ...
-                }
-            } */
-        },
         previewViewDatas: {},
         isShowDatasource: false,
+        activeSheetTablePath: {},
     },
     reducers: {
+        updateActiveSheetTablePath(state, { payload }) {
+            const { tablePaths = {} } = payload;
+            state.activeSheetTablePath = tablePaths;
+        },
         pushDsList(state, { payload }) {
             const { datas, parentId } = payload;
             let parent = findTreeNodeById(parentId, state.dsList);
@@ -389,19 +382,6 @@ export const datasourceSlice = createSlice({
                 });
             });
         },
-        saveSheetInfo(state, { payload }) {
-            const { cellInstanceId, sheetInstanceId, key, value } =
-                payload.sheetInfos;
-
-            if (!state['sheetInfos'][sheetInstanceId]) {
-                state['sheetInfos'][sheetInstanceId] = {};
-            }
-
-            if (!state['sheetInfos'][sheetInstanceId][cellInstanceId]) {
-                state['sheetInfos'][sheetInstanceId][cellInstanceId] = {};
-            }
-            state['sheetInfos'][sheetInstanceId][cellInstanceId][key] = value;
-        },
     },
 });
 export const {
@@ -414,6 +394,6 @@ export const {
     genPreviewDatas,
     setIsShowDatasource,
     removeBindInfosByCellInstanceId,
-    saveSheetInfo,
+    updateActiveSheetTablePath,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

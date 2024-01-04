@@ -1,17 +1,21 @@
-import { getNamespace } from '@utils/spreadUtil';
-import { setTableCornerMarks } from '@utils/tableUtil.js';
-
 import {
     removeBindInfos,
     saveBindInfos,
-} from '../../store/datasourceSlice/datasourceSlice';
-import { findTreeNodeById, genUUID } from '../../utils/commonUtil.js';
+    updateActiveSheetTablePath,
+} from '@store/datasourceSlice/datasourceSlice';
+import {
+    findTreeNodeById,
+    genUUID,
+    getActiveSheetTablesPath,
+} from '@utils/commonUtil.js';
+import { getNamespace } from '@utils/spreadUtil';
+import { setTableCornerMarks } from '@utils/tableUtil.js';
 import {
     getCellInstanceId,
     getCellTag,
     getSheetInstanceId,
     setCellTag,
-} from '../../utils/worksheetUtil.js';
+} from '@utils/worksheetUtil.js';
 
 const GC = getNamespace();
 
@@ -89,6 +93,9 @@ export function addTable(params) {
             },
         })
     );
+
+    const tablePaths = getActiveSheetTablesPath({ sheet });
+    dispatch(updateActiveSheetTablePath({ tablePaths }));
 }
 
 export function getPath(node, treeNodes) {
@@ -275,6 +282,14 @@ export function checkHasBind(params) {
                                 return false;
                             }
 
+                            if (path !== newPath && !sync) {
+                                return true;
+                            }
+
+                            if (path !== newPath) {
+                                table.bindingPath(newPath);
+                            }
+
                             let columnHasChange = false;
                             //字段发生变化
                             table.BSt.forEach(function (tableColumn, index) {
@@ -331,7 +346,7 @@ export function checkHasBind(params) {
                                     col,
                                     cellInstanceId,
                                     sheetInstanceId,
-                                    dataPath: path,
+                                    dataPath: newPath,
                                     itemId: id,
                                 });
                             }
@@ -450,14 +465,6 @@ export function getCellRacts(spread, cellRange) {
             let topRowIndex = activeSheet.getViewportTopRow(a);
             //获取视图底部行索引
             let bottomRowIndex = activeSheet.getViewportBottomRow(a);
-
-            console.log(
-                letColumnIndex,
-                rightColumnIndex,
-                topRowIndex,
-                bottomRowIndex,
-                '索引'
-            );
             let d = new GC.Spread.Sheets.Range(
                 topRowIndex,
                 letColumnIndex,
@@ -488,7 +495,6 @@ export function getCellRacts(spread, cellRange) {
 
 export function highlightBlock(spread, cellRange) {
     const cellRacts = getCellRacts(spread, cellRange);
-    console.log(cellRacts, 'cellRanges');
     _createHighlightOneBlock();
 
     if (cellRacts && cellRacts.length > 0) {

@@ -83,3 +83,15 @@ export function genValueByType(name, type, index) {
             return name + index;
     }
 }
+
+export function getActiveSheetTablesPath(params) {
+    const { sheet } = params;
+    const tables = sheet.tables.all();
+    return tables.reduce(function (result, table) {
+        const path = table.bindingPath();
+        if (path) {
+            result[path] = true;
+        }
+        return result;
+    }, {});
+}

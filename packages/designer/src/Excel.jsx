@@ -1,32 +1,22 @@
-import {
-  Fragment,
-  useCallback,
-  useContext,
-} from 'react';
+import { Fragment, useCallback, useContext } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  Workbook,
-  Worksheet,
-} from '@components/spread/Index';
+import { Workbook, Worksheet } from '@components/spread/Index';
 import { setSpread } from '@store/appSlice/appSlice';
-import { updateDslist } from '@store/datasourceSlice/datasourceSlice';
+import {
+    updateActiveSheetTablePath,
+    updateDslist,
+} from '@store/datasourceSlice/datasourceSlice';
 import { setFontStyles } from '@store/fontSlice/fontSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
-import { findTreeNodeById } from '@utils/commonUtil';
+import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
 import DesignerContext from './DesignerContext';
-import {
-  EVENTS,
-  fire,
-} from './event/EventManager';
+import { EVENTS, fire } from './event/EventManager';
 
 export default function () {
     const dispatch = useDispatch();
@@ -58,6 +48,8 @@ export default function () {
     const handleActiveSheetChanged = useCallback((type, args) => {
         const sheet = args.newSheet;
         const styles = parseFont(sheet);
+        const tablePaths = getActiveSheetTablesPath({ sheet });
+        dispatch(updateActiveSheetTablePath({ tablePaths }));
         dispatch(setFontStyles({ styles }));
         dispatch(resetView());
         dispatch(hideTab({ code: 'table' }));
@@ -83,6 +75,11 @@ export default function () {
         if (spreadJson) {
             spread.fromJSON(JSON.parse(spreadJson));
         }
+
+        const sheet = spread.getActiveSheet();
+        const tablePaths = getActiveSheetTablesPath({ sheet });
+        dispatch(updateActiveSheetTablePath({ tablePaths }));
+
         dispatch(setSpread({ spread }));
     });
     const handleSelectionChanged = useCallback((type, data) => {
@@ -91,7 +88,7 @@ export default function () {
             args: data,
         });
     });
-    const handleSelectionChanging = useCallback((type,data)=>{
+    const handleSelectionChanging = useCallback((type, data) => {
         fire({
             event: EVENTS.SelectionChanging,
             args: data,

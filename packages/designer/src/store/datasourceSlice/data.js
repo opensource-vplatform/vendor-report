@@ -267,7 +267,7 @@ export const ds = [
         name: '工作经历',
         children: [
             {
-                id: 'A001',
+                id: 'A0001',
                 code: 'startDate',
                 name: '开始日期',
                 type: 'text',
