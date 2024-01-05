@@ -118,10 +118,10 @@ const ButtonWrap = styled.div`
 `;
 
 export default function (props) {
-    const { value = '#000000', onClose,onChange } = props;
+    const { value = '#ffffff', onClose,onChange } = props;
     const palletPointer = useRef(null);
     const [data, setData] = useState(() => {
-        const rgb = hexToRgb(value);
+        const rgb = hexToRgb(value==null ? '#ffffff':value);
         return {
             isDragingHueSat: false,
             isDragingLum: false,
@@ -132,7 +132,7 @@ export default function (props) {
     });
     useEffect(()=>{
         setData((data)=>{
-            const rgb = hexToRgb(value);
+            const rgb = hexToRgb(value==null ? '#ffffff':value);
             return {
                 isDragingHueSat: false,
                 isDragingLum: false,
