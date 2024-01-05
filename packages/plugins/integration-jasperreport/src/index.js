@@ -1,3 +1,3 @@
 import JasperReportTransform from './JasperReportTransform';
 
-export { JasperReportTransform };
+export default JasperReportTransform;

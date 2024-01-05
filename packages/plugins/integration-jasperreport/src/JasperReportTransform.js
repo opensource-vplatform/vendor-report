@@ -4,12 +4,15 @@ class JasperReportTransform{
 
     data = {};
 
-    constructor(data){
+    ctx = {};
+
+    constructor(data,ctx){
         this.data = data;
+        this.ctx = ctx;
     }
 
     transform(){
-        return testTransform(this.data);
+        return testTransform({spreadJsonData:this.data,dsList:this.ctx.dsList});
     }
 
 }
