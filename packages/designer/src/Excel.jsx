@@ -8,7 +8,7 @@ import {
     updateActiveSheetTablePath,
     updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import { setFontStyles } from '@store/fontSlice/fontSlice';
+import { setFontStyles, setIsStrickoutLine } from '@store/fontSlice/fontSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
@@ -17,6 +17,7 @@ import { getCellTag } from '@utils/worksheetUtil';
 
 import DesignerContext from './DesignerContext';
 import { EVENTS, fire } from './event/EventManager';
+import { isLineThrough } from './utils/fontUtil';
 
 export default function () {
     const dispatch = useDispatch();
@@ -44,6 +45,14 @@ export default function () {
         const styles = parseFont(sheet);
         dispatch(setFontStyles({ styles }));
         context.handleSelectionChange();
+
+        // 解析textDecoration数值，验证是否选中删除线
+        const { textDecoration } = styles;
+        dispatch(
+            setIsStrickoutLine({
+                isStrickoutLine: isLineThrough(textDecoration),
+            })
+        );
     };
     const handleActiveSheetChanged = useCallback((type, args) => {
         const sheet = args.newSheet;

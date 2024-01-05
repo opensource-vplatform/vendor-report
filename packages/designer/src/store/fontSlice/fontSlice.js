@@ -12,7 +12,7 @@ export const fontSlice = createSlice({
         fontWeight: 'normal',
         fontVariant: 'normal',
         lineHeight: 'normal',
-        textDecoration: undefined,
+        textDecoration: 0,
         vAlign: null,
         hAlign: null,
         isVerticalText: false,
@@ -23,6 +23,7 @@ export const fontSlice = createSlice({
         textOrientation: undefined,
         //文字竖向排列
         isVerticalText: undefined,
+        isStrickoutLine: null,
     },
     reducers: {
         setHAlign(state, action) {
@@ -64,7 +65,9 @@ export const fontSlice = createSlice({
             if (styles) {
                 Object.assign(state, styles);
             }
-            console.log('state :>> ', state.hAlign);
+        },
+        setIsStrickoutLine(state, action) {
+            state.isStrickoutLine = action.payload.isStrickoutLine;
         },
     },
     extraReducers: (builder) => {
@@ -86,5 +89,6 @@ export const {
     setTextDecoration,
     setBackColor,
     setForeColor,
+    setIsStrickoutLine,
 } = fontSlice.actions;
 export default fontSlice.reducer;

@@ -331,12 +331,15 @@
         .fontList {
             height: 210px;
             width: 330px;
+            font-size: 12px;
         }
         .fontStyle {
+            font-size: 12px;
             height: 210px;
             width: 170px;
         }
         .fontSize {
+            font-size: 12px;
             height: 210px;
             width: 170px;
         }
@@ -353,6 +356,7 @@
             span {
                 display: block;
                 height: 20px;
+                font-size: 12px;
             }
             .effect {
                 width: 318px;
@@ -375,7 +379,13 @@
             .fontColor {
                 width: 330px;
                 height: 50px;
-
+                span {
+                    display: block;
+                    padding-left: 5px;
+                    width: 330px;
+                    height: 20px;
+                    font-size: 12px;
+                }
                 .lineColor {
                     width: 325px;
                     height: 24px;
@@ -395,12 +405,6 @@
                     &:hover {
                         border: 1px solid black;
                     }
-                }
-                span {
-                    display: block;
-                    padding-left: 5px;
-                    width: 330px;
-                    height: 20px;
                 }
             }
         }

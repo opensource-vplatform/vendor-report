@@ -397,20 +397,41 @@ export function unMergeCell(spread) {
     });
 }
 
-export function isUnderline(textDecoration) {
-    return textDecoration == 1;
-}
-
+// 下划线
 export function toUnderline() {
     return 1;
 }
 
-export function isDoubleUnderline(textDecoration) {
-    return textDecoration == 8;
+// 删除线
+export function toLineThrough() {
+    return 2;
 }
 
+// 上划线
+export function toOverline() {
+    return 4;
+}
+
+// 双下划线
 export function toDoubleUnderline() {
     return 8;
+}
+
+export function isUnderline(textDecoration) {
+    return textDecoration == 1 || textDecoration - 2 == 1;
+}
+
+export function isDoubleUnderline(textDecoration) {
+    return textDecoration == 8 || textDecoration - 2 == 8;
+}
+
+export function isLineThrough(textDecoration) {
+    return (
+        textDecoration == 2 ||
+        textDecoration - toUnderline() == 2 ||
+        textDecoration - toOverline() == 2 ||
+        textDecoration - toDoubleUnderline() == 2
+    );
 }
 
 export function setBorderByType(spread, type, color, lineType) {

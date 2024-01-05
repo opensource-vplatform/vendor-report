@@ -50,6 +50,12 @@ import {
     unMergeCell,
     setAlign,
     setIndentByCounter,
+    toUnderline,
+    toDoubleUnderline,
+    toLineThrough,
+    isUnderline,
+    isDoubleUnderline,
+    isLineThrough,
 } from '@utils/fontUtil.js';
 import {
     setBorderColor,
@@ -67,8 +73,16 @@ import {
 import { setShowEllipsis, setShrinkToFit } from '@utils/borderUtil.js';
 
 import { getFontFamilies, getFontSizes } from '@metadatas/font';
-import { setFontSize } from '../../store/fontSlice/fontSlice';
 
+import {
+    setFontFamily,
+    setFontSize,
+    setFontStyle,
+    setFontWeight,
+    setForeColor,
+    setTextDecoration,
+    setIsStrickoutLine,
+} from '@store/fontSlice/fontSlice.js';
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
@@ -116,11 +130,11 @@ function CellStyleSetting(props) {
     const [selectedFontStyle, setSelectedFontStyle] = useState('常规');
     const [selectedUnderlineStyle, setSelectedUnderlineStyle] = useState('无');
     const [fontColor, setFontColor] = useState('black');
-    const [isStrickout, setIsStrickout] = useState(false);
+
     const fontFamilies = getFontFamilies();
     const fontSizes = getFontSizes();
 
-    const fontStyle = useSelector(({ fontSlice }) => fontSlice);
+    const fontStyles = useSelector(({ fontSlice }) => fontSlice);
     const borderStyle = useSelector(({ borderSlice }) => borderSlice);
     const {
         spread,
@@ -129,7 +143,14 @@ function CellStyleSetting(props) {
         wordWrap,
         textOrientation,
         isVerticalText,
-    } = fontStyle;
+        fontFamily = '微软雅黑',
+        fontWeight,
+        fontStyle,
+        fontSize = 11,
+        textDecoration,
+        foreColor = 'black',
+        isStrickoutLine,
+    } = fontStyles;
 
     const { color, tabValueCellSetting, isOpenCellSetting } = borderStyle;
 
@@ -318,6 +339,54 @@ function CellStyleSetting(props) {
         return sheet.getText(selections[0].row, selections[0].col);
     }
 
+    // 计算TextDecoration数值
+    function calculatesTheTextDecorationNumber() {
+        let textDecorationNumber = 0;
+        switch (selectedUnderlineStyle) {
+            case '单下划线':
+                textDecorationNumber += toUnderline();
+                break;
+            case '双下划线':
+                textDecorationNumber += toDoubleUnderline();
+                break;
+            case '无':
+                break;
+            default:
+                break;
+        }
+        if (isStrickoutLine) {
+            textDecorationNumber += toLineThrough();
+        }
+        return textDecorationNumber;
+    }
+
+    // 解析TextDecoration数值
+    function parseTextDecoration(textDecoration) {
+        if (textDecoration == 1 || textDecoration - 2 == 1) {
+            return '单下划线';
+        } else if (textDecoration == 8 || textDecoration - 2 == 8) {
+            return '双下划线';
+        } else {
+            return '无';
+        }
+    }
+
+    // 转换字形选择框对应的key
+    function transformFontToselectedFontStyleKey() {
+        let selectFontKey = '';
+        if (fontWeight === 'bold' && fontStyle === 'italic') {
+            selectFontKey = fontWeight + fontStyle;
+        } else if (fontWeight !== 'bold' && fontStyle !== 'italic') {
+            selectFontKey = 'normal';
+        } else if (fontWeight === 'bold') {
+            selectFontKey = 'bold';
+        } else if (fontStyle === 'italic') {
+            selectFontKey = 'italic';
+        }
+
+        return FontStyle[selectFontKey];
+    }
+
     const handleOK = () => {
         dispatch(setIsOpenCellSetting(false));
         dispatch(setTabValueCellSetting('数字'));
@@ -362,6 +431,31 @@ function CellStyleSetting(props) {
             );
         dispatch(setHAlign({ hAlign: textHAlignValue }));
         dispatch(setVAlign({ vAlign: textVAlignValue }));
+
+        // 字体
+        dispatch(setFontFamily({ fontFamily: selectedFontFamily }));
+        dispatch(setForeColor({ foreColor: fontColor }));
+        dispatch(setFontSize({ fontSize: selectedFontSize }));
+
+        dispatch(
+            setFontWeight({
+                fontWeight: selectedFontStyle.includes('bold')
+                    ? 'bold'
+                    : 'normal',
+            })
+        );
+        dispatch(
+            setFontStyle({
+                fontStyle: selectedFontStyle.includes('italic')
+                    ? 'italic'
+                    : 'normal',
+            })
+        );
+        dispatch(
+            setTextDecoration({
+                textDecoration: calculatesTheTextDecorationNumber(),
+            })
+        );
 
         // 初始化
         setBorderBottom(false);
@@ -573,12 +667,9 @@ function CellStyleSetting(props) {
         setFontColor(color);
     };
     const handleIsStrickout = (event) => {
-        setIsStrickout(event.target.checked);
+        dispatch(setIsStrickoutLine({ isStrickoutLine: !isStrickoutLine }));
+        // setIsStrickout(event.target.checked);
     };
-
-    useEffect(() => {
-        console.log('object :>> ', selectedFontStyle);
-    }, [selectedFontStyle]);
 
     useEffect(() => {
         let tempValue = firstCellValue ? firstCellValue : '12345';
@@ -1108,7 +1199,7 @@ function CellStyleSetting(props) {
                                     values={fontFamiliesToListData(
                                         fontFamilies
                                     )}
-                                    selectedValue={selectedFontFamily}
+                                    selectedValue={fontFamily}
                                     onChange={handleFontFamily}
                                 />
                             </div>
@@ -1119,7 +1210,7 @@ function CellStyleSetting(props) {
                                     height='150px'
                                     isHasInput={true}
                                     values={Object.values(FontStyle)}
-                                    selectedValue={FontStyle[selectedFontStyle]}
+                                    selectedValue={transformFontToselectedFontStyleKey()}
                                     onChange={handleFontStyle}
                                 />
                             </div>
@@ -1130,7 +1221,7 @@ function CellStyleSetting(props) {
                                     height='150px'
                                     isHasInput={true}
                                     values={fontFamiliesToListData(fontSizes)}
-                                    selectedValue={selectedFontSize}
+                                    selectedValue={fontSize}
                                     onChange={handleFontSize}
                                 />
                             </div>
@@ -1149,7 +1240,9 @@ function CellStyleSetting(props) {
                                             width: '100%',
                                         }}
                                         onChange={handleUnderlineStyle}
-                                        value={selectedUnderlineStyle}
+                                        value={parseTextDecoration(
+                                            textDecoration
+                                        )}
                                     ></Select>
                                 </div>
                                 <div className='effect'>
@@ -1169,7 +1262,7 @@ function CellStyleSetting(props) {
                                         <div className='strikethrough'>
                                             <input
                                                 type='checkbox'
-                                                checked={isStrickout}
+                                                checked={isStrickoutLine}
                                                 onChange={handleIsStrickout}
                                             ></input>
                                             <span>删除线</span>
@@ -1190,7 +1283,7 @@ function CellStyleSetting(props) {
                                             <div
                                                 className='colorPreView'
                                                 style={{
-                                                    backgroundColor: fontColor,
+                                                    backgroundColor: foreColor,
                                                 }}
                                             ></div>
                                             <div className='arrowDownIcon'>
@@ -1238,7 +1331,7 @@ function CellStyleSetting(props) {
                                                         ? 'italic'
                                                         : 'normal',
                                                 textDecorationLine: `${
-                                                    isStrickout
+                                                    isStrickoutLine
                                                         ? 'line-through'
                                                         : ''
                                                 } ${
@@ -1250,7 +1343,7 @@ function CellStyleSetting(props) {
                                                 borderBottom:
                                                     selectedUnderlineStyle ===
                                                     '双下划线'
-                                                        ? '3px double rgb(0, 0, 0)'
+                                                        ? `3px double ${fontColor}`
                                                         : 'unset',
                                             }}
                                         >
