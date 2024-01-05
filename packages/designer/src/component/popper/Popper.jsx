@@ -37,7 +37,13 @@ const PopperContentWrap = styled.div`
 `;
 
 export default function (props) {
-    const { style = {},children,content = null,contentStyle={} } = props;
+    const {
+        style = {},
+        children,
+        content = null,
+        contentStyle = {},
+        disabled = false,
+    } = props;
     const [contentVisible, setContentVisible] = useState(false);
     return (
         <Fragment>
@@ -50,9 +56,10 @@ export default function (props) {
             ) : null}
             <Wrap
                 onClick={(evt) => {
+                    if (disabled) return;
                     if (!evt.target.closest('.popper-content-wrap')) {
                         setContentVisible(true);
-                    }else{
+                    } else {
                         setContentVisible(false);
                     }
                 }}
@@ -60,7 +67,10 @@ export default function (props) {
             >
                 {children}
                 {contentVisible ? (
-                    <PopperContentWrap className='popper-content-wrap' style={contentStyle}>
+                    <PopperContentWrap
+                        className='popper-content-wrap'
+                        style={contentStyle}
+                    >
                         {content}
                     </PopperContentWrap>
                 ) : null}

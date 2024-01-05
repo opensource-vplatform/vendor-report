@@ -32,6 +32,7 @@ export default function (props) {
         children,
         //菜单项最大个数，超出此个数将出现竖向滚动条
         optionMaxSize = 10,
+        disabled=false,
         value,
     } = props;
     let contentStyle = {
@@ -50,6 +51,7 @@ export default function (props) {
     return (
         <Popper
             style={style}
+            disabled={disabled}
             content={
                 <ItemsPanel value={value} items={datas} optionMaxSize={optionMaxSize} onNodeClick={handleNodeClick}></ItemsPanel>
             }

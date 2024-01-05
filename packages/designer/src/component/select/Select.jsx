@@ -21,6 +21,10 @@ const Wrap = styled.div`
     height: 24px;
     padding: 0 0 0 0.2em;
     width: 100%;
+    &[data-disabled='true']{
+        background: #f3f3f3;
+        cursor:not-allowed;
+    }
 `;
 
 const Text = styled.div``;
@@ -55,6 +59,7 @@ export default function (props) {
         lineIndexs = [],
         //能否取消选择
         cancelAble = false,
+        disabled=false,
         //取消选择值
         cancelValue = undefined,
         value,
@@ -77,9 +82,10 @@ export default function (props) {
             lineIndexs={lineIndexs}
             cancelAble={cancelAble}
             cancelValue={cancelValue}
+            disabled = {disabled}
             value={data.value}
         >
-            <Wrap style={style}>
+            <Wrap style={style} data-disabled={disabled}>
                 <Text>{data.text}</Text>
                 <ArrowDown></ArrowDown>
             </Wrap>
