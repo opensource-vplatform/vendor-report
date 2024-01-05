@@ -1,10 +1,14 @@
 import {
   createRef,
-  Fragment,
   useState,
 } from 'react';
 
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
+import { showLoadingMessage } from '@utils/messageUtil';
 
 import {
   CsvIcon,
@@ -17,18 +21,17 @@ import {
   ImportButtonWrap,
   None,
 } from '../Components';
-import WaitMsg from '../WaitMsg';
 
 function CsvImport(props) {
     const { closeHandler } = props;
     const { spread } = useSelector(({ appSlice }) => appSlice);
+    const dispatch = useDispatch();
     const iptRef = createRef(null);
     const [data, setData] = useState({
         rowDelimiter: '\\r\\n',
         columnDelimiter: ',',
-        encoding: 'UTF8'
+        encoding: 'UTF8',
     });
-    const [loading, setLoading] = useState(false);
     const importHandler = () => {
         if (iptRef.current) {
             iptRef.current.click();
@@ -37,82 +40,97 @@ function CsvImport(props) {
     const handleFileChange = (evt) => {
         const fileList = evt.target.files;
         if (fileList && fileList[0] && spread) {
-            setLoading(true);
+            showLoadingMessage(dispatch, '导入中...');
             setTimeout(() => {
                 const file = fileList[0];
                 const reader = new FileReader();
                 const importCsvOptions = {
-                    columnDelimiter: data.columnDelimiter||'\\r\\n',
-                    encoding: data.encoding||"UTF8",
-                    rowDelimiter: data.rowDelimiter||',',
+                    columnDelimiter: data.columnDelimiter || '\\r\\n',
+                    encoding: data.encoding || 'UTF8',
+                    rowDelimiter: data.rowDelimiter || ',',
                 };
                 reader.onload = () => {
-                    const sheet = spread.getActiveSheet()
-                    sheet.setCsv(0, 0, reader.result, importCsvOptions.rowDelimiter, importCsvOptions.columnDelimiter);
+                    const sheet = spread.getActiveSheet();
+                    sheet.setCsv(
+                        0,
+                        0,
+                        reader.result,
+                        importCsvOptions.rowDelimiter,
+                        importCsvOptions.columnDelimiter
+                    );
                     closeHandler();
-                    setLoading(false);
+                    showLoadingMessage(dispatch, null);
                 };
-                reader.readAsText(file,importCsvOptions.encoding);
+                reader.readAsText(file, importCsvOptions.encoding);
             }, 500);
         }
     };
     return (
-        <Fragment>
-            {loading ? <WaitMsg></WaitMsg> : null}
-            <DetailWrap>
-                <DetailTitle>CSV文件</DetailTitle>
-                <DetialOptions>
-                    <DetailOption>行分隔符</DetailOption>
-                    <DetailOption>
-                        <DetailInput type='text'
+        <DetailWrap>
+            <DetailTitle>CSV文件</DetailTitle>
+            <DetialOptions>
+                <DetailOption>行分隔符</DetailOption>
+                <DetailOption>
+                    <DetailInput
+                        type='text'
                         value={data.rowDelimiter}
                         onChange={(evt) => {
                             setData((data) => {
-                                return { ...data, rowDelimiter: evt.target.value };
+                                return {
+                                    ...data,
+                                    rowDelimiter: evt.target.value,
+                                };
                             });
-                        }}></DetailInput>
-                    </DetailOption>
-                    <DetailOption>列分隔符</DetailOption>
-                    <DetailOption>
-                        <DetailInput type='text'
+                        }}
+                    ></DetailInput>
+                </DetailOption>
+                <DetailOption>列分隔符</DetailOption>
+                <DetailOption>
+                    <DetailInput
+                        type='text'
                         value={data.columnDelimiter}
                         className='import-ipt'
                         onChange={(evt) => {
                             setData((data) => {
-                                return { ...data, columnDelimiter: evt.target.value };
+                                return {
+                                    ...data,
+                                    columnDelimiter: evt.target.value,
+                                };
                             });
-                        }}></DetailInput>
-                    </DetailOption>
-                    <DetailOption>文件编码</DetailOption>
-                    <DetailOption>
-                        <DetailInput type='text'
-                       value={data.encoding}
-                       className='import-ipt'
-                       onChange={(evt) => {
-                           setData((data) => {
-                               return { ...data, encoding: evt.target.value };
-                           });
-                       }}></DetailInput>
-                    </DetailOption>
-                </DetialOptions>
-                <ImportButtonWrap
-                    onClick={() => {
-                        importHandler();
-                    }}
-                >
-                    <CsvIcon></CsvIcon>
-                    <IconTitle>导入CSV文件</IconTitle>
-                </ImportButtonWrap>
-                <None>
-                    <input
-                        type='file'
-                        accept='.csv'
-                        ref={iptRef}
-                        onChange={handleFileChange}
-                    ></input>
-                </None>
-            </DetailWrap>
-        </Fragment>
+                        }}
+                    ></DetailInput>
+                </DetailOption>
+                <DetailOption>文件编码</DetailOption>
+                <DetailOption>
+                    <DetailInput
+                        type='text'
+                        value={data.encoding}
+                        className='import-ipt'
+                        onChange={(evt) => {
+                            setData((data) => {
+                                return { ...data, encoding: evt.target.value };
+                            });
+                        }}
+                    ></DetailInput>
+                </DetailOption>
+            </DetialOptions>
+            <ImportButtonWrap
+                onClick={() => {
+                    importHandler();
+                }}
+            >
+                <CsvIcon></CsvIcon>
+                <IconTitle>导入CSV文件</IconTitle>
+            </ImportButtonWrap>
+            <None>
+                <input
+                    type='file'
+                    accept='.csv'
+                    ref={iptRef}
+                    onChange={handleFileChange}
+                ></input>
+            </None>
+        </DetailWrap>
     );
 }
 

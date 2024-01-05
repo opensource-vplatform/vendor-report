@@ -1,4 +1,4 @@
-import Loading from '@components/loading/Index';
+import Loading from './Loading';
 
 function WaitMsg(props) {
     const {title='导入中...'} = props;

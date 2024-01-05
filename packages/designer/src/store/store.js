@@ -34,7 +34,7 @@ export default configureStore({
         navSlice,
         tableDesignSlice,
     },
-    middleware(getDefaultMiddleware) {
+    middleware:function(getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });
     },
 });

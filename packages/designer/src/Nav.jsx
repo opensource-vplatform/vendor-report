@@ -1,10 +1,12 @@
+import { Fragment } from 'react';
+
 import {
   useDispatch,
   useSelector,
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Button from '@components/Button/Index';
+import Button from '@components/button/Index';
 import {
   Tab,
   Tabs,
@@ -16,7 +18,15 @@ import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
 
-import { setMode } from './store/appSlice/appSlice';
+import {
+  EVENTS,
+  fire,
+} from './event/EventManager';
+import {
+  setErrorMsg,
+  setMode,
+  setWaitMsg,
+} from './store/appSlice/appSlice';
 import { genPreviewDatas } from './store/datasourceSlice/datasourceSlice';
 import Formula from './tabs/formula/Index';
 
@@ -60,21 +70,75 @@ const FormulaNavItem = WithNavItem(Formula);
 export default function () {
     const dispatch = useDispatch();
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const handleSave = () => {
+        if (spread) {
+            const data = spread.toJSON();
+            const result = fire({ event: EVENTS.onSave, args: { data } });
+            if (result.length > 0) {
+                dispatch(setWaitMsg({ message: "正在保存，请稍候..." }));
+                const promise = result[0];
+                if (promise instanceof Promise) {
+                    promise
+                        .then((data) => {
+                            if (data.success) {
+                                dispatch(setWaitMsg({ message: null }));
+                            } else {
+                                dispatch(setWaitMsg({ message: null }));
+                                dispatch(
+                                    setErrorMsg({ message: data.message })
+                                );
+                            }
+                        })
+                        .catch((e) => {
+                            dispatch(
+                                setErrorMsg({
+                                    message:
+                                        typeof e == 'string'
+                                            ? e
+                                            : e.message
+                                              ? e.message
+                                              : null,
+                                })
+                            );
+                        });
+                } else {
+                    throw Error(
+                        'onSave事件回调返回值不正确，期望：Promise实例，实际：' +
+                            typeof promise
+                    );
+                }
+            } else {
+                dispatch(setWaitMsg({ message: null }));
+            }
+        }
+    };
     return (
         <Tabs
             value={active}
             hideCodes={hideCodes}
             onChange={(code) => dispatch(setActive({ code }))}
             tool={
-                <Button
-                    style={{ marginRight: 8 }}
-                    onClick={() => {
-                        dispatch(genPreviewDatas());
-                        dispatch(setMode({ mode: 'preview' }));
-                    }}
-                >
-                    预览
-                </Button>
+                <Fragment>
+                    <Button
+                        style={{
+                            marginRight: 8,
+                        }}
+                        type='primary'
+                        onClick={handleSave}
+                    >
+                        保存
+                    </Button>
+                    <Button
+                        style={{ marginRight: 8 }}
+                        onClick={() => {
+                            dispatch(genPreviewDatas());
+                            dispatch(setMode({ mode: 'preview' }));
+                        }}
+                    >
+                        预览
+                    </Button>
+                </Fragment>
             }
         >
             <FileNavItem

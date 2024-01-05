@@ -4,19 +4,22 @@ import {
   useState,
 } from 'react';
 
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Dialog from '@components/dialog/Index';
-import Error from '@components/error/Index';
-import { getFormulaMetadata } from '@metadatas/formula';
-
 import {
   bind,
   EVENTS,
   unbind,
-} from '../../../event/EventManager';
-import { withBatchUpdate } from '../../../utils/spreadUtil';
+} from '@event/EventManager';
+import { getFormulaMetadata } from '@metadatas/formula';
+import { showErrorMessage } from '@utils/messageUtil';
+import { withBatchUpdate } from '@utils/spreadUtil';
+
 import {
   ButtonWrap,
   FormulaButton,
@@ -123,6 +126,7 @@ const argsToFormulaArgs = function (args) {
 export default function (props) {
     const { code, onClose } = props;
     const { spread } = useSelector(({ appSlice }) => appSlice);
+    const dispatch = useDispatch();
     const metadata = getFormulaMetadata(code);
     const [data, setData] = useState(() => {
         const args = metadata.args || [];
@@ -131,7 +135,6 @@ export default function (props) {
             col: 0,
             mode: 'base',
             current: 0,
-            errorMessage: null,
             args: args.map((arg) => {
                 return { ...arg, exp: '' };
             }),
@@ -199,10 +202,7 @@ export default function (props) {
                 sheet.setSelection(row, col, 1, 1);
             });
         } catch (e) {
-            return setData({
-                ...data,
-                errorMessage: typeof e == 'string' ? e : e.message,
-            });
+            showErrorMessage(dispatch, typeof e == 'string' ? e : e.message);
         }
         if (typeof onClose == 'function') {
             onClose();
@@ -238,65 +238,53 @@ export default function (props) {
         }
     }, []);
     return (
-        <Fragment>
-            {data.errorMessage == null ? (
-                <Dialog
-                    title='函数参数'
-                    mask={false}
-                    onClose={handleDialogClose}
-                    anchor={true}
-                    closable={false}
-                >
-                    <Wrap>
-                        {data.mode == 'base' ? (
-                            <Fragment>
-                                <FormulaWrap>
-                                    <FormulaTitle>{code}</FormulaTitle>
-                                    <FormulaArgsWrap>
-                                        <FormulaArgs
-                                            data={data}
-                                            setData={setData}
-                                        ></FormulaArgs>
-                                    </FormulaArgsWrap>
-                                </FormulaWrap>
-                                <FormulaDesc style={{ marginTop: 8 }}>
-                                    {metadata.desc}
-                                </FormulaDesc>
-                                <FormulaResult>
-                                    =
-                                    <FormulaExample
-                                        code={code}
-                                        style={{maxWidth:380}}
-                                        argNames={formulaArgs}
-                                    ></FormulaExample>
-                                </FormulaResult>
-                                <ButtonWrap>
-                                    <FormulaButton onClick={handleDialogClose}>
-                                        取消
-                                    </FormulaButton>
-                                    <FormulaButton
-                                        style={{ marginRight: 8 }}
-                                        onClick={handleFormulaSetting}
-                                    >
-                                        确定
-                                    </FormulaButton>
-                                </ButtonWrap>
-                            </Fragment>
-                        ) : null}
-                        {data.mode == 'rangSelect' ? (
-                            <RangSelector
-                                data={data}
-                                setData={setData}
-                            ></RangSelector>
-                        ) : null}
-                    </Wrap>
-                </Dialog>
-            ) : (
-                <Error
-                    message={data.errorMessage}
-                    onClose={handleDialogClose}
-                ></Error>
-            )}
-        </Fragment>
+        <Dialog
+            title='函数参数'
+            mask={false}
+            onClose={handleDialogClose}
+            anchor={true}
+            closable={false}
+        >
+            <Wrap>
+                {data.mode == 'base' ? (
+                    <Fragment>
+                        <FormulaWrap>
+                            <FormulaTitle>{code}</FormulaTitle>
+                            <FormulaArgsWrap>
+                                <FormulaArgs
+                                    data={data}
+                                    setData={setData}
+                                ></FormulaArgs>
+                            </FormulaArgsWrap>
+                        </FormulaWrap>
+                        <FormulaDesc style={{ marginTop: 8 }}>
+                            {metadata.desc}
+                        </FormulaDesc>
+                        <FormulaResult>
+                            =
+                            <FormulaExample
+                                code={code}
+                                style={{ maxWidth: 380 }}
+                                argNames={formulaArgs}
+                            ></FormulaExample>
+                        </FormulaResult>
+                        <ButtonWrap>
+                            <FormulaButton onClick={handleDialogClose}>
+                                取消
+                            </FormulaButton>
+                            <FormulaButton
+                                style={{ marginRight: 8 }}
+                                onClick={handleFormulaSetting}
+                            >
+                                确定
+                            </FormulaButton>
+                        </ButtonWrap>
+                    </Fragment>
+                ) : null}
+                {data.mode == 'rangSelect' ? (
+                    <RangSelector data={data} setData={setData}></RangSelector>
+                ) : null}
+            </Wrap>
+        </Dialog>
     );
 }

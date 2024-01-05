@@ -3,7 +3,6 @@ import {
   resolve,
 } from 'path';
 import { fileURLToPath } from 'url';
-import { defineConfig } from 'vite';
 
 import react from '@vitejs/plugin-react';
 
@@ -11,19 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = dirname(__filename);
 
-export default defineConfig({
-    build: {
-        target: 'es2015',
-        lib: {
-            name: 'TOONE',
-            entry: 'src/Index.jsx',
-            fileName: 'index-[hash]',
-            formats: ['umd'],
-        },
-    },
-    define: {
-        'process.env': {},
-    },
+export default {
     resolve: {
         alias: [
             {
@@ -57,8 +44,13 @@ export default defineConfig({
             {
                 find: '@tabs',
                 replacement: resolve(__dirname, 'src/tabs'),
+            },{
+                find: '@event',
+                replacement: resolve(__dirname, 'src/event'),
             },
         ],
     },
-    plugins: [react()],
-});
+    plugins: [
+        react()
+    ],
+};

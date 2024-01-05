@@ -11,21 +11,28 @@ import {
 import { getNamespace } from '@utils/spreadUtil';
 
 import Designer from './Designer';
+import { bind } from './event/EventManager';
 
 class ReportDesigner {
     conf = {};
 
     constructor(conf) {
         this.conf = conf;
+        if (this.conf && this.conf.event) {
+            const events = this.conf.event;
+            for (let [event, handler] of Object.entries(events)) {
+                bind({ id: "TOONE_EXCEL_ONSAVE", event, handler });
+            }
+        }
     }
 
-    async mount(el) {
-        if(this.conf&&this.conf.license){
+    mount(el) {
+        if (this.conf && this.conf.license) {
             setLicense(this.conf.license);
         }
         const GC = getNamespace();
         const license = getLicense();
-        if(license){
+        if (license) {
             GC.Spread.Sheets.LicenseKey = license;
         }
         GC.Spread.Common.CultureManager.culture('zh-cn');

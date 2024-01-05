@@ -7,6 +7,10 @@ export const EVENTS = {
      * 选择变更后事件
      */
     SelectionChanged:"SelectionChanged",
+    /**
+     * 保存
+     */
+    onSave: "onSave",
 };
 
 const check = function (params) {
@@ -74,13 +78,15 @@ export const fire = function (params) {
     check(params);
     const {event,args} = params;
     const handlers = EVENT_HANDLER_MAP[event];
+    const result = [];
     if(handlers){
         for(let [id,handler] of Object.entries(handlers)){
             try{
-                handler(args);
+                result.push(handler(args));
             }catch(e){
                 handler(null,e);
             }
         }
     }
+    return result;
 };

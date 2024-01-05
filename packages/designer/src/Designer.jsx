@@ -1,13 +1,28 @@
-import React, { Fragment, useState } from 'react';
+import React, {
+  Fragment,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled, { createGlobalStyle } from 'styled-components';
 
-import { hideTab, setActive, showTab } from '@store/navSlice/navSlice';
-import { isBindingTable } from '@utils/bindingUtil';
+import Error from '@components/error/Index';
+import Loading from '@components/loading/Index';
+import { setErrorMsg } from '@store/appSlice/appSlice';
+import {
+  hideTab,
+  setActive,
+  showTab,
+} from '@store/navSlice/navSlice';
+import { isBindingTable } from '@utils/worksheetUtil';
 
 import CellStyleSetting from './component/cellStyles/cellStyleSetting';
-import { DraggableDatasourceList } from './component/defineDatasource/defineDatasource';
+import {
+  DraggableDatasourceList,
+} from './component/defineDatasource/defineDatasource';
 import DesignerContext from './DesignerContext';
 import Excel from './Excel';
 import Nav from './Nav';
@@ -44,6 +59,8 @@ const Wrap = styled.div`
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+        'Microsoft YaHei', 微软雅黑, Arial, sans-serif;
 `;
 
 const Box = styled.div`
@@ -61,7 +78,9 @@ const SpreadWrap = styled.div`
 
 function Designer() {
     const dispatch = useDispatch();
-    const { mode, spread } = useSelector(({ appSlice }) => appSlice);
+    const { mode, spread, waitMsg, errorMsg } = useSelector(
+        ({ appSlice }) => appSlice
+    );
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     const [data] = useState({});
     data.spread = spread;
@@ -90,6 +109,15 @@ function Designer() {
         <Fragment>
             <DesignerContext.Provider value={ctxValue}>
                 <GlobalStyle></GlobalStyle>
+                {waitMsg != null ? <Loading title={waitMsg}></Loading> : null}
+                {errorMsg != null ? (
+                    <Error
+                        message={errorMsg}
+                        onClose={() => {
+                            dispatch(setErrorMsg({ message: null }));
+                        }}
+                    ></Error>
+                ) : null}
                 <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
                     <Wrap>
                         <Nav></Nav>

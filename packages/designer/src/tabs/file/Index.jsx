@@ -14,7 +14,6 @@ const Wrap = styled.div`
     left: 0;
     top: 0;
     background-color: white;
-    font-family: Tahoma, Arial, Helvetica, "Microsoft YaHei New", "Microsoft Yahei", "微软雅黑", "宋体", SimSun, STXihei, "华文细黑", sans-serif;
     z-index: 1000;
 `;
 

@@ -4,23 +4,22 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="styles.css" />
-        <link
-            rel="stylesheet"
-            href="spreadjs/styles/gc.spread.sheets.excel2013white.16.2.6.css"
-        />
-        <script
-            type="text/javascript"
-            src="spreadjs/gc.spread.sheets.all.16.2.6.min.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="spreadjs/resources/zh/gc.spread.sheets.resources.zh.16.2.6.min.js"
-        ></script>
-        <script src="./index-90948ce3.umd.js"></script>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="vendor/styles/excel.all.16.2.6.min.css" />
         <title>同望Web报表设计器</title>
     </head>
     <body>
         <div id="app"></div>
+        <script
+            type="text/javascript"
+            src="vendor/excel.all.16.2.6.min.js"
+        ></script>
+        <script
+            type="text/javascript"
+            src="vendor/resources/zh/excel.resources.zh.16.2.6.min.js"
+        ></script>
+        <script src="./polyfill.min.js"></script>
+        <script src="./index-90948ce3.umd.js"></script>
         <script>
             var designer = new TOONE.ReportDesigner({});
             designer.mount(document.getElementById('app'));

@@ -32,7 +32,7 @@ import {
     setCellTag,
 } from '@utils/worksheetUtil.js';
 
-import { testTransform } from '../../../../plugins/transform.js';
+//import { testTransform } from '../../../../plugins/transform.js';
 import DesignerContext from '../../DesignerContext.jsx';
 import {
     addTable,
@@ -618,10 +618,10 @@ export function DraggableDatasourceList() {
                             JSON.stringify(spread.toJSON())
                         );
 
-                        testTransform({
+                        /*testTransform({
                             spreadJsonData: spread.toJSON(),
                             dsList: finalDsList,
-                        });
+                        });*/
                     }}
                 >
                     保存数据源
