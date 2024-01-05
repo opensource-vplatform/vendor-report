@@ -52,7 +52,8 @@ function getExtent(params) {
     let startRow = row;
     let endRow = row + rowCount;
     while (startRow < endRow) {
-        height += rowsSize?.[startRow++]?.size || defaultHeight;
+        height += rowsSize?.[startRow]?.size || defaultHeight;
+        startRow += 1;
     }
 
     //单元格宽度
@@ -60,7 +61,8 @@ function getExtent(params) {
     let startCol = col;
     let endCol = col + colCount;
     while (startCol < endCol) {
-        width += columnsSize?.[startCol++]?.size || defaultWidth;
+        width += columnsSize?.[startCol]?.size || defaultWidth;
+        startCol += 1;
     }
 
     return {
@@ -83,7 +85,8 @@ function getRect(params) {
     let x = 0;
     let colIndex = 0;
     while (colIndex < col) {
-        x += columnsSize?.[colIndex++]?.size || defaultWidth;
+        x += columnsSize?.[colIndex]?.size || defaultWidth;
+        colIndex += 1;
     }
 
     return {
@@ -98,12 +101,13 @@ function calculateHeight(params) {
     const { startRow, endRow, rowsSize } = params;
 
     let height = 15;
-    if (startRow !== null) {
+    if (startRow !== null && Array.isArray(rowsSize) && rowsSize.length > 0) {
         let index = 0;
         height = 0;
         let rowIndex = startRow + index;
         while (rowIndex <= endRow) {
-            height += rowsSize[rowIndex++]?.size || defaultHeight;
+            height += rowsSize[rowIndex]?.size || defaultHeight;
+            rowIndex += 1;
         }
     }
     return height;
@@ -682,7 +686,8 @@ function getJasperReportRect(params) {
     let pageWidth = leftMargin + rightMargin;
 
     while (colIndex <= endCol) {
-        pageWidth += columnsSize?.[colIndex++]?.size || defaultWidth;
+        pageWidth += columnsSize?.[colIndex]?.size || defaultWidth;
+        colIndex += 1;
     }
 
     return {
