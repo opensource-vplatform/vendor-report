@@ -1,3 +1,5 @@
 import CheckBox from './CheckBox';
+import Integer from './Integer';
+import Select from './Select';
 
-export { CheckBox };
+export { CheckBox, Integer, Select };
