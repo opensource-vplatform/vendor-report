@@ -192,17 +192,6 @@ function CellStyleSetting(props) {
     );
     const {
         spread,
-        hAlign,
-        vAlign,
-        wordWrap,
-        textOrientation,
-        isVerticalText,
-        fontFamily = '微软雅黑',
-        fontWeight,
-        fontStyle,
-        fontSize = 11,
-        textDecoration,
-        foreColor = 'black',
         isStrickoutLine,
     } = fontStyles;
 

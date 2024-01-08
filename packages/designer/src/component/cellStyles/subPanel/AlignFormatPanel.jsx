@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
 
 import styled from 'styled-components';
 
@@ -384,7 +384,7 @@ const AlignFormatPanel = (props) => {
                             />
                         </TextItem>
                     </TextItemLeft>
-                    <TextItemDIV textHAlignValue={textHAlignValue}>
+                    <TextItemDIV data-texthalignvalue={textHAlignValue}>
                         <span> 缩减：</span>
                         <Integer
                             style={{
@@ -421,13 +421,7 @@ const AlignFormatPanel = (props) => {
                         ></input>
                         <span>自动换行</span>
                     </ControlItem>
-                    <ControlledItem
-                        isWrapText={isWrapText}
-                        style={{
-                            pointerEvents: isWrapText ? 'none' : 'unset',
-                            opacity: isWrapText ? 0.6 : 1,
-                        }}
-                    >
+                    <ControlledItem data-iswraptext={isWrapText}>
                         <input
                             type='checkbox'
                             checked={isShrinkToFit}
@@ -453,7 +447,7 @@ const AlignFormatPanel = (props) => {
                     </ControlItem>
                 </TextControl>
             </LeftAlignment>
-            <Orientation textHAlignValue={textHAlignValue}>
+            <Orientation data-texthalignvalue={textHAlignValue}>
                 <fieldset
                     style={{
                         border: '1px solid lightgray',
