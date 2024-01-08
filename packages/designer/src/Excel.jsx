@@ -1,37 +1,19 @@
-import {
-  Fragment,
-  useCallback,
-  useContext,
-} from 'react';
+import { Fragment, useCallback, useContext } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  Workbook,
-  Worksheet,
-} from '@components/spread/Index';
-import {
-  EVENTS,
-  fire,
-} from '@event/EventManager';
+import { Workbook, Worksheet } from '@components/spread/Index';
+import { EVENTS, fire } from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
-  updateActiveSheetTablePath,
-  updateDslist,
+    updateActiveSheetTablePath,
+    updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import {
-  setFontStyles,
-  setIsStrickoutLine,
-} from '@store/fontSlice/fontSlice';
+import { setFontStyles, setIsStrickoutLine } from '@store/fontSlice/fontSlice';
+import { setSelectedFontColor } from '@store/cellSettingSlice/fontCellSettingSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
-import {
-  findTreeNodeById,
-  getActiveSheetTablesPath,
-} from '@utils/commonUtil';
+import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
@@ -72,6 +54,10 @@ export default function () {
                 isStrickoutLine: isLineThrough(textDecoration),
             })
         );
+        // 解析时更新选择的selectColor
+        let { foreColor } = styles;
+        if (foreColor === undefined) foreColor = 'black';
+        dispatch(setSelectedFontColor({ selectedFontColor: foreColor }));
     };
     const handleActiveSheetChanged = useCallback((type, args) => {
         const sheet = args.newSheet;

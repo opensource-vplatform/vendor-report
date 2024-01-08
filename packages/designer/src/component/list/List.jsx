@@ -1,8 +1,4 @@
-import React, {
-  createRef,
-  useEffect,
-  useState,
-} from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -14,7 +10,7 @@ const Wrap = styled.div`
 
 const Input = styled.input`
     height: 25px;
-    width: 97%;
+    width: calc(100% - 12px);
     padding-left: 10px;
     display: flex;
     align-items: center;
@@ -45,7 +41,7 @@ const ListItem = styled.div`
     :active {
         background-color: #dbdbdb;
     }
-    &:[data-selected='true'] {
+    &: [data-selected= 'true'] {
         height: 30px;
         width: auto;
         margin: 2px;
@@ -56,7 +52,7 @@ const ListItem = styled.div`
         font-size: 12px;
         background-color: #dbdbdb;
     }
-    &:[data-style='red'] {
+    &: [data-style= 'red'] {
         color: red;
     }
 `;
@@ -87,7 +83,7 @@ const List = ({
                 for (let index = 0; index < children.length; index++) {
                     const child = children[index];
                     if (child.className == 'listItemSelected') {
-                        scrollIntoView(child,true);
+                        scrollIntoView(child, true);
                         break;
                     }
                 }
@@ -108,7 +104,7 @@ const List = ({
                     return (
                         <ListItem
                             key={value + index}
-                            data-selected = {isSelected}
+                            data-selected={isSelected}
                             onClick={() => handleItemClick(value)}
                             onDoubleClick={onDoubleClick}
                         >
@@ -122,8 +118,8 @@ const List = ({
                         return (
                             <ListItem
                                 key={key}
-                                data-selected = {isSelected}
-                                data-style={key.includes('red') ? 'red':''}
+                                data-selected={isSelected}
+                                data-style={key.includes('red') ? 'red' : ''}
                                 onClick={() => handleItemClick(key)}
                             >
                                 {objDatas[key]}

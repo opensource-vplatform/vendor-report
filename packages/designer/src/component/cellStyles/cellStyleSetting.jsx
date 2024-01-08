@@ -83,6 +83,8 @@ import {
     setTextDecoration,
     setIsStrickoutLine,
 } from '@store/fontSlice/fontSlice.js';
+
+import { setSelectedFontColor } from '@store/cellSettingSlice/fontCellSettingSlice';
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
@@ -136,6 +138,9 @@ function CellStyleSetting(props) {
 
     const fontStyles = useSelector(({ fontSlice }) => fontSlice);
     const borderStyle = useSelector(({ borderSlice }) => borderSlice);
+    const fontCellSetting = useSelector(
+        ({ fontCellSettingSlice }) => fontCellSettingSlice
+    );
     const {
         spread,
         hAlign,
@@ -153,7 +158,7 @@ function CellStyleSetting(props) {
     } = fontStyles;
 
     const { color, tabValueCellSetting, isOpenCellSetting } = borderStyle;
-
+    const { selectedFontColor } = fontCellSetting;
     const fontFamiliesToListData = function (metadatas) {
         const result = [];
         metadatas.forEach((metadata) => {
@@ -434,7 +439,7 @@ function CellStyleSetting(props) {
 
         // 字体
         dispatch(setFontFamily({ fontFamily: selectedFontFamily }));
-        dispatch(setForeColor({ foreColor: fontColor }));
+        dispatch(setForeColor({ foreColor: selectedFontColor }));
         dispatch(setFontSize({ fontSize: selectedFontSize }));
 
         dispatch(
@@ -664,7 +669,7 @@ function CellStyleSetting(props) {
         setSelectedUnderlineStyle(value);
     };
     const handleColorEditorforFont = (color) => {
-        setFontColor(color);
+        dispatch(setSelectedFontColor({ selectedFontColor: color }));
     };
     const handleIsStrickout = (event) => {
         dispatch(setIsStrickoutLine({ isStrickoutLine: !isStrickoutLine }));
@@ -1277,13 +1282,14 @@ function CellStyleSetting(props) {
                                     <ColorEditor
                                         style={{ width: '188px' }}
                                         onChange={handleColorEditorforFont}
-                                        value={fontColor}
+                                        value={selectedFontColor}
                                     >
                                         <div className='lineColor'>
                                             <div
                                                 className='colorPreView'
                                                 style={{
-                                                    backgroundColor: foreColor,
+                                                    backgroundColor:
+                                                        selectedFontColor,
                                                 }}
                                             ></div>
                                             <div className='arrowDownIcon'>
@@ -1305,7 +1311,7 @@ function CellStyleSetting(props) {
                                             fontSize: '12px',
                                             height: 100,
                                             padding: 0,
-                                            marginTop: 5,
+                                            marginTop: 6,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -1323,7 +1329,7 @@ function CellStyleSetting(props) {
                                                         : 'normal',
                                                 fontSize:
                                                     selectedFontSize + 'pt',
-                                                color: fontColor,
+                                                color: selectedFontColor,
                                                 fontStyle:
                                                     selectedFontStyle.includes(
                                                         'italic'
@@ -1343,7 +1349,7 @@ function CellStyleSetting(props) {
                                                 borderBottom:
                                                     selectedUnderlineStyle ===
                                                     '双下划线'
-                                                        ? `3px double ${fontColor}`
+                                                        ? `3px double ${selectedFontColor}`
                                                         : 'unset',
                                             }}
                                         >
