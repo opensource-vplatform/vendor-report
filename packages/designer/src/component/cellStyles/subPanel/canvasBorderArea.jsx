@@ -26,8 +26,8 @@ const CanvasBorderArea = (props) => {
         context.strokeStyle = lineColor;
         canvas.style.display = 'block';
         context.lineWidth = 1;
-
         if (!isMoreCell) {
+            console.log('object :>> ', isMoreCell,!isMoreCell);
             context.font = '24px Arial';
             context.fillStyle = 'black';
             // 在 Canvas 上绘制文本
