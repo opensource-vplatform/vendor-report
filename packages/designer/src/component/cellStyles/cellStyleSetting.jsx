@@ -1,4 +1,4 @@
-import './CellStyleSetting.scss';
+
 
 import React, { useEffect, useState, useRef } from 'react';
 
@@ -62,18 +62,12 @@ import {
     setTabValueCellSetting,
     setIsOpenCellSetting,
 } from '@store/borderSlice/borderSlice';
-
 import {
     setHAlign,
     setTextOrientation,
     setVAlign,
     setWordWrap,
 } from '@store/fontSlice/fontSlice.js';
-
-import { setShowEllipsis, setShrinkToFit } from '@utils/borderUtil.js';
-
-import { getFontFamilies, getFontSizes } from '@metadatas/font';
-
 import {
     setFontFamily,
     setFontSize,
@@ -83,8 +77,472 @@ import {
     setTextDecoration,
     setIsStrickoutLine,
 } from '@store/fontSlice/fontSlice.js';
-
 import { setSelectedFontColor } from '@store/cellSettingSlice/fontCellSettingSlice';
+
+import { setShowEllipsis, setShrinkToFit } from '@utils/borderUtil.js';
+
+import { getFontFamilies, getFontSizes } from '@metadatas/font';
+
+import styled from 'styled-components';
+
+const TabPanel = styled.div`
+    margin: 10px 13px;
+    background: #fff;
+    width: 700px;
+    height: 530px;
+    border-bottom: 1px solid #d3d3d3;
+    border-left: 1px solid #d3d3d3;
+    border-right: 1px solid #d3d3d3;
+    P {
+        margin: 5px 0 0 5px;
+    }
+`;
+const CategoriesArea = styled.div`
+float: left;
+width: 150px;
+height: 423px;
+margin: 0px 5px 5px 5px;
+`;
+
+const SimpleArea = styled.div`
+    float: left;
+    width: 70%;
+    height: 61px;
+    margin: 0 5px;
+    font-size: 11px;
+    fieldset {
+        padding: 0;
+        height: 100%;
+        border: 1px solid lightgray;
+        label {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 5px;
+        }
+    }
+`;
+const RightAreaOfNumberTab = styled.div`
+    float: left;
+    width: 510px;
+    height: 220px;
+    margin: 5px;
+    span {
+        font-size:14px;
+    }
+`;
+const BottomAreaOfNumberTab =styled.div`
+font-size:14px;
+    float: left;
+    width: 670px;
+    height: 21px;
+    margin: 2px;
+    padding-left: 5px;
+    padding-top: 10px;
+`;
+const DecimalPlaces = styled.div`
+    width: 100%;
+    height: 26px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+`;
+const ThousandSeparator = styled.div`
+    height: 25px;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+`;
+const BorderTabPanel = styled.div`
+    margin: 10px;
+    display: flex;
+    width: 500px;
+    height: 300px;
+`;
+const LineArea = styled.div`
+    width: 150px;
+    height: 300px;
+    font-size: 12px;
+    display: flex;
+    span {
+        border: none;
+        display: block;
+        height: 16px;
+        margin: 5px;
+    }
+`;
+const LineStyle = styled.div`
+    display: flex;
+    width: 130px;
+    height: 150px;
+    margin: 5px;
+    border: none;
+`;
+const LineStyleLeft = styled.div`
+margin: 2px;
+width: 60px;
+height: 112px;
+border: none;
+background: transparent;
+`;
+
+const LineStyleRight = styled.div`
+margin: 2px;
+width: 60px;
+height: 112px;
+background: transparent;
+
+`;
+const LineColor = styled.div`
+width: 126px;
+height: 24px;
+margin: 5px;
+display: flex;
+border: 1px solid lightgray;
+&:hover {
+    border: 1px solid black;
+}
+`;
+const ColorPreView = styled.div`
+border: 4px solid #fff;
+width: 100px;
+height: 16px;
+`;
+const ArrowDownIcon = styled.div`
+width: 20px;
+height: 23px;
+border-left: 1px solid lightgray;
+
+`;
+
+const PreArea = styled.div`
+width: 350px;
+height: 300px;
+`;
+
+
+const PresetAreaItem = styled.div`
+width: 100px;
+height: 68px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+`;
+const PreShowArea = styled.div`
+height: 130px;
+width: 310px;
+display: flex;
+`;
+const PreShowAreaLeft = styled.div`
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+align-items: center;
+width: 50px;
+height: 120px;
+`;
+
+
+
+const PreShowAreaRight = styled.div`
+width: 250px;
+height: 120px;
+display: flex;
+justify-content: center;
+`;
+const PreShowAreaBottom = styled.div`
+width: 250px;
+height: 35px;
+position: relative;
+`;
+
+
+const BottomAreaofBorderTab = styled.div`
+font-size: 14px;
+padding-left: 12px;
+width: 550px;
+height: 35px;
+position: relative;
+`;
+const PresetArea = styled.div`
+width: 300px;
+height: 68px;
+display: flex;
+`;
+
+const AlignmentTabPanel = styled.div`
+height: 245px;
+width: 680px;
+margin: 10px;
+display: flex;
+flex-direction: row;
+`;
+const LeftAlignment = styled.div`
+width: 460px;
+height: 90px;
+display: flex;
+flex-direction: column;
+`;
+
+const LeftAlignmentItems = styled.div`
+display: flex;
+flex-direction: row;
+`;
+
+const TextItemLeft = styled.div`
+width: 260px;
+height: 58px;
+display: flex;
+flex-direction: column;
+`;
+const TextItem = styled.div`
+margin: 5px;
+display: flex;
+flex-direction: row;
+width: 260px;
+height: 24px;
+span {
+    margin-top: 3px;
+    padding-left: 30px;
+    width: 100px;
+    height: 24px;
+    font-size: 12px;
+}
+`;
+const TextItemDIV = styled.div`
+margin-top: 24px;
+margin-left: 24px;
+display: flex;
+flex-direction: row;
+width: 200px;
+height: 58px;
+pointer-events: ${(props) => (props.textHAlignValue === 4  ? 'none' : 'unset')};
+opacity: ${(props) => (props.textHAlignValue === 4  ? 0.6 : 1)};
+span {
+    font-size:14px;
+    margin-top: 2px;
+}
+`;
+const TextItemRight = styled.div`
+margin-top: 24px;
+margin-left: 24px;
+display: flex;
+flex-direction: row;
+width: 200px;
+height: 58px;
+span {
+    margin-top: 2px;
+}
+`;
+const DisabledIndent = styled.div`
+margin-top: 24px;
+margin-left: 24px;
+display: flex;
+flex-direction: row;
+width: 200px;
+height: 58px;
+span {
+    margin-top: 2px;
+}
+pointer-events: none; 
+opacity: 0.6;
+`;
+
+const TextControl = styled.div`
+width: 460px;
+height: 120px;
+`;
+
+const ControlItem = styled.div`
+width: 430px;
+height: 20px;
+margin: 10px 0 0 30px;
+
+span {
+    font-size: 12px;
+    margin-left: 3px;
+}
+input {
+    margin-top: 2px;
+}
+`;
+
+const ControlledItem = styled.div`
+width: 430px;
+height: 20px;
+margin: 10px 0 0 30px;
+pointer-events: ${(props) => (props.isWrapText ? 'none' : 'unset')};
+opacity: ${(props) => (props.isWrapText ? 0.6 : 1)};
+span {
+    font-size: 12px;
+    margin-left: 3px;
+}
+input {
+    margin-top: 2px;
+}
+`;
+const Orientation = styled.div`
+width: 140px;
+height: 220px;
+display: flex;
+margin-left: 22px;
+pointer-events: ${(props) => ( props.textHAlignValue === 4 ? 'none' : 'unset')};
+opacity: ${(props) => ( props.textHAlignValue === 4 ? 0.6 : 1)};
+`;
+
+const OrientationTopItem = styled.div`
+display: flex;
+flex-direction: row;
+width: 130px;
+height: 150px;
+`;
+const OrientationText = styled.div`
+height: 140px;
+width: 30px;
+border: 1px solid lightgray;
+span {
+    width: 10px;
+    height: 100%;
+    padding-left: 8px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+`;
+const Pointer = styled.div`
+height: 140px;
+width: 90px;
+margin-left: 10px;
+border: 1px solid lightgrey;
+`;
+
+const PointsWrap = styled.div`
+position: relative;
+height: 140px;
+width: 100px;
+transform: translate(-50%, -50%);
+display: flex;
+justify-content: center;
+align-items: center;
+left: 10px;
+top: 70px;
+`;
+const PointsBottom = styled.div`
+display: flex;
+flex-direction: row;
+width: 150px;
+height: 50px;
+span {
+    font-size: 14px;
+    padding-top: 3px;
+    padding-left: 16px;
+}
+`;
+const FontTop = styled.div`
+height: 210px;
+width: 680px;
+margin: 10px;
+display: flex;
+flex-direction: row;
+`;
+const FontList = styled.div`
+height: 210px;
+width: 330px;
+font-size: 12px;
+`;
+const FontStyleSelect = styled.div`
+font-size: 12px;
+height: 210px;
+width: 170px;
+`;
+const FontSizeSelect = styled.div`
+font-size: 12px;
+height: 210px;
+width: 170px;
+`;
+const FontMiddle = styled.div`
+display: flex;
+flex-direction: row;
+`;
+const FontLeft = styled.div`
+height: 150px;
+width: 318px;
+margin: 0 10px;
+display: flex;
+flex-direction: column;
+span {
+    display: block;
+    height: 20px;
+    font-size: 12px;
+}
+`;
+
+const EffectItem = styled.div`
+width: 318px;
+height: 100px;
+`;
+const Strikethrough = styled.div`
+display: flex;
+flex-direction: row;
+span {
+    padding-left: 5px;
+    padding-top: 2px;
+}
+`;
+const FontRight = styled.div`
+height: 150px;
+width: 330px;
+display: flex;
+flex-direction: column;
+`;
+
+const FontColor = styled.div`
+width: 330px;
+height: 50px;
+span {
+    display: block;
+    padding-left: 5px;
+    width: 330px;
+    height: 20px;
+    font-size: 12px;
+}
+`;
+const FontColorSelector = styled.div`
+width: 325px;
+height: 24px;
+margin-left: 5px;
+display: flex;
+border: 1px solid lightgray;
+&:hover {
+    border: 1px solid black;
+}
+`;
+
+const FontColorPreView = styled.div`
+height: 150px;
+border: 4px solid #fff;
+width: 300px;
+height: 16px;
+`;
+const TabBottomButtons = styled.div`
+width: 100%;
+height: 40px;
+display: flex;
+justify-content: flex-end;
+Button {
+    width: 80px;
+    height: 30px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+};
+`;
+
+
+
 function CellStyleSetting(props) {
     let firstCellValue = null;
     const dispatch = useDispatch();
@@ -793,12 +1251,12 @@ function CellStyleSetting(props) {
             mask={true}
             onClose={handleClose}
         >
-            <div className='tabBox'>
+            <TabPanel>
                 <Tabs value={tabValueCellSetting} onChange={handleTabChange}>
                     {/* 可以抽成组件 <numberFormat>*/}
                     <Tab code='数字' title='数字'>
                         <p>分类：</p>
-                        <div className='leftArea'>
+                        <CategoriesArea>
                             <List
                                 height='423px'
                                 values={Object.values(Categories)}
@@ -807,8 +1265,8 @@ function CellStyleSetting(props) {
                                 ].toString()}
                                 onChange={handleSelectCategoriesChange}
                             />
-                        </div>
-                        <div className='simpleArea'>
+                        </CategoriesArea>
+                        <SimpleArea>
                             <fieldset>
                                 <legend>示例</legend>
                                 <label>
@@ -817,14 +1275,14 @@ function CellStyleSetting(props) {
                                         : exampleValue}
                                 </label>
                             </fieldset>
-                        </div>
-                        <div className='rightArea'>
+                        </SimpleArea>
+                        <RightAreaOfNumberTab>
                             {(selectedValue === 'numbers' ||
                                 selectedValue === 'currency' ||
                                 selectedValue === 'accounting' ||
                                 selectedValue === 'scientific' ||
                                 selectedValue === 'percentage') && (
-                                <div className='decimalPlaces'>
+                                <DecimalPlaces>
                                     <span>小数位数：</span>
                                     <Integer
                                         value={decimalPlacesValue}
@@ -837,22 +1295,22 @@ function CellStyleSetting(props) {
                                             )
                                         }
                                     />
-                                </div>
+                                </DecimalPlaces>
                             )}
 
                             {selectedValue === 'numbers' && (
-                                <div id='thousand-separator'>
+                                <ThousandSeparator>
                                     <input
                                         type='checkbox'
                                         checked={checkboxOfThousandSeparator}
                                         onChange={handleCheckboxChange}
                                     ></input>
                                     <span>使用千位分隔符(,)</span>
-                                </div>
+                                </ThousandSeparator>
                             )}
                             {(selectedValue === 'currency' ||
                                 selectedValue === 'accounting') && (
-                                <div className='decimalPlaces'>
+                                <DecimalPlaces>
                                     <span>货币符号： </span>
                                     <Select
                                         datas={AccountingSymbol}
@@ -866,7 +1324,7 @@ function CellStyleSetting(props) {
                                         onChange={handleSelectSymbolChange}
                                         value={selectedSymbol}
                                     />
-                                </div>
+                                </DecimalPlaces>
                             )}
                             {(selectedValue === 'numbers' ||
                                 selectedValue === 'currency') && (
@@ -954,7 +1412,6 @@ function CellStyleSetting(props) {
                                 selectedValue === 'special') && (
                                 <div>
                                     <span>区域设置（国家/地区）:</span>
-
                                     <Select
                                         datas={LocaleType}
                                         style={{
@@ -970,17 +1427,17 @@ function CellStyleSetting(props) {
                                     />
                                 </div>
                             )}
-                        </div>
-                        <div className='bottomArea'>
+                        </RightAreaOfNumberTab>
+                        <BottomAreaOfNumberTab>
                             <span>
                                 {FormatNumber[selectedValue].toString()}
                             </span>
-                        </div>
+                        </BottomAreaOfNumberTab>
                     </Tab>
                     <Tab code='对齐' title='对齐'>
-                        <div className='alignment'>
-                            <div className='leftalignment'>
-                                <div className='textAlignment'>
+                        <AlignmentTabPanel>
+                            <LeftAlignment>
+                               
                                     <fieldset
                                         style={{
                                             borderTop: '1px solid lightgray',
@@ -992,9 +1449,9 @@ function CellStyleSetting(props) {
                                     >
                                         <legend>文本对齐方式</legend>
                                     </fieldset>
-                                    <div className='items'>
-                                        <div className='textItemLeft'>
-                                            <div className='textItem'>
+                                    <LeftAlignmentItems>
+                                        <TextItemLeft>
+                                            <TextItem>
                                                 <span> 水平对齐: </span>
                                                 <Select
                                                     datas={
@@ -1012,8 +1469,8 @@ function CellStyleSetting(props) {
                                                     }
                                                     value={hAlign}
                                                 />
-                                            </div>
-                                            <div className='textItem'>
+                                            </TextItem>
+                                            <TextItem>
                                                 <span> 垂直对齐: </span>
                                                 <Select
                                                     datas={
@@ -1031,14 +1488,10 @@ function CellStyleSetting(props) {
                                                     }
                                                     value={vAlign}
                                                 />
-                                            </div>
-                                        </div>
-                                        <div
-                                            className={
-                                                textHAlignValue === 4
-                                                    ? 'disabledIndent'
-                                                    : 'textItemRight'
-                                            }
+                                            </TextItem>
+                                        </TextItemLeft>
+                                        <TextItemDIV
+                                         textHAlignValue={textHAlignValue}
                                         >
                                             <span> 缩减：</span>
                                             <Integer
@@ -1053,10 +1506,10 @@ function CellStyleSetting(props) {
                                                     handleIndent(indentValue)
                                                 }
                                             ></Integer>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='textControl'>
+                                        </TextItemDIV>
+                                    </LeftAlignmentItems>
+                              
+                                <TextControl>
                                     <fieldset
                                         style={{
                                             borderTop: '1px solid lightgray',
@@ -1068,17 +1521,16 @@ function CellStyleSetting(props) {
                                     >
                                         <legend>文本控制</legend>
                                     </fieldset>
-                                    <div className='controlItem'>
+                                    <ControlItem>
                                         <input
-                                            className='chekbox'
                                             type='checkbox'
                                             checked={isWrapText}
                                             onChange={handleWrapText}
                                         ></input>
                                         <span>自动换行</span>
-                                    </div>
-                                    <div
-                                        className='controlItem'
+                                    </ControlItem>
+                                    <ControlledItem
+                                        isWrapText={isWrapText}
                                         style={{
                                             pointerEvents: isWrapText
                                                 ? 'none'
@@ -1087,42 +1539,32 @@ function CellStyleSetting(props) {
                                         }}
                                     >
                                         <input
-                                            className='chekbox'
                                             type='checkbox'
                                             checked={isShrinkToFit}
                                             onChange={handleShrinkToFit}
                                         ></input>
                                         <span>缩小字体填充</span>
-                                    </div>
-                                    <div className='controlItem'>
+                                    </ControlledItem>
+                                    <ControlItem>
                                         <input
-                                            className='chekbox'
                                             type='checkbox'
                                             checked={isMergeCells}
                                             onChange={handleMergeCells}
                                         ></input>
                                         <span>合并单元格</span>
-                                    </div>
-                                    <div className='controlItem'>
+                                    </ControlItem>
+                                    <ControlItem>
                                         <input
-                                            className='chekbox'
                                             type='checkbox'
                                             checked={isShowEllipsis}
                                             onChange={handleShowEllipsis}
                                         ></input>
                                         <span>显示省略号</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div
-                                className='orientation'
-                                style={{
-                                    pointerEvents:
-                                        textHAlignValue === 4
-                                            ? 'none'
-                                            : 'unset',
-                                    opacity: textHAlignValue === 4 ? 0.6 : 1,
-                                }}
+                                    </ControlItem>
+                                </TextControl>
+                            </LeftAlignment>
+                            <Orientation
+                            textHAlignValue={textHAlignValue} 
                             >
                                 <fieldset
                                     style={{
@@ -1132,13 +1574,12 @@ function CellStyleSetting(props) {
                                     }}
                                 >
                                     <legend>方向</legend>
-                                    <div className='orientationTopItem'>
-                                        <div className='orientationText'>
+                                    <OrientationTopItem>
+                                        <OrientationText>
                                             <span>文本</span>
-                                        </div>
-                                        <div className='pointer'>
-                                            <div
-                                                className='fixed-points'
+                                        </OrientationText>
+                                        <Pointer>
+                                            <PointsWrap
                                                 onMouseDown={handleMouseDown}
                                                 onMouseUp={handleMouseUp}
                                                 onMouseMove={handleMouseMove}
@@ -1147,8 +1588,10 @@ function CellStyleSetting(props) {
                                             >
                                                 <div
                                                     draggable={false}
-                                                    className='pointsText'
                                                     style={{
+                                                        fontSize: '12px',
+                                                        marginLeft: '45px',
+                                                        marginBottom: '3px',
                                                         userSelect: 'none',
                                                         transform: `rotate(${-startDeg}deg)`,
                                                         transformOrigin:
@@ -1160,8 +1603,11 @@ function CellStyleSetting(props) {
                                                 {directions.map((deg) => (
                                                     <div
                                                         key={deg}
-                                                        className='fixed-point'
                                                         style={{
+                                                            width: '5px',
+                                                            height:' 5px',
+                                                            background: 'black',
+                                                            position: 'absolute',
                                                             transform: `rotate(${deg}deg)translateX(${
                                                                 130 / 2
                                                             }px)`,
@@ -1173,10 +1619,10 @@ function CellStyleSetting(props) {
                                                         }}
                                                     ></div>
                                                 ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='orientationBottomItem'>
+                                            </PointsWrap>
+                                        </Pointer>
+                                    </OrientationTopItem>
+                                    <PointsBottom>
                                         <Integer
                                             style={{
                                                 width: '80px',
@@ -1188,14 +1634,14 @@ function CellStyleSetting(props) {
                                             onChange={handleDegChange}
                                         ></Integer>
                                         <span>度</span>
-                                    </div>
+                                    </PointsBottom>
                                 </fieldset>
-                            </div>
-                        </div>
+                            </Orientation>
+                        </AlignmentTabPanel>
                     </Tab>
                     <Tab code='字体' title='字体'>
-                        <div className='fontTop'>
-                            <div className='fontList'>
+                        <FontTop>
+                            <FontList>
                                 <span>字体:</span>
                                 <List
                                     width='320px'
@@ -1207,8 +1653,8 @@ function CellStyleSetting(props) {
                                     selectedValue={fontFamily}
                                     onChange={handleFontFamily}
                                 />
-                            </div>
-                            <div className='fontStyle'>
+                            </FontList>
+                            <FontStyleSelect>
                                 <span>字形:</span>
                                 <List
                                     width='160px'
@@ -1218,8 +1664,8 @@ function CellStyleSetting(props) {
                                     selectedValue={transformFontToselectedFontStyleKey()}
                                     onChange={handleFontStyle}
                                 />
-                            </div>
-                            <div className='fontSize'>
+                            </FontStyleSelect>
+                            <FontSizeSelect>
                                 <span>字号:</span>
                                 <List
                                     width='160px'
@@ -1229,10 +1675,10 @@ function CellStyleSetting(props) {
                                     selectedValue={fontSize}
                                     onChange={handleFontSize}
                                 />
-                            </div>
-                        </div>
-                        <div className='fontMiddle'>
-                            <div className='fontLeft'>
+                            </FontSizeSelect>
+                        </FontTop>
+                        <FontMiddle>
+                            <FontLeft>
                                 <div>
                                     <span>下划线:</span>
                                     <Select
@@ -1250,7 +1696,7 @@ function CellStyleSetting(props) {
                                         )}
                                     ></Select>
                                 </div>
-                                <div className='effect'>
+                                <EffectItem>
                                     <fieldset
                                         style={{
                                             border: '1px solid lightgray',
@@ -1264,35 +1710,34 @@ function CellStyleSetting(props) {
                                         }}
                                     >
                                         <legend>特殊效果</legend>
-                                        <div className='strikethrough'>
+                                        <Strikethrough>
                                             <input
                                                 type='checkbox'
                                                 checked={isStrickoutLine}
                                                 onChange={handleIsStrickout}
                                             ></input>
                                             <span>删除线</span>
-                                        </div>
+                                        </Strikethrough>
                                     </fieldset>
-                                </div>
-                            </div>
+                                </EffectItem>
+                            </FontLeft>
 
-                            <div className='fontRight'>
-                                <div className='fontColor'>
+                            <FontRight>
+                                <FontColor>
                                     <span>颜色:</span>
                                     <ColorEditor
                                         style={{ width: '188px' }}
                                         onChange={handleColorEditorforFont}
                                         value={selectedFontColor}
                                     >
-                                        <div className='lineColor'>
-                                            <div
-                                                className='colorPreView'
+                                        <FontColorSelector>
+                                            <FontColorPreView
                                                 style={{
                                                     backgroundColor:
                                                         selectedFontColor,
                                                 }}
-                                            ></div>
-                                            <div className='arrowDownIcon'>
+                                            ></FontColorPreView>
+                                            <ArrowDownIcon>
                                                 <ArrowDown
                                                     style={{
                                                         width: 20,
@@ -1300,10 +1745,10 @@ function CellStyleSetting(props) {
                                                         margin: 0,
                                                     }}
                                                 ></ArrowDown>
-                                            </div>
-                                        </div>
+                                            </ArrowDownIcon>
+                                        </FontColorSelector>
                                     </ColorEditor>
-                                </div>
+                                </FontColor>
                                 <div>
                                     <fieldset
                                         style={{
@@ -1312,6 +1757,7 @@ function CellStyleSetting(props) {
                                             height: 100,
                                             padding: 0,
                                             marginTop: 6,
+                                            marginLeft:5,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -1357,12 +1803,12 @@ function CellStyleSetting(props) {
                                         </div>
                                     </fieldset>
                                 </div>
-                            </div>
-                        </div>
+                            </FontRight>
+                        </FontMiddle>
                     </Tab>
                     <Tab code='边框' title='边框'>
-                        <div className='borderArea'>
-                            <div className='lineArea'>
+                        <BorderTabPanel>
+                            <LineArea>
                                 <fieldset
                                     style={{
                                         border: '1px solid lightgray',
@@ -1372,8 +1818,8 @@ function CellStyleSetting(props) {
                                     <legend>线条</legend>
                                     <span>样式：</span>
 
-                                    <div className='lineStyle'>
-                                        <div className='lineStyleLeft'>
+                                    <LineStyle>
+                                        <LineStyleLeft>
                                             <div
                                                 style={{ textAlign: 'center' }}
                                                 onClick={() =>
@@ -1456,8 +1902,8 @@ function CellStyleSetting(props) {
                                                     color={lineColor}
                                                 />
                                             </div>
-                                        </div>
-                                        <div className='lineStyleRight'>
+                                        </LineStyleLeft>
+                                        <LineStyleRight>
                                             <div
                                                 onClick={() =>
                                                     setLineType(
@@ -1549,8 +1995,8 @@ function CellStyleSetting(props) {
                                                     color={lineColor}
                                                 />
                                             </div>
-                                        </div>
-                                    </div>
+                                        </LineStyleRight>
+                                    </LineStyle>
                                     <span>颜色：</span>
                                     <div>
                                         <ColorEditor
@@ -1560,15 +2006,14 @@ function CellStyleSetting(props) {
                                             }
                                             value={lineColor}
                                         >
-                                            <div className='lineColor'>
-                                                <div
-                                                    className='colorPreView'
+                                            <LineColor>
+                                                <ColorPreView
                                                     style={{
                                                         backgroundColor:
                                                             lineColor,
                                                     }}
-                                                ></div>
-                                                <div className='arrowDownIcon'>
+                                                ></ColorPreView>
+                                                <ArrowDownIcon>
                                                     <ArrowDown
                                                         style={{
                                                             width: 20,
@@ -1576,13 +2021,13 @@ function CellStyleSetting(props) {
                                                             margin: 0,
                                                         }}
                                                     ></ArrowDown>
-                                                </div>
-                                            </div>
+                                                </ArrowDownIcon>
+                                            </LineColor>
                                         </ColorEditor>
                                     </div>
                                 </fieldset>
-                            </div>
-                            <div className='preArea'>
+                            </LineArea>
+                            <PreArea>
                                 <fieldset
                                     style={{
                                         borderTop: '1px solid lightgray',
@@ -1594,8 +2039,8 @@ function CellStyleSetting(props) {
                                 >
                                     <legend>预置</legend>
                                 </fieldset>
-                                <div className='presetArea'>
-                                    <div className='item'>
+                                <PresetArea>
+                                    <PresetAreaItem>
                                         <BorderNone
                                             onClick={handlePreBorderNone}
                                             iconStyle={{
@@ -1606,8 +2051,8 @@ function CellStyleSetting(props) {
                                             icon='url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU2LjIgKDgxNjcyKSAtIGh0dHBzOi8vc2tldGNoLmNvbSAtLT4KICAgIDx0aXRsZT5Ob25lPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9Ik5vbmUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLnvJbnu4QtMTIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIuMDAwMDAwLCAzLjAwMDAwMCkiPgogICAgICAgICAgICA8cmVjdCBpZD0i55+p5b2iIiBmaWxsPSIjRkZGRkZGIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjciIGhlaWdodD0iMjciPjwvcmVjdD4KICAgICAgICAgICAgPHBhdGggZD0iTTI3LDI2IEwyNywyNyBMMjQsMjcgTDI0LDI2IEwyNiwyNiBMMjYsMjQgTDI3LDI0IEwyNywyNiBaIE0yNiwxIEwyNCwxIEwyNCwwIEwyNiwwIEwyNyw5LjE4NDg1MDk5ZS0xNyBMMjcsMyBMMjYsMyBMMjYsMSBaIE0xLDEzIEwzLDEzIEwzLDE0IEwxLDE0IEwxLDE1IEwtMS4xMzkwODg4MmUtMTMsMTUgTC0xLjEzNDY0NzkzZS0xMywxMiBMMSwxMiBMMSwxMyBaIE0xMywyNiBMMTMsMjQgTDE0LDI0IEwxNCwyNiBMMTUsMjYgTDE1LDI3IEwxMiwyNyBMMTIsMjYgTDEzLDI2IFogTS0xLjEzOTA4ODgyZS0xMywyNiBMLTEuMTM0NjQ3OTNlLTEzLDI0IEwxLDI0IEwxLDI2IEwzLDI2IEwzLDI3IEwtMS4xMzY4NjgzOGUtMTMsMjcgTC0xLjEzNjg2ODM4ZS0xMywyNiBaIE0xNCwxMyBMMTUsMTMgTDE1LDE0IEwxNCwxNCBMMTQsMTUgTDEzLDE1IEwxMywxNCBMMTIsMTQgTDEyLDEzIEwxMywxMyBMMTMsMTIgTDE0LDEyIEwxNCwxMyBaIE0yNiwxNCBMMjQsMTQgTDI0LDEzIEwyNiwxMyBMMjYsMTIgTDI3LDEyIEwyNywxNSBMMjYsMTUgTDI2LDE0IFogTTE0LDEgTDE0LDMgTDEzLDMgTDEzLDEgTDEyLDEgTDEyLDAgTDE1LDAgTDE1LDEgTDE0LDEgWiBNMSwxIEwxLDMgTC0xLjEzOTA4ODgyZS0xMywzIEwtMS4xMzYxMjgyM2UtMTMsMSBMLTEuMTM2ODY4MzhlLTEzLDAgTDMsMCBMMywxIEwxLDEgWiBNNCwwIEw3LDAgTDcsMSBMNCwxIEw0LDAgWiBNNCwyNiBMNywyNiBMNywyNyBMNCwyNyBMNCwyNiBaIE04LDAgTDExLDAgTDExLDEgTDgsMSBMOCwwIFogTTgsMjYgTDExLDI2IEwxMSwyNyBMOCwyNyBMOCwyNiBaIE0xNiwwIEwxOSwwIEwxOSwxIEwxNiwxIEwxNiwwIFogTTE2LDI2IEwxOSwyNiBMMTksMjcgTDE2LDI3IEwxNiwyNiBaIE0yMCwwIEwyMywwIEwyMywxIEwyMCwxIEwyMCwwIFogTTIwLDI2IEwyMywyNiBMMjMsMjcgTDIwLDI3IEwyMCwyNiBaIE0yNyw0IEwyNyw3IEwyNiw3IEwyNiw0IEwyNyw0IFogTTEsNCBMMSw3IEwtMS4xMzkwODg4MmUtMTMsNyBMLTEuMTM0NjQ3OTNlLTEzLDQgTDEsNCBaIE0xNCw0IEwxNCw3IEwxMyw3IEwxMyw0IEwxNCw0IFogTTIzLDE0IEwyMCwxNCBMMjAsMTMgTDIzLDEzIEwyMywxNCBaIE0yNyw4IEwyNywxMSBMMjYsMTEgTDI2LDggTDI3LDggWiBNMSw4IEwxLDExIEwtMS4xMzkwODg4MmUtMTMsMTEgTC0xLjEzNDY0NzkzZS0xMyw4IEwxLDggWiBNMTQsOCBMMTQsMTEgTDEzLDExIEwxMyw4IEwxNCw4IFogTTE5LDE0IEwxNiwxNCBMMTYsMTMgTDE5LDEzIEwxOSwxNCBaIE0yNywxNiBMMjcsMTkgTDI2LDE5IEwyNiwxNiBMMjcsMTYgWiBNMSwxNiBMMSwxOSBMLTEuMTM5MDg4ODJlLTEzLDE5IEwtMS4xMzQ2NDc5M2UtMTMsMTYgTDEsMTYgWiBNMTQsMTYgTDE0LDE5IEwxMywxOSBMMTMsMTYgTDE0LDE2IFogTTExLDE0IEw4LDE0IEw4LDEzIEwxMSwxMyBMMTEsMTQgWiBNMjcsMjAgTDI3LDIzIEwyNiwyMyBMMjYsMjAgTDI3LDIwIFogTTEsMjAgTDEsMjMgTC0xLjEzOTA4ODgyZS0xMywyMyBMLTEuMTM0NjQ3OTNlLTEzLDIwIEwxLDIwIFogTTE0LDIwIEwxNCwyMyBMMTMsMjMgTDEzLDIwIEwxNCwyMCBaIE03LDE0IEw0LDE0IEw0LDEzIEw3LDEzIEw3LDE0IFoiIGlkPSLlvaLnirbnu5PlkIgiIGZpbGw9IiNBOEE4QTgiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==)'
                                         ></BorderNone>
                                         <span>无</span>
-                                    </div>
-                                    <div className='item'>
+                                    </PresetAreaItem>
+                                    <PresetAreaItem>
                                         <BorderOutline
                                             onClick={handleBorderOutline}
                                             iconStyle={{
@@ -1618,8 +2063,8 @@ function CellStyleSetting(props) {
                                             icon='url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU2LjIgKDgxNjcyKSAtIGh0dHBzOi8vc2tldGNoLmNvbSAtLT4KICAgIDx0aXRsZT5PdXRsaW5lPC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9Ik91dGxpbmUiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxnIGlkPSLnvJbnu4QiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIuMDAwMDAwLCAzLjAwMDAwMCkiPgogICAgICAgICAgICA8cmVjdCBpZD0i55+p5b2iIiBmaWxsPSIjRkZGRkZGIiB4PSIwIiB5PSIwIiB3aWR0aD0iMjciIGhlaWdodD0iMjciPjwvcmVjdD4KICAgICAgICAgICAgPHBhdGggZD0iTTI3LDI2IEwyNywyNyBMMjQsMjcgTDI0LDI2IEwyNiwyNiBMMjYsMjQgTDI3LDI0IEwyNywyNiBaIE0yNiwxIEwyNCwxIEwyNCwwIEwyNiwwIEwyNyw5LjE4NDg1MDk5ZS0xNyBMMjcsMyBMMjYsMyBMMjYsMSBaIE0xLDEzIEwzLDEzIEwzLDE0IEwxLDE0IEwxLDE1IEwtMi4yMjA0NDYwNWUtMTYsMTUgTDIuMjIwNDQ2MDVlLTE2LDEyIEwxLDEyIEwxLDEzIFogTTEzLDI2IEwxMywyNCBMMTQsMjQgTDE0LDI2IEwxNSwyNiBMMTUsMjcgTDEyLDI3IEwxMiwyNiBMMTMsMjYgWiBNLTIuMjIwNDQ2MDVlLTE2LDI2IEwyLjIyMDQ0NjA1ZS0xNiwyNCBMMSwyNCBMMSwyNiBMMywyNiBMMywyNyBMMCwyNyBMMCwyNiBaIE0xNCwxMyBMMTUsMTMgTDE1LDE0IEwxNCwxNCBMMTQsMTUgTDEzLDE1IEwxMywxNCBMMTIsMTQgTDEyLDEzIEwxMywxMyBMMTMsMTIgTDE0LDEyIEwxNCwxMyBaIE0yNiwxNCBMMjQsMTQgTDI0LDEzIEwyNiwxMyBMMjYsMTIgTDI3LDEyIEwyNywxNSBMMjYsMTUgTDI2LDE0IFogTTE0LDEgTDE0LDMgTDEzLDMgTDEzLDEgTDEyLDEgTDEyLDAgTDE1LDAgTDE1LDEgTDE0LDEgWiBNMSwxIEwxLDMgTC0yLjIyMDQ0NjA1ZS0xNiwzIEw3LjQwMTQ4NjgzZS0xNywxIEwwLDAgTDMsMCBMMywxIEwxLDEgWiBNNCwwIEw3LDAgTDcsMSBMNCwxIEw0LDAgWiBNNCwyNiBMNywyNiBMNywyNyBMNCwyNyBMNCwyNiBaIE04LDAgTDExLDAgTDExLDEgTDgsMSBMOCwwIFogTTgsMjYgTDExLDI2IEwxMSwyNyBMOCwyNyBMOCwyNiBaIE0xNiwwIEwxOSwwIEwxOSwxIEwxNiwxIEwxNiwwIFogTTE2LDI2IEwxOSwyNiBMMTksMjcgTDE2LDI3IEwxNiwyNiBaIE0yMCwwIEwyMywwIEwyMywxIEwyMCwxIEwyMCwwIFogTTIwLDI2IEwyMywyNiBMMjMsMjcgTDIwLDI3IEwyMCwyNiBaIE0yNyw0IEwyNyw3IEwyNiw3IEwyNiw0IEwyNyw0IFogTTEsNCBMMSw3IEwtMi4yMjA0NDYwNWUtMTYsNyBMMi4yMjA0NDYwNWUtMTYsNCBMMSw0IFogTTE0LDQgTDE0LDcgTDEzLDcgTDEzLDQgTDE0LDQgWiBNMjMsMTQgTDIwLDE0IEwyMCwxMyBMMjMsMTMgTDIzLDE0IFogTTI3LDggTDI3LDExIEwyNiwxMSBMMjYsOCBMMjcsOCBaIE0xLDggTDEsMTEgTC0yLjIyMDQ0NjA1ZS0xNiwxMSBMMi4yMjA0NDYwNWUtMTYsOCBMMSw4IFogTTE0LDggTDE0LDExIEwxMywxMSBMMTMsOCBMMTQsOCBaIE0xOSwxNCBMMTYsMTQgTDE2LDEzIEwxOSwxMyBMMTksMTQgWiBNMjcsMTYgTDI3LDE5IEwyNiwxOSBMMjYsMTYgTDI3LDE2IFogTTEsMTYgTDEsMTkgTC0yLjIyMDQ0NjA1ZS0xNiwxOSBMMi4yMjA0NDYwNWUtMTYsMTYgTDEsMTYgWiBNMTQsMTYgTDE0LDE5IEwxMywxOSBMMTMsMTYgTDE0LDE2IFogTTExLDE0IEw4LDE0IEw4LDEzIEwxMSwxMyBMMTEsMTQgWiBNMjcsMjAgTDI3LDIzIEwyNiwyMyBMMjYsMjAgTDI3LDIwIFogTTEsMjAgTDEsMjMgTC0yLjIyMDQ0NjA1ZS0xNiwyMyBMMi4yMjA0NDYwNWUtMTYsMjAgTDEsMjAgWiBNMTQsMjAgTDE0LDIzIEwxMywyMyBMMTMsMjAgTDE0LDIwIFogTTcsMTQgTDQsMTQgTDQsMTMgTDcsMTMgTDcsMTQgWiIgaWQ9IuW9oueKtue7k+WQiOWkh+S7vS0zIiBmaWxsPSIjQThBOEE4Ij48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0wLDAgTDI3LDAgTDI3LDI3IEwwLDI3IEwwLDAgWiBNMSwxIEwxLDI2IEwyNiwyNiBMMjYsMSBMMSwxIFoiIGlkPSLlvaLnirbnu5PlkIgiIGZpbGw9IiMzNjdGQzkiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==)'
                                         ></BorderOutline>
                                         <span>外边框</span>
-                                    </div>
-                                    <div className='item'>
+                                    </PresetAreaItem>
+                                    <PresetAreaItem>
                                         <BorderInside
                                             onClick={handlePreBorderInside}
                                             iconStyle={{
@@ -1629,8 +2074,8 @@ function CellStyleSetting(props) {
                                             }}
                                         ></BorderInside>
                                         <span>内边框</span>
-                                    </div>
-                                </div>
+                                    </PresetAreaItem>
+                                </PresetArea>
                                 <fieldset
                                     style={{
                                         borderTop: '1px solid lightgray',
@@ -1642,8 +2087,8 @@ function CellStyleSetting(props) {
                                 >
                                     <legend>边框</legend>
                                 </fieldset>
-                                <div className='preShowArea'>
-                                    <div className='preShowAreaLeft'>
+                                <PreShowArea>
+                                    <PreShowAreaLeft>
                                         <div
                                             style={{
                                                 width: 32,
@@ -1724,8 +2169,8 @@ function CellStyleSetting(props) {
                                                 }}
                                             ></BorderBottom>
                                         </div>
-                                    </div>
-                                    <div className='preShowAreaRight'>
+                                    </PreShowAreaLeft>
+                                    <PreShowAreaRight>
                                         <div
                                             style={{
                                                 width: 180,
@@ -1783,9 +2228,9 @@ function CellStyleSetting(props) {
                                                 ></CanvasBorderArea>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div className='preShowAreaBottom'>
+                                    </PreShowAreaRight>
+                                </PreShowArea>
+                                <PreShowAreaBottom>
                                     <div
                                         style={{
                                             width: 32,
@@ -1927,27 +2372,27 @@ function CellStyleSetting(props) {
                                             }}
                                         ></DiagonalDownLine>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='bottomArea'>
+                                </PreShowAreaBottom>
+                            </PreArea>
+                        </BorderTabPanel>
+                        <BottomAreaofBorderTab>
                             单击预置选项、预览草图及上面的按钮可以添加边框样式
-                        </div>
+                        </BottomAreaofBorderTab>
                     </Tab>
                     <Tab code='保护' title='保护'>
                         <p>Content for 保护 </p>
                     </Tab>
                 </Tabs>
-            </div>
+            </TabPanel>
 
-            <div className='bottomButtons'>
+            <TabBottomButtons>
                 <Button title={'确定'} onClick={handleOK}>
                     确定
                 </Button>
                 <Button title={'取消'} onClick={handleCancel}>
                     取消
                 </Button>
-            </div>
+            </TabBottomButtons>
         </Index>
     ) : null;
 }
