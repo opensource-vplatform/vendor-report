@@ -11,6 +11,16 @@ import {
   Tab,
   Tabs,
 } from '@components/tabs/Index';
+import {
+  EVENTS,
+  fire,
+} from '@event/EventManager';
+import {
+  setErrorMsg,
+  setMode,
+  setWaitMsg,
+} from '@store/appSlice/appSlice';
+import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
@@ -18,16 +28,6 @@ import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
 
-import {
-  EVENTS,
-  fire,
-} from './event/EventManager';
-import {
-  setErrorMsg,
-  setMode,
-  setWaitMsg,
-} from './store/appSlice/appSlice';
-import { genPreviewDatas } from './store/datasourceSlice/datasourceSlice';
 import Formula from './tabs/formula/Index';
 
 const FileTabTitle = styled.a`
@@ -71,12 +71,18 @@ export default function () {
     const dispatch = useDispatch();
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     const { spread } = useSelector(({ appSlice }) => appSlice);
+    const { finalDsList } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
     const handleSave = () => {
         if (spread) {
             const data = spread.toJSON();
-            const result = fire({ event: EVENTS.onSave, args: { data } });
+            const result = fire({
+                event: EVENTS.onSave,
+                args: [data, { dsList: finalDsList }],
+            });
             if (result.length > 0) {
-                dispatch(setWaitMsg({ message: "正在保存，请稍候..." }));
+                dispatch(setWaitMsg({ message: '正在保存，请稍候...' }));
                 const promise = result[0];
                 if (promise instanceof Promise) {
                     promise

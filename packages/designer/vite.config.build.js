@@ -38,7 +38,7 @@ export default defineConfig({
         },
         target: 'es2015',
         lib: {
-            name: 'TOONE',
+            name: 'TOONE.ReportDesigner',
             entry: 'src/Index.jsx',
             fileName: 'index-[hash]',
             formats: ['umd'],

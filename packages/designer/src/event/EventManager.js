@@ -82,7 +82,7 @@ export const fire = function (params) {
     if(handlers){
         for(let [id,handler] of Object.entries(handlers)){
             try{
-                result.push(handler(args));
+                result.push(handler.apply(handler,args));
             }catch(e){
                 handler(null,e);
             }

@@ -1,22 +1,41 @@
-import { Fragment, useCallback, useContext } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useContext,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import { Workbook, Worksheet } from '@components/spread/Index';
+import {
+  Workbook,
+  Worksheet,
+} from '@components/spread/Index';
+import {
+  EVENTS,
+  fire,
+} from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
-    updateActiveSheetTablePath,
-    updateDslist,
+  updateActiveSheetTablePath,
+  updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import { setFontStyles, setIsStrickoutLine } from '@store/fontSlice/fontSlice';
+import {
+  setFontStyles,
+  setIsStrickoutLine,
+} from '@store/fontSlice/fontSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
-import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
+import {
+  findTreeNodeById,
+  getActiveSheetTablesPath,
+} from '@utils/commonUtil';
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
 import DesignerContext from './DesignerContext';
-import { EVENTS, fire } from './event/EventManager';
 import { isLineThrough } from './utils/fontUtil';
 
 export default function () {
@@ -94,13 +113,13 @@ export default function () {
     const handleSelectionChanged = useCallback((type, data) => {
         fire({
             event: EVENTS.SelectionChanged,
-            args: data,
+            args: [data],
         });
     });
     const handleSelectionChanging = useCallback((type, data) => {
         fire({
             event: EVENTS.SelectionChanging,
-            args: data,
+            args: [data],
         });
     });
     return (

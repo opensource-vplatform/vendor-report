@@ -82,7 +82,26 @@ importers:
         specifier: ^4.3.9
         version: 4.3.9(sass@1.69.5)(terser@5.26.0)
 
-  packages/plugins/integration-jasperreport: {}
+  packages/plugins/integration-jasperreport:
+    devDependencies:
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/preset-env':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/runtime':
+        specifier: ^7.23.7
+        version: 7.23.7
+      '@rollup/plugin-babel':
+        specifier: ^6.0.4
+        version: 6.0.4(@babel/core@7.23.5)
+      terser:
+        specifier: ^5.26.0
+        version: 5.26.0
+      vite:
+        specifier: ^4.3.9
+        version: 4.3.9(sass@1.69.5)(terser@5.26.0)
 
 packages:
 
