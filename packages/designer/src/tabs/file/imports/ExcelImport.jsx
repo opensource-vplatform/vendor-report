@@ -9,6 +9,7 @@ import {
 } from 'react-redux';
 import resourceManager from 'resource-manager-js';
 
+import { CheckBox } from '@components/form/Index';
 import { error } from '@utils/consoleUtil';
 import {
   showErrorMessage,
@@ -18,7 +19,6 @@ import { getNamespace } from '@utils/spreadUtil';
 
 import {
   DetailDesc,
-  DetailInput,
   DetailLabel,
   DetailOption,
   DetailSubTitle,
@@ -118,55 +118,53 @@ function ExcelImport(props) {
             <DetailSubTitle>导入选项</DetailSubTitle>
             <DetialOptions>
                 <DetailOption>
-                    <DetailLabel title='忽略工作簿中所有样式设置。如果您只关注工作簿中的数据且遇到了性能问题，可勾选此项。'>
-                        <DetailInput
-                            type='checkbox'
-                            checked={cfg.ignoreStyle}
-                            onChange={(evt) => {
-                                setCfg((preCfg) => {
-                                    return {
-                                        ...preCfg,
-                                        ignoreStyle: evt.target.checked,
-                                    };
-                                });
-                            }}
-                        ></DetailInput>
+                    <DetailLabel
+                        onClick={() => {
+                            setCfg((preCfg) => {
+                                return {
+                                    ...preCfg,
+                                    ignoreStyle: !preCfg.ignoreStyle,
+                                };
+                            });
+                        }}
+                        title='忽略工作簿中所有样式设置。如果您只关注工作簿中的数据且遇到了性能问题，可勾选此项。'
+                    >
+                        <CheckBox value={cfg.ignoreStyle}></CheckBox>
                         <DetailDesc>忽略样式</DetailDesc>
                     </DetailLabel>
                 </DetailOption>
                 <DetailOption>
-                    <DetailLabel title='忽略工作簿中所有公式设置。如果您不需要使用工作簿中的公式，仅需要显示值，可勾选此项。'>
-                        <DetailInput
-                            type='checkbox'
-                            checked={cfg.ignoreFormula}
-                            onChange={(evt) => {
-                                setCfg((preCfg) => {
-                                    return {
-                                        ...preCfg,
-                                        ignoreFormula: evt.target.checked,
-                                    };
-                                });
-                            }}
-                        ></DetailInput>
+                    <DetailLabel
+                        onClick={() => {
+                            setCfg((preCfg) => {
+                                return {
+                                    ...preCfg,
+                                    ignoreFormula: !preCfg.ignoreFormula,
+                                };
+                            });
+                        }}
+                        title='忽略工作簿中所有公式设置。如果您不需要使用工作簿中的公式，仅需要显示值，可勾选此项。'
+                    >
+                        <CheckBox value={cfg.ignoreFormula}></CheckBox>
                         <DetailDesc>忽略公式</DetailDesc>
                     </DetailLabel>
                 </DetailOption>
                 <DetailOption>
-                    <DetailLabel title='导入文件后将重新进行计算。勾选此项可禁用自动计算，提高初始加载性能。'>
-                        <DetailInput
-                            type='checkbox'
-                            name=''
-                            checked={cfg.doNotRecalculateAfterLoad}
-                            onChange={(evt) => {
-                                setCfg((preCfg) => {
-                                    return {
-                                        ...preCfg,
-                                        doNotRecalculateAfterLoad:
-                                            evt.target.checked,
-                                    };
-                                });
-                            }}
-                        ></DetailInput>
+                    <DetailLabel
+                        onClick={() => {
+                            setCfg((preCfg) => {
+                                return {
+                                    ...preCfg,
+                                    doNotRecalculateAfterLoad:
+                                        !preCfg.doNotRecalculateAfterLoad,
+                                };
+                            });
+                        }}
+                        title='导入文件后将重新进行计算。勾选此项可禁用自动计算，提高初始加载性能。'
+                    >
+                        <CheckBox
+                            value={cfg.doNotRecalculateAfterLoad}
+                        ></CheckBox>
                         <DetailDesc>导入后不自动计算公式</DetailDesc>
                     </DetailLabel>
                 </DetailOption>

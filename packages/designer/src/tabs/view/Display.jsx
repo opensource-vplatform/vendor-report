@@ -34,13 +34,14 @@ export default function () {
         tabStripVisible,
     } = useSelector(({ viewSlice }) => viewSlice);
     useEffect(() => {
-        withBatchUpdate(spread,()=>{
+        withBatchUpdate(spread, () => {
             spread.options.newTabVisible = newTabVisible;
             spread.options.tabStripVisible = tabStripVisible;
             const sheet = spread.getActiveSheet();
             sheet.options.colHeaderVisible = colHeaderVisible;
             sheet.options.rowHeaderVisible = rowHeaderVisible;
-            sheet.options.gridline.showHorizontalGridline = showHorizontalGridline;
+            sheet.options.gridline.showHorizontalGridline =
+                showHorizontalGridline;
             sheet.options.gridline.showVerticalGridline = showVerticalGridline;
         });
     }, [
@@ -51,33 +52,34 @@ export default function () {
         newTabVisible,
         tabStripVisible,
     ]);
+    const groupStyle = {padding:'4px 6px'};
     return (
         <GroupItem title='显示/隐藏'>
             <HLayout>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={groupStyle}>
                         <CheckBox
                             title='行标题'
                             desc='显示、隐藏行标题'
                             value={rowHeaderVisible}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setRowHeaderVisible({
-                                        visible: evt.target.checked,
+                                        visible: checked,
                                     })
                                 );
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={groupStyle}>
                         <CheckBox
                             title='列标题'
                             desc='显示、隐藏列标题'
                             value={colHeaderVisible}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setColHeaderVisible({
-                                        visible: evt.target.checked,
+                                        visible: checked,
                                     })
                                 );
                             }}
@@ -85,29 +87,29 @@ export default function () {
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={groupStyle}>
                         <CheckBox
                             title='垂直网格线'
                             desc='显示、隐藏垂直网格线'
                             value={showVerticalGridline}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setShowVerticalGridline({
-                                        visible: evt.target.checked,
+                                        visible: checked,
                                     })
                                 );
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={groupStyle}>
                         <CheckBox
                             title='水平网格线'
                             desc='显示、隐藏水平网格线'
                             value={showHorizontalGridline}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setShowHorizontalGridline({
-                                        visible: evt.target.checked,
+                                        visible: checked,
                                     })
                                 );
                             }}
@@ -115,30 +117,30 @@ export default function () {
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={groupStyle}>
                         <CheckBox
                             title='工作表选项卡'
                             desc='显示、隐藏工作表选项卡'
                             value={tabStripVisible}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setTabStripVisible({
-                                        visible: evt.target.checked,
+                                        visible: checked,
                                     })
                                 );
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={groupStyle}>
                         <CheckBox
                             title='新建工作表'
                             desc='显示、隐藏新增工作表图标，使用此功能需显示工作选项卡'
                             value={newTabVisible}
                             disabled={!tabStripVisible}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setNewTabVisible({
-                                        visible: evt.target.checked,
+                                        visible: checked,
                                     })
                                 );
                             }}

@@ -33,7 +33,11 @@ export const DetailOption = styled.li`
 
 export const DetailLabel = styled.label`
     display: flex;
+    width: max-content;
     align-items: center;
+    &:hover{
+        background-color: #dadada;
+    }
 `;
 
 export const DetailInput = styled.input`
@@ -61,6 +65,7 @@ export const DetailInput = styled.input`
 
 export const DetailDesc = styled.span`
     cursor: pointer;
+    margin-right: 8px;
 `;
 
 export const None = styled.div`

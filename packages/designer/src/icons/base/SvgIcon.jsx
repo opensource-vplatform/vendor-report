@@ -21,6 +21,7 @@ const IconWrap = styled.label`
 const Icon = styled.svg`
     height: 24px;
     width: 24px;
+    transform: scale(0.8);
     fill: currentColor;
 `;
 
@@ -31,11 +32,11 @@ function Index(pros) {
         st.backgroundColor = '#dadada';
     }
     const icSt = {...iconStyle};
-    icSt.backgroundImage = icon;
     return (
         <IconWrap title={tips} onClick={onClick} style={st} data-disabled={disabled}>
             <Icon
                 style={icSt}
+                viewBox="0 0 24 24"
             ><path d={icon}></path></Icon>
             {children}
         </IconWrap>
