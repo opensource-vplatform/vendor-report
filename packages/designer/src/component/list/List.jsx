@@ -1,5 +1,3 @@
-import './list.scss';
-
 import React, {
   createRef,
   useEffect,
