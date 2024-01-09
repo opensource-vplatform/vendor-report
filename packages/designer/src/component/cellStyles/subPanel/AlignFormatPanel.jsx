@@ -44,6 +44,8 @@ const TextItem = styled.div`
         width: 100px;
         height: 24px;
         font-size: 12px;
+        padding-top: 0px;
+        padding-bottom: 0px;
     }
 `;
 const TextItemDIV = styled.div`
@@ -362,7 +364,7 @@ const AlignFormatPanel = (props) => {
                                     height: '24px',
                                 }}
                                 optionStyle={{
-                                    width: '99%',
+                                    width: '100%',
                                 }}
                                 onChange={handleSelectTextHAlign}
                                 value={hAlign}
@@ -377,7 +379,7 @@ const AlignFormatPanel = (props) => {
                                     height: '24px',
                                 }}
                                 optionStyle={{
-                                    width: '99%',
+                                    width: '100%',
                                 }}
                                 onChange={handleSelectTextVAlign}
                                 value={vAlign}
@@ -487,7 +489,6 @@ const AlignFormatPanel = (props) => {
                                         style={{
                                             width: '5px',
                                             height: ' 5px',
-                                            background: 'black',
                                             position: 'absolute',
                                             transform: `rotate(${deg}deg)translateX(${
                                                 130 / 2

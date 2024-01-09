@@ -49,6 +49,8 @@ const FontLeft = styled.div`
         display: block;
         height: 20px;
         font-size: 12px;
+        padding-top: 0px;
+        padding-bottom: 0px;
     }
 `;
 const EffectItem = styled.div`
@@ -238,10 +240,10 @@ const FontFormatPanel = (props) => {
                             datas={UnderlineStyle}
                             style={{
                                 height: '25px',
-                                width: ' 318px',
+                                width: '317px',
                             }}
                             optionStyle={{
-                                width: '100%',
+                                width: '321px',
                             }}
                             onChange={handleUnderlineStyle}
                             value={parseTextDecoration(textDecoration)}
@@ -252,7 +254,7 @@ const FontFormatPanel = (props) => {
                             style={{
                                 border: '1px solid lightgray',
                                 fontSize: '12px',
-                                width: 318,
+                                width: 317,
                                 height: 100,
                                 padding: 0,
                                 marginTop: 5,
@@ -305,6 +307,7 @@ const FontFormatPanel = (props) => {
                                 border: '1px solid lightgray',
                                 fontSize: '12px',
                                 height: 100,
+                                width:325,
                                 padding: 0,
                                 marginTop: 6,
                                 marginLeft: 5,
