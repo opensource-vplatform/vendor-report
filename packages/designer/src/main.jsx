@@ -11,14 +11,14 @@ const config = {
         //start: false | true //开始。默认值true
         start: {
             font: true, //字体。默认值true
-            align: false, //居中。默认值true
+            align: true, //居中。默认值true
         },
         //formula:false | true //公式。默认值true
         formula: {
-            library: false, //函数库。默认值true
+            library: true, //函数库。默认值true
             calculation: true, //计算。默认值true
         }, //公式
-        data: false, //数据。默认值true
+        data: true, //数据。默认值true
         //view:false | true //视图。默认值true
         view: {
             display: true, //显示/隐藏。默认值true
@@ -253,7 +253,7 @@ const config = {
                 ],
             },
         ], //数据源定义
-        allowToView: false, //是否允许查看数据源
+        allowToView: true, //是否允许查看数据源
         allowToEdit: true, //是否允许编辑数据源
     },
     sheets: {
