@@ -16,34 +16,6 @@ export const AddDatasourceBtn = styled.div`
         opacity: 0.4;
     }
 `;
-
-export const InputField = styled.input`
-    position: relative;
-    border: 1px solid #ddd;
-    min-width: 500px;
-    min-height: 26px;
-    border-radius: 4px;
-    cursor: pointer;
-    caret-color: #777;
-
-    &:focus {
-        outline: 2px solid #ddd;
-    }
-`;
-
-export const TextareaField = styled.textarea`
-    border: 1px solid #ddd;
-    min-width: 500px;
-    min-height: 80px;
-    border-radius: 4px;
-    cursor: pointer;
-    caret-color: #777;
-
-    &:focus {
-        outline: 2px solid #ddd;
-    }
-`;
-
 export const SaveBtn = styled.button`
     background-color: white;
     border: 1px solid #ddd;
@@ -196,4 +168,35 @@ export const ConfirmDialogBox = styled.div`
         cursor: pointer;
         borderradius: 4px;
     }
+`;
+
+export const DraggableDatasourcesBox = styled.div`
+    display: flex;
+    height: 100%;
+    overflow: auto;
+    flex-direction: column;
+    text-align: center;
+    border-right: 1px solid #ababab;
+`;
+
+export const DraggableDatasourcesHeander = styled.div`
+    background-color: #f6f6f6;
+    border-bottom: 1px solid #ababab;
+    height: 32px;
+    line-height: 32px;
+    display: flex;
+    padding: 0 6px;
+`;
+
+export const DraggableDatasourcesContent = styled.div`
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+`;
+
+export const DraggableDatasourcesFooter = styled.span`
+    height: 27px;
+    background: #f6f6f6;
+    border-top: 1px solid #ababab;
 `;

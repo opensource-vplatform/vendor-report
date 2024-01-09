@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import {
+  useContext,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
+import DesignerContext from '../../DesignerContext';
 import Error from './Error';
 import Export from './Export';
 import Import from './Import';
@@ -39,25 +43,50 @@ const ContentWrap = styled.div`
 `;
 
 function Index(props) {
-    const {closeHandler} = props;
-    const [menuCode,setMenuCode] = useState('import');
+    const { closeHandler } = props;
+
+    const context = useContext(DesignerContext);
+    //是否显示导入菜单
+    const isShowImport = context?.conf?.nav?.file?.import !== false;
+    //是否显示导出菜单
+    const isShowExport = context?.conf?.nav?.file?.export !== false;
+    //是否显示打印菜单
+    const isShowPrint = context?.conf?.nav?.file?.print !== false;
+
+    let initMenuCode = '';
+    if (isShowImport) {
+        initMenuCode = 'import';
+    } else if (isShowExport) {
+        initMenuCode = 'export';
+    } else if (isShowPrint) {
+        initMenuCode = 'print';
+    }
+
+    const [menuCode, setMenuCode] = useState(initMenuCode);
     let content = null;
-    if(menuCode == 'import'){
-        content = <Import closeHandler={closeHandler}></Import>
-    }else if(menuCode == 'export'){
-        content = <Export closeHandler={closeHandler}></Export>
-    }else{
-        content = <Error></Error>
+    if (menuCode == 'import') {
+        content = <Import closeHandler={closeHandler}></Import>;
+    } else if (menuCode == 'export') {
+        content = <Export closeHandler={closeHandler}></Export>;
+    } else {
+        content = <Error></Error>;
     }
     return (
         <Wrap>
             <FileMenuWrap>
                 <LeftMenuWrap>
-                    <Menu value = {menuCode} closeHandler={closeHandler} onClick={(code)=>{setMenuCode(code)}}></Menu>
+                    <Menu
+                        value={menuCode}
+                        closeHandler={closeHandler}
+                        onClick={(code) => {
+                            setMenuCode(code);
+                        }}
+                        isShowImport={isShowImport}
+                        isShowExport={isShowExport}
+                        isShowPrint={isShowPrint}
+                    ></Menu>
                 </LeftMenuWrap>
-                <ContentWrap>
-                    {content}
-                </ContentWrap>
+                <ContentWrap>{content}</ContentWrap>
             </FileMenuWrap>
         </Wrap>
     );

@@ -15,10 +15,10 @@ const Headers = styled.div`
     padding: 0px;
     display: flex;
     justify-content: space-between;
-    align-items:center;
+    align-items: center;
 `;
 
-const HeaderWrap = styled.div``
+const HeaderWrap = styled.div``;
 
 const ToolWrap = styled.div``;
 
@@ -83,7 +83,7 @@ const getValidTabCode = function (code, children) {
 };
 
 function Tabs(props) {
-    let { value, onChange, hideCodes = [], children,tool } = props;
+    let { value, onChange, hideCodes = [], children, tool } = props;
     const tabs = Array.isArray(children) ? children : [children];
     const [active, setActive] = useState(() => {
         const activeCode = getValidTabCode(value, tabs);
@@ -104,40 +104,48 @@ function Tabs(props) {
     const headers = (
         <Headers>
             <HeaderWrap>
-            {children.map((child) => {
-                const childProps = child.props;
-                const childCode = childProps.code;
-                if (hideCodes.indexOf(childCode) != -1) return null;
-                const onClick = childProps.onClick;
-                const actived = childCode == active;
-                let children = childProps.title;
-                children =
-                    typeof children == 'string' ? (
-                        <TitleWrap data-active={actived}>{children}</TitleWrap>
-                    ) : (
-                        children
+                {children.map((child) => {
+                    const childProps = child.props;
+                    //隐藏导航
+                    const hidden = childProps?.tabProps?.hidden;
+                    if (hidden) {
+                        return null;
+                    }
+
+                    const childCode = childProps.code;
+                    if (hideCodes.indexOf(childCode) != -1) return null;
+                    const onClick = childProps.onClick;
+                    const actived = childCode == active;
+                    let children = childProps.title;
+                    children =
+                        typeof children == 'string' ? (
+                            <TitleWrap data-active={actived}>
+                                {children}
+                            </TitleWrap>
+                        ) : (
+                            children
+                        );
+                    const clickHandler =
+                        typeof onClick == 'function' ? onClick : handleActive;
+                    return (
+                        <Fragment key={childCode}>
+                            <Header
+                                data-active={actived}
+                                onClick={
+                                    actived
+                                        ? null
+                                        : () => {
+                                              clickHandler(childCode);
+                                          }
+                                }
+                            >
+                                {children}
+                            </Header>
+                        </Fragment>
                     );
-                const clickHandler =
-                    typeof onClick == 'function' ? onClick : handleActive;
-                return (
-                    <Fragment key={childCode}>
-                        <Header
-                            data-active={actived}
-                            onClick={
-                                actived
-                                    ? null
-                                    : () => {
-                                          clickHandler(childCode);
-                                      }
-                            }
-                        >
-                            {children}
-                        </Header>
-                    </Fragment>
-                );
-            })}
+                })}
             </HeaderWrap>
-            {tool ? <ToolWrap>{tool}</ToolWrap>:null}
+            {tool ? <ToolWrap>{tool}</ToolWrap> : null}
         </Headers>
     );
     return (

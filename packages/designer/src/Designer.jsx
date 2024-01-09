@@ -1,5 +1,6 @@
 import React, {
   Fragment,
+  useEffect,
   useState,
 } from 'react';
 
@@ -9,9 +10,12 @@ import {
 } from 'react-redux';
 import styled, { createGlobalStyle } from 'styled-components';
 
+import CellStyleSetting from '@components/cellStyles/cellStyleSetting';
+import { DraggableDatasources } from '@components/defineDatasource/Index';
 import Error from '@components/error/Index';
 import Loading from '@components/loading/Index';
 import { setErrorMsg } from '@store/appSlice/appSlice';
+import { initDatasource } from '@store/datasourceSlice/datasourceSlice';
 import {
   hideTab,
   setActive,
@@ -19,10 +23,6 @@ import {
 } from '@store/navSlice/navSlice';
 import { isBindingTable } from '@utils/worksheetUtil';
 
-import CellStyleSetting from './component/cellStyles/cellStyleSetting';
-import {
-  DraggableDatasourceList,
-} from './component/defineDatasource/defineDatasource';
 import DesignerContext from './DesignerContext';
 import Excel from './Excel';
 import Nav from './Nav';
@@ -76,7 +76,8 @@ const SpreadWrap = styled.div`
     width: 100%;
 `;
 
-function Designer() {
+function Designer(props) {
+    const { conf } = props;
     const dispatch = useDispatch();
     const { mode, spread, waitMsg, errorMsg } = useSelector(
         ({ appSlice }) => appSlice
@@ -104,7 +105,20 @@ function Designer() {
                 dispatch(setActive({ code: 'start' }));
             }
         },
+        conf,
     };
+    useEffect(
+        function () {
+            dispatch(
+                initDatasource({
+                    datasource: conf?.dataSource?.dataSourceDefinition,
+                })
+            );
+        },
+        [conf?.dataSource?.dataSourceDefinition]
+    );
+    //是否显示导航
+    const isShowNav = conf?.nav !== false;
     return (
         <Fragment>
             <DesignerContext.Provider value={ctxValue}>
@@ -120,13 +134,13 @@ function Designer() {
                 ) : null}
                 <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
                     <Wrap>
-                        <Nav></Nav>
+                        {isShowNav && <Nav></Nav>}
                         <SpreadWrap
                             style={{
                                 overflow: 'hidden',
                             }}
                         >
-                            <DraggableDatasourceList></DraggableDatasourceList>
+                            <DraggableDatasources></DraggableDatasources>
                             <Excel></Excel>
                         </SpreadWrap>
                         <CellStyleSetting></CellStyleSetting>

@@ -1,4 +1,7 @@
-import { Fragment } from 'react';
+import {
+  Fragment,
+  useContext,
+} from 'react';
 
 import {
   useDispatch,
@@ -28,6 +31,7 @@ import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
 
+import DesignerContext from './DesignerContext';
 import Formula from './tabs/formula/Index';
 
 const FileTabTitle = styled.a`
@@ -119,6 +123,21 @@ export default function () {
             }
         }
     };
+
+    const context = useContext(DesignerContext);
+    //是否隐藏文件导航
+    const isHiddenFile = context?.conf?.nav?.file === false;
+    //是否隐藏开始导航
+    const isHiddenStart = context?.conf?.nav?.start === false;
+    //是否隐藏公式导航
+    const isHiddenFormula = context?.conf?.nav?.formula === false;
+    //是否隐藏数据导航
+    const isHiddenData = context?.conf?.nav?.data === false;
+    //是否隐藏视图导航
+    const isHiddenView = context?.conf?.nav?.view === false;
+    //是否隐藏表设计导航
+    const isHiddenTable = context?.conf?.nav?.table === false;
+
     return (
         <Tabs
             value={active}
@@ -153,13 +172,34 @@ export default function () {
                 title={<FileTabTitle>文件</FileTabTitle>}
                 tabProps={{
                     closeHandler: () => dispatch(setActive({ code: null })),
+                    hidden: isHiddenFile,
                 }}
             ></FileNavItem>
-            <StartNavItem code='start' title='开始'></StartNavItem>
-            <FormulaNavItem code='formula' title='公式'></FormulaNavItem>
-            <DataNavItem code='data' title='数据'></DataNavItem>
-            <ViewNavItem code='view' title='视图'></ViewNavItem>
-            <TableNavItem code='table' title='表设计'></TableNavItem>
+            <StartNavItem
+                code='start'
+                title='开始'
+                tabProps={{ hidden: isHiddenStart }}
+            ></StartNavItem>
+            <FormulaNavItem
+                code='formula'
+                title='公式'
+                tabProps={{ hidden: isHiddenFormula }}
+            ></FormulaNavItem>
+            <DataNavItem
+                code='data'
+                title='数据'
+                tabProps={{ hidden: isHiddenData }}
+            ></DataNavItem>
+            <ViewNavItem
+                code='view'
+                title='视图'
+                tabProps={{ hidden: isHiddenView }}
+            ></ViewNavItem>
+            <TableNavItem
+                code='table'
+                title='表设计'
+                tabProps={{ hidden: isHiddenTable }}
+            ></TableNavItem>
         </Tabs>
     );
 }

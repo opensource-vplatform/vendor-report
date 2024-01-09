@@ -1,100 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import {
-    deepCopy,
-    findTreeNodeById,
-    genValueByType,
+  deepCopy,
+  findTreeNodeById,
+  genValueByType,
 } from '../../utils/commonUtil.js';
-import { ds } from './data.js';
-
-const test_data_finalDsList = [
-    {
-        id: '6589cf29ae694fe1a7a6de70fbceac06',
-        value: '',
-        type: 'table',
-        typeName: '文本',
-        desc: '必填',
-        code: 'name',
-        name: '姓名',
-    },
-    {
-        id: '187ee2a13e0748f5b52342929db18325',
-        value: '',
-        type: 'integer',
-        typeName: '整数',
-        desc: '年龄必须年满18岁',
-        code: 'age',
-        name: '年龄',
-    },
-    {
-        id: 'c623ebe57c374eff9c243b63b3d73027',
-        value: '',
-        type: 'text',
-        typeName: '文本',
-        desc: '性别',
-        code: 'sex',
-        name: '性别',
-    },
-    {
-        id: '140a79cc0041403a9aa30898ba858ac5',
-        value: '',
-        type: 'table',
-        typeName: '表',
-        desc: '工作履历',
-        code: 'work',
-        name: '工作经历',
-        children: [
-            {
-                id: 'A001',
-                code: 'startDate',
-                name: '开始日期',
-                type: 'text',
-                typeName: '文本',
-                parentId: '140a79cc0041403a9aa30898ba858ac5',
-            },
-            {
-                id: 'B001',
-                code: 'endDate',
-                type: 'text',
-                typeName: '文本',
-                name: '结束日期',
-                parentId: '140a79cc0041403a9aa30898ba858ac5',
-            },
-            {
-                id: 'C001',
-                code: 'companyName',
-                name: '公司名称',
-                type: 'text',
-                typeName: '文本',
-                parentId: '140a79cc0041403a9aa30898ba858ac5',
-            },
-            {
-                id: 'D001',
-                code: 'workingYears',
-                name: '工龄',
-                type: 'integer',
-                typeName: '整数',
-                parentId: '140a79cc0041403a9aa30898ba858ac5',
-            },
-            {
-                id: 'E001',
-                code: 'averagePay',
-                name: '平均工资',
-                type: 'decimals',
-                typeName: '小数',
-                parentId: '140a79cc0041403a9aa30898ba858ac5',
-            },
-        ],
-    },
-];
 
 export const datasourceSlice = createSlice({
     name: 'datasourceSlice',
     initialState: {
         ds: {},
         activeDs: {},
-        finalDsList: [...ds],
-        dsList: [...ds],
+        finalDsList: [],
+        dsList: [],
         bindInfos: {
             /*  {
                 [数据源id]:{
@@ -382,6 +300,12 @@ export const datasourceSlice = createSlice({
                 });
             });
         },
+        initDatasource(state, { payload }) {
+            let { datasource } = payload;
+            datasource = Array.isArray(datasource) ? datasource : [];
+            state.dsList = [...datasource];
+            state.finalDsList = [...datasource];
+        },
     },
 });
 export const {
@@ -395,5 +319,6 @@ export const {
     setIsShowDatasource,
     removeBindInfosByCellInstanceId,
     updateActiveSheetTablePath,
+    initDatasource,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;
