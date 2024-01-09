@@ -6,8 +6,7 @@ import {
 
 import styled from 'styled-components';
 
-import Button from '@components/Button/Index';
-import Dialog from '@components/dialog/Index';
+import { OperationDialog } from '@components/dialog/Index';
 import Integer from '@components/integer/Index';
 import {
   colorFromHLS,
@@ -15,14 +14,6 @@ import {
   rgb2hls,
   rgbToHex,
 } from '@utils/colorUtil';
-
-const Wrap = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 330px;
-    padding: 8px;
-    box-sizing: border-box;
-`;
 
 const PalletWrap = styled.div`
     width: 100%;
@@ -108,40 +99,31 @@ const Display = styled.div`
     broder: solid 1px lightgray;
 `;
 
-const ButtonWrap = styled.div`
-    width: 100%;
-    padding: 8px 0px 0px 0px;
-    margin: 0px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row-reverse;
-`;
-
 export default function (props) {
-    const { value = '#ffffff', onClose,onChange } = props;
+    const { value = '#ffffff', onClose, onChange } = props;
     const palletPointer = useRef(null);
     const [data, setData] = useState(() => {
-        const rgb = hexToRgb(value==null ? '#ffffff':value);
+        const rgb = hexToRgb(value == null ? '#ffffff' : value);
         return {
             isDragingHueSat: false,
             isDragingLum: false,
             hls: rgb2hls(rgb),
-            lumColor:rgb,
+            lumColor: rgb,
             color: rgb,
         };
     });
-    useEffect(()=>{
-        setData((data)=>{
-            const rgb = hexToRgb(value==null ? '#ffffff':value);
+    useEffect(() => {
+        setData((data) => {
+            const rgb = hexToRgb(value == null ? '#ffffff' : value);
             return {
                 isDragingHueSat: false,
                 isDragingLum: false,
                 hls: rgb2hls(rgb),
-                lumColor:rgb,
+                lumColor: rgb,
                 color: rgb,
             };
         });
-    },[value]);
+    }, [value]);
     const palletWidth = 190,
         palletHeight = 160;
     const integerStyle = { width: 120, height: 24 };
@@ -161,7 +143,7 @@ export default function (props) {
             updateColor();
         }
     };
-    const handlePalletArrowColorChange = (evt)=>{
+    const handlePalletArrowColorChange = (evt) => {
         const evt1 = evt.nativeEvent;
         const srcElement = evt1.target || evt1.srcElement;
         let y = evt1.offsetY;
@@ -176,7 +158,7 @@ export default function (props) {
         }
         data.hls.luminosity = ((palletHeight - y) / palletHeight) * 255;
         updateColor('palletArrow');
-    }
+    };
     const handlePalletMouseDown = (evt) => {
         data.isDragingHueSat = true;
         handlePalletColorChange(evt);
@@ -185,34 +167,38 @@ export default function (props) {
         data.isDragingLum = true;
         handlePalletArrowColorChange(evt);
     };
-    const handlePalletArrowMouseUp = ()=>{
+    const handlePalletArrowMouseUp = () => {
         data.isDragingLum = false;
-    }
+    };
     const handlePalletMouseUp = () => {
         data.isDragingHueSat = false;
     };
-    const handlePalletArrowMouseMove = (evt)=>{
-        if(data.isDragingLum){
+    const handlePalletArrowMouseMove = (evt) => {
+        if (data.isDragingLum) {
             handlePalletArrowColorChange(evt);
         }
-    }
+    };
     const handlePalletMouseMove = (evt) => {
         if (data.isDragingHueSat) {
             handlePalletColorChange(evt);
         }
     };
-    const updateColor = function (type='pallet') {
-        const { saturation, hue,luminosity } = data.hls;
+    const updateColor = function (type = 'pallet') {
+        const { saturation, hue, luminosity } = data.hls;
         const color = colorFromHLS(
             Math.floor((hue / 255) * 240),
-            Math.floor(((type=='pallet' ? 128:luminosity) / 255) * 240),
+            Math.floor(((type == 'pallet' ? 128 : luminosity) / 255) * 240),
             Math.floor((saturation / 255) * 240)
         );
         color.r = parseInt(color.r.toString(), 10);
         color.g = parseInt(color.g.toString(), 10);
         color.b = parseInt(color.b.toString(), 10);
         setData((data) => {
-            return { ...data, color: color,lumColor:type=='pallet' ? color:data.lumColor };
+            return {
+                ...data,
+                color: color,
+                lumColor: type == 'pallet' ? color : data.lumColor,
+            };
         });
     };
     const color = data.color;
@@ -224,154 +210,149 @@ export default function (props) {
     const luminosity = Math.floor((hls.luminosity / 240) * 255);
     const saturation = Math.floor((hls.saturation / 240) * 255);
     return (
-        <Dialog title='颜色'>
-            <Wrap>
-                <PalletWrap>
+        <OperationDialog
+            title='颜色'
+            onCancel={onClose}
+            onConfirm={() => {
+                onChange(rgbToHex(data.color));
+            }}
+        >
+            <PalletWrap>
+                <Pallet
+                    onMouseDown={handlePalletMouseDown}
+                    onMouseUp={handlePalletMouseUp}
+                    onMouseMove={handlePalletMouseMove}
+                    style={{
+                        position: 'relative',
+                        width: palletWidth,
+                        height: palletHeight,
+                    }}
+                >
                     <Pallet
-                        onMouseDown={handlePalletMouseDown}
-                        onMouseUp={handlePalletMouseUp}
-                        onMouseMove={handlePalletMouseMove}
+                        ref={palletPointer}
                         style={{
-                            position: 'relative',
-                            width: palletWidth,
-                            height: palletHeight,
+                            position: 'absolute',
+                            width: 10,
+                            height: 10,
+                            left: (hue / 255) * palletWidth - 4,
+                            top:
+                                palletHeight -
+                                (saturation / 255) * palletHeight -
+                                4,
+                            backgroundPosition: '0px 0px',
                         }}
-                    >
-                        <Pallet
-                            ref={palletPointer}
+                        data-type='palletPointer'
+                    ></Pallet>
+                </Pallet>
+                <PalletBarWrap onMouseMove={handlePalletArrowMouseMove}>
+                    <PalletBar
+                        onMouseDown={handlePalletArrowMouseDown}
+                        onMouseUp={handlePalletArrowMouseUp}
+                        style={{
+                            backgroundImage: `linear-gradient(to bottom, rgb(255,  255, 255),${lumRgbColor}, rgb(0, 0, 0))`,
+                        }}
+                    ></PalletBar>
+                    <IndicatorWrap>
+                        <Indicator
                             style={{
-                                position: 'absolute',
-                                width: 10,
-                                height: 10,
-                                left: (hue / 255) * palletWidth - 4,
+                                left: 4,
                                 top:
                                     palletHeight -
-                                    (saturation / 255) * palletHeight - 4,
-                                backgroundPosition: '0px 0px',
+                                    (luminosity / 255) * palletHeight -
+                                    5,
                             }}
-                            data-type='palletPointer'
-                        ></Pallet>
-                    </Pallet>
-                    <PalletBarWrap onMouseMove={handlePalletArrowMouseMove}>
-                        <PalletBar
-                            onMouseDown={handlePalletArrowMouseDown}
-                            onMouseUp={handlePalletArrowMouseUp}
-                            style={{
-                                backgroundImage: `linear-gradient(to bottom, rgb(255,  255, 255),${lumRgbColor}, rgb(0, 0, 0))`,
+                            data-type='palletArrow'
+                        ></Indicator>
+                    </IndicatorWrap>
+                </PalletBarWrap>
+            </PalletWrap>
+            <InputWrap>
+                <InputArea>
+                    <InputItem>
+                        <Label>红色:</Label>
+                        <Integer
+                            value={color.r}
+                            style={integerStyle}
+                            min={0}
+                            max={255}
+                            onChange={(val) => {
+                                setData((data) => {
+                                    const color = { ...data.color, r: val };
+                                    return {
+                                        ...data,
+                                        color,
+                                        lumColor: color,
+                                    };
+                                });
                             }}
-                        ></PalletBar>
-                        <IndicatorWrap>
-                            <Indicator
-                                style={{
-                                    left: 4,
-                                    top:
-                                        palletHeight -
-                                        (luminosity / 255) * palletHeight -
-                                        5,
-                                }}
-                                data-type='palletArrow'
-                            ></Indicator>
-                        </IndicatorWrap>
-                    </PalletBarWrap>
-                </PalletWrap>
-                <InputWrap>
-                    <InputArea>
-                        <InputItem>
-                            <Label>红色:</Label>
-                            <Integer
-                                value={color.r}
-                                style={integerStyle}
-                                min={0}
-                                max={255}
-                                onChange={(val) => {
-                                    setData((data) => {
-                                        const color = { ...data.color, r: val };
-                                        return {
-                                            ...data,
-                                            color,
-                                            lumColor:color
-                                        };
-                                    });
-                                }}
-                            ></Integer>
-                        </InputItem>
-                        <InputItem>
-                            <Label>绿色:</Label>
-                            <Integer
-                                value={color.g}
-                                style={integerStyle}
-                                min={0}
-                                max={255}
-                                onChange={(val) => {
-                                    setData((data) => {
-                                        const color = { ...data.color, g: val };
-                                        return {
-                                            ...data,
-                                            color,
-                                            lumColor:color
-                                        };
-                                    });
-                                }}
-                            ></Integer>
-                        </InputItem>
-                        <InputItem>
-                            <Label>蓝色:</Label>
-                            <Integer
-                                value={color.b}
-                                style={integerStyle}
-                                min={0}
-                                max={255}
-                                onChange={(val) => {
-                                    setData((data) => {
-                                        const color = { ...data.color, b: val };
-                                        return {
-                                            ...data,
-                                            color,
-                                            lumColor:color
-                                        };
-                                    });
-                                }}
-                            ></Integer>
-                        </InputItem>
-                    </InputArea>
-                    <DisplayWrap>
-                        <DisplayItem style={{ justifyContent: 'center' }}>
-                            <Label>新增</Label>
-                        </DisplayItem>
-                        <DisplayItem
-                            style={{
-                                border: 'solid 1px black',
-                                borderBottom: 'none',
-                                backgroundColor: rgbColor,
+                        ></Integer>
+                    </InputItem>
+                    <InputItem>
+                        <Label>绿色:</Label>
+                        <Integer
+                            value={color.g}
+                            style={integerStyle}
+                            min={0}
+                            max={255}
+                            onChange={(val) => {
+                                setData((data) => {
+                                    const color = { ...data.color, g: val };
+                                    return {
+                                        ...data,
+                                        color,
+                                        lumColor: color,
+                                    };
+                                });
                             }}
-                        >
-                            <Display></Display>
-                        </DisplayItem>
-                        <DisplayItem
-                            style={{
-                                border: 'solid 1px black',
-                                borderTop: 'none',
-                                backgroundColor:value
+                        ></Integer>
+                    </InputItem>
+                    <InputItem>
+                        <Label>蓝色:</Label>
+                        <Integer
+                            value={color.b}
+                            style={integerStyle}
+                            min={0}
+                            max={255}
+                            onChange={(val) => {
+                                setData((data) => {
+                                    const color = { ...data.color, b: val };
+                                    return {
+                                        ...data,
+                                        color,
+                                        lumColor: color,
+                                    };
+                                });
                             }}
-                        >
-                            <Display></Display>
-                        </DisplayItem>
-                        <DisplayItem style={{ justifyContent: 'center' }}>
-                            <Label>当前</Label>
-                        </DisplayItem>
-                    </DisplayWrap>
-                </InputWrap>
-                <ButtonWrap>
-                    <Button style={btnStyle} onClick={onClose}>
-                        取消
-                    </Button>
-                    <Button style={{ ...btnStyle, marginRight: 8 }} onClick={()=>{
-                        onChange(rgbToHex(data.color));
-                    }}>
-                        确定
-                    </Button>
-                </ButtonWrap>
-            </Wrap>
-        </Dialog>
+                        ></Integer>
+                    </InputItem>
+                </InputArea>
+                <DisplayWrap>
+                    <DisplayItem style={{ justifyContent: 'center' }}>
+                        <Label>新增</Label>
+                    </DisplayItem>
+                    <DisplayItem
+                        style={{
+                            border: 'solid 1px black',
+                            borderBottom: 'none',
+                            backgroundColor: rgbColor,
+                        }}
+                    >
+                        <Display></Display>
+                    </DisplayItem>
+                    <DisplayItem
+                        style={{
+                            border: 'solid 1px black',
+                            borderTop: 'none',
+                            backgroundColor: value,
+                        }}
+                    >
+                        <Display></Display>
+                    </DisplayItem>
+                    <DisplayItem style={{ justifyContent: 'center' }}>
+                        <Label>当前</Label>
+                    </DisplayItem>
+                </DisplayWrap>
+            </InputWrap>
+        </OperationDialog>
     );
 }

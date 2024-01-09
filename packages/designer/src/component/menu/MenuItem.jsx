@@ -22,6 +22,10 @@ const MenuItemWrap = styled.div`
     &[data-selected='true'] {
         background-color: #dadada;
     }
+    &[data-disabled='true'] {
+        background-color: transparent !important;
+        opacity: 0.5;
+    }
 `;
 
 const Title = styled.span`
@@ -38,6 +42,7 @@ const WithMenuItem = function (Component) {
             active,
             value,
             title,
+            disabled = false,
             onClick,
             optionMaxSize,
             datas,
@@ -45,6 +50,7 @@ const WithMenuItem = function (Component) {
         } = props;
         const [data, setData] = useState({ show: false, left: 0, top: 0 });
         const handleMouseEnter = (evt) => {
+            if(disabled)return;
             const target = evt.target;
             const itemWrap = target.closest('.menuItemWrap');
             const itemsWrap = target.closest('.menuItemsWrap');
@@ -52,12 +58,13 @@ const WithMenuItem = function (Component) {
             const itemsWrapRect = itemsWrap.getBoundingClientRect();
             setData({
                 show: true,
-                left: itemsWrapRect.width-3,
+                left: itemsWrapRect.width - 3,
                 top: itemWrapRect.top - itemsWrapRect.top,
             });
         };
 
         const handleMouseLeave = (evt) => {
+            if(disabled)return;
             setData({ show: false });
         };
         return (
@@ -65,15 +72,20 @@ const WithMenuItem = function (Component) {
                 data-value={value}
                 className='menuItemWrap'
                 data-selected={active == value}
+                data-disabled={disabled}
                 title={title}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 onClick={() => {
-                    onClick(value);
+                    !disabled&&onClick(value);
                 }}
             >
-                <Component datas={datas} {...others}></Component>
-                {hasChildren(datas) && data.show ? (
+                <Component
+                    datas={datas}
+                    disabled={disabled}
+                    {...others}
+                ></Component>
+                {!disabled && hasChildren(datas) && data.show ? (
                     <ItemsPanel
                         value={active}
                         items={datas}
@@ -96,12 +108,12 @@ const hasChildren = function (children) {
 };
 
 export const MenuItem = WithMenuItem(function (props) {
-    const { text, icon, datas } = props;
+    const { text, icon, disabled = false, datas } = props;
     return (
         <Fragment>
             {icon ? <IconWrap>{icon}</IconWrap> : null}
             <Title>{text}</Title>
-            {hasChildren(datas) ? (
+            {!disabled && hasChildren(datas) ? (
                 <ArrowDownIcon
                     style={{ transform: 'rotate(270deg)' }}
                 ></ArrowDownIcon>

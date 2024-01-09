@@ -7,39 +7,23 @@ import {
 } from '@components/group/Index';
 import FindInPageIcon from '@icons/shape/FindInPage';
 import RestorePageIcon from '@icons/shape/RestorePage';
-import SearchIcon from '@icons/shape/Search';
 import {
   zoom,
   zoomBySelection,
 } from '@utils/worksheetUtil';
 
+import ShowRatio from './componnets/ShowRatio';
+
 export default function () {
-    const {
-        spread
-    } = useSelector(({ appSlice }) => appSlice);
-    const handleResetZoom = ()=>{
-        zoom(spread,1);
-    }
-    const handleZoomBySelection = ()=>zoomBySelection(spread)
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const handleResetZoom = () => {
+        zoom(spread, 1);
+    };
+    const handleZoomBySelection = () => zoomBySelection(spread);
     return (
         <GroupItem title='显示比例'>
             <HLayout>
-                <VItem
-                    title='显示比例'
-                    style={{
-                        paddingLeft: 4,
-                        paddingBottom: 4,
-                    }}
-                    icon={
-                        <SearchIcon
-                            iconStyle={{
-                                width: 44,
-                                height: 44,
-                                color:'#367fc9'
-                            }}
-                        ></SearchIcon>
-                    }
-                ></VItem>
+                <ShowRatio></ShowRatio>
                 <VItem
                     title='100%'
                     style={{
@@ -53,7 +37,7 @@ export default function () {
                             iconStyle={{
                                 width: 44,
                                 height: 44,
-                                color:'#367fc9'
+                                color: '#367fc9',
                             }}
                         ></RestorePageIcon>
                     }
@@ -72,7 +56,7 @@ export default function () {
                             iconStyle={{
                                 width: 44,
                                 height: 44,
-                                color:'#367fc9'
+                                color: '#367fc9',
                             }}
                         ></FindInPageIcon>
                     }

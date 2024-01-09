@@ -21,14 +21,6 @@ const ScrollWrap = styled.div`
     overflow-y: auto;
 `;
 
-const hasItems = function (items) {
-    return items && items.length > 0;
-};
-
-const hasChildren = function (item) {
-    return item.children && item.children.length > 0;
-};
-
 //菜单项高度
 const MENU_ITEM_HEIGHT = 34;
 
@@ -44,6 +36,7 @@ const createMenuItem = function (value,item, onNodeClick,optionMaxSize) {
                 title={title}
                 icon={icon}
                 text={text}
+                disabled={item.disabled}
                 optionMaxSize={optionMaxSize}
                 datas={children}
                 onClick={onNodeClick}

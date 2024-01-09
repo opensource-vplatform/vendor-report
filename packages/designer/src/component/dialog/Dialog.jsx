@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 
 import styled from 'styled-components';
 
@@ -167,4 +168,6 @@ function Index(props) {
     ) : null;
 }
 
-export default Index;
+export default function(props){
+    return createPortal(<Index {...props}></Index>,document.body);
+};

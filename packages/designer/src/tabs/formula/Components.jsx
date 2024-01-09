@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Button from '@components/Button/Index';
+import Button from '@components/button/Index';
 import { VItem } from '@components/group/Index';
 import Menu from '@components/menu/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';

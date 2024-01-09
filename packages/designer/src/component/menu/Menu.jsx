@@ -1,23 +1,5 @@
-import styled from 'styled-components';
-
 import Popper from '../popper/Popper';
 import ItemsPanel from './ItemsPanel';
-
-const Wrap = styled.div`
-    display: flex;
-    flex-direction: column;
-`;
-
-const ScrollWrap = styled.div`
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-`;
-
-const hasChildren = function(item){
-    return item.children && item.children.length>0
-}
 
 export default function (props) {
     const {

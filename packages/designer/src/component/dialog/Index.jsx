@@ -1,9 +1,6 @@
-import { createPortal } from 'react-dom';
-
 import Dialog from './Dialog';
+import OperationDialog from './OperationDialog';
 
-function Index(props){
-    return createPortal(<Dialog {...props}></Dialog>,document.body);
-}
+export default Dialog;
 
-export default Index;
+export { Dialog, OperationDialog };
