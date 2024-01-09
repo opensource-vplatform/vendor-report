@@ -30,7 +30,7 @@ export const FormatNumber = {
 };
 
 export const AccountingSymbol = [
-    { value: '', title: '', text: '' },
+    { value: '', title: '无', text: '无' },
     { value: '$', title: '$', text: '$' },
     { value: '¥', title: '¥(Chinese)', text: '¥(Chinese)' },
     { value: '₩', title: '₩(Korean)', text: '₩(Korean)' },

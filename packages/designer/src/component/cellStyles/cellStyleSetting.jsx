@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
-import Select from '@components/Select/Index'
+import Select from '@components/Select/Index';
 import Button from '../button/Index';
 import Index from '../dialog/Index';
 import Integer from '../integer/Index';
@@ -118,6 +118,10 @@ const DecimalPlaces = styled.div`
     margin-top: 10px;
     display: flex;
     align-items: center;
+    span {
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
 `;
 const ThousandSeparator = styled.div`
     height: 25px;
@@ -139,6 +143,12 @@ const TabBottomButtons = styled.div`
         align-items: center;
         justify-content: center;
         margin-right: 15px;
+    }
+`;
+const LocaleDiv = styled.div`
+    span {
+        padding-top: 0px;
+        padding-bottom: 0px;
     }
 `;
 
@@ -190,10 +200,7 @@ function CellStyleSetting(props) {
     const fontCellSetting = useSelector(
         ({ fontCellSettingSlice }) => fontCellSettingSlice
     );
-    const {
-        spread,
-        isStrickoutLine,
-    } = fontStyles;
+    const { spread, isStrickoutLine } = fontStyles;
 
     const { tabValueCellSetting, isOpenCellSetting } = borderStyle;
     const { selectedFontColor } = fontCellSetting;
@@ -703,7 +710,7 @@ function CellStyleSetting(props) {
                                             height: '25px',
                                         }}
                                         optionStyle={{
-                                            width: '99%',
+                                            width: '100%',
                                         }}
                                         onChange={handleSelectSymbolChange}
                                         value={selectedSymbol}
@@ -794,22 +801,20 @@ function CellStyleSetting(props) {
                             {(selectedValue === 'date' ||
                                 selectedValue === 'time' ||
                                 selectedValue === 'special') && (
-                                <div>
+                                <LocaleDiv>
                                     <span>区域设置（国家/地区）:</span>
                                     <Select
                                         datas={LocaleType}
                                         style={{
-                                            width: '50%',
+                                            width: '300px',
                                             height: '25px',
                                             margin: '5px 0px',
                                         }}
-                                        optionStyle={{
-                                            width: '50%',
-                                        }}
+                                        optionStyle={{ width: '304px' }}
                                         onChange={handleLocaleType}
                                         value={locale}
                                     />
-                                </div>
+                                </LocaleDiv>
                             )}
                         </RightAreaOfNumberTab>
                         <BottomAreaOfNumberTab>
