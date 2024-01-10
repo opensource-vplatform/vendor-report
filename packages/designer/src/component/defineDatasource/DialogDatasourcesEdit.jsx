@@ -1,4 +1,7 @@
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import Dialog from '@components/dialog/Index.jsx';
 import { setIsShowDatasource } from '@store/datasourceSlice/datasourceSlice';
@@ -9,6 +12,7 @@ export default function Index(props) {
     const { isShowDatasource } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
+    const dispatch = useDispatch();
     if (!isShowDatasource) {
         return null;
     }

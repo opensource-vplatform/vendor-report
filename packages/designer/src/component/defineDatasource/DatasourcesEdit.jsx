@@ -1,4 +1,5 @@
 import {
+  useContext,
   useRef,
   useState,
 } from 'react';
@@ -25,6 +26,7 @@ import {
   hasSameNode,
 } from '@utils/commonUtil.js';
 
+import DesignerContext from '../../DesignerContext.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
 import Datasources from './Datasources.jsx';
 import {
@@ -66,10 +68,10 @@ export default function Index(props) {
         updated: [],
     });
 
-    const { reportDesigner } = useSelector(({ configSlice }) => configSlice);
+    const context = useContext(DesignerContext);
 
     //是否允许编辑数据源
-    const isAllowToEdit = reportDesigner?.dataSource?.allowToEdit !== false;
+    const isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
 
     let { spread } = useSelector(({ fontSlice }) => fontSlice);
 
