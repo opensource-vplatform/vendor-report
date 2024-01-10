@@ -105,7 +105,7 @@ export default function (props) {
                             tips={data.collapsed ? '向右展开' : '向左折叠'}
                             style={{
                                 marginLeft: -8,
-                                backgroundColor: 'transparent',
+                                backgroundColor: '#dadada',
                             }}
                             onClick={handleIconClick}
                         ></DotVertIcon>
