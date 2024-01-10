@@ -9,6 +9,7 @@ const Component = styled.div`
     vertical-align: middle;
     &[data-type='horizontal']{
         height: 1px;
+        width: 100%;
         border-top: 1px solid lightgray;
         margin: 0px 0px 0px 12px;
     }

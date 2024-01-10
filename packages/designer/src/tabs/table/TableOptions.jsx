@@ -73,10 +73,10 @@ export default function () {
                             title='标题行'
                             value={showHeader}
                             desc='显示/隐藏标题'
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setShowHeader({
-                                        showHeader: evt.target.checked,
+                                        showHeader: checked,
                                     })
                                 );
                             }}
@@ -87,10 +87,10 @@ export default function () {
                             title='汇总行'
                             desc='显示/隐藏汇总行。汇总行中可以对数据进行求和、平均值、最大值、最小值等计算'
                             value={showFooter}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setShowFooter({
-                                        showFooter: evt.target.checked,
+                                        showFooter: checked,
                                     })
                                 );
                             }}
@@ -103,10 +103,10 @@ export default function () {
                             title='镶边行'
                             value={bandRow}
                             desc='显示/隐藏镶边行。显示镶边行时，数据行间将出现斑马纹'
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setBandRow({
-                                        bandRow: evt.target.checked,
+                                        bandRow: checked,
                                     })
                                 );
                             }}
@@ -117,10 +117,10 @@ export default function () {
                             title='镶边列'
                             value={bandColumn}
                             desc='显示/隐藏镶边列。显示镶边列时，数据列间将出现斑马纹'
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setBandColumn({
-                                        bandColumn: evt.target.checked,
+                                        bandColumn: checked,
                                     })
                                 );
                             }}
@@ -133,11 +133,10 @@ export default function () {
                             title='第一列'
                             value={highlightFirstColumn}
                             desc='突出显示第一列数据'
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setHighlightFirstColumn({
-                                        highlightFirstColumn:
-                                            evt.target.checked,
+                                        highlightFirstColumn: checked,
                                     })
                                 );
                             }}
@@ -148,10 +147,10 @@ export default function () {
                             title='最后一列'
                             value={highlightLastColumn}
                             desc='突出显示最后一列数据'
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setHighlightLastColumn({
-                                        highlightLastColumn: evt.target.checked,
+                                        highlightLastColumn: checked,
                                     })
                                 );
                             }}
@@ -163,10 +162,10 @@ export default function () {
                         <CheckBox
                             title='筛选按钮'
                             value={filterButtonVisible}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setFilterButtonVisible({
-                                        filterButtonVisible: evt.target.checked,
+                                        filterButtonVisible: checked,
                                     })
                                 );
                             }}
@@ -178,10 +177,10 @@ export default function () {
                             desc='勾选此项，汇总行将提供下拉选择工具，方便进行求和、平均值、最大值、最小值等汇总设置，使用此选项需启用汇总行。'
                             value={footerDropDownList}
                             disabled={!showFooter}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setFooterDropDownList({
-                                        footerDropDownList: evt.target.checked,
+                                        footerDropDownList: checked,
                                     })
                                 );
                             }}
@@ -194,10 +193,10 @@ export default function () {
                             title='行合并'
                             desc='勾选此项，同行数据存在连续相同时，将合并成一个单元格'
                             value={rowMerge}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setRowMerge({
-                                        rowMerge: evt.target.checked,
+                                        rowMerge: checked,
                                     })
                                 );
                             }}
@@ -208,10 +207,10 @@ export default function () {
                             title='列合并'
                             desc='勾选此项，同列数据存在连续相同时，将合并成一个单元格'
                             value={columnMerge}
-                            onChange={(evt) => {
+                            onChange={(checked) => {
                                 dispatch(
                                     setColumnMerge({
-                                        columnMerge: evt.target.checked,
+                                        columnMerge: checked,
                                     })
                                 );
                             }}

@@ -83,22 +83,22 @@ const LogicItem = WithIconMenu(
 const TextItem = WithIconMenu(
     '文本',
     TextIcon,
-    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('text'))
 );
 const DateItem = WithIconMenu(
     '日期和时间',
     DateIcon,
-    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('dateAndTime'))
 );
 const SearchItem = WithIconMenu(
     '查找与引用',
     SearchIcon,
-    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('lookupAndReference'))
 );
 const MathItem = WithIconMenu(
     '数学和三角函数',
     MathIcon,
-    formulaMetadataToDatas(getFormulaMetadatasByCatalog('financial'))
+    formulaMetadataToDatas(getFormulaMetadatasByCatalog('mathAndTrigonometry'))
 );
 const OtherItem = WithIconMenu('其他函数', OtherIcon, [
     {
