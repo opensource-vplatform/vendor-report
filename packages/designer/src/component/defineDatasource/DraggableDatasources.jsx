@@ -352,11 +352,22 @@ export default function Index() {
             <DialogDatasourcesEdit></DialogDatasourcesEdit>
             <DraggableDatasourcesBox>
                 <DraggableDatasourcesHeander>
-                    <div style={{ width: '100%' }}>数据源</div>
+                    <div
+                        style={{
+                            width: '100%',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                        }}
+                    >
+                        数据源
+                    </div>
                     {isAllowToView && (
                         <DatasourceIcon
                             onClick={function () {
-                                dispatch(setActive({ code: 'data' }));
+                                const isShowData =
+                                    context?.conf?.nav?.data !== false;
+                                isShowData &&
+                                    dispatch(setActive({ code: 'data' }));
                                 dispatch(setIsShowDatasource());
                             }}
                         ></DatasourceIcon>

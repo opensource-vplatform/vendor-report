@@ -213,7 +213,7 @@ export default function Index(props) {
             ) : (
                 ''
             )}
-            <h1>数据源</h1>
+            <h2>数据源</h2>
             <LineSepatator type='horizontal'></LineSepatator>
             <DatasourceOptBox>
                 <DatasourceOptBoxLeft>

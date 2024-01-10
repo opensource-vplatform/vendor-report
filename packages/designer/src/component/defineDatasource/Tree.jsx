@@ -115,7 +115,13 @@ export default function Index(props) {
                                     : 0
                             }
                         >
-                            <div className='text'>{name || '-'}</div>
+                            <div
+                                className={`text ${
+                                    type === 'text' ? 'string' : type
+                                }`}
+                            >
+                                {name || '-'}
+                            </div>
                             {type === 'table' && isShowAddSubDatasource
                                 ? isAllowToEdit && (
                                       <DddSubDatasource
