@@ -1,58 +1,238 @@
-import {
-  useContext,
-  useEffect,
-  useRef,
-} from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import DatasourceIcon from '@icons/data/datasource';
 import {
-  removeBindInfosByCellInstanceId,
-  saveBindInfos,
-  setIsShowDatasource,
-  updateActiveSheetTablePath,
+    removeBindInfosByCellInstanceId,
+    saveBindInfos,
+    setIsShowDatasource,
+    updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
-import {
-  setActive,
-  showTab,
-} from '@store/navSlice/navSlice';
+import { setActive, showTab } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
 import {
-  findTreeNodeById,
-  getActiveSheetTablesPath,
+    findTreeNodeById,
+    getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
+import { parseTable, setTableCornerMarks } from '@utils/tableUtil.js';
 import {
-  parseTable,
-  setTableCornerMarks,
-} from '@utils/tableUtil.js';
-import {
-  getCellInstanceId,
-  getSheetInstanceId,
-  setCellTag,
+    getCellInstanceId,
+    getSheetInstanceId,
+    setCellTag,
 } from '@utils/worksheetUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import Datasources from './Datasources.jsx';
 import DialogDatasourcesEdit from './DialogDatasourcesEdit.jsx';
 import {
-  DraggableDatasourcesBox,
-  DraggableDatasourcesContent,
-  DraggableDatasourcesFooter,
-  DraggableDatasourcesHeander,
+    DraggableDatasourcesBox,
+    DraggableDatasourcesContent,
+    DraggableDatasourcesFooter,
+    DraggableDatasourcesHeander,
 } from './ui.jsx';
 import {
-  addTable,
-  BindingPathCellType,
-  getCellInfo,
-  getPath,
-  highlightBlock,
-  removeHighlightOneBlock,
+    addTable,
+    BindingPathCellType,
+    getCellInfo,
+    getPath,
+    highlightBlock,
+    removeHighlightOneBlock,
 } from './utils/utils.js';
+
+//删除表格
+function tableDeleteAllCommand(params) {
+    const { commandManager, dispatch, context } = params;
+    const command = {
+        canUndo: false,
+        execute(spread, infos) {
+            const sheet = spread.getActiveSheet();
+            const table = sheet.tables.findByName(infos.tableName);
+            setTableCornerMarks({
+                setType: 'onlyRemove',
+                sheet,
+                ...table.range(),
+            });
+            sheet.tables.remove(table);
+            //删除表格后，需隐藏表设计页签
+            context.handleSelectionChange();
+
+            //删除表格后需要重新保存数据源是否已经绑定
+            const tablePaths = getActiveSheetTablesPath({
+                sheet,
+            });
+            dispatch(updateActiveSheetTablePath({ tablePaths }));
+        },
+    };
+    commandManager.register(
+        'tableDeleteAllForContextMenu',
+        command,
+        null,
+        false,
+        false,
+        false,
+        false
+    );
+}
+
+//清除单元格
+function clearContents(params) {
+    const { commandManager, spread, dispatch } = params;
+    //清除动作。当触发清除动作的时候，需要调用接口清除已经绑定的数据源路径
+    commandManager.addListener(
+        'gc.spread.contextMenu.clearContents',
+        function ({ command: { selections } }) {
+            const activeSheet = spread.getActiveSheet();
+            Array.isArray(selections) &&
+                selections.forEach(function ({ col, row, colCount, rowCount }) {
+                    const endRow = row + rowCount;
+                    const endCol = col + colCount;
+                    for (let rowIndex = row; rowIndex < endRow; rowIndex++) {
+                        for (
+                            let colIndex = col;
+                            colIndex < endCol;
+                            colIndex++
+                        ) {
+                            //清除绑定的数据源
+                            if (
+                                activeSheet.getBindingPath(rowIndex, colIndex)
+                            ) {
+                                activeSheet.setBindingPath(
+                                    rowIndex,
+                                    colIndex,
+                                    ''
+                                );
+                                dispatch(
+                                    removeBindInfosByCellInstanceId({
+                                        cellInstanceId: getCellInstanceId(
+                                            activeSheet,
+                                            rowIndex,
+                                            colIndex
+                                        ),
+                                    })
+                                );
+                            }
+
+                            //清除角标
+                            const style = activeSheet.getStyle(
+                                rowIndex,
+                                colIndex
+                            );
+                            if (style) {
+                                if (
+                                    style?.decoration?.cornerFold?.markType ===
+                                    'table'
+                                ) {
+                                    delete style.decoration.cornerFold;
+                                    activeSheet.setStyle(
+                                        rowIndex,
+                                        colIndex,
+                                        style
+                                    );
+                                }
+                            }
+                        }
+                    }
+                });
+
+            //清除表格后需要重新保存数据源是否已经绑定
+            const tablePaths = getActiveSheetTablesPath({
+                sheet: activeSheet,
+            });
+            dispatch(updateActiveSheetTablePath({ tablePaths }));
+        }
+    );
+}
+
+//移动表格
+function tableMove(params) {
+    const { commandManager } = params;
+    const command = {
+        canUndo: false,
+        execute(spread, infos) {
+            const sheet = spread.getActiveSheet();
+            const table = sheet.tables.findByName(infos.tableName);
+            const cellRange = table.range();
+            cellRange.rowCount = 1;
+            const targetElement = highlightBlock(spread, cellRange);
+            const a = { is: false };
+            const GC = getNamespace();
+
+            document.addEventListener('mousemove', (event) => {
+                if (a.is) {
+                    return;
+                }
+                const { cell, row, col } = getCellInfo({ event, spread }) || {};
+                if (!cell) {
+                    return;
+                }
+
+                const _cellRange = new GC.Spread.Sheets.Range(
+                    row,
+                    col,
+                    cellRange.rowCount,
+                    cellRange.colCount
+                );
+                highlightBlock(spread, _cellRange);
+            });
+
+            document.addEventListener('mousedown', (event) => {
+                if (event.button === 0) {
+                    a.is = true;
+                    setTableCornerMarks({
+                        setType: 'onlyRemove',
+                        sheet,
+                        ...table.range(),
+                    });
+                    const { cell, row, col } =
+                        getCellInfo({ event, spread }) || {};
+
+                    //如果表格的结束索引大于表单的结束索引，则创建表单列以确保表单的结束索引不小于表格的结束索引
+                    const spreadNS = GC.Spread.Sheets;
+                    const sheetColumnCount = sheet.getColumnCount(
+                        spreadNS.SheetArea.viewport
+                    );
+                    if (col + cellRange.colCount > sheetColumnCount) {
+                        sheet.addColumns(col, cellRange.colCount - 1);
+                    }
+                    sheet.tables.move(table, row, col);
+                    setTableCornerMarks({
+                        setType: 'onlyAdd',
+                        sheet,
+                        ...table.range(),
+                    });
+                    sheet.setActiveCell(row, col);
+                    removeHighlightOneBlock();
+                }
+            });
+            //debugger;
+        },
+    };
+    commandManager.register(
+        'tableMoveForContextMenu',
+        command,
+        null,
+        false,
+        false,
+        false,
+        false
+    );
+}
+
+function subContextMenuActions(params) {
+    const { spread } = params;
+    params.commandManager = spread.commandManager();
+
+    //清除单元格
+    //clearContents(params);
+
+    //删除表格
+    tableDeleteAllCommand(params);
+
+    //移动表格
+    tableMove(params);
+}
 
 //可拖拽树形数据源列表
 export default function Index() {
@@ -77,116 +257,7 @@ export default function Index() {
             if (!spread) {
                 return;
             }
-
-            //清除动作。当触发清除动作的时候，需要调用接口清除已经绑定的数据源路径
-            const commandManager = spread.commandManager();
-            commandManager.addListener(
-                'gc.spread.contextMenu.clearContents',
-                function ({ command: { selections } }) {
-                    const activeSheet = spread.getActiveSheet();
-                    Array.isArray(selections) &&
-                        selections.forEach(function ({
-                            col,
-                            row,
-                            colCount,
-                            rowCount,
-                        }) {
-                            const endRow = row + rowCount;
-                            const endCol = col + colCount;
-                            for (
-                                let rowIndex = row;
-                                rowIndex < endRow;
-                                rowIndex++
-                            ) {
-                                for (
-                                    let colIndex = col;
-                                    colIndex < endCol;
-                                    colIndex++
-                                ) {
-                                    //清除绑定的数据源
-                                    if (
-                                        activeSheet.getBindingPath(
-                                            rowIndex,
-                                            colIndex
-                                        )
-                                    ) {
-                                        activeSheet.setBindingPath(
-                                            rowIndex,
-                                            colIndex,
-                                            ''
-                                        );
-                                        dispatch(
-                                            removeBindInfosByCellInstanceId({
-                                                cellInstanceId:
-                                                    getCellInstanceId(
-                                                        activeSheet,
-                                                        rowIndex,
-                                                        colIndex
-                                                    ),
-                                            })
-                                        );
-                                    }
-
-                                    //清除角标
-                                    const style = activeSheet.getStyle(
-                                        rowIndex,
-                                        colIndex
-                                    );
-                                    if (style) {
-                                        if (
-                                            style?.decoration?.cornerFold
-                                                ?.markType === 'table'
-                                        ) {
-                                            delete style.decoration.cornerFold;
-                                            activeSheet.setStyle(
-                                                rowIndex,
-                                                colIndex,
-                                                style
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        });
-
-                    //清除表格后需要重新保存数据源是否已经绑定
-                    const tablePaths = getActiveSheetTablesPath({
-                        sheet: activeSheet,
-                    });
-                    dispatch(updateActiveSheetTablePath({ tablePaths }));
-                }
-            );
-
-            let tableDeleteAllCommand = {
-                canUndo: false,
-                execute: function (spread, infos, c /* boolean */) {
-                    const sheet = spread.getActiveSheet();
-                    const table = sheet.tables.findByName(infos.tableName);
-                    setTableCornerMarks({
-                        setType: 'onlyRemove',
-                        sheet,
-                        ...table.range(),
-                    });
-                    sheet.tables.remove(table);
-                    //删除表格后，需隐藏表设计页签
-                    context.handleSelectionChange();
-
-                    //删除表格后需要重新保存数据源是否已经绑定
-                    const tablePaths = getActiveSheetTablesPath({
-                        sheet,
-                    });
-                    dispatch(updateActiveSheetTablePath({ tablePaths }));
-                },
-            };
-            commandManager.register(
-                'tableDeleteAllForContextMenu',
-                tableDeleteAllCommand,
-                null,
-                false,
-                false,
-                false,
-                false
-            );
+            subContextMenuActions({ spread, dispatch, context });
         },
         [spread]
     );

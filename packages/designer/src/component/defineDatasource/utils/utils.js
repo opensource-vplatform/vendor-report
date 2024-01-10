@@ -499,7 +499,7 @@ export function highlightBlock(spread, cellRange) {
 
     if (cellRacts && cellRacts.length > 0) {
         const container = document.querySelector(decorationContainerSelector);
-        if (container)
+        if (container) {
             for (let n = 0; n < cellRacts.length; n++) {
                 let decoration = void 0;
                 if (9 <= n) {
@@ -526,6 +526,8 @@ export function highlightBlock(spread, cellRange) {
                 decoration.style.left = r.x - l + 'px';
                 decoration.style.top = r.y - i + 'px';
             }
+        }
+        return container;
     }
 }
 
