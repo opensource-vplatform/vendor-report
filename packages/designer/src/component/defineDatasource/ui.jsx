@@ -61,6 +61,7 @@ export const DatasourceOptBoxLeft = styled.div`
     flex-direction: column;
     flex: 1;
     border-right: 1px solid #ddd;
+    overflow-y: hidden;
 
     .header {
         display: flex;
@@ -72,14 +73,20 @@ export const DatasourceOptBoxLeft = styled.div`
 
 export const DatasourceBox = styled.div`
     width: 100%;
-    height: 100%;
+    height: calc(100% - 30px);
+    display: flex;
+    flex-direction: column;
     padding: 0 24px;
     box-sizing: border-box;
     background-color: #fff;
+    overflow-y: hidden;
 `;
 export const DatasourceOptBox = styled.div`
     width: 100%;
+    height: 100%;
+    flex: 1;
     display: flex;
+    overflow-y: hidden;
 `;
 
 export const DddSubDatasource = styled.div`
@@ -139,6 +146,7 @@ export const DatasourceListOl = styled.ol`
     padding: 0;
     counter-reset: listCounter;
     list-style-type: none;
+    overflow-y: auto;
 
     > li {
         cursor: pointer;
