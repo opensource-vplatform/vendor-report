@@ -91,8 +91,6 @@ new ReportDesigner({
 })
 ```
 
-
-
 ### 打印(nav.file.print)
 
 类型：Boolean
@@ -161,8 +159,6 @@ new ReportDesigner({
     } 
 })
 ```
-
-
 
 ### 区中(nav.start.align)
 
@@ -233,8 +229,6 @@ new ReportDesigner({
 })
 ```
 
-
-
 ### 计算(nav.formula.calculation)
 
 类型：Boolean
@@ -271,8 +265,6 @@ new ReportDesigner({
     } 
 })
 ```
-
-
 
 ## 导航视图(nav.view)
 
@@ -334,6 +326,25 @@ new ReportDesigner({
     nav:{
         view:{
             ratio:false
+        },
+        ...
+    } 
+})
+```
+
+### 窗口(nav.view.window)
+
+类型：Boolean
+
+说明：用于控制视图导航【窗口】是否显示。默认值是true。值等于false不显示，反之亦然。
+
+代码示例：
+
+```
+new ReportDesigner({
+    nav:{
+        view:{
+            window:false
         },
         ...
     } 
@@ -406,7 +417,6 @@ new ReportDesigner({
         ...
     } 
 })
-
 ```
 
 ## 数据源(dataSource)
@@ -519,8 +529,6 @@ new ReportDesigner({
     } 
 })
 ```
-
-
 
 ### 显示(sheets.tabStripVisible)
 

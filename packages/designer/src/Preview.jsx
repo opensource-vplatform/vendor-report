@@ -1,10 +1,16 @@
 import { useCallback } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import { Workbook, Worksheet } from '@components/spread/Index';
+import {
+  Workbook,
+  Worksheet,
+} from '@components/spread/Index';
 import { getNamespace } from '@utils/spreadUtil';
 
 import { setMode } from './store/appSlice/appSlice';
@@ -34,6 +40,7 @@ const Toolbar = styled.div`
 
 const ExcelWrap = styled.div`
     padding: 8px;
+    box-sizing: border-box;
     width: 100%;
     height: 100%;
 `;
