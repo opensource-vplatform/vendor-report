@@ -14,6 +14,11 @@ import CellStyleSetting from '@components/cellStyles/cellStyleSetting';
 import { DraggableDatasources } from '@components/defineDatasource/Index';
 import Error from '@components/error/Index';
 import Loading from '@components/loading/Index';
+import {
+  Pane,
+  Resizer,
+  SplitPane,
+} from '@components/splitpane/Index';
 import { setErrorMsg } from '@store/appSlice/appSlice';
 import { initDatasource } from '@store/datasourceSlice/datasourceSlice';
 import {
@@ -140,8 +145,18 @@ function Designer(props) {
                                 overflow: 'hidden',
                             }}
                         >
-                            <DraggableDatasources></DraggableDatasources>
-                            <Excel></Excel>
+                            <SplitPane
+                                style={{ width: '100%' }}
+                                onResize={() => spread.refresh()}
+                            >
+                                <Pane style={{ width: 248 }}>
+                                    <DraggableDatasources></DraggableDatasources>
+                                </Pane>
+                                <Resizer width={8}></Resizer>
+                                <Pane style={{ width: '100%', flex: 1 }}>
+                                    <Excel></Excel>
+                                </Pane>
+                            </SplitPane>
                         </SpreadWrap>
                         <CellStyleSetting></CellStyleSetting>
                     </Wrap>

@@ -17,7 +17,6 @@ import {
 import {
   filterFormula,
   getFormulaMetadatasByCatalog,
-  getRecentFormulaMetadatas,
   updateRecentFormula,
 } from '../../../utils/formulaUtil';
 import {
@@ -67,15 +66,7 @@ export default function (props) {
     const filterRef = createRef(null);
     const [data, setData] = useState(() => {
         let catalogs = getCatalogs();
-        const recents = getRecentFormulaMetadatas();
-        catalogs =
-            recents && recents.length > 0
-                ? [
-                      { code: 'recent', name: '最近使用' },
-                      { code: 'all', name: '全部' },
-                      ...catalogs,
-                  ]
-                : [{ code: 'all', name: '全部' }, ...catalogs];
+        catalogs = [{code:'useful',name:'常用函数'},{ code: 'all', name: '全部' }, ...catalogs];
         catalogs = catalogs.map((catalog) => {
             return {
                 filterSkips: [],
@@ -236,6 +227,10 @@ export default function (props) {
                 <Highlight
                     text={metadata ? metadata.desc : ''}
                     highlight={data.filter}
+                    style={{
+                        wordBreak: "break-word",
+                        wordWrap: "normal"
+                    }}
                 ></Highlight>
             </FormulaDesc>
         </OperationDialog>
