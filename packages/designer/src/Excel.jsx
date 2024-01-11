@@ -1,19 +1,40 @@
-import { Fragment, useCallback, useContext } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useContext,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import { Workbook, Worksheet } from '@components/spread/Index';
-import { EVENTS, fire } from '@event/EventManager';
+import {
+  Workbook,
+  Worksheet,
+} from '@components/spread/Index';
+import {
+  EVENTS,
+  fire,
+} from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
-    updateActiveSheetTablePath,
-    updateDslist,
+  setSelectedFontColor,
+} from '@store/cellSettingSlice/fontCellSettingSlice';
+import {
+  updateActiveSheetTablePath,
+  updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import { setFontStyles, setIsStrickoutLine } from '@store/fontSlice/fontSlice';
-import { setSelectedFontColor } from '@store/cellSettingSlice/fontCellSettingSlice';
+import {
+  setFontStyles,
+  setIsStrickoutLine,
+} from '@store/fontSlice/fontSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
-import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
+import {
+  findTreeNodeById,
+  getActiveSheetTablesPath,
+} from '@utils/commonUtil';
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
@@ -81,6 +102,12 @@ export default function () {
                     iconClass: 'gc-spread-deleteComment',
                     name: 'gc.spread.tableDeleteAll',
                     text: '整表',
+                });
+                menuDatas.push({
+                    command: 'tableMoveForContextMenu',
+                    name: 'gc.spread.tableMove',
+                    text: '移动',
+                    workArea: 'table',
                 });
                 break;
             }
