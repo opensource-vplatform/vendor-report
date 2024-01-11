@@ -1,28 +1,12 @@
-import {
-  Fragment,
-  useContext,
-} from 'react';
+import { Fragment, useContext } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
-import {
-  EVENTS,
-  fire,
-} from '@event/EventManager';
-import {
-  setErrorMsg,
-  setMode,
-  setWaitMsg,
-} from '@store/appSlice/appSlice';
+import { Tab, Tabs } from '@components/tabs/Index';
+import { EVENTS, fire } from '@event/EventManager';
+import { setErrorMsg, setMode, setWaitMsg } from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
@@ -30,6 +14,7 @@ import FileTab from '@tabs/file/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
+import SettingTab from '@tabs/setting/Index';
 
 import DesignerContext from './DesignerContext';
 import Formula from './tabs/formula/Index';
@@ -70,6 +55,7 @@ const ViewNavItem = WithNavItem(ViewTab);
 const TableNavItem = WithNavItem(TableTab);
 const DataNavItem = WithNavItem(DataTab);
 const FormulaNavItem = WithNavItem(Formula);
+const SettingNavItem = WithNavItem(SettingTab);
 
 export default function () {
     const dispatch = useDispatch();
@@ -137,7 +123,8 @@ export default function () {
     const isHiddenView = context?.conf?.nav?.view === false;
     //是否隐藏表设计导航
     const isHiddenTable = context?.conf?.nav?.table === false;
-
+    //是否隐藏设置导航
+    const isHiddenSetting = context?.conf?.nav?.setting === false;
     return (
         <Tabs
             value={active}
@@ -200,6 +187,11 @@ export default function () {
                 title='表设计'
                 tabProps={{ hidden: isHiddenTable }}
             ></TableNavItem>
+            <SettingNavItem
+                code='Setting'
+                title='设置'
+                tabProps={{ hidden: isHiddenSetting }}
+            ></SettingNavItem>
         </Tabs>
     );
 }

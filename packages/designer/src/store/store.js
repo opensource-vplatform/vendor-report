@@ -8,6 +8,8 @@ import navSlice from './navSlice/navSlice';
 import tableDesignSlice from './tableDesignSlice/tableDesignSlice';
 import viewSlice from './viewSlice/viewSlice';
 import fontCellSettingSlice from './cellSettingSlice/FontCellSettingSlice';
+import workbookSettingSlice from './settingSlice/workbookSettingSlice';
+import worksheetSettingSlice from './settingSlice/worksheetSettingSlice';
 //不可序列化的值存储在redux中控制台会报错，需添加忽略动作和路径
 const serializableCheck = {
     // Ignore these action types
@@ -22,6 +24,8 @@ const serializableCheck = {
         'tableDesignSlice.spread',
         'borderSlice.spread',
         'fontCellSettingSlice.spread',
+        'workbookSettingSlice.spread',
+        'worksheetSettingSlice.spread',
     ],
 };
 
@@ -35,6 +39,8 @@ export default configureStore({
         navSlice,
         tableDesignSlice,
         fontCellSettingSlice,
+        workbookSettingSlice,
+        worksheetSettingSlice,
     },
     middleware: function (getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });

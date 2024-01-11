@@ -882,9 +882,9 @@ function CellStyleSetting(props) {
                             setLineType={setLineType}
                         />
                     </Tab>
-                    <Tab code='保护' title='保护'>
+                    {/* <Tab code='保护' title='保护'>
                         <p>Content for 保护 </p>
-                    </Tab>
+                    </Tab> */}
                 </Tabs>
             </TabPanel>
 
