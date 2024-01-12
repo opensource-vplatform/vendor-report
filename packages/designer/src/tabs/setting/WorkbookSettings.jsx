@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -9,6 +9,7 @@ import {
 
 import Tab from '@components/tabs/Tab';
 import Tabs from '@components/tabs/Tabs';
+import Button from '@components/button/Index';
 import SpreadGeneralIcon from '@icons/setting/spreadGeneral';
 import ScrollbarsIcon from '@icons/setting/Scrollbars';
 import CalculationIcon from '@icons/setting/Calculation';
@@ -35,6 +36,23 @@ const TabPanel = styled.div`
         margin: 5px 0 0 5px;
     }
 `;
+const TabBottomButtons = styled.div`
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: flex-end;
+    Button {
+        background: #e6e6e6;
+        border: 1px solid #d3d3d3;
+        width: 80px;
+        height: 30px;
+        margin: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+`;
 const WithTabItem = function (Component) {
     return function (props) {
         const dispatch = useDispatch();
@@ -58,11 +76,84 @@ const ScrollbarsNavItem = WithTabItem(ScrollbarsTab);
 
 export default function () {
     const dispatch = useDispatch();
-    const workbookState = useSelector(
-        ({ workbookSettingSlice }) => workbookSettingSlice
-    );
-    const { active, isOpenforWorkbookSetting } = workbookState;
 
+    const {
+        isOpenforWorkbookSetting,
+        active,
+        // 允许拖拽
+        allowUserDragDrop,
+        // 允许拖放填充
+        allowUserDragFill,
+        // 允许撤销
+        allowUndo,
+        // 允许拖拽合并单元格
+        allowUserDragMerge,
+        // 允许自动生成超链接
+        allowAutoCreateHyperlink,
+        // 允许自动拓展筛选范围
+        allowAutoExtendFilterRange,
+
+        rowResizeMode,
+        columnResizeMode,
+        maxUndoStack,
+
+        // 允许输入公式
+        allowUserEditFormula,
+        // 允许缩放
+        allowUserZoom,
+        // 允许动态数组
+        allowDynamicArray,
+        // 允许无效公式
+        allowInvalidFormula,
+        // 允许无障碍
+        enableAccessibility,
+        // 像素滚动
+        scrollByPixel,
+        scrollPixel,
+        formulaFormatHint,
+
+        showVerticalScrollbar,
+        scrollbarShowMax,
+        useMobileScrollbar,
+        showHorizontalScrollbar,
+        scrollbarMaxAlign,
+    } = useSelector(({ workbookSettingSlice }) => workbookSettingSlice);
+
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const handleApply = () => {
+        var sheet = spread.getActiveSheet();
+        // 常规设置
+        sheet.suspendPaint();
+        spread.options.allowUserDragDrop = allowUserDragDrop;
+        spread.options.allowUserDragFill = allowUserDragFill;
+        spread.options.allowUndo = allowUndo;
+        spread.options.allowUserDragMerge = allowUserDragMerge;
+        spread.options.allowAutoCreateHyperlink = allowAutoCreateHyperlink;
+        spread.options.allowAutoExtendFilterRange = allowAutoExtendFilterRange;
+        spread.options.rowResizeMode = rowResizeMode;
+        spread.options.columnResizeMode = columnResizeMode;
+        spread.options.maxUndoStack = maxUndoStack;
+        spread.options.allowUserEditFormula = allowUserEditFormula;
+        spread.options.allowUserZoom = allowUserZoom;
+        spread.options.allowDynamicArray = allowDynamicArray;
+        spread.options.allowInvalidFormula = allowInvalidFormula;
+        spread.options.enableAccessibility = enableAccessibility;
+        spread.options.scrollByPixel = scrollByPixel;
+        spread.options.scrollPixel = scrollPixel;
+        spread.options.formulaFormatHint = formulaFormatHint;
+        // 滚动条
+        spread.options.showVerticalScrollbar = showVerticalScrollbar;
+        spread.options.showHorizontalScrollbar = showHorizontalScrollbar;
+        spread.options.scrollbarShowMax = scrollbarShowMax;
+        spread.options.scrollbarMaxAlign = scrollbarMaxAlign;
+        spread.options.scrollbarAppearance = useMobileScrollbar;
+        sheet.resumePaint();
+
+        dispatch(setIsOpenforWorkbookSetting(false));
+    };
+    const handleCancel = () => {
+        dispatch(setIsOpenforWorkbookSetting(false));
+    };
     const handleClose = () => {
         dispatch(setIsOpenforWorkbookSetting(false));
     };
@@ -80,30 +171,27 @@ export default function () {
                             paddingLeft: 4,
                             paddingRight: 4,
                             paddingBottom: 4,
-                            // cursor,
                         }}
                         icon={
                             <SpreadGeneralIcon
                                 iconStyle={{
                                     width: 28,
                                     height: 28,
-                                    // cursor,
                                 }}
                             ></SpreadGeneralIcon>
                         }
                         onClick={() => {
-                            dispatch(
-                                setIsOpenforWorkbookSetting(
-                                    !isOpenforWorkbookSetting
-                                )
-                            );
+                            dispatch(setIsOpenforWorkbookSetting(true));
+                            dispatch(setActive({ code: 'general' }));
                         }}
                     ></VItem>
                     <VGroupItem>
                         <ItemList style={{ padding: '2px 4px 2px 4px' }}>
                             <ScrollbarsIcon
-                                // onClick={handleAutoCalculation}
-                                // disabled={isAuto}
+                                onClick={() => {
+                                    dispatch(setIsOpenforWorkbookSetting(true));
+                                    dispatch(setActive({ code: 'scrollbars' }));
+                                }}
                                 tips='滚动条'
                             >
                                 <Label>滚动条</Label>
@@ -111,8 +199,12 @@ export default function () {
                         </ItemList>
                         <ItemList style={{ padding: '2px 4px 2px 4px' }}>
                             <CalculationIcon
-                                // onClick={handleCalcWorksheet}
-                                // disabled={isAuto}
+                                onClick={() => {
+                                    dispatch(setIsOpenforWorkbookSetting(true));
+                                    dispatch(
+                                        setActive({ code: 'calculation' })
+                                    );
+                                }}
                                 tips='计算'
                             >
                                 <Label>计算</Label>
@@ -120,8 +212,12 @@ export default function () {
                         </ItemList>
                         <ItemList style={{ padding: '2px 4px 2px 4px' }}>
                             <TabstripIcon
-                                // onClick={handleCalcWorksheet}
-                                // disabled={isAuto}
+                                onClick={() => {
+                                    dispatch(setIsOpenforWorkbookSetting(true));
+                                    dispatch(
+                                        setActive({ code: 'tabstripIcon' })
+                                    );
+                                }}
                                 tips='工作表标签'
                             >
                                 <Label>工作表标签</Label>
@@ -136,11 +232,13 @@ export default function () {
                     width='730px'
                     height='630px'
                     open={isOpenforWorkbookSetting}
-                    // mask={true}
                     onClose={handleClose}
                 >
                     <TabPanel>
-                        <Tabs>
+                        <Tabs
+                            value={active}
+                            onChange={(code) => dispatch(setActive({ code }))}
+                        >
                             <GeneralTabItem
                                 code='general'
                                 title='常规'
@@ -149,8 +247,19 @@ export default function () {
                                 code='scrollbars'
                                 title='滚动条'
                             ></ScrollbarsNavItem>
+                            <Tab code='calculation' title='计算'></Tab>
+                            <Tab code='tabstripIcon' title='工作表标签'></Tab>
                         </Tabs>
                     </TabPanel>
+
+                    <TabBottomButtons>
+                        <Button title={'确定'} onClick={handleApply}>
+                            确定
+                        </Button>
+                        <Button title={'取消'} onClick={handleCancel}>
+                            取消
+                        </Button>
+                    </TabBottomButtons>
                 </Dialog>
             )}
         </>

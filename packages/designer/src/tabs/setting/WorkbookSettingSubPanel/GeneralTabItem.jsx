@@ -1,4 +1,26 @@
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    setAllowUserDragDrop,
+    setAllowUserDragFill,
+    setAllowUndo,
+    setAllowUserDragMerge,
+    setAllowAutoCreateHyperlink,
+    setAllowAutoExtendFilterRange,
+    setAllowUserEditFormula,
+    setAllowUserZoom,
+    setAllowDynamicArray,
+    setAllowInvalidFormula,
+    setEnableAccessibility,
+    setScrollByPixel,
+    setRowResizeMode,
+    setColumnResizeMode,
+    setMaxUndoStack,
+    setScrollPixel,
+    setFormulaFormatHint,
+} from '@store/settingSlice/workbookSettingSlice';
+
 import { CheckBox } from '@components/form/Index';
 import Select from '@components/Select/Index';
 import Integer from '@components/integer/Index';
@@ -49,15 +71,59 @@ const Counter = styled.div`
     margin: 4px 4px;
 `;
 const RowResizeMode = [
-    { value: 'norma', title: '普通模式', text: '普通模式' },
-    { value: 'split', title: '分离模式', text: '分离模式' },
+    { value: false, title: '普通模式', text: '普通模式' },
+    { value: true, title: '分离模式', text: '分离模式' },
 ];
 const ColumnResizeMode = [
-    { value: 'norma', title: '普通模式', text: '普通模式' },
-    { value: 'split', title: '分离模式', text: '分离模式' },
+    { value: false, title: '普通模式', text: '普通模式' },
+    { value: true, title: '分离模式', text: '分离模式' },
 ];
 
 function Index(props) {
+    const {
+        active,
+        // 允许拖拽
+        allowUserDragDrop,
+        // 允许拖放填充
+        allowUserDragFill,
+        // 允许撤销
+        allowUndo,
+        // 允许拖拽合并单元格
+        allowUserDragMerge,
+        // 允许自动生成超链接
+        allowAutoCreateHyperlink,
+        // 允许自动拓展筛选范围
+        allowAutoExtendFilterRange,
+
+        rowResizeMode,
+        columnResizeMode,
+        maxUndoStack,
+
+        // 允许输入公式
+        allowUserEditFormula,
+        // 允许缩放
+        allowUserZoom,
+        // 允许动态数组
+        allowDynamicArray,
+        // 允许无效公式
+        allowInvalidFormula,
+        // 允许无障碍
+        enableAccessibility,
+        // 像素滚动
+        scrollByPixel,
+        scrollPixel,
+        formulaFormatHint,
+    } = useSelector(({ workbookSettingSlice }) => workbookSettingSlice);
+
+    const dispatch = useDispatch();
+
+    const handleRowResizeMode = (value) => {
+        dispatch(setRowResizeMode(value));
+    };
+    const handleColumnResizeMode = (value) => {
+        dispatch(setColumnResizeMode(value));
+    };
+
     return (
         <Wrapper>
             <Label>设置</Label>
@@ -67,43 +133,47 @@ function Index(props) {
                     <ItemList>
                         <CheckBox
                             title='允许拖拽'
-                            // value={showVerticalGridline}
-                            // onChange={(checked) => {
-                            //     dispatch(
-                            //         setShowVerticalGridline({
-                            //             visible: checked,
-                            //         })
-                            //     );
-                            // }}
+                            value={allowUserDragDrop}
+                            onChange={(checked) => {
+                                dispatch(setAllowUserDragDrop(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许拖动和填充'
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowUserDragFill}
+                            onChange={(checked) => {
+                                dispatch(setAllowUserDragFill(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许撤销'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowUndo}
+                            onChange={(checked) => {
+                                dispatch(setAllowUndo(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许拖拽合并单元格'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowUserDragMerge}
+                            onChange={(checked) => {
+                                dispatch(setAllowUserDragMerge(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许自动生成超链接'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowAutoCreateHyperlink}
+                            onChange={(checked) => {
+                                dispatch(setAllowAutoCreateHyperlink(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许自动扩展筛选范围'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowAutoExtendFilterRange}
+                            onChange={(checked) => {
+                                dispatch(
+                                    setAllowAutoExtendFilterRange(checked)
+                                );
+                            }}
                         ></CheckBox>
 
                         <Selector>
@@ -111,14 +181,14 @@ function Index(props) {
                             <SelectWrapper>
                                 <Select
                                     datas={RowResizeMode}
+                                    value={rowResizeMode}
+                                    onChange={handleRowResizeMode}
                                     style={{
                                         width: '100px',
                                         height: '25px',
                                         margin: '5px 0px',
                                     }}
                                     optionStyle={{ width: '100px' }}
-                                    //    onChange={handleLocaleType}
-                                    //    value={locale}
                                 ></Select>
                             </SelectWrapper>
                         </Selector>
@@ -127,6 +197,8 @@ function Index(props) {
                             <SelectWrapper>
                                 <Select
                                     datas={ColumnResizeMode}
+                                    value={columnResizeMode}
+                                    onChange={handleColumnResizeMode}
                                     style={{
                                         width: '100px',
                                         height: '25px',
@@ -140,15 +212,13 @@ function Index(props) {
                             <SelectTittle>撤销/恢复栈最大长度</SelectTittle>
                             <SelectWrapper>
                                 <Integer
-                                    // value={decimalPlacesValue}
+                                    value={maxUndoStack}
                                     style={{ width: '102px', height: 27 }}
                                     max={Number.MAX_SAFE_INTEGER}
                                     min={1}
-                                    // onChange={(decimalPlacesValue) =>
-                                    //     handleDecimalValue(
-                                    //         decimalPlacesValue
-                                    //     )
-                                    // }
+                                    onChange={(countNumber) =>
+                                        dispatch(setMaxUndoStack(countNumber))
+                                    }
                                 />
                             </SelectWrapper>
                         </Selector>
@@ -158,59 +228,64 @@ function Index(props) {
                     <ItemList>
                         <CheckBox
                             title='允许用户输入公式'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowUserEditFormula}
+                            onChange={(checked) => {
+                                dispatch(setAllowUserEditFormula(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许缩放'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowUserZoom}
+                            onChange={(checked) => {
+                                dispatch(setAllowUserZoom(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许动态数组'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowDynamicArray}
+                            onChange={(checked) => {
+                                dispatch(setAllowDynamicArray(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许无效公式'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={allowInvalidFormula}
+                            onChange={(checked) => {
+                                dispatch(setAllowInvalidFormula(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='允许无障碍'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={enableAccessibility}
+                            onChange={(checked) => {
+                                dispatch(setEnableAccessibility(checked));
+                            }}
                         ></CheckBox>
                         <CheckBox
                             title='像素滚动'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={scrollByPixel}
+                            onChange={(checked) => {
+                                dispatch(setScrollByPixel(checked));
+                            }}
                         ></CheckBox>
                         <Counter>
                             <Integer
-                                // value={decimalPlacesValue}
+                                value={scrollPixel}
                                 style={{ width: '102px', height: 27 }}
                                 max={100000000}
                                 min={1}
-                                // onChange={(decimalPlacesValue) =>
-                                //     handleDecimalValue(
-                                //         decimalPlacesValue
-                                //     )
-                                // }
+                                onChange={(counterNumber) =>
+                                    dispatch(setScrollPixel(counterNumber))
+                                }
                             />
                             <Label>{'滚动单位<像素>'}</Label>
                         </Counter>
                         <CheckBox
                             title='公式自动格式化'
-
-                            // value={showVerticalGridline}
-                            // onChange={}
+                            value={formulaFormatHint}
+                            onChange={(checked) => {
+                                dispatch(setFormulaFormatHint(checked));
+                            }}
                         ></CheckBox>
                     </ItemList>
                 </VGroupItem>
