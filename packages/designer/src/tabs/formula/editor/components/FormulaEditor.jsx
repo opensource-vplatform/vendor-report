@@ -1,12 +1,18 @@
 import {
   createRef,
-  useContext,
   useEffect,
 } from 'react';
 
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
-import context from '../Context';
+import {
+  setFormula,
+  setSelection,
+} from '../../../../store/formulaSlice/formulaSlice';
 import Error from './Error';
 
 const Editor = styled.textarea`
@@ -15,7 +21,7 @@ const Editor = styled.textarea`
     width: 100%;
     outline: none;
     background-color: #f0f0f0;
-    border:none;
+    border: none;
 `;
 
 const Wrap = styled.div`
@@ -35,10 +41,11 @@ const Flag = styled.span`
 `;
 
 export default function (props) {
+    const { formula, selectionStart, selectionEnd } = useSelector(
+        ({ formulaSlice }) => formulaSlice
+    );
+    const dispatch = useDispatch();
     const editorContainer = createRef();
-    const ctx = useContext(context);
-    const { data, setData } = ctx;
-    const { formula, selectionStart, selectionEnd } = data;
     useEffect(() => {
         const ele = editorContainer.current;
         if (ele) {
@@ -51,11 +58,12 @@ export default function (props) {
                     (selectionStart != ele.selectionStart ||
                         selectionEnd != ele.selectionEnd)
                 ) {
-                    setData({
-                        ...data,
-                        selectionStart: ele.selectionStart,
-                        selectionEnd: ele.selectionEnd,
-                    });
+                    dispatch(
+                        setSelection({
+                            start: ele.selectionStart,
+                            end: ele.selectionEnd,
+                        })
+                    );
                 }
             };
             document.addEventListener('selectionchange', handleSelectionChange);
@@ -67,20 +75,23 @@ export default function (props) {
             };
         }
     }, [formula, selectionStart, selectionEnd]);
+    const handleInput = (evt) => {
+        const nativeEvent = evt.nativeEvent;
+        const ele = nativeEvent.target;
+        dispatch(setFormula({formula:ele.value}));
+        dispatch(setSelection({start:ele.selectionStart,end:ele.selectionEnd}));
+    };
     return (
         <Wrap>
             <EditorWrap>
                 <Flag>=</Flag>
                 <Editor
                     suppressContentEditableWarning
-                    onselectstart={(e) => {
-                        debugger;
-                    }}
                     contentEditable='true'
                     ref={editorContainer}
+                    onInput={handleInput}
                     value={formula}
-                >
-                </Editor>
+                ></Editor>
             </EditorWrap>
             <Error></Error>
         </Wrap>

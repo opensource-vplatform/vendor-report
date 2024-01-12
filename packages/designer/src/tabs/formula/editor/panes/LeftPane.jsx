@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import {
@@ -13,6 +14,7 @@ import {
   getFormulasByCatalog,
 } from '@metadatas/formula';
 
+import { insert } from '../../../../store/formulaSlice/formulaSlice';
 import Context from '../Context';
 
 const Wrap = styled.div`
@@ -56,6 +58,7 @@ const getFuncTree = () => {
 };
 
 export default function (props) {
+    const dispatch = useDispatch();
     const [data] = useState(() => {
         return { funTree: getFuncTree() };
     });
@@ -81,7 +84,12 @@ export default function (props) {
                                     datas={data.funTree}
                                     onDoubleClick={(formula, isParent) => {
                                         if (!isParent) {
-                                            context.insert(formula + '()', -1);
+                                            dispatch(
+                                                insert({
+                                                    formula: formula + '()',
+                                                    offset: -1,
+                                                })
+                                            );
                                         }
                                     }}
                                 ></Tree>
