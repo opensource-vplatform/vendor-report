@@ -44,8 +44,16 @@ export default function (props) {
         }, data.duration);
         data.timeoutIndexs.push(index);
         const targetX = evt.pageX - mouseX;
-        handleResize(targetX);
+        mouseX = evt.pageX;
+        handleResizeByDelta(targetX);
     };
+    const handleResizeByDelta = (delta)=>{
+        if (ref.current) {
+            const preEle = ref.current.previousElementSibling;
+            const {width} = preEle.getBoundingClientRect();
+            handleResize(width+delta);
+        }
+    }
     const handleResize = (newWidth) => {
         if (ref.current) {
             const preEle = ref.current.previousElementSibling;
@@ -81,7 +89,7 @@ export default function (props) {
                         ref={ref}
                         onMouseDown={(evt) => {
                             if (evt.currentTarget === evt.target) {
-                                mouseX = evt.nativeEvent.offsetX;
+                                mouseX = evt.nativeEvent.pageX;
                                 document.addEventListener(
                                     'mousemove',
                                     mouseMoveHandler

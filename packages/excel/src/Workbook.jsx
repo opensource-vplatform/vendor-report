@@ -1,18 +1,23 @@
 import {
   createRef,
-  useContext,
   useEffect,
   useState,
 } from 'react';
 
 import styled from 'styled-components';
 
-import { checkLicense } from '@utils/licenseUtil';
-import { getNamespace } from '@utils/spreadUtil';
-
-import DesignerContext from '../../DesignerContext';
+import { register } from './custom/index';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
+import {
+  checkLicense,
+  getLicense,
+  setLicense,
+} from './utils/licenseUtil';
+import {
+  getNamespace,
+  withBatchCalcUpdate,
+} from './utils/spreadUtil';
 
 const Wrap = styled.div`
     position: relative;
@@ -39,15 +44,28 @@ const bindEvent = function (spread, typeName, handler) {
 
 export default function (props) {
     const {
-        inited,
-        enterCell,
-        activeSheetChanged,
-        valueChanged,
-        selectionChanged,
-        selectionChanging,
+        newTabVisible=true,
+        tabEditable = true,
+        tabStripVisible=true,
+        onInited,
+        onEnterCell,
+        onActiveSheetChanged,
+        onValueChanged,
+        onSelectionChanged,
+        onSelectionChanging,
+        license,
+        json=null,
         children,
     } = props;
-    const [data, setData] = useState(() => {
+    if (license) {
+        setLicense(license);
+    }
+    const GC = getNamespace();
+    const licenseKey = getLicense();
+    if (licenseKey) {
+        GC.Spread.Sheets.LicenseKey = licenseKey;
+    }
+    const [data] = useState(() => {
         const result = checkLicense();
         let showError = false,
             showWarn = false;
@@ -62,8 +80,6 @@ export default function (props) {
         };
     });
 
-    const context = useContext(DesignerContext);
-
     const el = createRef(null);
     useEffect(() => {
         if (el.current && !data.showError) {
@@ -71,15 +87,6 @@ export default function (props) {
             const unInited = !data.spread;
             if (unInited) {
                 const GC = getNamespace();
-
-                const sheetsConf = context?.conf?.sheets || {};
-                //是否显示添加选项卡按钮
-                const newTabVisible = sheetsConf.newTabVisible !== false;
-                //选项卡是否可编辑
-                const tabEditable = sheetsConf.tabEditable !== false;
-                //实现显示选项卡
-                const tabStripVisible = sheetsConf.tabStripVisible !== false;
-
                 spread = new GC.Spread.Sheets.Workbook(el.current, {
                     sheetCount: 0,
                     newTabVisible,
@@ -94,7 +101,18 @@ export default function (props) {
             spread.suspendEvent();
             try {
                 if (unInited) {
-                    if (children) {
+                    if(json){
+                        withBatchCalcUpdate(spread,()=>{
+                            spread.fromJSON(json);
+                            register(spread);
+                            const sheets = spread.sheets;
+                            if(sheets&&sheets.length>0){
+                                sheets.forEach(sheet=>{
+                                    sheet.recalcAll(true);
+                                });
+                            }
+                        });
+                    }else if (children) {
                         const sheetList = Array.isArray(children)
                             ? children
                             : [children];
@@ -111,27 +129,29 @@ export default function (props) {
                             workSheet.setColumnCount(colCount);
                             spread.addSheet(index, workSheet);
                         });
+                        register(spread);
                     }
-                    inited && inited(spread);
+                    onInited && onInited(spread);
                 }
                 spread.unbindAll();
-                bindEvent(spread, 'EnterCell', enterCell);
-                bindEvent(spread, 'ActiveSheetChanged', activeSheetChanged);
-                bindEvent(spread, 'ValueChanged', valueChanged);
-                bindEvent(spread, 'SelectionChanged', selectionChanged);
-                bindEvent(spread, 'SelectionChanging', selectionChanging);
+                bindEvent(spread, 'EnterCell', onEnterCell);
+                bindEvent(spread, 'ActiveSheetChanged', onActiveSheetChanged);
+                bindEvent(spread, 'ValueChanged', onValueChanged);
+                bindEvent(spread, 'SelectionChanged', onSelectionChanged);
+                bindEvent(spread, 'SelectionChanging', onSelectionChanging);
+                bindEvent(spread, 'SheetChanged',()=>{debugger});
             } finally {
                 spread.resumePaint();
                 spread.resumeEvent();
             }
         }
     }, [
-        inited,
-        enterCell,
-        activeSheetChanged,
-        valueChanged,
-        selectionChanged,
-        selectionChanging,
+        onInited,
+        onEnterCell,
+        onActiveSheetChanged,
+        onValueChanged,
+        onSelectionChanged,
+        onSelectionChanging,
     ]);
 
     return (

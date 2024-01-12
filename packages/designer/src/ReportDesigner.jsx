@@ -4,8 +4,6 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 
 import store from '@store/store';
-import { getLicense, setLicense } from '@utils/licenseUtil';
-import { getNamespace } from '@utils/spreadUtil';
 
 import Designer from './Designer';
 import { bind } from './event/EventManager';
@@ -24,14 +22,6 @@ class ReportDesigner {
     }
 
     mount(el) {
-        if (this.conf && this.conf.license) {
-            setLicense(this.conf.license);
-        }
-        const GC = getNamespace();
-        const license = getLicense();
-        if (license) {
-            GC.Spread.Sheets.LicenseKey = license;
-        }
         GC.Spread.Common.CultureManager.culture('zh-cn');
         createRoot(el).render(
             <StrictMode>

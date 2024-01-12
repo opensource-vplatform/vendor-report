@@ -6,10 +6,10 @@ import {
 import styled from 'styled-components';
 
 import DesignerContext from '../../DesignerContext';
-import Error from './Error';
 import Export from './Export';
 import Import from './Import';
 import Menu from './Menu';
+import Print from './print/Index';
 
 const Wrap = styled.div`
     position: fixed;
@@ -69,7 +69,7 @@ function Index(props) {
     } else if (menuCode == 'export') {
         content = <Export closeHandler={closeHandler}></Export>;
     } else {
-        content = <Error></Error>;
+        content = <Print></Print>;
     }
     return (
         <Wrap>

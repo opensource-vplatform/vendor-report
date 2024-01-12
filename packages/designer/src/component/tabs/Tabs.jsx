@@ -18,9 +18,15 @@ const Headers = styled.div`
     align-items: center;
 `;
 
-const HeaderWrap = styled.div``;
+const HeaderWrap = styled.div`
+    display:flex;
+    width:100%;
+`;
 
-const ToolWrap = styled.div``;
+const ToolWrap = styled.div`
+    display:flex;
+    width: max-content;
+`;
 
 const Header = styled.div`
     border-bottom: none;
@@ -31,7 +37,14 @@ const Header = styled.div`
     font-size: 12px;
     position: relative;
     margin-top: 4px;
-    &[data-active='true'] {
+    &[data-type='line'] {
+        width: 100%;
+        text-align: center;
+    }
+    &[data-active='true'][data-type='line'] {
+        border-bottom: 2px solid #2d8cf0;
+    }
+    &[data-active='true'][data-type='card'] {
         padding-bottom: 1px;
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
@@ -45,10 +58,15 @@ const Header = styled.div`
 const TitleWrap = styled.a`
     padding: 6px 12px 6px 12px;
     display: block;
-    color: #333;
     cursor: pointer;
     &[data-active='true'] {
         cursor: text;
+    }
+    &[data-type='card']{
+        color: #333;
+    }
+    &[data-active='true'][data-type='line'] {
+        color: #2d8cf0;
     }
 `;
 
@@ -83,7 +101,7 @@ const getValidTabCode = function (code, children) {
 };
 
 function Tabs(props) {
-    let { value, onChange, hideCodes = [], children, tool } = props;
+    let { value, onChange,type="card", hideCodes = [],headerStyle={},style={}, children, tool } = props;
     const tabs = Array.isArray(children) ? children : [children];
     const [active, setActive] = useState(() => {
         const activeCode = getValidTabCode(value, tabs);
@@ -119,7 +137,7 @@ function Tabs(props) {
                     let children = childProps.title;
                     children =
                         typeof children == 'string' ? (
-                            <TitleWrap data-active={actived}>
+                            <TitleWrap data-active={actived} data-type={type}>
                                 {children}
                             </TitleWrap>
                         ) : (
@@ -131,6 +149,8 @@ function Tabs(props) {
                         <Fragment key={childCode}>
                             <Header
                                 data-active={actived}
+                                data-type={type}
+                                style={headerStyle}
                                 onClick={
                                     actived
                                         ? null
@@ -151,7 +171,7 @@ function Tabs(props) {
     return (
         <Fragment>
             <Context.Provider value={active}>
-                <div>
+                <div style={style}>
                     {headers}
                     {children}
                 </div>

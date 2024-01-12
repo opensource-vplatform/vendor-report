@@ -1,4 +1,7 @@
-import { useCallback } from 'react';
+import {
+  useCallback,
+  useContext,
+} from 'react';
 
 import {
   useDispatch,
@@ -10,9 +13,10 @@ import Button from '@components/button/Index';
 import {
   Workbook,
   Worksheet,
-} from '@components/spread/Index';
+} from '@toone/report-excel';
 import { getNamespace } from '@utils/spreadUtil';
 
+import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
 
 const GC = getNamespace();
@@ -96,6 +100,7 @@ function handleDatas(params) {
 }
 
 export default function () {
+    const context = useContext(DesignerContext);
     const dispatch = useDispatch();
     const { previewViewDatas } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
@@ -106,10 +111,9 @@ export default function () {
     );
 
     const { spread: sourceSpread } = useSelector(({ appSlice }) => appSlice);
-
+    const sourceJson = JSON.stringify(sourceSpread.toJSON(), replacer);
+    const json = JSON.parse(sourceJson);
     const workbookInitializedHandler = useCallback(function (spread) {
-        const sourceJson = JSON.stringify(sourceSpread.toJSON(), replacer);
-        spread.fromJSON(JSON.parse(sourceJson));
         spread.sheets.forEach(function (sheet) {
             const dataSource = JSON.parse(JSON.stringify(previewViewDatas));
             handleDatas({
@@ -127,7 +131,8 @@ export default function () {
             });
         });
     });
-
+    //许可证
+    const license = context?.conf?.license;
     return (
         <Wrap>
             <Toolbar>
@@ -141,7 +146,11 @@ export default function () {
                 </Button>
             </Toolbar>
             <ExcelWrap>
-                <Workbook inited={workbookInitializedHandler}>
+                <Workbook
+                    license={license}
+                    json={json}
+                    onInited={workbookInitializedHandler}
+                >
                     <Worksheet></Worksheet>
                 </Workbook>
             </ExcelWrap>

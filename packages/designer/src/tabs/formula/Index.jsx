@@ -4,6 +4,7 @@ import { Group } from '@components/group/Index';
 
 import DesignerContext from '../../DesignerContext';
 import Calculation from './Calculation';
+import Editor from './Editor';
 import Library from './Library';
 
 function Index() {
@@ -20,9 +21,11 @@ function Index() {
     const isSHowCalculation =
         context?.conf?.nav?.formula?.calculation !== false;
 
+    const isShowEditor = context?.conf?.nav?.formula?.editor !== false;
     return (
         <Group>
             {isSHowLibary && <Library></Library>}
+            {isShowEditor && <Editor></Editor>}
             {isSHowCalculation && <Calculation></Calculation>}
         </Group>
     );

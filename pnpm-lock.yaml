@@ -29,6 +29,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^1.9.7
         version: 1.9.7(react-redux@8.1.3)(react@18.2.0)
+      '@toone/report-excel':
+        specifier: workspace:^
+        version: link:../excel
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -81,6 +84,15 @@ importers:
       vite:
         specifier: ^4.3.9
         version: 4.3.9(sass@1.69.5)(terser@5.26.0)
+
+  packages/excel:
+    dependencies:
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      styled-components:
+        specifier: ^6.1.1
+        version: 6.1.1(react-dom@18.2.0)(react@18.2.0)
 
   packages/plugins/integration-jasperreport:
     devDependencies:

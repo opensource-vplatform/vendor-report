@@ -26,7 +26,7 @@ const Icon = styled.svg`
 `;
 
 function Index(pros) {
-    const { icon, tips, active = false, onClick,disabled=false, style={},iconStyle={},children } = pros;
+    const { icon, tips, active = false, onClick,disabled=false, style={},iconStyle={},iconChildren=null,children } = pros;
     const st = {...style}
     if(active){
         st.backgroundColor = '#dadada';
@@ -37,7 +37,7 @@ function Index(pros) {
             <Icon
                 style={icSt}
                 viewBox="0 0 24 24"
-            ><path d={icon}></path></Icon>
+            ><path d={icon}></path>{iconChildren}</Icon>
             {children}
         </IconWrap>
     );

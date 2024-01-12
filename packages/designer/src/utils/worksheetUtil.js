@@ -152,8 +152,8 @@ export function getRatioBySelection(spread) {
     if (sheet) {
         const selections = sheet.getSelections();
         if (selections && selections.length > 0) {
-            const viewportWidth = sheet.getViewportWidth(1);
-            const viewportHeight = sheet.getViewportHeight(1);
+            let viewportWidth = sheet.getViewportWidth(1);
+            let viewportHeight = sheet.getViewportHeight(1);
             let rowHeight = 0;
             let columnWidth = 0;
             const rowCount = sheet.getRowCount(
@@ -336,5 +336,11 @@ export function unFrozen(spread) {
             sheet.frozenColumnCount(0);
         }
         sheet.frozenTrailingColumnCount(0), sheet.frozenTrailingRowCount(0);
+    });
+}
+
+export function setShowFormulas(spread,isShow){
+    withBatchUpdate(spread, (sheet) => {
+        sheet.options.showFormulas = isShow;
     });
 }

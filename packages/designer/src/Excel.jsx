@@ -10,10 +10,6 @@ import {
 } from 'react-redux';
 
 import {
-  Workbook,
-  Worksheet,
-} from '@components/spread/Index';
-import {
   EVENTS,
   fire,
 } from '@event/EventManager';
@@ -31,6 +27,10 @@ import {
 } from '@store/fontSlice/fontSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
+import {
+  Workbook,
+  Worksheet,
+} from '@toone/report-excel';
 import {
   findTreeNodeById,
   getActiveSheetTablesPath,
@@ -112,11 +112,6 @@ export default function () {
                 break;
             }
         }
-        const spreadJson = localStorage.getItem('spreadJson');
-        if (spreadJson) {
-            spread.fromJSON(JSON.parse(spreadJson));
-        }
-
         const sheet = spread.getActiveSheet();
         const tablePaths = getActiveSheetTablesPath({ sheet });
         dispatch(updateActiveSheetTablePath({ tablePaths }));
@@ -135,15 +130,33 @@ export default function () {
             args: [data],
         });
     });
+    const sheetsConf = context?.conf?.sheets || {};
+    //是否显示添加选项卡按钮
+    const newTabVisible = sheetsConf.newTabVisible !== false;
+    //选项卡是否可编辑
+    const tabEditable = sheetsConf.tabEditable !== false;
+    //实现显示选项卡
+    const tabStripVisible = sheetsConf.tabStripVisible !== false;
+    //许可证
+    const license = context?.conf?.license;
+
+    const spreadJson = localStorage.getItem('spreadJson');
+    const json = JSON.parse(spreadJson);
+
     return (
         <Fragment>
             <Workbook
-                inited={handleWorkbookInitialized}
-                enterCell={handleEnterCell}
-                activeSheetChanged={handleActiveSheetChanged}
-                valueChanged={handleValueChanged}
-                selectionChanged={handleSelectionChanged}
-                selectionChanging={handleSelectionChanging}
+                license={license}
+                json={json}
+                newTabVisible={newTabVisible}
+                tabEditable={tabEditable}
+                tabStripVisible={tabStripVisible}
+                onInited={handleWorkbookInitialized}
+                onEnterCell={handleEnterCell}
+                onActiveSheetChanged={handleActiveSheetChanged}
+                onValueChanged={handleValueChanged}
+                onSelectionChanged={handleSelectionChanged}
+                onSelectionChanging={handleSelectionChanging}
             >
                 <Worksheet
                     name={sheetName}

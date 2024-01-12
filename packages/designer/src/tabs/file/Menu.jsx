@@ -62,7 +62,7 @@ function Menu(props) {
                     导出
                 </MenuItem>
             )}
-            {isShowMenuDivider && <MenuDivider></MenuDivider>}
+            {/*isShowMenuDivider && <MenuDivider></MenuDivider>}
             {isShowPrint && (
                 <MenuItem
                     data-selected={value == 'print'}
@@ -70,7 +70,7 @@ function Menu(props) {
                 >
                     打印
                 </MenuItem>
-            )}
+            )*/}
         </Wrap>
     );
 }

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import ErrorImgIcon from '@assets/images/error_icon.png';
+import ErrorImgIcon from './assets/images/error_icon.png';
 
 const ErrorWrap = styled.div`
     color: #6a6a6a;
