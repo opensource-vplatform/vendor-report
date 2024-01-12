@@ -39,7 +39,6 @@ export default function (props) {
     const ctx = useContext(context);
     const { data, setData } = ctx;
     const { formula, selectionStart, selectionEnd } = data;
-    useState(data.formula);
     useEffect(() => {
         const ele = editorContainer.current;
         if (ele) {
