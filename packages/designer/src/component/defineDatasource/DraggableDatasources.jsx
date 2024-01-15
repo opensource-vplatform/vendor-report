@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import DatasourceIcon from '@icons/data/datasource';
 import {
-    removeBindInfosByCellInstanceId,
-    saveBindInfos,
     setIsShowDatasource,
     updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
@@ -42,27 +40,38 @@ import {
 } from './utils/utils.js';
 
 //删除表格
+function removeTable(params) {
+    const { dispatch, context, spread, tableName } = params;
+    const sheet = spread.getActiveSheet();
+    const table = sheet.tables.findByName(tableName);
+    debugger;
+    setTableCornerMarks({
+        setType: 'onlyRemove',
+        sheet,
+        ...table.range(),
+    });
+    sheet.tables.remove(table);
+    //删除表格后，需隐藏表设计页签
+    context.handleSelectionChange();
+
+    //删除表格后需要重新保存数据源是否已经绑定
+    const tablePaths = getActiveSheetTablesPath({
+        sheet,
+    });
+    dispatch(updateActiveSheetTablePath({ tablePaths }));
+}
+
+//删除表格命令
 function tableDeleteAllCommand(params) {
-    const { commandManager, dispatch, context } = params;
+    const { commandManager } = params;
     const command = {
         canUndo: false,
         execute(spread, infos) {
-            const sheet = spread.getActiveSheet();
-            const table = sheet.tables.findByName(infos.tableName);
-            setTableCornerMarks({
-                setType: 'onlyRemove',
-                sheet,
-                ...table.range(),
+            removeTable({
+                ...params,
+                spread,
+                tableName: infos.tableName,
             });
-            sheet.tables.remove(table);
-            //删除表格后，需隐藏表设计页签
-            context.handleSelectionChange();
-
-            //删除表格后需要重新保存数据源是否已经绑定
-            const tablePaths = getActiveSheetTablesPath({
-                sheet,
-            });
-            dispatch(updateActiveSheetTablePath({ tablePaths }));
         },
     };
     commandManager.register(
@@ -103,15 +112,6 @@ function clearContents(params) {
                                     colIndex,
                                     ''
                                 );
-                                dispatch(
-                                    removeBindInfosByCellInstanceId({
-                                        cellInstanceId: getCellInstanceId(
-                                            activeSheet,
-                                            rowIndex,
-                                            colIndex
-                                        ),
-                                    })
-                                );
                             }
 
                             //清除角标
@@ -147,7 +147,7 @@ function clearContents(params) {
 
 //移动表格
 function tableMove(params) {
-    const { commandManager } = params;
+    const { commandManager, spread: _spread } = params;
     const command = {
         canUndo: false,
         execute(spread, infos) {
@@ -155,14 +155,10 @@ function tableMove(params) {
             const table = sheet.tables.findByName(infos.tableName);
             const cellRange = table.range();
             cellRange.rowCount = 1;
-            const targetElement = highlightBlock(spread, cellRange);
-            const a = { is: false };
+            highlightBlock(spread, cellRange);
             const GC = getNamespace();
 
-            document.addEventListener('mousemove', (event) => {
-                if (a.is) {
-                    return;
-                }
+            function mousemoveHandler(event) {
                 const { cell, row, col } = getCellInfo({ event, spread }) || {};
                 if (!cell) {
                     return;
@@ -175,28 +171,49 @@ function tableMove(params) {
                     cellRange.colCount
                 );
                 highlightBlock(spread, _cellRange);
-            });
+            }
 
-            document.addEventListener('mousedown', (event) => {
+            function mousedownHandler(event) {
                 if (event.button === 0) {
-                    a.is = true;
+                    spread.suspendPaint();
+                    const oldTableRange = table.range();
                     setTableCornerMarks({
                         setType: 'onlyRemove',
                         sheet,
-                        ...table.range(),
+                        ...oldTableRange,
                     });
-                    const { cell, row, col } =
-                        getCellInfo({ event, spread }) || {};
+                    const { row, col } = getCellInfo({ event, spread }) || {};
 
                     //如果表格的结束索引大于表单的结束索引，则创建表单列以确保表单的结束索引不小于表格的结束索引
                     const spreadNS = GC.Spread.Sheets;
                     const sheetColumnCount = sheet.getColumnCount(
                         spreadNS.SheetArea.viewport
                     );
+
                     if (col + cellRange.colCount > sheetColumnCount) {
                         sheet.addColumns(col, cellRange.colCount - 1);
                     }
+
+                    //超出行的范围，新增行
+                    const sheetRowCount = sheet.getRowCount(
+                        spreadNS.SheetArea.viewport
+                    );
+                    const { rowCount } = oldTableRange;
+                    if (row + rowCount > sheetRowCount) {
+                        sheet.addRows(row, rowCount - 1);
+                    }
+                    sheet.moveTo(
+                        cellRange.row,
+                        cellRange.col,
+                        row,
+                        col,
+                        cellRange.rowCount,
+                        cellRange.colCount,
+                        GC.Spread.Sheets.CopyToOptions.tag
+                    );
+
                     sheet.tables.move(table, row, col);
+
                     setTableCornerMarks({
                         setType: 'onlyAdd',
                         sheet,
@@ -204,9 +221,16 @@ function tableMove(params) {
                     });
                     sheet.setActiveCell(row, col);
                     removeHighlightOneBlock();
+                    spread.resumePaint();
+                    //清除事件
+                    document.removeEventListener('mousemove', mousemoveHandler);
+                    document.removeEventListener('mousedown', mousedownHandler);
                 }
-            });
-            //debugger;
+            }
+
+            document.addEventListener('mousemove', mousemoveHandler);
+
+            document.addEventListener('mousedown', mousedownHandler);
         },
     };
     commandManager.register(
@@ -225,7 +249,7 @@ function subContextMenuActions(params) {
     params.commandManager = spread.commandManager();
 
     //清除单元格
-    //clearContents(params);
+    clearContents(params);
 
     //删除表格
     tableDeleteAllCommand(params);
@@ -242,6 +266,11 @@ export default function Index() {
     const context = useContext(DesignerContext);
     //是否允许查看数据源
     const isAllowToView = context?.conf?.dataSource?.allowToView !== false;
+
+    const { filterButtonVisible } = useSelector(
+        ({ tableDesignSlice }) => tableDesignSlice
+    );
+
     const dispatch = useDispatch();
     const cacheDatasRef = useRef({
         hasBindEvent: false,
@@ -381,6 +410,7 @@ export default function Index() {
                             sheetInstanceId,
                             dataPath,
                             itemId,
+                            filterButtonVisible,
                         });
                         sheet.setActiveCell(row, col);
                         //切换到表设计视图
@@ -396,19 +426,6 @@ export default function Index() {
                             bindType: 'cell',
                             bindDsInstanceId: itemId,
                         });
-                        dispatch(
-                            saveBindInfos({
-                                bindInfos: {
-                                    row,
-                                    col,
-                                    path: dataPath,
-                                    id: itemId,
-                                    bindType: 'cell',
-                                    cellInstanceId,
-                                    sheetInstanceId,
-                                },
-                            })
-                        );
                     }
                 } catch (error) {
                 } finally {

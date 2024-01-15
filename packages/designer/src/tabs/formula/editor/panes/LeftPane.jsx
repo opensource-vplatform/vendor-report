@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
+import { Datasources } from '@components/defineDatasource/Index';
 import {
   Tab,
   Tabs,
@@ -62,6 +63,7 @@ export default function (props) {
     const [data] = useState(() => {
         return { funTree: getFuncTree() };
     });
+
     return (
         <Context.Consumer>
             {(context) => {
@@ -72,8 +74,19 @@ export default function (props) {
                             style={{ height: '100%' }}
                             headerStyle={{ height: 35 }}
                         >
-                            <Tab code='table' title='数据源'>
-                                页签1
+                            <Tab
+                                code='table'
+                                title='数据源'
+                                style={{ height: 'calc(100% - 35px)' }}
+                            >
+                                <Datasources
+                                    notAllowEdit={false}
+                                    onDoubleClick={function (data) {
+                                        context.insert(
+                                            `TOONE.GET("${data?.code}")`
+                                        );
+                                    }}
+                                ></Datasources>
                             </Tab>
                             <Tab
                                 code='func'

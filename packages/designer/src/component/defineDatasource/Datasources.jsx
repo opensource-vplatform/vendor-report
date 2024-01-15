@@ -10,6 +10,8 @@ export default function Index(props) {
         isShowAddSubDatasource = true,
         width,
         draggable,
+        notAllowEdit = true,
+        onDoubleClick,
     } = props;
     let { dsList, activeDs, finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
@@ -32,6 +34,8 @@ export default function Index(props) {
             draggable={draggable}
             isShowAddSubDatasource={isShowAddSubDatasource}
             activeSheetTablePath={activeSheetTablePath}
+            notAllowEdit={notAllowEdit}
+            onDoubleClick={onDoubleClick}
         ></Tree>
     );
 }

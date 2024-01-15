@@ -1,22 +1,20 @@
-import {
-  useContext,
-  useRef,
-} from 'react';
+import { useContext, useRef } from 'react';
 
 import { useDispatch } from 'react-redux';
 
 import {
-  deleteDsList,
-  pushDsList,
+    deleteDsList,
+    pushDsList,
 } from '@store/datasourceSlice/datasourceSlice';
 import { genUUID } from '@utils/commonUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
+import { rawData } from './constant.js';
 import {
-  DatasourceListOl,
-  DddSubDatasource,
-  DelDatasource,
-  ListItemText,
+    DatasourceListOl,
+    DddSubDatasource,
+    DelDatasource,
+    ListItemText,
 } from './ui.jsx';
 
 //树形数据源列表
@@ -25,7 +23,7 @@ export default function Index(props) {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
     //是否允许编辑数据源
-    const isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
+
     const datasObj = useRef({}).current;
     const {
         datas,
@@ -38,7 +36,15 @@ export default function Index(props) {
         draggable = false,
         parentType,
         activeSheetTablePath = {},
+        notAllowEdit = true,
+        onDoubleClick,
     } = props;
+
+    let isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
+    if (!notAllowEdit) {
+        isAllowToEdit = false;
+    }
+
     if (!Array.isArray(datas)) {
         return '';
     }
@@ -55,7 +61,7 @@ export default function Index(props) {
         const target = e.target.closest('.listItem');
         const parentId = target.dataset.itemId;
         const newData = {
-            ...initialDatasourceData,
+            ...rawData,
             parentId,
             id,
         };
@@ -67,6 +73,12 @@ export default function Index(props) {
         e.stopPropagation();
         const itemId = e.target.dataset.itemId;
         dispatch(deleteDsList({ itemId }));
+    };
+
+    const listDoubleClickHandler = function (data) {
+        if (typeof onDoubleClick === 'function') {
+            onDoubleClick(data);
+        }
     };
 
     return (
@@ -114,6 +126,9 @@ export default function Index(props) {
                                     ? children.length
                                     : 0
                             }
+                            onDoubleClick={function () {
+                                listDoubleClickHandler(dataItem);
+                            }}
                         >
                             <div
                                 className={`text ${
@@ -151,6 +166,8 @@ export default function Index(props) {
                                 parentType='table'
                                 isShowAddSubDatasource={isShowAddSubDatasource}
                                 activeSheetTablePath={activeSheetTablePath}
+                                notAllowEdit={notAllowEdit}
+                                onDoubleClick={onDoubleClick}
                             ></Index>
                         ) : (
                             ''

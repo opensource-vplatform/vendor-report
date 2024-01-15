@@ -1,64 +1,38 @@
-import {
-  useContext,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useRef, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Textarea from '@components/form/Textarea';
 import TextInput from '@components/form/TextInput';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Select from '@components/select/Index';
 import {
-  pushDsList,
-  setIsShowDatasource,
-  toggleActiveDs,
-  updateActiveSheetTablePath,
-  updateDslist,
+    pushDsList,
+    setIsShowDatasource,
+    toggleActiveDs,
+    updateActiveSheetTablePath,
+    updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import {
-  genUUID,
-  getActiveSheetTablesPath,
-  hasSameNode,
+    genUUID,
+    getActiveSheetTablesPath,
+    hasSameNode,
 } from '@utils/commonUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
+import { rawData, types } from './constant.js';
 import Datasources from './Datasources.jsx';
 import {
-  AddDatasourceBtn,
-  DatasourceBox,
-  DatasourceOptBox,
-  DatasourceOptBoxLeft,
-  DatasourceOptBoxRight,
-  OptBtnBox,
-  SaveBtn,
+    AddDatasourceBtn,
+    DatasourceBox,
+    DatasourceOptBox,
+    DatasourceOptBoxLeft,
+    DatasourceOptBoxRight,
+    OptBtnBox,
+    SaveBtn,
 } from './ui.jsx';
-import {
-  checkHasBind,
-  getChanged,
-} from './utils/utils.js';
-
-const initialDatasourceData = {
-    id: '',
-    value: '',
-    type: 'string',
-    desc: '',
-    code: '',
-    name: '',
-    parentId: '',
-};
-
-const initDatasourceTypeDatas = [
-    { value: 'text', text: '文本' },
-    { value: 'integer', text: '整数' },
-    { value: 'decimals', text: '小数' },
-    { value: 'table', text: '表' },
-];
+import { checkHasBind, getChanged } from './utils/utils.js';
 
 //编辑
 export default function Index(props) {
@@ -75,7 +49,11 @@ export default function Index(props) {
 
     let { spread } = useSelector(({ fontSlice }) => fontSlice);
 
-    let { dsList, bindInfos, activeDs, finalDsList } = useSelector(
+    const { filterButtonVisible } = useSelector(
+        ({ tableDesignSlice }) => tableDesignSlice
+    );
+
+    let { dsList, activeDs, finalDsList } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
 
@@ -84,10 +62,8 @@ export default function Index(props) {
     }
 
     let datasourceTypeDatas = activeDs.parentId
-        ? initDatasourceTypeDatas.filter(function (item) {
-              return item.value !== 'table';
-          })
-        : [...initDatasourceTypeDatas];
+        ? types.filter(({ value }) => value !== 'table')
+        : [...types];
 
     const isCanBeSaved = activeDs.code && activeDs.name;
     const isCanAdd = (isCanBeSaved && dsList.length > 0) || dsList.length === 0;
@@ -96,7 +72,7 @@ export default function Index(props) {
     const addDatasourceClickHandler = function () {
         const id = genUUID();
         const newData = {
-            ...initialDatasourceData,
+            ...rawData,
             id,
         };
         dispatch(pushDsList({ datas: newData }));
@@ -130,19 +106,20 @@ export default function Index(props) {
         const newData = {
             ...activeDs,
         };
-        const { updated } = getChanged({
+        const { updated, deleted } = getChanged({
             dsList,
             finalDsList,
         });
-        debugger;
         const result = checkHasBind({
             spread,
-            bindInfos,
+            deleted,
             updated,
             dsList,
+            finalDsList,
         });
 
         cacheDatasRef.current.updated = updated;
+        cacheDatasRef.current.deleted = deleted;
         if (result) {
             setIsShowConfirmDialog(true);
         } else {
@@ -197,12 +174,13 @@ export default function Index(props) {
                         dispatch(updateDslist({ newData, isSave: true }));
                         dispatch(setIsShowDatasource());
                         checkHasBind({
-                            dispatch,
                             spread,
-                            bindInfos,
                             dsList,
                             updated: cacheDatasRef.current.updated,
+                            deleted: cacheDatasRef.current.deleted,
                             sync: true,
+                            finalDsList,
+                            filterButtonVisible,
                         });
                         //更新后表格后需要重新保存数据源是否已经绑定
                         const sheet = spread.getActiveSheet();

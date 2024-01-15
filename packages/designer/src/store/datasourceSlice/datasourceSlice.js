@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import {
-  deepCopy,
-  findTreeNodeById,
-  genValueByType,
+    deepCopy,
+    findTreeNodeById,
+    genValueByType,
 } from '../../utils/commonUtil.js';
 
 export const datasourceSlice = createSlice({
@@ -13,23 +13,6 @@ export const datasourceSlice = createSlice({
         activeDs: {},
         finalDsList: [],
         dsList: [],
-        bindInfos: {
-            /*  {
-                [数据源id]:{
-                    [表单实例id]:{
-                        [单元格实例Id]：{
-                            row:number,
-                            col:number,
-                            path:string,
-                            bindType:table | cell
-                            tableName?:string
-                            cellInstanceId:string,
-                            sheetInstanceId:string
-                        }
-                    }
-                }
-            } */
-        },
         previewViewDatas: {},
         isShowDatasource: false,
         activeSheetTablePath: {},
@@ -88,47 +71,6 @@ export const datasourceSlice = createSlice({
                         desc: '',
                     };
                 }
-            }
-        },
-        saveBindInfos(state, { payload }) {
-            const {
-                id,
-                row,
-                col,
-                path,
-                bindType = 'cell',
-                tableName,
-                cellInstanceId,
-                sheetInstanceId,
-            } = payload.bindInfos;
-
-            //数据源坐标
-            if (!state.bindInfos[id]) {
-                state.bindInfos[id] = {};
-            }
-
-            //表格坐标
-            if (!state.bindInfos[id][sheetInstanceId]) {
-                state.bindInfos[id][sheetInstanceId] = {};
-            }
-
-            //单元格坐标
-            state.bindInfos[id][sheetInstanceId][cellInstanceId] = {
-                id,
-                row,
-                col,
-                path,
-                bindType,
-                tableName,
-
-                cellInstanceId,
-                sheetInstanceId,
-            };
-        },
-        removeBindInfos(state, { payload }) {
-            const { id, cellInstanceId, sheetInstanceId } = payload.bindInfos;
-            if (state?.bindInfos?.[id]?.[sheetInstanceId]) {
-                delete state.bindInfos[id][sheetInstanceId][cellInstanceId];
             }
         },
         genPreviewDatas(state, { payload }) {
@@ -292,14 +234,6 @@ export const datasourceSlice = createSlice({
                 state.isShowDatasource = !state.isShowDatasource;
             }
         },
-        removeBindInfosByCellInstanceId(state, { payload }) {
-            const { cellInstanceId } = payload;
-            Object.entries(state.bindInfos).forEach(function ([id, sheetInfo]) {
-                Object.keys(sheetInfo).forEach(function (sheetInstanceId) {
-                    delete state.bindInfos[id][sheetInstanceId][cellInstanceId];
-                });
-            });
-        },
         initDatasource(state, { payload }) {
             let { datasource } = payload;
             datasource = Array.isArray(datasource) ? datasource : [];
@@ -313,11 +247,8 @@ export const {
     updateDslist,
     toggleActiveDs,
     deleteDsList,
-    saveBindInfos,
-    removeBindInfos,
     genPreviewDatas,
     setIsShowDatasource,
-    removeBindInfosByCellInstanceId,
     updateActiveSheetTablePath,
     initDatasource,
 } = datasourceSlice.actions;

@@ -1,8 +1,4 @@
-import {
-    removeBindInfos,
-    saveBindInfos,
-    updateActiveSheetTablePath,
-} from '@store/datasourceSlice/datasourceSlice';
+import { updateActiveSheetTablePath } from '@store/datasourceSlice/datasourceSlice';
 import {
     findTreeNodeById,
     genUUID,
@@ -10,12 +6,7 @@ import {
 } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
-import {
-    getCellInstanceId,
-    getCellTag,
-    getSheetInstanceId,
-    setCellTag,
-} from '@utils/worksheetUtil.js';
+import { setCellTag } from '@utils/worksheetUtil.js';
 
 const GC = getNamespace();
 
@@ -27,10 +18,8 @@ export function addTable(params) {
         dispatch,
         row,
         col,
-        cellInstanceId,
-        sheetInstanceId,
         dataPath,
-        itemId,
+        filterButtonVisible,
     } = params;
 
     const tableColumnsCount = Array.isArray(columnsTemp)
@@ -46,6 +35,14 @@ export function addTable(params) {
         sheet.addColumns(col, tableColumnsCount - 1);
     }
 
+    const rowCount = 3;
+
+    //超出行的范围，新增行
+    const sheetRowCount = sheet.getRowCount(spreadNS.SheetArea.viewport);
+    if (row + rowCount > sheetRowCount) {
+        sheet.addRows(row, rowCount - 1);
+    }
+
     const tableName = `tableName_${genUUID()}`;
     const table = sheet.tables.add(tableName, row, col, 3, tableColumnsCount);
     table.autoGenerateColumns(false);
@@ -55,7 +52,7 @@ export function addTable(params) {
         sheet,
         row,
         col,
-        rowCount: 3,
+        rowCount,
         colCount: tableColumnsCount,
     });
 
@@ -73,27 +70,14 @@ export function addTable(params) {
 
         tableColumns.length > 0 && table.bindColumns(tableColumns);
         const { colCount } = table.range();
-        for (let i = 0, l = colCount; i < l; i++) {
-            table.filterButtonVisible(i, false);
+        if (!filterButtonVisible) {
+            for (let i = 0, l = colCount; i < l; i++) {
+                table.filterButtonVisible(i, false);
+            }
         }
     }
     table.expandBoundRows(true);
     table.bindingPath(dataPath);
-    dispatch(
-        saveBindInfos({
-            bindInfos: {
-                row,
-                col,
-                path: dataPath,
-                id: itemId,
-                bindType: 'table',
-                cellInstanceId,
-                sheetInstanceId,
-                tableName,
-            },
-        })
-    );
-
     const tablePaths = getActiveSheetTablesPath({ sheet });
     dispatch(updateActiveSheetTablePath({ tablePaths }));
 }
@@ -129,14 +113,33 @@ export function getChanged(params) {
             ]) {
                 return JSON.stringify(current[key]) !== JSON.stringify(value);
             });
-            hanChanged && result.updated.push({ ...current });
+            hanChanged &&
+                result.updated.push({
+                    newData: { ...current },
+                    oldData: { ...oldData },
+                });
         } else {
-            result.added.push({ ...current });
+            result.added.push({ newData: { ...current } });
         }
         if (Array.isArray(children)) {
             stack.push(...children);
         }
     }
+
+    //查找已经删除了的数据源（旧数据源中有而新数据源中没有，则定义为删除的数据）
+    const oldStack = [...finalDsList];
+    while (oldStack.length > 0) {
+        const current = oldStack.shift();
+        const { id } = current;
+        const newData = findTreeNodeById(id, dsList);
+        if (!newData) {
+            result.deleted.push({
+                newData: { ...current, isDel: true },
+                oldData: { ...current, isDel: true },
+            });
+        }
+    }
+
     return result;
 }
 
@@ -145,227 +148,168 @@ export function checkHasBind(params) {
     let result = false;
     const {
         spread,
-        bindInfos,
         updated,
         dsList,
         sync = false,
-        dispatch,
+        finalDsList,
+        filterButtonVisible,
+        deleted,
     } = params;
-    if (updated.length <= 0) {
+    if (updated.length <= 0 && deleted.length <= 0) {
         return result;
     }
 
-    const stack = [...updated];
+    const stack = [...updated, ...deleted];
     while (stack.length > 0) {
-        const current = stack.shift();
-        const { id, children, type } = current;
-        const dsBindInfo = bindInfos[id];
-        const newPath = getPath(current, dsList);
-        if (dsBindInfo) {
-            result = Object.entries(dsBindInfo).some(function ([
-                sheetInstanceId,
-                cellBindInfos,
-            ]) {
-                //获取表单实例
-                const sheetInstance = spread.sheets.find(function (sheet) {
-                    return getSheetInstanceId(sheet) === sheetInstanceId;
-                });
-                if (!sheetInstance) {
-                    return false;
-                }
+        const { newData, oldData } = stack.shift();
 
-                //数据源是否已经绑定单元格
-                const hasBindCell = Object.values(cellBindInfos).some(
-                    function ({ row, col, bindType, path, cellInstanceId }) {
-                        const _cellInstanceId = getCellInstanceId(
-                            sheetInstance,
-                            row,
-                            col
-                        );
+        const { children, type, parentId, isDel = false } = newData;
+        const { type: oldType } = oldData;
 
-                        if (_cellInstanceId !== cellInstanceId) {
-                            return false;
-                        }
+        const newPath = getPath(newData, dsList);
+        const oldPath = getPath(oldData, finalDsList);
+        const typeHasChanged = type !== oldType;
 
-                        const { bindDsInstanceId } =
-                            getCellTag(sheetInstance, row, col, 'bindInfo') ||
-                            {};
+        sync && spread.suspendPaint();
 
-                        if (bindDsInstanceId !== id) {
-                            return false;
-                        }
+        spread.sheets.some(function (sheet) {
+            const {
+                tables = [],
+                data: { dataTable = {} },
+            } = sheet.toJSON();
 
+            //其它单元格
+            if (!parentId) {
+                Object.entries(dataTable).some(function ([row, colInfos]) {
+                    Object.entries(colInfos).some(function ([
+                        col,
+                        { bindingPath },
+                    ]) {
                         if (
-                            path !== newPath ||
-                            (bindType !== 'table' && type === 'table')
+                            bindingPath === oldPath &&
+                            (bindingPath !== newPath ||
+                                type === 'table' ||
+                                isDel)
                         ) {
-                            //如果同步更改，则不中断迭代
+                            result = true;
                             if (sync) {
-                                //如果类型发生变化，则清除绑定
-                                if (bindType !== 'table' && type === 'table') {
-                                    sheetInstance
-                                        .getCell(row, col)
-                                        .bindingPath('');
-
-                                    dispatch(
-                                        removeBindInfos({
-                                            bindInfos: {
-                                                cellInstanceId,
-                                                sheetInstanceId,
-                                                id,
-                                            },
-                                        })
-                                    );
-                                    return false;
-                                }
-
-                                //如果不是类型发生变化，则同步修改
-                                sheetInstance
-                                    .getCell(row, col)
-                                    .bindingPath(newPath);
-                                dispatch(
-                                    saveBindInfos({
-                                        bindInfos: {
-                                            row,
-                                            col,
-                                            path: newPath,
-                                            id,
-                                            bindType: 'cell',
-                                            cellInstanceId,
-                                            sheetInstanceId,
-                                        },
-                                    })
-                                );
-
-                                return false;
+                                const _row = Number(row);
+                                const _col = Number(col);
+                                let path =
+                                    typeHasChanged || isDel ? '' : newPath;
+                                sheet.getCell(_row, _col).bindingPath(path);
                             }
-                            return true;
                         }
 
-                        return false;
-                    }
-                );
+                        return result && !sync;
+                    });
+                    return result && !sync;
+                });
 
-                if (hasBindCell && !sync) {
-                    return true;
+                if (result && !sync) {
+                    return result;
+                }
+            }
+
+            //处理实体
+            result = tables.some(function ({ bindingPath, name: tableName }) {
+                const table = sheet.tables.findByName(tableName);
+                //数据源类型已经发生改变或数据源已经被删除，需要移除表格
+                if ((typeHasChanged || isDel) && bindingPath === oldPath) {
+                    result = true;
+                    setTableCornerMarks({
+                        setType: 'onlyRemove',
+                        sheet,
+                        ...table.range(),
+                    });
+                    sync && sheet.tables.remove(table);
                 }
 
-                //数据源是否已经绑定表格
-                return Object.values(cellBindInfos).some(function ({
-                    bindType,
-                    tableName,
-                    sheetInstanceId: _sheetInstanceId,
-                    cellInstanceId,
-                    row,
-                    col,
-                    path,
-                }) {
-                    if (_sheetInstanceId === sheetInstanceId) {
-                        const hasChanged =
-                            bindType === 'table' && type !== 'table';
-                        if (hasChanged && !sync) {
-                            return true;
-                        }
-
-                        if (tableName) {
-                            spread.suspendPaint();
-                            const table =
-                                sheetInstance.tables.findByName(tableName);
-                            //其它逻辑
-                            if (hasChanged && sync) {
-                                if (table) {
-                                    sheetInstance.tables.remove(table);
-                                    return true;
-                                }
-                            }
-                            if (!table) {
-                                return false;
-                            }
-
-                            if (path !== newPath && !sync) {
-                                return true;
-                            }
-
-                            if (path !== newPath) {
-                                table.bindingPath(newPath);
-                            }
-
-                            let columnHasChange = false;
-                            //字段发生变化
-                            table.BSt.forEach(function (tableColumn, index) {
-                                if (
-                                    Array.isArray(children) &&
-                                    children.length > 0
-                                ) {
-                                    const columnId = tableColumn.id();
-                                    const columnName = tableColumn.name();
-                                    const dataField = tableColumn.dataField();
-                                    const ds = children.find(function (child) {
-                                        return child?.id === columnId;
-                                    });
-                                    if (ds) {
-                                        if (ds.code !== dataField) {
-                                            sync &&
-                                                tableColumn.dataField(ds.code);
-                                            columnHasChange = true;
-                                        }
-                                        if (ds.name !== columnName) {
-                                            sync && tableColumn.name(ds.name);
-                                            columnHasChange = true;
-                                        }
-                                    } else {
-                                        columnHasChange = true;
-                                        sync && table.deleteColumns(index, 1);
-                                    }
-                                }
-                            });
-
-                            let isInsert = false;
-                            //数据源新增字段
-                            if (Array.isArray(children)) {
-                                children.forEach(function ({ id }) {
-                                    const tableColumn = table.BSt.find(
-                                        function (tableColumn) {
-                                            return tableColumn.id() === id;
-                                        }
-                                    );
-                                    if (!tableColumn) {
-                                        isInsert = true;
-                                        columnHasChange = true;
-                                    }
-                                });
-                            }
-                            if (isInsert && sync) {
-                                sheetInstance.tables.remove(table);
-                                addTable({
-                                    columnsTemp: children,
-                                    sheet: sheetInstance,
-                                    spreadNS: GC.Spread.Sheets,
-                                    dispatch,
-                                    row,
-                                    col,
-                                    cellInstanceId,
-                                    sheetInstanceId,
-                                    dataPath: newPath,
-                                    itemId: id,
-                                });
-                            }
-                            spread.resumePaint();
-                            return columnHasChange;
-                        }
-                        return false;
+                if (!typeHasChanged && !isDel) {
+                    //判断表格已经绑定的实体编码是否与修改后的实体编码一致
+                    if (bindingPath === oldPath && bindingPath !== newPath) {
+                        result = true;
+                        sync && table.bindingPath(newPath);
                     }
 
-                    return false;
-                });
+                    //判断表格列绑定的实体字段是否与修改后的实体字段编码一致
+
+                    const { BSt } = table;
+                    //字段发生变化
+                    BSt.forEach(function (tableColumn, index) {
+                        if (Array.isArray(children) && children.length > 0) {
+                            const columnId = tableColumn.id();
+                            const columnName = tableColumn.name();
+                            const dataField = tableColumn.dataField();
+                            const ds = children.find(
+                                ({ id }) => id === columnId
+                            );
+
+                            if (ds) {
+                                if (ds.code !== dataField) {
+                                    sync && tableColumn.dataField(ds.code);
+                                    result = true;
+                                }
+                                if (ds.name !== columnName) {
+                                    sync && tableColumn.name(ds.name);
+                                    result = true;
+                                }
+                            } else {
+                                result = true;
+                                const node = findTreeNodeById(
+                                    columnId,
+                                    finalDsList
+                                );
+                                sync && node && table.deleteColumns(index, 1);
+                            }
+                        }
+                    });
+
+                    //数据源新增字段
+                    if (Array.isArray(children)) {
+                        let isInserted = false;
+                        children.forEach(function ({ id, name, code }, index) {
+                            const col = BSt.find((item) => item.id() === id);
+                            if (!col) {
+                                result = true;
+                                if (sync) {
+                                    isInserted = true;
+                                    setTableCornerMarks({
+                                        setType: 'onlyRemove',
+                                        sheet,
+                                        ...table.range(),
+                                    });
+
+                                    const isZero = index === 0;
+                                    table.insertColumns(
+                                        index - (isZero ? 0 : 1),
+                                        1,
+                                        !isZero
+                                    );
+                                    !filterButtonVisible &&
+                                        table.filterButtonVisible(index, false);
+                                    const newCol = BSt[index];
+                                    newCol.id(id);
+                                    newCol.name(name);
+                                    newCol.dataField(code);
+                                }
+                            }
+                        });
+
+                        isInserted &&
+                            setTableCornerMarks({
+                                setType: 'onlyAdd',
+                                sheet,
+                                ...table.range(),
+                            });
+                    }
+                }
+
+                return result && !sync;
             });
-            if (result) {
-                break;
-            }
-        }
-        if (Array.isArray(children)) {
-            stack.push(...children);
-        }
+        });
+
+        sync && spread.resumePaint();
     }
     return result;
 }

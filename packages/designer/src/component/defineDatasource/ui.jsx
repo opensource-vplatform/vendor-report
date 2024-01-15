@@ -167,6 +167,8 @@ export const ListItemText = styled.div`
 `;
 
 export const DatasourceListOl = styled.ol`
+    height: 100%;
+    margin: 0;
     padding: 0;
     counter-reset: listCounter;
     list-style-type: none;
