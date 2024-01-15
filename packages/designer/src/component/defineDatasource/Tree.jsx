@@ -23,7 +23,6 @@ import {
 //树形数据源列表
 
 export default function Index(props) {
-    debugger;
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
     //是否允许编辑数据源

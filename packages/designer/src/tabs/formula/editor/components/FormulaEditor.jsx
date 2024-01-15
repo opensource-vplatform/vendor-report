@@ -10,9 +10,11 @@ import {
 import styled from 'styled-components';
 
 import {
+  markHistory,
   setFormula,
   setSelection,
-} from '../../../../store/formulaSlice/formulaSlice';
+} from '@store/formulaEditorSlice/formulaEditorSlice';
+
 import Error from './Error';
 
 const Editor = styled.textarea`
@@ -20,8 +22,9 @@ const Editor = styled.textarea`
     height: 100%;
     width: 100%;
     outline: none;
-    background-color: #f0f0f0;
+    background-color: #fff;
     border: none;
+    resize: none;
 `;
 
 const Wrap = styled.div`
@@ -40,9 +43,9 @@ const Flag = styled.span`
     position: absolute;
 `;
 
-export default function (props) {
+export default function () {
     const { formula, selectionStart, selectionEnd } = useSelector(
-        ({ formulaSlice }) => formulaSlice
+        ({ formulaEditorSlice }) => formulaEditorSlice
     );
     const dispatch = useDispatch();
     const editorContainer = createRef();
@@ -81,6 +84,9 @@ export default function (props) {
         dispatch(setFormula({formula:ele.value}));
         dispatch(setSelection({start:ele.selectionStart,end:ele.selectionEnd}));
     };
+    const handleBlur = ()=>{
+        dispatch(markHistory());
+    }
     return (
         <Wrap>
             <EditorWrap>
@@ -90,6 +96,7 @@ export default function (props) {
                     contentEditable='true'
                     ref={editorContainer}
                     onInput={handleInput}
+                    onBlur={handleBlur}
                     value={formula}
                 ></Editor>
             </EditorWrap>

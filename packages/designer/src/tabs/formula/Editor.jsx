@@ -49,7 +49,7 @@ export default function () {
                     title='公式编辑器'
                     anchor={true}
                     onClose={() => setShowEditor(false)}
-                ><Editor></Editor></Dialog>
+                ><Editor onClose={() => setShowEditor(false)}></Editor></Dialog>
             ) : null}
             <GroupItem title='公式编辑'>
                 <VGroupItem>

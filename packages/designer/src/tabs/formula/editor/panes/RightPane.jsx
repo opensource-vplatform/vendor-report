@@ -12,12 +12,13 @@ const Wrap = styled.div`
 `;
 
 export default function (props) {
+    const {onClose} = props;
     return (
       <Wrap>
         <ShortcutBar></ShortcutBar>
         <FormulaEditor></FormulaEditor>
         <Toolbar></Toolbar>
-        <Operations></Operations>
+        <Operations onClose={onClose}></Operations>
       </Wrap>
     );
   };;

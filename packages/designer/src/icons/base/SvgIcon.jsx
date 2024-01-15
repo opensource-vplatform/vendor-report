@@ -3,10 +3,9 @@ import styled from 'styled-components';
 const IconWrap = styled.label`
     margin: 0px 2px;
     display: flex;
-    cursor:pointer;
     align-items: center;
-
-    &:hover {
+    &[data-hoverable='true']:hover {
+        cursor:pointer;
         background-color: #dadada;
     }
     &[data-disabled='true']{
@@ -26,18 +25,19 @@ const Icon = styled.svg`
 `;
 
 function Index(pros) {
-    const { icon, tips, active = false, onClick,disabled=false, style={},iconStyle={},iconChildren=null,children } = pros;
+    const { icon, tips, active = false, hoverable=true,onClick,disabled=false, style={},svgAttrs={},pathAttrs={},iconStyle={},iconChildren=null,children } = pros;
     const st = {...style}
     if(active){
         st.backgroundColor = '#dadada';
     }
     const icSt = {...iconStyle};
     return (
-        <IconWrap title={tips} onClick={onClick} style={st} data-disabled={disabled}>
+        <IconWrap title={tips} onClick={onClick} style={st} data-disabled={disabled} data-hoverable={hoverable}>
             <Icon
                 style={icSt}
                 viewBox="0 0 24 24"
-            ><path d={icon}></path>{iconChildren}</Icon>
+                {...svgAttrs}
+            ><path d={icon} {...pathAttrs}></path>{iconChildren}</Icon>
             {children}
         </IconWrap>
     );

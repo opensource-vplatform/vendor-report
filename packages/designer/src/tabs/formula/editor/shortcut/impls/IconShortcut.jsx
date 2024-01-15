@@ -24,11 +24,7 @@ const IconShortcut = function (props) {
             style={{ width: width }}
             onClick={() => onClick()}
         >
-            <span
-                className={
-                    'jwExpressionEditor jw-expresion-editor-shortcut-' + icon
-                }
-            ></span>
+            {icon}
         </IconWrap>
     );
 };
