@@ -31,7 +31,7 @@ export default function (props) {
         duration: 200,
         onResize: () => {},
     });
-    let mouseX = 0;
+    let mouseX = 0,targetWidth=0;
     const ref = createRef(null);
     const mouseMoveHandler = (evt) => {
         const indesx = data.timeoutIndexs;
@@ -43,9 +43,9 @@ export default function (props) {
             data.onResize();
         }, data.duration);
         data.timeoutIndexs.push(index);
-        const targetX = evt.pageX - mouseX;
-        mouseX = evt.pageX;
-        handleResizeByDelta(targetX);
+        const targetX = evt.screenX - mouseX;
+        //mouseX = evt.screenX;
+        handleResize(targetWidth+targetX);
     };
     const handleResizeByDelta = (delta)=>{
         if (ref.current) {
@@ -76,6 +76,7 @@ export default function (props) {
             const preEle = ref.current.previousElementSibling;
             const { width } = preEle.getBoundingClientRect();
             data.originalWidth = width;
+            targetWidth = width;
         }
     }, []);
     return (
@@ -89,7 +90,12 @@ export default function (props) {
                         ref={ref}
                         onMouseDown={(evt) => {
                             if (evt.currentTarget === evt.target) {
-                                mouseX = evt.nativeEvent.pageX;
+                                mouseX = evt.nativeEvent.screenX;
+                                if (ref.current) {
+                                    const preEle = ref.current.previousElementSibling;
+                                    const rect = preEle.getBoundingClientRect();
+                                    targetWidth = rect.width;
+                                }
                                 document.addEventListener(
                                     'mousemove',
                                     mouseMoveHandler

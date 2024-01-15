@@ -14,7 +14,7 @@ Get.prototype.isContextSensitive = function(){
 }
 Get.prototype.evaluate = function (arg) {
     const sheet = arg?.source?.getSheet();
-    const args = arg?.WK?.arguments;
+    const args = arg?.Whe?.arguments;
     if(args&&args.length>0&&sheet){
         const fieldCode = args[0].value;
         const datasource = sheet.getDataSource();
