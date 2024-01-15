@@ -81,9 +81,13 @@ export default function (props) {
                             >
                                 <Datasources
                                     notAllowEdit={false}
+                                    disabledTypes={['table']}
                                     onDoubleClick={function (data) {
-                                        context.insert(
-                                            `TOONE.GET("${data?.code}")`
+                                        console.log(1234);
+                                        dispatch(
+                                            insert({
+                                                formula: `TOONE.GET("${data?.code}")`,
+                                            })
                                         );
                                     }}
                                 ></Datasources>

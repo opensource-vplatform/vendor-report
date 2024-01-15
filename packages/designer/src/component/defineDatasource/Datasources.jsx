@@ -4,38 +4,21 @@ import Tree from './Tree.jsx';
 
 //数据源列表
 export default function Index(props) {
-    const {
-        activeId,
-        click,
-        isShowAddSubDatasource = true,
-        width,
-        draggable,
-        notAllowEdit = true,
-        onDoubleClick,
-    } = props;
+    const { draggable } = props;
     let { dsList, activeDs, finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
-    if (draggable) {
-        dsList = finalDsList;
-    }
+    draggable && (dsList = finalDsList);
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
     }
-    const isCanBeSaved = activeDs.code && activeDs.name;
-    const isNotAllow = !isCanBeSaved;
+    const isNotAllow = !(activeDs.code && activeDs.name);
     return (
         <Tree
-            width={width}
+            {...props}
             datas={dsList}
-            activeId={activeId}
-            click={click}
             isNotAllow={isNotAllow}
-            draggable={draggable}
-            isShowAddSubDatasource={isShowAddSubDatasource}
             activeSheetTablePath={activeSheetTablePath}
-            notAllowEdit={notAllowEdit}
-            onDoubleClick={onDoubleClick}
         ></Tree>
     );
 }

@@ -1,42 +1,55 @@
-import { useContext, useEffect, useRef } from 'react';
+import {
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import DatasourceIcon from '@icons/data/datasource';
 import {
-    setIsShowDatasource,
-    updateActiveSheetTablePath,
+  setIsShowDatasource,
+  updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
-import { setActive, showTab } from '@store/navSlice/navSlice';
+import {
+  setActive,
+  showTab,
+} from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
 import {
-    findTreeNodeById,
-    getActiveSheetTablesPath,
+  findTreeNodeById,
+  getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
-import { parseTable, setTableCornerMarks } from '@utils/tableUtil.js';
 import {
-    getCellInstanceId,
-    getSheetInstanceId,
-    setCellTag,
+  parseTable,
+  setTableCornerMarks,
+} from '@utils/tableUtil.js';
+import {
+  getCellInstanceId,
+  getSheetInstanceId,
+  setCellTag,
 } from '@utils/worksheetUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import Datasources from './Datasources.jsx';
 import DialogDatasourcesEdit from './DialogDatasourcesEdit.jsx';
 import {
-    DraggableDatasourcesBox,
-    DraggableDatasourcesContent,
-    DraggableDatasourcesFooter,
-    DraggableDatasourcesHeander,
+  DraggableDatasourcesBox,
+  DraggableDatasourcesContent,
+  DraggableDatasourcesFooter,
+  DraggableDatasourcesHeander,
 } from './ui.jsx';
 import {
-    addTable,
-    BindingPathCellType,
-    getCellInfo,
-    getPath,
-    highlightBlock,
-    removeHighlightOneBlock,
+  addTable,
+  BindingPathCellType,
+  getCellInfo,
+  getPath,
+  highlightBlock,
+  removeHighlightOneBlock,
 } from './utils/utils.js';
 
 //删除表格
@@ -464,7 +477,6 @@ export default function Index() {
                 <DraggableDatasourcesContent>
                     <Datasources
                         isShowAddSubDatasource={false}
-                        width={350}
                         draggable={true}
                     ></Datasources>
                 </DraggableDatasourcesContent>

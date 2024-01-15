@@ -1,25 +1,29 @@
-import { useContext, useRef } from 'react';
+import {
+  useContext,
+  useRef,
+} from 'react';
 
 import { useDispatch } from 'react-redux';
 
 import {
-    deleteDsList,
-    pushDsList,
+  deleteDsList,
+  pushDsList,
 } from '@store/datasourceSlice/datasourceSlice';
 import { genUUID } from '@utils/commonUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import { rawData } from './constant.js';
 import {
-    DatasourceListOl,
-    DddSubDatasource,
-    DelDatasource,
-    ListItemText,
+  DatasourceListOl,
+  DddSubDatasource,
+  DelDatasource,
+  ListItemText,
 } from './ui.jsx';
 
 //树形数据源列表
 
 export default function Index(props) {
+    debugger;
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
     //是否允许编辑数据源
@@ -38,6 +42,8 @@ export default function Index(props) {
         activeSheetTablePath = {},
         notAllowEdit = true,
         onDoubleClick,
+        disabledTypes = [],
+        parentDisabled = false,
     } = props;
 
     let isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
@@ -107,6 +113,11 @@ export default function Index(props) {
                     draggableClass = 'notDraggable';
                     isDraggable = false;
                 }
+                const disabled = disabledTypes.includes(type);
+                if (disabled || parentDisabled) {
+                    draggableClass = 'notDraggable';
+                    isDraggable = false;
+                }
 
                 return (
                     <li
@@ -127,6 +138,12 @@ export default function Index(props) {
                                     : 0
                             }
                             onDoubleClick={function () {
+                                if (
+                                    draggableClass === 'notDraggable' ||
+                                    parentType === 'table'
+                                ) {
+                                    return;
+                                }
                                 listDoubleClickHandler(dataItem);
                             }}
                         >
@@ -156,18 +173,12 @@ export default function Index(props) {
                         </ListItemText>
                         {type === 'table' ? (
                             <Index
+                                {...props}
                                 datas={children}
-                                activeId={activeId}
-                                click={click}
                                 indent={2 * indent}
                                 parentId={id}
-                                isNotAllow={isNotAllow}
-                                draggable={draggable}
                                 parentType='table'
-                                isShowAddSubDatasource={isShowAddSubDatasource}
-                                activeSheetTablePath={activeSheetTablePath}
-                                notAllowEdit={notAllowEdit}
-                                onDoubleClick={onDoubleClick}
+                                parentDisabled={disabled}
                             ></Index>
                         ) : (
                             ''
