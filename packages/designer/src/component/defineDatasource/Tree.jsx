@@ -43,7 +43,21 @@ export default function Index(props) {
         onDoubleClick,
         disabledTypes = [],
         parentDisabled = false,
+        searchKey = '',
     } = props;
+
+    let _datas = datas;
+    if (searchKey) {
+        _datas = datas.filter(function ({ name = '', children }) {
+            let result = name.includes(searchKey);
+            if (!result && Array.isArray(children) && children.length > 0) {
+                result = children.some(({ name = '' }) =>
+                    name.includes(searchKey)
+                );
+            }
+            return result;
+        });
+    }
 
     let isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
     if (!notAllowEdit) {
@@ -91,7 +105,7 @@ export default function Index(props) {
             onClick={listClickHandler}
             style={{ width: width + 'px' }}
         >
-            {datas.map(function (dataItem) {
+            {_datas.map(function (dataItem) {
                 const { name, id, children, type, code } = dataItem;
                 datasObj[id] = dataItem;
 

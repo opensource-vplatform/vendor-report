@@ -1,38 +1,51 @@
-import { useContext, useRef, useState } from 'react';
+import {
+  useContext,
+  useRef,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import Textarea from '@components/form/Textarea';
 import TextInput from '@components/form/TextInput';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Select from '@components/select/Index';
 import {
-    pushDsList,
-    setIsShowDatasource,
-    toggleActiveDs,
-    updateActiveSheetTablePath,
-    updateDslist,
+  pushDsList,
+  setIsShowDatasource,
+  toggleActiveDs,
+  updateActiveSheetTablePath,
+  updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import {
-    genUUID,
-    getActiveSheetTablesPath,
-    hasSameNode,
+  genUUID,
+  getActiveSheetTablesPath,
+  hasSameNode,
 } from '@utils/commonUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
-import { rawData, types } from './constant.js';
+import {
+  rawData,
+  types,
+} from './constant.js';
 import Datasources from './Datasources.jsx';
 import {
-    AddDatasourceBtn,
-    DatasourceBox,
-    DatasourceOptBox,
-    DatasourceOptBoxLeft,
-    DatasourceOptBoxRight,
-    OptBtnBox,
-    SaveBtn,
+  AddDatasourceBtn,
+  DatasourceBox,
+  DatasourceOptBox,
+  DatasourceOptBoxLeft,
+  DatasourceOptBoxRight,
+  OptBtnBox,
+  SaveBtn,
 } from './ui.jsx';
-import { checkHasBind, getChanged } from './utils/utils.js';
+import {
+  checkHasBind,
+  getChanged,
+} from './utils/utils.js';
 
 //编辑
 export default function Index(props) {
@@ -233,6 +246,7 @@ export default function Index(props) {
                             itemType='code'
                             maxLength={20}
                             disabled={!isAllowToEdit}
+                            width='500px'
                         ></TextInput>
                     </div>
                     <div>名称</div>
@@ -241,8 +255,9 @@ export default function Index(props) {
                             value={activeDs.name}
                             onChange={dataChangeHandler}
                             itemType='name'
-                            maxLength={80}
+                            maxLength={20}
                             disabled={!isAllowToEdit}
+                            width='500px'
                         ></TextInput>
                     </div>
                     <div>类型</div>

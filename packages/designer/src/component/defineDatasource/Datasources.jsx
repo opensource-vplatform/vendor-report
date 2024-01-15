@@ -4,11 +4,11 @@ import Tree from './Tree.jsx';
 
 //数据源列表
 export default function Index(props) {
-    const { draggable } = props;
+    const { draggable, isEditData = true } = props;
     let { dsList, activeDs, finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
-    draggable && (dsList = finalDsList);
+    (draggable || !isEditData) && (dsList = finalDsList);
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
     }

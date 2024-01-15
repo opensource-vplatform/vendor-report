@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 import { Datasources } from '@components/defineDatasource/Index';
+import { Search } from '@components/form/Index';
 import {
   Tab,
   Tabs,
@@ -61,6 +62,7 @@ export default function () {
     const [data] = useState(() => {
         return { funTree: getFuncTree() };
     });
+    const [searchKey, setSearchKey] = useState('');
     return (
         <Wrap style={{ height: '100%' }}>
             <Tabs
@@ -71,13 +73,26 @@ export default function () {
                 <Tab
                     code='table'
                     title='数据源'
-                    style={{ height: 'calc(100% - 35px)' }}
+                    style={{
+                        height: 'calc(100% - 35px)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
                 >
+                    <Search
+                        onClear={function () {
+                            setSearchKey('');
+                        }}
+                        onInput={function (value) {
+                            setSearchKey(value);
+                        }}
+                    ></Search>
                     <Datasources
                         notAllowEdit={false}
+                        isEditData={false}
                         disabledTypes={['table']}
+                        searchKey={searchKey}
                         onDoubleClick={function (data) {
-                            console.log(1234);
                             dispatch(
                                 insert({
                                     formula: `TOONE.GET("${data?.code}")`,

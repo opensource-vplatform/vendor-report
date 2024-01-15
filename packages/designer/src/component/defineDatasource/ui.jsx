@@ -174,6 +174,7 @@ export const DatasourceListOl = styled.ol`
     list-style-type: none;
     overflow-y: auto;
     overflow-x: hidden;
+    flex: 1;
 
     > li {
         cursor: pointer;

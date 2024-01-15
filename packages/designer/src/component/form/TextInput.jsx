@@ -1,14 +1,28 @@
 import styled from 'styled-components';
 
+const Wrap = styled.div`
+    padding: 8px;
+    width: 100%;
+    min-height: 26px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 4px;
+    box-sizing: border-box;
+    &:focus-within {
+        outline: 2px solid #ddd;
+    }
+`;
+
 const Input = styled.input`
     position: relative;
-    border: 1px solid #ddd;
-    min-width: 500px;
-    min-height: 26px;
-    border-radius: 4px;
+    border: none;
     cursor: pointer;
     caret-color: #777;
-
+    outline: none !important ;
+    flex: 1;
     &:focus {
         outline: 2px solid #ddd;
     }
@@ -25,17 +39,32 @@ export default function Index(props) {
         onBlur = () => {},
         itemType = '',
         disabled = false,
+        placeholder = '',
+        minWidth,
+        width,
+        SuffixIcon = {},
+        maxLength = 20,
+        style = {},
     } = props;
 
+    const { Component: SuffixComponent, props: SuffixComponentProps = {} } =
+        SuffixIcon;
+
     return (
-        <Input
-            type='text'
-            value={value}
-            onChange={onChange}
-            onBlur={onBlur}
-            data-item-type={itemType}
-            maxLength={20}
-            disabled={disabled}
-        ></Input>
+        <Wrap style={{ minWidth, width, ...style }}>
+            <Input
+                type='text'
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                data-item-type={itemType}
+                maxLength={maxLength}
+                disabled={disabled}
+                placeholder={placeholder}
+            ></Input>
+            {SuffixComponent && (
+                <SuffixComponent {...SuffixComponentProps}></SuffixComponent>
+            )}
+        </Wrap>
     );
 }
