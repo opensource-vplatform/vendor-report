@@ -566,8 +566,11 @@ new ReportDesigner({
 ```
 new ReportDesigner({
     event:{
-        onSave(info){
-            console.log(info)
+        onSave(json,context){
+            return new Promise(function(resolve,reject){
+                console.log(json)
+                resolve({success:true});
+            });
         },
         ...
     } 
