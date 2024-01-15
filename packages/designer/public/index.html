@@ -4,7 +4,6 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="styles.css" />
-        <link rel="stylesheet" href="style.css" />
         <link rel="stylesheet" href="vendor/styles/excel.all.16.2.6.min.css" />
         <title>同望Web报表设计器</title>
     </head>
@@ -20,8 +19,20 @@
         ></script>
         <script src="./polyfill.min.js"></script>
         <script src="./index-90948ce3.umd.js"></script>
+        <script src="./vendor/plugins/integration-jasperreport-22aff65c.umd.js"></script>
         <script>
-            var designer = new TOONE.ReportDesigner({});
+            var designer = new TOONE.ReportDesigner({event:{onSave:function(json,context){
+                return new Promise(function(resolve,reject){
+                    //转换成jasperReports格式xml
+                    const transformer = new TOONE.JasperReportTransform(json,context);
+                    const xml = transformer.transform();
+                    console.log(xml);
+                    setTimeout(function(){
+                        //保存成功后执行resolve
+                        resolve();
+                    },2000);
+                });
+            }}});
             designer.mount(document.getElementById('app'));
         </script>
     </body>
