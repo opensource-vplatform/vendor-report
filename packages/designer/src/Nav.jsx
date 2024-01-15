@@ -1,20 +1,36 @@
-import { Fragment, useContext } from 'react';
+import {
+  Fragment,
+  useContext,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import { Tab, Tabs } from '@components/tabs/Index';
-import { EVENTS, fire } from '@event/EventManager';
-import { setErrorMsg, setMode, setWaitMsg } from '@store/appSlice/appSlice';
+import {
+  Tab,
+  Tabs,
+} from '@components/tabs/Index';
+import {
+  EVENTS,
+  fire,
+} from '@event/EventManager';
+import {
+  setErrorMsg,
+  setMode,
+  setWaitMsg,
+} from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
+import SettingTab from '@tabs/setting/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
-import SettingTab from '@tabs/setting/Index';
 
 import DesignerContext from './DesignerContext';
 import Formula from './tabs/formula/Index';
@@ -87,6 +103,7 @@ export default function () {
                             }
                         })
                         .catch((e) => {
+                            dispatch(setWaitMsg({ message: null }));
                             dispatch(
                                 setErrorMsg({
                                     message:

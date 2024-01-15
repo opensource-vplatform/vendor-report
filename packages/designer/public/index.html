@@ -21,18 +21,38 @@
         <script src="./index-90948ce3.umd.js"></script>
         <script src="./vendor/plugins/integration-jasperreport-22aff65c.umd.js"></script>
         <script>
-            var designer = new TOONE.ReportDesigner({event:{onSave:function(json,context){
-                return new Promise(function(resolve,reject){
-                    //转换成jasperReports格式xml
-                    const transformer = new TOONE.JasperReportTransform(json,context);
-                    const xml = transformer.transform();
-                    console.log(xml);
-                    setTimeout(function(){
-                        //保存成功后执行resolve
-                        resolve();
-                    },2000);
-                });
-            }}});
+            //实例化设计器
+            var designer = new TOONE.ReportDesigner({
+                //配置详情参考README.md
+                nav: {
+                    file: false, //隐藏文件页签页，
+                },
+                event: {
+                    onSave: function (json, context) {
+                        return new Promise(function (resolve, reject) {
+                            try {
+                                //转换成jasperReports格式xml
+                                const transformer =
+                                    new TOONE.JasperReportTransform(
+                                        json,
+                                        context
+                                    );
+                                const xml = transformer.transform();
+                                console.log(xml);
+                                setTimeout(function () {
+                                    //保存成功后执行resolve
+                                    resolve({ success: true });
+                                }, 2000);
+                                //异常处理
+                                //reject("错误信息")
+                            } catch (e) {
+                                reject('出现未知异常！');
+                            }
+                        });
+                    },
+                },
+            });
+            //设计器挂在到指定dom元素
             designer.mount(document.getElementById('app'));
         </script>
     </body>
