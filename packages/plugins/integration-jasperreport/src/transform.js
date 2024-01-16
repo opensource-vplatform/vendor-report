@@ -117,17 +117,19 @@ function genFields(params) {
     const fields = [];
     const { tables } = params;
 
-    const { bindingPath, columns } = tables[0];
+    if (Array.isArray(tables) && tables.length > 0) {
+        const { bindingPath, columns } = tables[0];
 
-    columns.forEach(function ({ dataField }) {
-        const _params = {
-            ...params,
-            bindingPath,
-            dataField,
-        };
-        const field = genField(_params);
-        fields.push(field);
-    });
+        columns.forEach(function ({ dataField }) {
+            const _params = {
+                ...params,
+                bindingPath,
+                dataField,
+            };
+            const field = genField(_params);
+            fields.push(field);
+        });
+    }
 
     return fields;
 }
@@ -286,7 +288,7 @@ function genColumnFooter(params) {
 
 //适用头部和尾部
 function _genBand(params) {
-    const { dataTable, rowsSize, condition } = params;
+    const { dataTable = {}, rowsSize, condition } = params;
     const childrens = [];
 
     //标记band的起始行与结束行
@@ -297,7 +299,7 @@ function _genBand(params) {
     let boxEndCol = null;
     let boxStartCol = null;
 
-    Object.entries(dataTable).forEach(function ([_row_, value]) {
+    Object.entries(dataTable).forEach(function ([_row_, value = {}]) {
         const _row = Number(_row_);
         if (condition(_row)) {
             Object.entries(value).forEach(function ([
@@ -372,13 +374,17 @@ function _genBand(params) {
 
 //以表格作为参照，表格结束行作为底部的开始行
 function genColumnFooterBand(params) {
-    const { tables } = params;
-    const { row, rowCount } = tables[0];
-    const endRow = row + rowCount - 1;
+    const { tables, sheetRowCount } = params;
+
     function condition(row) {
-        return row > endRow;
+        if (Array.isArray(tables) && tables.length > 0) {
+            const { row, rowCount } = tables[0];
+            const endRow = row + rowCount - 1;
+            return row > endRow;
+        }
+        return row > sheetRowCount;
     }
-    debugger;
+
     return _genBand({ ...params, condition });
 }
 
@@ -395,10 +401,14 @@ function genPageHeader(params) {
 
 //以表格作为参照，表格开始行作为头部的结束行
 function genPageHeaderBand(params) {
-    const { tables } = params;
-    const { row: endRow } = tables[0];
+    const { tables, sheetRowCount } = params;
+
     function condition(row) {
-        return row < endRow;
+        if (Array.isArray(tables) && tables.length > 0) {
+            const { row: endRow } = tables[0];
+            return row < endRow;
+        }
+        return row < sheetRowCount;
     }
 
     return _genBand({ ...params, condition });
@@ -416,28 +426,38 @@ function genDetail(params) {
 }
 
 function genDetailBand(params) {
-    const { tables, rowsSize } = params;
-    const { row, col, rowCount, colCount, bindingPath, columns } = tables[0];
+    const { tables, rowsSize, sheetRowCount, sheetColCount } = params;
+    let _rowCount = sheetRowCount;
+    let _colCount = sheetColCount;
+    let _row = 0;
+    let _col = 0;
     const childrens = [];
-    columns.forEach(function ({ dataField }, index) {
-        const _col = col + index;
-        const _params = {
-            ...params,
-            row,
-            col: _col,
-            dataField,
-            boxStartRow: row,
-            type: 'F',
-        };
-        _params.style = getStyle(_params);
-        const textField = genTextField(_params);
-        childrens.push(textField);
-    });
+    if (Array.isArray(tables) && tables.length > 0) {
+        const { row, col, rowCount, colCount, columns } = tables[0];
+        _rowCount = rowCount;
+        _colCount = colCount;
+        _row = row;
+        _col = col;
+        columns.forEach(function ({ dataField }, index) {
+            const _col = col + index;
+            const _params = {
+                ...params,
+                row,
+                col: _col,
+                dataField,
+                boxStartRow: row,
+                type: 'F',
+            };
+            _params.style = getStyle(_params);
+            const textField = genTextField(_params);
+            childrens.push(textField);
+        });
+    }
 
     //计算band高度
     const height = calculateHeight({
-        startRow: row,
-        endRow: row,
+        startRow: _row,
+        endRow: _row,
         //endRow: row + rowCount - 1,
         rowsSize,
     });
@@ -447,10 +467,10 @@ function genDetailBand(params) {
             props: { height, isSplitAllowed: 'false' },
             childrens,
             bandRect: {
-                startRow: row,
-                startCol: col,
-                endRow: row + rowCount - 1,
-                endCol: col + colCount - 1,
+                startRow: _row,
+                startCol: _col,
+                endRow: _row + _rowCount - 1,
+                endCol: _col + _colCount - 1,
             },
         },
     };
@@ -829,8 +849,9 @@ export function testTransform(params) {
         rows: rowsSize,
         data: { dataTable },
         spans,
+        rowCount,
     } = sheet;
-
+    debugger;
     const jasperReport = genJasperReport({
         tables,
         dataTable,
@@ -838,6 +859,8 @@ export function testTransform(params) {
         rowsSize,
         dsList,
         spans,
+        sheetRowCount: rowCount,
+        sheetColCount: 20, //没有列数？
     });
 
     const JRXML = genJRXML(jasperReport);
