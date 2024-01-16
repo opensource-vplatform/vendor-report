@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
@@ -18,9 +21,18 @@ export default function (props) {
         onDoubleClick = () => {},
         highlight = '',
     } = props;
+
     const [data, setData] = useState(() => {
         return { opened };
     });
+
+    useEffect(
+        function () {
+            setData({ opened });
+        },
+        [opened]
+    );
+
     const ctx = {
         opened: data.opened,
         expand: (value) => {

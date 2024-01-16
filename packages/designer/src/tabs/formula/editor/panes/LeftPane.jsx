@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useRef,
+  useState,
+} from 'react';
 
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -58,6 +61,7 @@ const getFuncTree = () => {
 };
 
 export default function () {
+    const openedDatas = useRef([]);
     const dispatch = useDispatch();
     const [searchKey, setSearchKey] = useState({
         dsSearchKey: '',
@@ -67,7 +71,11 @@ export default function () {
         return { funTree: getFuncTree() };
     });
     let funcDatas = JSON.parse(JSON.stringify(data));
+
+    let opened = [...openedDatas.current];
     if (searchKey.funcSearchkey) {
+        opened = [];
+        openedDatas.current = [];
         funcDatas.funTree = funcDatas.funTree.filter(function (item) {
             const { value = '', label = '', desc = '', children } = item;
 
@@ -92,6 +100,12 @@ export default function () {
 
                 result = item.children.length > 0;
             }
+
+            if (result) {
+                opened.push(value);
+                openedDatas.current.push(value);
+            }
+
             return result;
         });
     }
@@ -160,6 +174,7 @@ export default function () {
                     <Tree
                         datas={funcDatas.funTree}
                         highlight={searchKey.funcSearchkey}
+                        opened={opened}
                         onDoubleClick={(formula, isParent) => {
                             if (!isParent) {
                                 dispatch(
