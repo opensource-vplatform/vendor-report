@@ -5,6 +5,7 @@ import {
 
 import { useDispatch } from 'react-redux';
 
+import { Highlight } from '@components/highlight/Index';
 import {
   deleteDsList,
   pushDsList,
@@ -165,7 +166,10 @@ export default function Index(props) {
                                     type === 'text' ? 'string' : type
                                 }`}
                             >
-                                {name || '-'}
+                                <Highlight
+                                    text={name || '-'}
+                                    highlight={searchKey}
+                                ></Highlight>
                             </div>
                             {type === 'table' && isShowAddSubDatasource
                                 ? isAllowToEdit && (

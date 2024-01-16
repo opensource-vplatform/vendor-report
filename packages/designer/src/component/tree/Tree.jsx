@@ -16,6 +16,7 @@ export default function (props) {
         style = {},
         opened = [],
         onDoubleClick = () => {},
+        highlight = '',
     } = props;
     const [data, setData] = useState(() => {
         return { opened };
@@ -52,6 +53,7 @@ export default function (props) {
                 style={{ ...style, overflow: 'auto', height: '100%' }}
                 datas={datas}
                 onDoubleClick={onDoubleClick}
+                highlight={highlight}
             ></ItemsPane>
         </Context.Provider>
     );

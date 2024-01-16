@@ -2,6 +2,8 @@ import { Fragment } from 'react';
 
 import styled from 'styled-components';
 
+import { Highlight } from '@components/highlight/Index';
+
 import DownIcon from '../../icons/arrow/Down';
 import RightIcon from '../../icons/arrow/Right';
 import Context from './Context';
@@ -20,6 +22,19 @@ const Wrap = styled.div`
 const Label = styled.span`
     user-select: none;
     font-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+    text-wrap: nowrap;
+`;
+
+const Desc = styled.div`
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    scale: 0.9;
+    translate: -9px;
+    color: #999;
 `;
 
 const hasChildren = function (children) {
@@ -27,7 +42,7 @@ const hasChildren = function (children) {
 };
 
 export default function (props) {
-    const { data, level = 0, onDoubleClick } = props;
+    const { data, level = 0, onDoubleClick, highlight = '' } = props;
     const { value, label, desc, children } = data;
     return (
         <Context.Consumer>
@@ -59,13 +74,25 @@ export default function (props) {
                                     ></RightIcon>
                                 )
                             ) : null}
-                            <Label>{label}</Label>
+                            <Label>
+                                <Highlight
+                                    text={label}
+                                    highlight={highlight}
+                                ></Highlight>
+                                <Desc>
+                                    <Highlight
+                                        text={desc}
+                                        highlight={highlight}
+                                    ></Highlight>
+                                </Desc>
+                            </Label>
                         </Wrap>
                         {isOpened ? (
                             <ItemsPane
                                 datas={children}
                                 level={level + 1}
                                 onDoubleClick={onDoubleClick}
+                                highlight={highlight}
                             ></ItemsPane>
                         ) : null}
                     </Fragment>

@@ -59,10 +59,43 @@ const getFuncTree = () => {
 
 export default function () {
     const dispatch = useDispatch();
+    const [searchKey, setSearchKey] = useState({
+        dsSearchKey: '',
+        funcSearchkey: '',
+    });
     const [data] = useState(() => {
         return { funTree: getFuncTree() };
     });
-    const [searchKey, setSearchKey] = useState('');
+    let funcDatas = JSON.parse(JSON.stringify(data));
+    if (searchKey.funcSearchkey) {
+        funcDatas.funTree = funcDatas.funTree.filter(function (item) {
+            const { value = '', label = '', desc = '', children } = item;
+
+            const _searchKey = searchKey.funcSearchkey.toLowerCase();
+            let result =
+                value.toLowerCase().includes(_searchKey) ||
+                label.toLowerCase().includes(_searchKey) ||
+                desc.toLowerCase().includes(_searchKey);
+            if (!result && Array.isArray(children) && children.length > 0) {
+                item.children = [];
+                item.children = children.filter(function ({
+                    value = '',
+                    label = '',
+                    desc = '',
+                }) {
+                    return (
+                        value.toLowerCase().includes(_searchKey) ||
+                        label.toLowerCase().includes(_searchKey) ||
+                        desc.toLowerCase().includes(_searchKey)
+                    );
+                });
+
+                result = item.children.length > 0;
+            }
+            return result;
+        });
+    }
+
     return (
         <Wrap style={{ height: '100%' }}>
             <Tabs
@@ -81,17 +114,24 @@ export default function () {
                 >
                     <Search
                         onClear={function () {
-                            setSearchKey('');
+                            setSearchKey({
+                                ...searchKey,
+                                dsSearchKey: '',
+                            });
                         }}
                         onInput={function (value) {
-                            setSearchKey(value);
+                            setSearchKey({
+                                ...searchKey,
+                                dsSearchKey: value,
+                            });
                         }}
+                        value={searchKey.dsSearchKey}
                     ></Search>
                     <Datasources
                         notAllowEdit={false}
                         isEditData={false}
                         disabledTypes={['table']}
-                        searchKey={searchKey}
+                        searchKey={searchKey.dsSearchKey}
                         onDoubleClick={function (data) {
                             dispatch(
                                 insert({
@@ -102,8 +142,24 @@ export default function () {
                     ></Datasources>
                 </Tab>
                 <Tab code='func' title='函数' style={{ height: '100%' }}>
+                    <Search
+                        onClear={function () {
+                            setSearchKey({
+                                ...searchKey,
+                                funcSearchkey: '',
+                            });
+                        }}
+                        onInput={function (value) {
+                            setSearchKey({
+                                ...searchKey,
+                                funcSearchkey: value,
+                            });
+                        }}
+                        value={searchKey.funcSearchkey}
+                    ></Search>
                     <Tree
-                        datas={data.funTree}
+                        datas={funcDatas.funTree}
+                        highlight={searchKey.funcSearchkey}
                         onDoubleClick={(formula, isParent) => {
                             if (!isParent) {
                                 dispatch(
