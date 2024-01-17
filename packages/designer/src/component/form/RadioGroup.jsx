@@ -15,6 +15,9 @@ const RadioWrap = styled.div`
     &:hover {
         background-color: #dadada;
     }
+    &[data-direction='vertical'] {
+        flex-direction: column;
+    }
     &[data-disabled='true'] {
         background-color: transparent !important;
         cursor: not-allowed;
@@ -29,7 +32,14 @@ const Label = styled.span`
 const Context = createContext(null);
 
 export const Radio = function (props) {
-    const { label, value, desc = '',children } = props;
+    const {
+        label,
+        //可选值：水平-horizontal，垂直-vertical
+        direction = 'horizontal',
+        value,
+        desc = '',
+        children,
+    } = props;
     return (
         <Context.Consumer>
             {(ctx) => {
@@ -38,10 +48,15 @@ export const Radio = function (props) {
                     <RadioWrap
                         data-disabled={ctx.disabled}
                         title={desc}
-                        onClick={()=>!ctx.disabled&&!checked&&ctx.onChange(value)}
+                        data-direction={direction}
+                        onClick={() =>
+                            !ctx.disabled && !checked && ctx.onChange(value)
+                        }
                     >
                         {checked ? (
-                            <CheckedRadio style={{color:'#0075ff'}}></CheckedRadio>
+                            <CheckedRadio
+                                style={{ color: '#0075ff' }}
+                            ></CheckedRadio>
                         ) : (
                             <UnCheckRadio></UnCheckRadio>
                         )}

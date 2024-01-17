@@ -47,11 +47,32 @@ export const workbookSettingSlice = createSlice({
 
         showVerticalScrollbar: true,
         scrollbarShowMax: true,
-        useMobileScrollbar: false,
+        scrollbarAppearance: false,
         showHorizontalScrollbar: true,
         scrollbarMaxAlign: false,
+        //计算-引用样式:0-A1,1-R1C1
+        referenceStyle: 0,
+        //需要时重算
+        calcOnDemand: true,
+        //迭代计算
+        iterativeCalculation: false,
+        //最多迭代次数
+        iterativeCalculationMaximumIterations: 100,
+        //最大误差
+        iterativeCalculationMaximumChange: 0.001,
+        tabStripVisible:true,
+        newTabVisible:true,
+        tabStripRatio:0.8,
+        tabStripWidth:80,
+        tabStripPosition:0,
+        allSheetsListVisible:2,
+        tabEditable:true
     },
     reducers: {
+        init(state,action){
+            const data = action.payload;
+            Object.assign(state,data);
+        },
         setIsOpenforWorkbookSetting(state, action) {
             state.isOpenforWorkbookSetting = action.payload;
         },
@@ -78,7 +99,6 @@ export const workbookSettingSlice = createSlice({
         setAllowAutoExtendFilterRange(state, action) {
             state.allowAutoExtendFilterRange = action.payload;
         },
-
         setRowResizeMode(state, action) {
             state.rowResizeMode = action.payload;
         },
@@ -119,14 +139,50 @@ export const workbookSettingSlice = createSlice({
         setScrollbarShowMax(state, action) {
             state.scrollbarShowMax = action.payload;
         },
-        setUseMobileScrollbar(state, action) {
-            state.useMobileScrollbar = action.payload;
+        setScrollbarAppearance(state, action) {
+            state.scrollbarAppearance = action.payload;
         },
         setShowHorizontalScrollbar(state, action) {
             state.showHorizontalScrollbar = action.payload;
         },
         setScrollbarMaxAlign(state, action) {
             state.scrollbarMaxAlign = action.payload;
+        },
+        setReferenceStyle(state, action) {
+            state.referenceStyle = action.payload;
+        },
+        setCalcOnDemand(state, action) {
+            state.calcOnDemand = action.payload;
+        },
+        setIterativeCalculation(state, action) {
+            state.iterativeCalculation = action.payload;
+        },
+        setIterativeCalculationMaximumIterations(state, action) {
+            state.iterativeCalculationMaximumIterations = action.payload;
+        },
+        setIterativeCalculationMaximumChange(state, action) {
+            state.iterativeCalculationMaximumChange = action.payload;
+        },
+        setTabStripVisible(state, action){
+            state.tabStripVisible = action.payload;
+        },
+        setNewTabVisible(state, action){
+            state.newTabVisible = action.payload;
+        },
+        setTabStripRatio(state, action){
+            state.tabStripRatio = action.payload;
+        },
+        setTabStripWidth(state, action){
+            state.tabStripWidth = action.payload;
+        },
+        setTabStripPosition(state, action){
+            state.tabStripPosition = action.payload;
+        },
+        setAllSheetsListVisible(state, action){
+            state.allSheetsListVisible = action.payload;
+        },
+        setTabEditable(state, action){
+            state.tabEditable = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -137,6 +193,7 @@ export const workbookSettingSlice = createSlice({
 });
 
 export const {
+    init,
     setIsOpenforWorkbookSetting,
     setActive,
     setAllowUserDragDrop,
@@ -160,7 +217,19 @@ export const {
     setShowHorizontalScrollbar,
     setScrollbarShowMax,
     setScrollbarMaxAlign,
-    setUseMobileScrollbar,
+    setScrollbarAppearance,
+    setReferenceStyle,
+    setCalcOnDemand,
+    setIterativeCalculation,
+    setIterativeCalculationMaximumIterations,
+    setIterativeCalculationMaximumChange,
+    setTabStripVisible,
+    setNewTabVisible,
+    setTabStripRatio,
+    setTabStripWidth,
+    setTabStripPosition,
+    setAllSheetsListVisible,
+    setTabEditable,
 } = workbookSettingSlice.actions;
 
 export default workbookSettingSlice.reducer;

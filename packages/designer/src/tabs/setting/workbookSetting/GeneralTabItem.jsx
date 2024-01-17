@@ -1,71 +1,45 @@
-import React, { useContext, useState } from 'react';
+import React from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
 import {
-    setAllowUserDragDrop,
-    setAllowUserDragFill,
-    setAllowUndo,
-    setAllowUserDragMerge,
-    setAllowAutoCreateHyperlink,
-    setAllowAutoExtendFilterRange,
-    setAllowUserEditFormula,
-    setAllowUserZoom,
-    setAllowDynamicArray,
-    setAllowInvalidFormula,
-    setEnableAccessibility,
-    setScrollByPixel,
-    setRowResizeMode,
-    setColumnResizeMode,
-    setMaxUndoStack,
-    setScrollPixel,
-    setFormulaFormatHint,
-} from '@store/settingSlice/workbookSettingSlice';
-
-import { CheckBox } from '@components/form/Index';
-import Select from '@components/Select/Index';
-import Integer from '@components/integer/Index';
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
-const Wrapper = styled.div`
-    margin: 10px;
-`;
+import { CheckBox } from '@components/form/Index';
+import Integer from '@components/integer/Index';
+import Select from '@components/Select/Index';
+import {
+  setAllowAutoCreateHyperlink,
+  setAllowAutoExtendFilterRange,
+  setAllowDynamicArray,
+  setAllowInvalidFormula,
+  setAllowUndo,
+  setAllowUserDragDrop,
+  setAllowUserDragFill,
+  setAllowUserDragMerge,
+  setAllowUserEditFormula,
+  setAllowUserZoom,
+  setColumnResizeMode,
+  setEnableAccessibility,
+  setFormulaFormatHint,
+  setMaxUndoStack,
+  setRowResizeMode,
+  setScrollByPixel,
+  setScrollPixel,
+} from '@store/settingSlice/workbookSettingSlice';
 
-const Label = styled.span`
-    font-size: 12px;
-    margin: 4px;
-`;
-const Divider = styled.div`
-    border-top: 1px solid lightgray;
-    margin-left: 4px;
-`;
-const HLayout = styled.div`
-    display: flex;
-`;
+import {
+  HLayout,
+  ItemList,
+  Label,
+  Selector,
+  SelectTittle,
+  SelectWrapper,
+  VGroupItem,
+  Wrapper,
+} from '../Components';
 
-const VGroupItem = styled.div`
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-`;
-const ItemList = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 8px 6px;
-`;
-const Selector = styled.div`
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-`;
-const SelectTittle = styled.span`
-    font-size: 12px;
-    margin-left: 8px;
-    flex: 1;
-`;
-const SelectWrapper = styled.span`
-    flex: 1.5;
-`;
 const Counter = styled.div`
     display: flex;
     margin: 4px 4px;
@@ -123,15 +97,14 @@ function Index(props) {
     const handleColumnResizeMode = (value) => {
         dispatch(setColumnResizeMode(value));
     };
-
+    const checkboxStyle = {width:'max-content'};
     return (
         <Wrapper>
-            <Label>设置</Label>
-            <Divider></Divider>
             <HLayout>
                 <VGroupItem>
                     <ItemList>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许拖拽'
                             value={allowUserDragDrop}
                             onChange={(checked) => {
@@ -139,6 +112,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许拖动和填充'
                             value={allowUserDragFill}
                             onChange={(checked) => {
@@ -146,6 +120,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许撤销'
                             value={allowUndo}
                             onChange={(checked) => {
@@ -153,6 +128,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许拖拽合并单元格'
                             value={allowUserDragMerge}
                             onChange={(checked) => {
@@ -160,6 +136,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许自动生成超链接'
                             value={allowAutoCreateHyperlink}
                             onChange={(checked) => {
@@ -167,6 +144,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许自动扩展筛选范围'
                             value={allowAutoExtendFilterRange}
                             onChange={(checked) => {
@@ -175,7 +153,6 @@ function Index(props) {
                                 );
                             }}
                         ></CheckBox>
-
                         <Selector>
                             <SelectTittle>行调整模式</SelectTittle>
                             <SelectWrapper>
@@ -227,6 +204,7 @@ function Index(props) {
                 <VGroupItem>
                     <ItemList>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许用户输入公式'
                             value={allowUserEditFormula}
                             onChange={(checked) => {
@@ -234,6 +212,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许缩放'
                             value={allowUserZoom}
                             onChange={(checked) => {
@@ -241,6 +220,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许动态数组'
                             value={allowDynamicArray}
                             onChange={(checked) => {
@@ -248,6 +228,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许无效公式'
                             value={allowInvalidFormula}
                             onChange={(checked) => {
@@ -255,6 +236,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='允许无障碍'
                             value={enableAccessibility}
                             onChange={(checked) => {
@@ -262,6 +244,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='像素滚动'
                             value={scrollByPixel}
                             onChange={(checked) => {
@@ -281,6 +264,7 @@ function Index(props) {
                             <Label>{'滚动单位<像素>'}</Label>
                         </Counter>
                         <CheckBox
+                            style={checkboxStyle}
                             title='公式自动格式化'
                             value={formulaFormatHint}
                             onChange={(checked) => {

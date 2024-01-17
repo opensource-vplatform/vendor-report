@@ -37,12 +37,12 @@ export default function (props) {
     };
     const fireChange = (val) => {
         if (typeof onChange == 'function') {
-            onChange(parseInt(val));
+            onChange(parseFloat(val));
         }
     };
     const increase = () => {
         if(disabled)return;
-        let newVal = parseInt(data.innerVal) + 1;
+        let newVal = parseFloat(data.innerVal) + 1;
         newVal = newVal <= max ? newVal : max;
         if (newVal != data.innerVal) {
             setVal(newVal);
@@ -51,7 +51,7 @@ export default function (props) {
     };
     const decrease = () => {
         if(disabled)return;
-        let newVal = parseInt(data.innerVal) - 1;
+        let newVal = parseFloat(data.innerVal) - 1;
         newVal = newVal >= min ? newVal : min;
         if (newVal != data.innerVal) {
             setVal(newVal);
@@ -59,11 +59,20 @@ export default function (props) {
         }
     };
     const handleInput = (evt) => {
-        const newVal = parseInt(evt.target.value);
-        setVal(newVal);
+        const nativeEvent = evt.nativeEvent;
+        const data = nativeEvent.data;
+        if (data == '.' || /[0-9\-]/.test(data)) {
+            const val = evt.target.value;
+            setData((data) => {
+                return {
+                    ...data,
+                    innerVal: val,
+                };
+            });
+        }
     };
     const handleBlur = (evt) => {
-        let newVal = parseInt(evt.target.value);
+        let newVal = parseFloat(evt.target.value);
         newVal = isNaN(newVal) ? 0 : newVal;
         if (newVal + '' != data.value) {
             setVal(newVal);

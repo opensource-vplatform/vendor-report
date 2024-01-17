@@ -29,18 +29,14 @@ const Title = styled.span`
 `;
 
 export default function (props) {
-    const { title, value, onChange, disabled, desc = '', children } = props;
+    const { title, value, onChange,style={}, disabled, desc = '',children } = props;
     const dsb = !!disabled;
     const checked = !!value;
     const defaultStyle = dsb
         ? { backgroundColor: 'transparent', cursor: 'not-allowed' }
         : {};
     return (
-        <Label
-            data-disabled={dsb}
-            title={desc}
-            onClick={() => !disabled && onChange && onChange(!checked)}
-        >
+        <Label data-disabled={dsb} style={style} title={desc} onClick={() => !disabled && onChange && onChange(!checked)}>
             {checked ? (
                 <FillCheckIcon
                     style={{

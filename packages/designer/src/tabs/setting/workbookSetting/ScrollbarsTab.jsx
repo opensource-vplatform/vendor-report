@@ -1,58 +1,43 @@
-import React, { useContext, useState } from 'react';
-import { CheckBox } from '@components/form/Index';
-import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-    setShowVerticalScrollbar,
-    setShowHorizontalScrollbar,
-    setScrollbarShowMax,
-    setScrollbarMaxAlign,
-    setUseMobileScrollbar,
-} from '@store/settingSlice/workbookSettingSlice';
-const Wrapper = styled.div`
-    margin: 10px;
-`;
-const Label = styled.span`
-    font-size: 12px;
-    margin: 4px;
-`;
-const Divider = styled.div`
-    border-top: 1px solid lightgray;
-    margin-left: 4px;
-`;
-const HLayout = styled.div`
-    display: flex;
-`;
-const VGroupItem = styled.div`
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-`;
-const ItemList = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 8px 6px;
-`;
+import React from 'react';
 
-function Index(props) {
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
+import { CheckBox } from '@components/form/Index';
+import {
+  setScrollbarAppearance,
+  setScrollbarMaxAlign,
+  setScrollbarShowMax,
+  setShowHorizontalScrollbar,
+  setShowVerticalScrollbar,
+} from '@store/settingSlice/workbookSettingSlice';
+
+import {
+  HLayout,
+  ItemList,
+  VGroupItem,
+  Wrapper,
+} from '../Components';
+
+function Index() {
     const dispatch = useDispatch();
     const {
         showVerticalScrollbar,
         showHorizontalScrollbar,
         scrollbarShowMax,
         scrollbarMaxAlign,
-        useMobileScrollbar,
+        scrollbarAppearance,
     } = useSelector(({ workbookSettingSlice }) => workbookSettingSlice);
-
+    const checkboxStyle = {width:'max-content'};
     return (
         <Wrapper>
-            <Label>可见性</Label>
-            <Divider></Divider>
             <HLayout>
                 <VGroupItem>
                     <ItemList>
                         <CheckBox
+                            style={checkboxStyle}
                             title='垂直滚动条'
                             value={showVerticalScrollbar}
                             onChange={(checked) => {
@@ -60,6 +45,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='滚动条最大显示'
                             value={scrollbarShowMax}
                             onChange={(checked) => {
@@ -67,10 +53,11 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='使用移动滚动条'
-                            value={useMobileScrollbar}
+                            value={scrollbarAppearance}
                             onChange={(checked) => {
-                                dispatch(setUseMobileScrollbar(checked));
+                                dispatch(setScrollbarAppearance(checked));
                             }}
                         ></CheckBox>
                     </ItemList>
@@ -78,6 +65,7 @@ function Index(props) {
                 <VGroupItem>
                     <ItemList>
                         <CheckBox
+                            style={checkboxStyle}
                             title='水平滚动条'
                             value={showHorizontalScrollbar}
                             onChange={(checked) => {
@@ -85,6 +73,7 @@ function Index(props) {
                             }}
                         ></CheckBox>
                         <CheckBox
+                            style={checkboxStyle}
                             title='动条最大对齐'
                             value={scrollbarMaxAlign}
                             onChange={(checked) => {
