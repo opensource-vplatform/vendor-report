@@ -9,7 +9,6 @@ import {
   useSelector,
 } from 'react-redux';
 
-import ReportDesignWizard from '@components/reportDesignWizard/Index';
 import DatasourceIcon from '@icons/data/datasource';
 import {
   setIsShowDatasource,
@@ -428,7 +427,6 @@ export default function Index() {
     }, []);
     return (
         <>
-            <ReportDesignWizard></ReportDesignWizard>
             <DialogDatasourcesEdit></DialogDatasourcesEdit>
             <DraggableDatasourcesBox>
                 <DraggableDatasourcesHeander>
