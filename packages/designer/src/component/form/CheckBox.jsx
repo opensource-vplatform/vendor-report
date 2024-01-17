@@ -29,31 +29,38 @@ const Title = styled.span`
 `;
 
 export default function (props) {
-    const { title, value, onChange, disabled, desc = '',children } = props;
+    const { title, value, onChange, disabled, desc = '', children } = props;
     const dsb = !!disabled;
     const checked = !!value;
     const defaultStyle = dsb
         ? { backgroundColor: 'transparent', cursor: 'not-allowed' }
         : {};
     return (
-        <Label data-disabled={dsb} title={desc} onClick={() => !disabled && onChange && onChange(!checked)}>
+        <Label
+            data-disabled={dsb}
+            title={desc}
+            onClick={() => !disabled && onChange && onChange(!checked)}
+        >
             {checked ? (
                 <FillCheckIcon
                     style={{
                         ...defaultStyle,
                         color: dsb ? '#bdbdbd' : '#0075ff',
                     }}
-                    
-                >{children}</FillCheckIcon>
+                >
+                    {children}
+                </FillCheckIcon>
             ) : (
                 <FillUnCheckIcon
                     style={{
                         ...defaultStyle,
                         color: dsb ? '#bdbdbd' : '#6d6d6d',
                     }}
-                >{children}</FillUnCheckIcon>
+                >
+                    {children}
+                </FillUnCheckIcon>
             )}
-            <Title>{title}</Title>
+            {title && <Title>{title}</Title>}
         </Label>
     );
 }

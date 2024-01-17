@@ -1,11 +1,21 @@
-import { updateActiveSheetTablePath } from '@store/datasourceSlice/datasourceSlice';
 import {
-    findTreeNodeById,
-    genUUID,
-    getActiveSheetTablesPath,
+  updateActiveSheetTablePath,
+} from '@store/datasourceSlice/datasourceSlice';
+import {
+  setActive,
+  showTab,
+} from '@store/navSlice/navSlice';
+import { setData } from '@store/tableDesignSlice/tableDesignSlice';
+import {
+  findTreeNodeById,
+  genUUID,
+  getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
-import { setTableCornerMarks } from '@utils/tableUtil.js';
+import {
+  parseTable,
+  setTableCornerMarks,
+} from '@utils/tableUtil.js';
 import { setCellTag } from '@utils/worksheetUtil.js';
 
 const GC = getNamespace();
@@ -78,6 +88,13 @@ export function addTable(params) {
     }
     table.expandBoundRows(true);
     table.bindingPath(dataPath);
+    sheet.setActiveCell(row, col);
+
+    //切换到表设计视图
+    dispatch(showTab({ code: 'table' }));
+    dispatch(setData({ data: parseTable(sheet) }));
+    dispatch(setActive({ code: 'table' }));
+
     const tablePaths = getActiveSheetTablesPath({ sheet });
     dispatch(updateActiveSheetTablePath({ tablePaths }));
 }

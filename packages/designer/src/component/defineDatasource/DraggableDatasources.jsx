@@ -9,30 +9,20 @@ import {
   useSelector,
 } from 'react-redux';
 
+import ReportDesignWizard from '@components/reportDesignWizard/Index';
 import DatasourceIcon from '@icons/data/datasource';
 import {
   setIsShowDatasource,
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
-import {
-  setActive,
-  showTab,
-} from '@store/navSlice/navSlice';
-import { setData } from '@store/tableDesignSlice/tableDesignSlice';
+import { setActive } from '@store/navSlice/navSlice';
 import {
   findTreeNodeById,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
-import {
-  parseTable,
-  setTableCornerMarks,
-} from '@utils/tableUtil.js';
-import {
-  getCellInstanceId,
-  getSheetInstanceId,
-  setCellTag,
-} from '@utils/worksheetUtil.js';
+import { setTableCornerMarks } from '@utils/tableUtil.js';
+import { setCellTag } from '@utils/worksheetUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import Datasources from './Datasources.jsx';
@@ -407,10 +397,6 @@ export default function Index() {
                     const dataPath = getPath(current, dsList);
                     const GC = getNamespace();
                     const spreadNS = GC.Spread.Sheets;
-
-                    const cellInstanceId = getCellInstanceId(sheet, row, col);
-                    const sheetInstanceId = getSheetInstanceId(sheet);
-
                     if (current.type === 'table') {
                         addTable({
                             columnsTemp: current.children,
@@ -419,17 +405,9 @@ export default function Index() {
                             dispatch,
                             row,
                             col,
-                            cellInstanceId,
-                            sheetInstanceId,
                             dataPath,
-                            itemId,
                             filterButtonVisible,
                         });
-                        sheet.setActiveCell(row, col);
-                        //切换到表设计视图
-                        dispatch(showTab({ code: 'table' }));
-                        dispatch(setData({ data: parseTable(sheet) }));
-                        dispatch(setActive({ code: 'table' }));
                     } else {
                         const bindingPathCellType = new BindingPathCellType();
                         cell.bindingPath(dataPath).cellType(
@@ -450,6 +428,7 @@ export default function Index() {
     }, []);
     return (
         <>
+            <ReportDesignWizard></ReportDesignWizard>
             <DialogDatasourcesEdit></DialogDatasourcesEdit>
             <DraggableDatasourcesBox>
                 <DraggableDatasourcesHeander>

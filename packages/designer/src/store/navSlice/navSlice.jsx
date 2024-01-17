@@ -6,6 +6,7 @@ export const navSlice = createSlice({
         hideCodes: ['table'],
         tableName: null,
         active: null,
+        reportDesignWizard: false,
     },
     reducers: {
         /**
@@ -17,8 +18,8 @@ export const navSlice = createSlice({
             const code = action.payload.code;
             const hideCodes = state.hideCodes;
             const index = hideCodes.indexOf(code);
-            if(index!=-1){
-                hideCodes.splice(index,1);
+            if (index != -1) {
+                hideCodes.splice(index, 1);
                 state.hideCodes = [...hideCodes];
             }
         },
@@ -31,7 +32,7 @@ export const navSlice = createSlice({
             const code = action.payload.code;
             const hideCodes = state.hideCodes;
             const index = hideCodes.indexOf(code);
-            if(index==-1){
+            if (index == -1) {
                 hideCodes.push(code);
                 state.hideCodes = [...hideCodes];
             }
@@ -42,19 +43,34 @@ export const navSlice = createSlice({
          * @param {*} action
          */
         setActive(state, action) {
-            if(state.active != action.payload.code){
+            if (state.active != action.payload.code) {
                 state.active = action.payload.code;
             }
         },
         /**
          * 设置表格名称
-         * @param {} state 
-         * @param {*} action 
+         * @param {} state
+         * @param {*} action
          */
-        setTableName(state, action){
+        setTableName(state, action) {
             state.tableName = action.payload.tableName;
-        }
+        },
+        /**
+         * 切换报表设计向导显隐藏
+         * @param {} state
+         * @param {*} action
+         */
+        toggleReportDesignWizard(state, action) {
+            state.reportDesignWizard = !state.reportDesignWizard;
+        },
     },
 });
-export const { setSpread, showTab, hideTab, setActive,setTableName } = navSlice.actions;
+export const {
+    setSpread,
+    showTab,
+    hideTab,
+    setActive,
+    setTableName,
+    toggleReportDesignWizard,
+} = navSlice.actions;
 export default navSlice.reducer;

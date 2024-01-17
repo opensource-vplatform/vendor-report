@@ -27,6 +27,7 @@ import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
+import ReportTab from '@tabs/report/Index';
 import SettingTab from '@tabs/setting/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
@@ -72,6 +73,7 @@ const TableNavItem = WithNavItem(TableTab);
 const DataNavItem = WithNavItem(DataTab);
 const FormulaNavItem = WithNavItem(Formula);
 const SettingNavItem = WithNavItem(SettingTab);
+const ReportNavItem = WithNavItem(ReportTab);
 
 export default function () {
     const dispatch = useDispatch();
@@ -209,6 +211,7 @@ export default function () {
                 title='设置'
                 tabProps={{ hidden: isHiddenSetting }}
             ></SettingNavItem>
+            <ReportNavItem code='Report' title='报表设计'></ReportNavItem>
         </Tabs>
     );
 }
