@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import {
-    deepCopy,
-    findTreeNodeById,
-    genValueByType,
+  deepCopy,
+  findTreeNodeById,
+  genValueByType,
 } from '../../utils/commonUtil.js';
 
 export const datasourceSlice = createSlice({
@@ -16,6 +16,11 @@ export const datasourceSlice = createSlice({
         previewViewDatas: {},
         isShowDatasource: false,
         activeSheetTablePath: {},
+        tables: {
+            /*  [sheetId]: {
+                [dsCode]:'drag' || 'wizard'
+            } */
+        },
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -240,6 +245,19 @@ export const datasourceSlice = createSlice({
             state.dsList = [...datasource];
             state.finalDsList = [...datasource];
         },
+        saveTables(state, { payload }) {
+            const { sheetInstanceId, tableInfo = {} } = payload;
+            if (!state.tables[sheetInstanceId]) {
+                state.tables[sheetInstanceId] = {};
+            }
+            Object.entries(tableInfo).forEach(function ([dsCode, addingMode]) {
+                if (addingMode) {
+                    state.tables[sheetInstanceId][dsCode] = addingMode;
+                } else {
+                    delete state.tables[sheetInstanceId][dsCode];
+                }
+            });
+        },
     },
 });
 export const {
@@ -251,5 +269,6 @@ export const {
     setIsShowDatasource,
     updateActiveSheetTablePath,
     initDatasource,
+    saveTables,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

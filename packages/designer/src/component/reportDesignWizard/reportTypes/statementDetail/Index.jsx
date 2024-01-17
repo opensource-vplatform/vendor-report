@@ -19,6 +19,11 @@ import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { toggleReportDesignWizard } from '@store/navSlice/navSlice';
 import { getNamespace } from '@utils/spreadUtil';
 
+import {
+  Button,
+  ButtonText,
+  FooterWrap,
+} from '../../Index';
 import Left from './left';
 import Right from './right';
 
@@ -41,34 +46,6 @@ const HeaderWrap = styled.div`
     flex: 1;
     overflow: hidden;
     border-bottom: 1px solid #ddd;
-`;
-
-const FooterWrap = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    border: none;
-    margin: 0px;
-    background: #f0f0f0;
-    padding: 8px;
-`;
-
-const Button = styled.button`
-    border: 1px solid #d3d3d3;
-    background-color: #e6e6e6;
-    min-width: 80px;
-    margin-right: 5px;
-    margin-left: 5px;
-    cursor: pointer;
-    &[disabled] {
-        cursor: not-allowed;
-    }
-`;
-
-const ButtonText = styled.span`
-    padding: 0.4em 1em;
-    display: block;
-    line-height: normal;
 `;
 
 function showHhighlight(spread = 0, row = 0, col, rowCount = 1, colCount = 1) {
@@ -109,6 +86,7 @@ function createTable(params) {
                 col,
                 dataPath: value,
                 filterButtonVisible: false,
+                addingMode: 'wizard',
             });
             spread.resumePaint();
             mousedownHandlerAfter();
@@ -188,6 +166,10 @@ export default function Index(props) {
         });
     };
 
+    const cancleHandler = function () {
+        dispatch(toggleReportDesignWizard());
+    };
+
     return (
         <Wrap>
             <HeaderWrap>
@@ -217,7 +199,7 @@ export default function Index(props) {
                 >
                     <ButtonText>确定</ButtonText>
                 </Button>
-                <Button type='button'>
+                <Button type='button' onClick={cancleHandler}>
                     <ButtonText>取消</ButtonText>
                 </Button>
             </FooterWrap>

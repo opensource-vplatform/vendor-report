@@ -66,9 +66,12 @@ export default function Index(props) {
         ({ tableDesignSlice }) => tableDesignSlice
     );
 
-    let { dsList, activeDs, finalDsList } = useSelector(
-        ({ datasourceSlice }) => datasourceSlice
-    );
+    let {
+        dsList,
+        activeDs,
+        finalDsList,
+        tables: tablesBindInfos,
+    } = useSelector(({ datasourceSlice }) => datasourceSlice);
 
     if (!activeDs.id && dsList.length > 0) {
         activeDs = dsList[0];
@@ -129,6 +132,7 @@ export default function Index(props) {
             updated,
             dsList,
             finalDsList,
+            tablesBindInfos,
         });
 
         cacheDatasRef.current.updated = updated;
@@ -194,6 +198,8 @@ export default function Index(props) {
                             sync: true,
                             finalDsList,
                             filterButtonVisible,
+                            tablesBindInfos,
+                            dispatch,
                         });
                         //更新后表格后需要重新保存数据源是否已经绑定
                         const sheet = spread.getActiveSheet();

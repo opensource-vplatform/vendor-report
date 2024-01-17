@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -34,10 +35,11 @@ const FooterWrap = styled.div`
     border: 1px solid #ddd;
 `;
 
-const FieldWap = styled.div`
+const FieldWrap = styled.div`
     display: flex;
     align-items: center;
     cursor: pointer;
+    user-select: none;
 
     &:hover {
         background-color: #dadada;
@@ -51,6 +53,7 @@ const FieldText = styled.span`
 
 function Footer(props) {
     const [_exclude, setExclude] = useState({});
+    const footerWrap = useRef();
     const { datas, onChange = () => {}, tableCode } = props;
     useEffect(
         function () {
@@ -58,6 +61,26 @@ function Footer(props) {
         },
         [tableCode]
     );
+
+    useEffect(function () {
+        const wrapEl = footerWrap.current;
+        if (wrapEl) {
+            wrapEl.addEventListener('dragover', (event) => {
+                event.dataTransfer.setData('dragTarget', event.target);
+                event.preventDefault(); // 阻止默认的拖放行为
+                event.dataTransfer.dropEffect = 'none';
+            });
+            wrapEl.addEventListener('dragleave', (event) => {
+                console.log(1234);
+                event.preventDefault(); // 阻止默认的拖放行为
+            });
+
+            wrapEl.addEventListener('drop', (event) => {
+                event.preventDefault(); // 阻止默认的拖放行为
+                debugger;
+            });
+        }
+    }, []);
 
     const changeHandler = function (code, res) {
         const newExclude = { ..._exclude, [code]: res };
@@ -75,16 +98,17 @@ function Footer(props) {
     };
 
     return (
-        <FooterWrap>
+        <FooterWrap ref={footerWrap}>
             {datas.map(function (item) {
                 const { name, id, code } = item;
                 const isChecked = _exclude[code] !== false;
                 return (
-                    <FieldWap
+                    <FieldWrap
                         key={id}
                         onClick={function () {
                             changeHandler(code, !isChecked);
                         }}
+                        draggable={true}
                     >
                         <CheckBox
                             value={isChecked}
@@ -93,7 +117,7 @@ function Footer(props) {
                             }}
                         ></CheckBox>
                         <FieldText>{name}</FieldText>
-                    </FieldWap>
+                    </FieldWrap>
                 );
             })}
         </FooterWrap>

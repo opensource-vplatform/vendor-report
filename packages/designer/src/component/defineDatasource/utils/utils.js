@@ -1,4 +1,5 @@
 import {
+  saveTables,
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import {
@@ -16,7 +17,10 @@ import {
   parseTable,
   setTableCornerMarks,
 } from '@utils/tableUtil.js';
-import { setCellTag } from '@utils/worksheetUtil.js';
+import {
+  getSheetInstanceId,
+  setCellTag,
+} from '@utils/worksheetUtil.js';
 
 const GC = getNamespace();
 
@@ -30,6 +34,7 @@ export function addTable(params) {
         col,
         dataPath,
         filterButtonVisible,
+        addingMode = 'drag',
     } = params;
 
     const tableColumnsCount = Array.isArray(columnsTemp)
@@ -97,6 +102,15 @@ export function addTable(params) {
 
     const tablePaths = getActiveSheetTablesPath({ sheet });
     dispatch(updateActiveSheetTablePath({ tablePaths }));
+    const sheetInstanceId = getSheetInstanceId(sheet);
+    dispatch(
+        saveTables({
+            sheetInstanceId,
+            tableInfo: {
+                [dataPath]: addingMode,
+            },
+        })
+    );
 }
 
 export function getPath(node, treeNodes) {
@@ -171,6 +185,8 @@ export function checkHasBind(params) {
         finalDsList,
         filterButtonVisible,
         deleted,
+        tablesBindInfos,
+        dispatch,
     } = params;
     if (updated.length <= 0 && deleted.length <= 0) {
         return result;
@@ -195,6 +211,8 @@ export function checkHasBind(params) {
                 data: { dataTable = {} },
             } = sheet.toJSON();
 
+            const sheetInstanceId = getSheetInstanceId(sheet);
+            const tableBindInfos = tablesBindInfos[sheetInstanceId] || {};
             //其它单元格
             if (!parentId) {
                 Object.entries(dataTable).some(function ([row, colInfos]) {
@@ -231,6 +249,7 @@ export function checkHasBind(params) {
             //处理实体
             result = tables.some(function ({ bindingPath, name: tableName }) {
                 const table = sheet.tables.findByName(tableName);
+                const addingMode = tableBindInfos[bindingPath];
                 //数据源类型已经发生改变或数据源已经被删除，需要移除表格
                 if ((typeHasChanged || isDel) && bindingPath === oldPath) {
                     result = true;
@@ -242,11 +261,23 @@ export function checkHasBind(params) {
                     sync && sheet.tables.remove(table);
                 }
 
-                if (!typeHasChanged && !isDel) {
+                if (!typeHasChanged && !isDel && bindingPath === oldPath) {
                     //判断表格已经绑定的实体编码是否与修改后的实体编码一致
                     if (bindingPath === oldPath && bindingPath !== newPath) {
                         result = true;
-                        sync && table.bindingPath(newPath);
+
+                        if (sync) {
+                            table.bindingPath(newPath);
+                            dispatch(
+                                saveTables({
+                                    sheetInstanceId,
+                                    tableInfo: {
+                                        [newPath]: addingMode,
+                                        [bindingPath]: undefined,
+                                    },
+                                })
+                            );
+                        }
                     }
 
                     //判断表格列绑定的实体字段是否与修改后的实体字段编码一致
@@ -283,7 +314,7 @@ export function checkHasBind(params) {
                     });
 
                     //数据源新增字段
-                    if (Array.isArray(children)) {
+                    if (Array.isArray(children) && addingMode === 'drag') {
                         let isInserted = false;
                         children.forEach(function ({ id, name, code }, index) {
                             const col = BSt.find((item) => item.id() === id);
