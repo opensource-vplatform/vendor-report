@@ -6,7 +6,7 @@ export const navSlice = createSlice({
         hideCodes: ['table'],
         tableName: null,
         active: null,
-        reportDesignWizard: true,
+        reportDesignWizard: false,
     },
     reducers: {
         /**

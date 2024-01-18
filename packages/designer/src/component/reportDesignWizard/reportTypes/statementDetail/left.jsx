@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
@@ -54,7 +53,6 @@ const FieldWrap = styled.div`
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     margin-top: -1px;
-
     &:hover {
         background-color: #dadada;
     }
@@ -65,7 +63,34 @@ const FieldText = styled.span`
     position: relative;
 `;
 
-const DragHandle = sortableHandle(() => <span>::</span>);
+const SortableHandle = styled.div`
+    position: relative;
+    top: 1px;
+    display: block;
+    width: 18px;
+    height: 11px;
+    opacity: 0.25;
+    margin-right: 10px;
+    margin-left: auto;
+    cursor: row-resize;
+    background: linear-gradient(
+        180deg,
+        #000,
+        #000 20%,
+        #fff 0,
+        #fff 40%,
+        #000 0,
+        #000 60%,
+        #fff 0,
+        #fff 80%,
+        #000 0,
+        #000
+    );
+`;
+
+const DragHandle = sortableHandle(() => (
+    <SortableHandle className='dragHandle'></SortableHandle>
+));
 
 const FooterItem = SortableElement(function (props) {
     const { code, isChecked, changeHandler, name } = props;
@@ -89,8 +114,6 @@ const FooterItem = SortableElement(function (props) {
 
 const Footer = SortableContainer(function (props) {
     const [_exclude, setExclude] = useState({});
-    const footerWrap = useRef();
-    const items = useRef([]);
     const { datas, onChange = () => {}, tableCode } = props;
     useEffect(
         function () {
@@ -115,7 +138,7 @@ const Footer = SortableContainer(function (props) {
     };
 
     return (
-        <FooterWrap ref={footerWrap}>
+        <FooterWrap>
             {datas.map(function (item, index) {
                 const { name, id, code } = item;
                 const isChecked = _exclude[code] !== false;
@@ -127,7 +150,6 @@ const Footer = SortableContainer(function (props) {
                         isChecked={isChecked}
                         changeHandler={changeHandler}
                         index={index}
-                        ref={items}
                     ></FooterItem>
                 );
             })}
@@ -173,7 +195,6 @@ export default function Index(props) {
                 onSortEnd={onSortEnd}
                 lockAxis='y'
                 lockToContainerEdges={true}
-                /*                 pressDelay={150} */
                 useDragHandle
             ></Footer>
         </Wrap>

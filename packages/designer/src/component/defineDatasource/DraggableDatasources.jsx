@@ -293,7 +293,6 @@ export default function Index() {
         [spread]
     );
     useEffect(function () {
-        return;
         if (!cacheDatasRef.current.hasBindEvent) {
             cacheDatasRef.current.hasBindEvent = true;
             let dragged = null;
