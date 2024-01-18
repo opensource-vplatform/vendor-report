@@ -3,6 +3,7 @@ import {
   useState,
 } from 'react';
 
+import { arrayMoveMutable } from 'array-move';
 import {
   useDispatch,
   useSelector,
@@ -145,7 +146,15 @@ export default function Index(props) {
         value = selectDatas[0].value;
     }
 
-    let field = fields[value] || [];
+    //let field = fields[value] || [];
+    const [field, setField] = useState(fields[value] || []);
+
+    useEffect(
+        function () {
+            setField(fields[value] || []);
+        },
+        [value]
+    );
 
     useEffect(function () {
         dispatch(genPreviewDatas());
@@ -185,6 +194,11 @@ export default function Index(props) {
                     value={value}
                     selectDatas={selectDatas}
                     fields={fields}
+                    onSortEnd={function ({ oldIndex, newIndex }) {
+                        const newDatas = [...field];
+                        arrayMoveMutable(newDatas, oldIndex, newIndex);
+                        setField(newDatas);
+                    }}
                 ></Left>
                 <Right value={value} field={field} exclude={exclude}></Right>
             </HeaderWrap>

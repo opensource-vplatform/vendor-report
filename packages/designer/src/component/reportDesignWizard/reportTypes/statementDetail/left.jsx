@@ -4,6 +4,11 @@ import {
   useState,
 } from 'react';
 
+import {
+  SortableContainer,
+  SortableElement,
+  sortableHandle,
+} from 'react-sortable-hoc';
 import styled from 'styled-components';
 
 import { CheckBox } from '@components/form/Index';
@@ -26,6 +31,8 @@ const Header = styled.div`
     font-size: 12px;
     align-items: center;
     padding-bottom: 12px;
+    position: relative;
+    z-index: 2;
 `;
 const FooterWrap = styled.div`
     font-size: 12px;
@@ -33,6 +40,8 @@ const FooterWrap = styled.div`
     overflow: hidden;
     overflow-y: auto;
     border: 1px solid #ddd;
+    position: relative;
+    z-index: 1;
 `;
 
 const FieldWrap = styled.div`
@@ -40,6 +49,11 @@ const FieldWrap = styled.div`
     align-items: center;
     cursor: pointer;
     user-select: none;
+    z-index: 2002;
+    position: relative;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin-top: -1px;
 
     &:hover {
         background-color: #dadada;
@@ -51,9 +65,32 @@ const FieldText = styled.span`
     position: relative;
 `;
 
-function Footer(props) {
+const DragHandle = sortableHandle(() => <span>::</span>);
+
+const FooterItem = SortableElement(function (props) {
+    const { code, isChecked, changeHandler, name } = props;
+    return (
+        <FieldWrap
+            onClick={function () {
+                changeHandler(code, !isChecked);
+            }}
+        >
+            <CheckBox
+                value={isChecked}
+                onChange={function (res) {
+                    changeHandler(code, res);
+                }}
+            ></CheckBox>
+            <FieldText>{name}</FieldText>
+            <DragHandle></DragHandle>
+        </FieldWrap>
+    );
+});
+
+const Footer = SortableContainer(function (props) {
     const [_exclude, setExclude] = useState({});
     const footerWrap = useRef();
+    const items = useRef([]);
     const { datas, onChange = () => {}, tableCode } = props;
     useEffect(
         function () {
@@ -61,26 +98,6 @@ function Footer(props) {
         },
         [tableCode]
     );
-
-    useEffect(function () {
-        const wrapEl = footerWrap.current;
-        if (wrapEl) {
-            wrapEl.addEventListener('dragover', (event) => {
-                event.dataTransfer.setData('dragTarget', event.target);
-                event.preventDefault(); // 阻止默认的拖放行为
-                event.dataTransfer.dropEffect = 'none';
-            });
-            wrapEl.addEventListener('dragleave', (event) => {
-                console.log(1234);
-                event.preventDefault(); // 阻止默认的拖放行为
-            });
-
-            wrapEl.addEventListener('drop', (event) => {
-                event.preventDefault(); // 阻止默认的拖放行为
-                debugger;
-            });
-        }
-    }, []);
 
     const changeHandler = function (code, res) {
         const newExclude = { ..._exclude, [code]: res };
@@ -99,30 +116,24 @@ function Footer(props) {
 
     return (
         <FooterWrap ref={footerWrap}>
-            {datas.map(function (item) {
+            {datas.map(function (item, index) {
                 const { name, id, code } = item;
                 const isChecked = _exclude[code] !== false;
                 return (
-                    <FieldWrap
+                    <FooterItem
                         key={id}
-                        onClick={function () {
-                            changeHandler(code, !isChecked);
-                        }}
-                        draggable={true}
-                    >
-                        <CheckBox
-                            value={isChecked}
-                            onChange={function (res) {
-                                changeHandler(code, res);
-                            }}
-                        ></CheckBox>
-                        <FieldText>{name}</FieldText>
-                    </FieldWrap>
+                        name={name}
+                        code={code}
+                        isChecked={isChecked}
+                        changeHandler={changeHandler}
+                        index={index}
+                        ref={items}
+                    ></FooterItem>
                 );
             })}
         </FooterWrap>
     );
-}
+});
 
 export default function Index(props) {
     const {
@@ -132,6 +143,7 @@ export default function Index(props) {
         value,
         fields,
         field,
+        onSortEnd = () => {},
     } = props;
 
     return (
@@ -158,6 +170,11 @@ export default function Index(props) {
                 tableCode={value}
                 datas={field}
                 onChange={onChange}
+                onSortEnd={onSortEnd}
+                lockAxis='y'
+                lockToContainerEdges={true}
+                /*                 pressDelay={150} */
+                useDragHandle
             ></Footer>
         </Wrap>
     );

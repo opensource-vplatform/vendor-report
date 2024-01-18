@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+/* import { StrictMode } from 'react'; */
 
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -24,11 +24,11 @@ class ReportDesigner {
     mount(el) {
         GC.Spread.Common.CultureManager.culture('zh-cn');
         createRoot(el).render(
-            <StrictMode>
-                <Provider store={store}>
-                    <Designer conf={this.conf} />
-                </Provider>
-            </StrictMode>
+            /*  <StrictMode> */
+            <Provider store={store}>
+                <Designer conf={this.conf} />
+            </Provider>
+            /*  </StrictMode> */
         );
     }
 }
