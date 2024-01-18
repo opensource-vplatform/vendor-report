@@ -40,6 +40,17 @@ function preview(params) {
     //表格字段数量大于0才创建表格
     const colCount = tableColumns.length;
     if (colCount > 0) {
+        //如果sheet的行数小于当前表格所绑定的数据长度，需要增加sheet的行数
+        const datasource = sheet.getDataSource().getSource();
+        const datas = datasource[value];
+        if (Array.isArray(datas)) {
+            const rowCount = sheet.getRowCount();
+            const datasLen = datas.length;
+            if (rowCount < datasLen) {
+                sheet.setRowCount(datasLen + 2);
+            }
+        }
+
         const tableName = '预览';
         const table = sheet.tables.add(tableName, 0, 0, 3, colCount);
         table.autoGenerateColumns(false);
