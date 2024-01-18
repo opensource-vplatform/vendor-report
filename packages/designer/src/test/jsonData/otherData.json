@@ -1,0 +1,33 @@
+{
+    "ds": [
+        {
+            "id": "codeId",
+            "type": "text",
+            "typeName": "文本",
+            "desc": "编码唯一",
+            "code": "code",
+            "name": "编码"
+        },
+        {
+            "id": "nameId",
+            "type": "text",
+            "typeName": "文本",
+            "desc": "名称",
+            "code": "name",
+            "name": "名称"
+        },
+        {
+            "id": "age",
+            "type": "integer",
+            "typeName": "整数",
+            "desc": "年龄",
+            "code": "age",
+            "name": "年龄"
+        }
+    ],
+    "data": {
+        "code": "code001",
+        "name": "张三",
+        "age": 30
+    }
+}

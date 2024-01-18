@@ -117,6 +117,7 @@ function Designer(props) {
             dispatch(
                 initDatasource({
                     datasource: conf?.dataSource?.dataSourceDefinition,
+                    datas: conf?.dataSource?.datas,
                 })
             );
         },

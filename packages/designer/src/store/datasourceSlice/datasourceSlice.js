@@ -14,6 +14,7 @@ export const datasourceSlice = createSlice({
         finalDsList: [],
         dsList: [],
         previewViewDatas: {},
+        previewViewDatasHasInit: false,
         isShowDatasource: false,
         activeSheetTablePath: {},
         tables: {
@@ -79,6 +80,9 @@ export const datasourceSlice = createSlice({
             }
         },
         genPreviewDatas(state, { payload }) {
+            if (state.previewViewDatasHasInit) {
+                return;
+            }
             function mergeColumnDatas(params) {
                 const {
                     instanceObject,
@@ -240,10 +244,15 @@ export const datasourceSlice = createSlice({
             }
         },
         initDatasource(state, { payload }) {
-            let { datasource } = payload;
+            let { datasource, datas } = payload;
             datasource = Array.isArray(datasource) ? datasource : [];
             state.dsList = [...datasource];
             state.finalDsList = [...datasource];
+            if (datas) {
+                state.previewViewDatas = datas;
+                state.previewViewDatasHasInit = true;
+                console.log(1234);
+            }
         },
         saveTables(state, { payload }) {
             const { sheetInstanceId, tableInfo = {} } = payload;
