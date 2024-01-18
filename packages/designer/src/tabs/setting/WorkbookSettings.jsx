@@ -4,7 +4,6 @@ import {
   useDispatch,
   useSelector,
 } from 'react-redux';
-import styled from 'styled-components';
 
 import {
   GroupItem,
@@ -19,21 +18,18 @@ import SpreadGeneralIcon from '@icons/setting/spreadGeneral';
 import TabstripIcon from '@icons/setting/Tabstrip';
 import {
   setActive,
-  setIsOpenforWorkbookSetting,
+  setOpened,
 } from '@store/settingSlice/workbookSettingSlice';
 
+import { Label } from './Components';
 import WorkbookSettingDialog from './workbookSetting/Index';
-
-const Label = styled.span`
-    font-size: 12px;
-    margin-right: 4px;
-`;
 
 export default function () {
     const dispatch = useDispatch();
     const {
-        isOpenforWorkbookSetting
+        opened
     } = useSelector(({ workbookSettingSlice }) => workbookSettingSlice);
+    const style = { padding: '2px 4px 2px 4px' }
     return (
         <>
             <GroupItem title='工作簿设置'>
@@ -57,15 +53,15 @@ export default function () {
                             ></SpreadGeneralIcon>
                         }
                         onClick={() => {
-                            dispatch(setIsOpenforWorkbookSetting(true));
+                            dispatch(setOpened(true));
                             dispatch(setActive({ code: 'general' }));
                         }}
                     ></VItem>
                     <VGroupItem>
-                        <ItemList style={{ padding: '2px 4px 2px 4px' }}>
+                        <ItemList style={style}>
                             <ScrollbarsIcon
                                 onClick={() => {
-                                    dispatch(setIsOpenforWorkbookSetting(true));
+                                    dispatch(setOpened(true));
                                     dispatch(setActive({ code: 'scrollbars' }));
                                 }}
                                 tips='滚动条'
@@ -73,10 +69,10 @@ export default function () {
                                 <Label>滚动条</Label>
                             </ScrollbarsIcon>
                         </ItemList>
-                        <ItemList style={{ padding: '2px 4px 2px 4px' }}>
+                        <ItemList style={style}>
                             <CalculationIcon
                                 onClick={() => {
-                                    dispatch(setIsOpenforWorkbookSetting(true));
+                                    dispatch(setOpened(true));
                                     dispatch(
                                         setActive({ code: 'calculation' })
                                     );
@@ -86,10 +82,10 @@ export default function () {
                                 <Label>计算</Label>
                             </CalculationIcon>
                         </ItemList>
-                        <ItemList style={{ padding: '2px 4px 2px 4px' }}>
+                        <ItemList style={style}>
                             <TabstripIcon
                                 onClick={() => {
-                                    dispatch(setIsOpenforWorkbookSetting(true));
+                                    dispatch(setOpened(true));
                                     dispatch(
                                         setActive({ code: 'tabstripIcon' })
                                     );
@@ -102,7 +98,7 @@ export default function () {
                     </VGroupItem>
                 </HLayout>
             </GroupItem>
-            {isOpenforWorkbookSetting ? (
+            {opened ? (
                 <WorkbookSettingDialog></WorkbookSettingDialog>
             ) : null}
         </>

@@ -22,11 +22,11 @@ import {
 
 import {
   HLayout,
+  InputWrap,
   ItemList,
-  Selector,
-  SelectTittle,
-  SelectWrapper,
+  Title,
   VGroupItem,
+  WithTitleItem,
   Wrapper,
 } from '../Components';
 
@@ -129,9 +129,9 @@ function Index() {
             <HLayout>
                 <VGroupItem>
                     <ItemList>
-                        <Selector>
-                            <SelectTittle style={titleStyle}>工作表标签比例(百分比)</SelectTittle>
-                            <SelectWrapper style={inputWrapStyle}>
+                        <WithTitleItem>
+                            <Title style={titleStyle}>工作表标签比例(百分比)</Title>
+                            <InputWrap style={inputWrapStyle}>
                                 <Integer
                                     style={inputStyle}
                                     value={tabStripRatio * 100}
@@ -141,12 +141,12 @@ function Index() {
                                         dispatch(setTabStripRatio(val / 100))
                                     }
                                 ></Integer>
-                            </SelectWrapper>
+                            </InputWrap>
                             %
-                        </Selector>
-                        <Selector>
-                            <SelectTittle style={titleStyle}>工作表标签宽度</SelectTittle>
-                            <SelectWrapper style={inputWrapStyle}>
+                        </WithTitleItem>
+                        <WithTitleItem>
+                            <Title style={titleStyle}>工作表标签宽度</Title>
+                            <InputWrap style={inputWrapStyle}>
                                 <Integer
                                     style={inputStyle}
                                     value={tabStripWidth}
@@ -155,11 +155,11 @@ function Index() {
                                         dispatch(setTabStripWidth(val))
                                     }
                                 ></Integer>
-                            </SelectWrapper>
-                        </Selector>
-                        <Selector>
-                            <SelectTittle style={titleStyle}>工作表标签位置</SelectTittle>
-                            <SelectWrapper style={inputWrapStyle}>
+                            </InputWrap>
+                        </WithTitleItem>
+                        <WithTitleItem>
+                            <Title style={titleStyle}>工作表标签位置</Title>
+                            <InputWrap style={inputWrapStyle}>
                                 <Select
                                     style={inputStyle}
                                     datas={TabStripPositions}
@@ -169,11 +169,11 @@ function Index() {
                                     }}
                                     optionStyle={{ width: '100px' }}
                                 ></Select>
-                            </SelectWrapper>
-                        </Selector>
-                        <Selector>
-                            <SelectTittle style={titleStyle}>工作表列表按钮可见</SelectTittle>
-                            <SelectWrapper style={inputWrapStyle}>
+                            </InputWrap>
+                        </WithTitleItem>
+                        <WithTitleItem>
+                            <Title style={titleStyle}>工作表列表按钮可见</Title>
+                            <InputWrap style={inputWrapStyle}>
                                 <Select
                                     style={inputStyle}
                                     datas={AllSheetsListVisibleEnums}
@@ -183,8 +183,8 @@ function Index() {
                                     }}
                                     optionStyle={{ width: '100px' }}
                                 ></Select>
-                            </SelectWrapper>
-                        </Selector>
+                            </InputWrap>
+                        </WithTitleItem>
                     </ItemList>
                 </VGroupItem>
             </HLayout>

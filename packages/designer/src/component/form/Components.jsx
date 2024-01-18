@@ -48,13 +48,13 @@ export const IconWrap = styled.div`
         background-color: transparent;
     }
     &[data-disabled!='true']:hover {
+        cursor: pointer;
         background-color: #aaa;
     }
 `;
 
 export const UpIcon = styled.div`
     width: 100%;
-    min-width: 18px;
     min-height: 12px;
     color: #555555;
     height: 50%;
@@ -64,7 +64,6 @@ export const UpIcon = styled.div`
 
 export const DownIcon = styled.div`
     width: 100%;
-    min-width: 18px;
     min-height: 12px;
     color: #555555;
     height: 50%;

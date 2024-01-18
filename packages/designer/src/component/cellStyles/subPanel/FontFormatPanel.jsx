@@ -1,17 +1,27 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
-import ColorEditor from '@components/color/Index';
+import { ColorPicker } from '@components/form/Index';
 import Select from '@components/Select/Index';
-import ArrowDown from '@icons/arrow/ArrowDown';
-import List from '../../list/List';
-import { FontStyle, UnderlineStyle } from '.././constant';
-
+import {
+  getFontFamilies,
+  getFontSizes,
+} from '@metadatas/font';
+import {
+  setSelectedFontColor,
+} from '@store/cellSettingSlice/fontCellSettingSlice';
 import { setIsStrickoutLine } from '@store/fontSlice/fontSlice.js';
-import { setSelectedFontColor } from '@store/cellSettingSlice/fontCellSettingSlice';
-import { getFontFamilies, getFontSizes } from '@metadatas/font';
+
+import List from '../../list/List';
+import {
+  FontStyle,
+  UnderlineStyle,
+} from '../constant';
 
 const FontTop = styled.div`
     height: 210px;
@@ -82,27 +92,6 @@ const FontColor = styled.div`
         font-size: 12px;
     }
 `;
-const ArrowDownIcon = styled.div`
-    width: 20px;
-    height: 23px;
-    border-left: 1px solid lightgray;
-`;
-const FontColorSelector = styled.div`
-    width: 325px;
-    height: 24px;
-    margin-left: 5px;
-    display: flex;
-    border: 1px solid lightgray;
-    &:hover {
-        border: 1px solid black;
-    }
-`;
-const FontColorPreView = styled.div`
-    height: 150px;
-    border: 4px solid #fff;
-    width: 300px;
-    height: 16px;
-`;
 
 /*
  * 字体 格式面板
@@ -128,7 +117,6 @@ const FontFormatPanel = (props) => {
         ({ fontCellSettingSlice }) => fontCellSettingSlice
     );
     const {
-        
         fontFamily = '微软雅黑',
         fontWeight,
         fontStyle,
@@ -278,28 +266,12 @@ const FontFormatPanel = (props) => {
                 <FontRight>
                     <FontColor>
                         <span>颜色:</span>
-                        <ColorEditor
-                            style={{ width: '188px' }}
+                        <ColorPicker
+                            style={{ marginLeft: 5 }}
+                            panelStyle={{ width: '188px', marginLeft: 5 }}
                             onChange={handleColorEditorforFont}
                             value={selectedFontColor}
-                        >
-                            <FontColorSelector>
-                                <FontColorPreView
-                                    style={{
-                                        backgroundColor: selectedFontColor,
-                                    }}
-                                ></FontColorPreView>
-                                <ArrowDownIcon>
-                                    <ArrowDown
-                                        style={{
-                                            width: 20,
-                                            height: 23,
-                                            margin: 0,
-                                        }}
-                                    ></ArrowDown>
-                                </ArrowDownIcon>
-                            </FontColorSelector>
-                        </ColorEditor>
+                        ></ColorPicker>
                     </FontColor>
                     <div>
                         <fieldset
@@ -307,7 +279,7 @@ const FontFormatPanel = (props) => {
                                 border: '1px solid lightgray',
                                 fontSize: '12px',
                                 height: 100,
-                                width:325,
+                                width: 325,
                                 padding: 0,
                                 marginTop: 6,
                                 marginLeft: 5,

@@ -32,14 +32,7 @@ const Label = styled.span`
 const Context = createContext(null);
 
 export const Radio = function (props) {
-    const {
-        label,
-        //可选值：水平-horizontal，垂直-vertical
-        direction = 'horizontal',
-        value,
-        desc = '',
-        children,
-    } = props;
+    const { label, value, desc = '', children } = props;
     return (
         <Context.Consumer>
             {(ctx) => {
@@ -48,7 +41,7 @@ export const Radio = function (props) {
                     <RadioWrap
                         data-disabled={ctx.disabled}
                         title={desc}
-                        data-direction={direction}
+                        data-direction={ctx.direction}
                         onClick={() =>
                             !ctx.disabled && !checked && ctx.onChange(value)
                         }
@@ -70,9 +63,16 @@ export const Radio = function (props) {
 };
 
 export const RadioGroup = function (props) {
-    const { value, disabled = false, children, onChange } = props;
+    const {
+        value,
+        disabled = false,
+        children,
+        onChange,
+        //可选值：水平-horizontal，垂直-vertical
+        direction = 'horizontal',
+    } = props;
     return (
-        <Context.Provider value={{ value, disabled, onChange }}>
+        <Context.Provider value={{ value, disabled, onChange, direction }}>
             {children}
         </Context.Provider>
     );

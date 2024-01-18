@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React from 'react';
 
 import { useDispatch } from 'react-redux';
+import styled from 'styled-components';
 
-import ColorEditor from '@components/color/Index';
-import ArrowDown from '@icons/arrow/ArrowDown';
+import { ColorPicker } from '@components/form/Index';
 import BorderBottom from '@icons/border/BorderBottom';
 import BorderInside from '@icons/border/BorderInside';
 import BorderLeft from '@icons/border/BorderLeft';
@@ -15,13 +15,11 @@ import DiagonalDownLine from '@icons/border/DiagonalDownLine';
 import DiagonalUpLine from '@icons/border/DiagonalUpLine';
 import LineHorizontalInner from '@icons/border/LineHorizontalInner';
 import LineVerticalInner from '@icons/border/LineVerticalInner';
-import CanvasBorderArea from './canvasBorderArea';
-import { IconType } from '.././constant';
-import Icon from '.././lineIcon';
-
 import { setBorderColor } from '@store/borderSlice/borderSlice';
 
-import styled from 'styled-components';
+import { IconType } from '../constant';
+import Icon from '../lineIcon';
+import CanvasBorderArea from './canvasBorderArea';
 
 const BorderTabPanel = styled.div`
     margin: 10px;
@@ -61,26 +59,6 @@ const LineStyleRight = styled.div`
     width: 60px;
     height: 112px;
     background: transparent;
-`;
-const LineColor = styled.div`
-    width: 126px;
-    height: 24px;
-    margin: 5px;
-    display: flex;
-    border: 1px solid lightgray;
-    &:hover {
-        border: 1px solid black;
-    }
-`;
-const ColorPreView = styled.div`
-    border: 4px solid #fff;
-    width: 100px;
-    height: 16px;
-`;
-const ArrowDownIcon = styled.div`
-    width: 20px;
-    height: 23px;
-    border-left: 1px solid lightgray;
 `;
 
 const PreArea = styled.div`
@@ -354,28 +332,13 @@ const BorderFormatPanel = (props) => {
                         </LineStyle>
                         <span>颜色：</span>
                         <div>
-                            <ColorEditor
-                                style={{ width: '188px' }}
+                            <ColorPicker
+                                style={{width: 126,marginLeft:5}}
+                                panelStyle={{ width: '188px',marginLeft:5 }}
                                 onChange={handleColorEditorforBorder}
                                 value={lineColor}
                             >
-                                <LineColor>
-                                    <ColorPreView
-                                        style={{
-                                            backgroundColor: lineColor,
-                                        }}
-                                    ></ColorPreView>
-                                    <ArrowDownIcon>
-                                        <ArrowDown
-                                            style={{
-                                                width: 20,
-                                                height: 23,
-                                                margin: 0,
-                                            }}
-                                        ></ArrowDown>
-                                    </ArrowDownIcon>
-                                </LineColor>
-                            </ColorEditor>
+                            </ColorPicker>
                         </div>
                     </fieldset>
                 </LineArea>

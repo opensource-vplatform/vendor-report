@@ -41,7 +41,7 @@ export default function (props) {
         }
     };
     const increase = () => {
-        if(disabled)return;
+        if (disabled) return;
         let newVal = parseInt(data.innerVal) + 1;
         newVal = newVal <= max ? newVal : max;
         if (newVal != data.innerVal) {
@@ -50,7 +50,7 @@ export default function (props) {
         }
     };
     const decrease = () => {
-        if(disabled)return;
+        if (disabled) return;
         let newVal = parseInt(data.innerVal) - 1;
         newVal = newVal >= min ? newVal : min;
         if (newVal != data.innerVal) {
@@ -95,13 +95,16 @@ export default function (props) {
             {showIcon ? (
                 <NumberIconWrap>
                     <IconWrap
-                        data-disabled={disabled}
+                        data-disabled={disabled || data.innerVal == max}
                         onClick={increase}
                         style={{ borderBottom: '1px solid #d3d3d3' }}
                     >
                         <UpIcon></UpIcon>
                     </IconWrap>
-                    <IconWrap data-disabled={disabled} onClick={decrease}>
+                    <IconWrap
+                        data-disabled={disabled || data.innerVal == min}
+                        onClick={decrease}
+                    >
                         <DownIcon></DownIcon>
                     </IconWrap>
                 </NumberIconWrap>

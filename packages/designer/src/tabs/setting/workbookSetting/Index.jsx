@@ -4,83 +4,35 @@ import {
   useDispatch,
   useSelector,
 } from 'react-redux';
-import styled from 'styled-components';
 
 import Button from '@components/button/Index';
 import { Dialog } from '@components/dialog/Index';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
+import { Tabs } from '@components/tabs/Index';
 import {
   setActive,
-  setIsOpenforWorkbookSetting,
+  setOpened,
 } from '@store/settingSlice/workbookSettingSlice';
 
 import { init } from '../../../store/settingSlice/workbookSettingSlice';
 import { withBatchUpdate } from '../../../utils/spreadUtil';
+import {
+  Operations,
+  TabPanel,
+  WithTabItem,
+} from '../Components';
 import CalcuationTab from './CalcuationTab';
 import GeneralTab from './GeneralTabItem';
 import ScrollbarsTab from './ScrollbarsTab';
 import WorksheetLabel from './WorksheetLabel';
 
-const TabPanel = styled.div`
-    margin: 10px 13px;
-    background: #fff;
-    width: 700px;
-    height: 530px;
-    border-bottom: 1px solid #d3d3d3;
-    border-left: 1px solid #d3d3d3;
-    border-right: 1px solid #d3d3d3;
-    P {
-        margin: 5px 0 0 5px;
-    }
-`;
-
-const TabBottomButtons = styled.div`
-    width: 100%;
-    height: 40px;
-    display: flex;
-    justify-content: flex-end;
-    Button {
-        background: #e6e6e6;
-        border: 1px solid #d3d3d3;
-        width: 80px;
-        height: 30px;
-        margin: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 15px;
-    }
-`;
-
-const WithTabItem = function (Component) {
-    return function (props) {
-        const dispatch = useDispatch();
-        const { code, title, tabProps = {} } = props;
-        return (
-            <Tab
-                code={code}
-                title={title}
-                onClick={() => {
-                    dispatch(setActive({ code }));
-                }}
-            >
-                <Component {...tabProps}></Component>
-            </Tab>
-        );
-    };
-};
-
-const GeneralTabItem = WithTabItem(GeneralTab);
-const ScrollbarsNavItem = WithTabItem(ScrollbarsTab);
-const CalculationNavItem = WithTabItem(CalcuationTab);
-const WorksheetLabelNavItem = WithTabItem(WorksheetLabel);
+const GeneralTabItem = WithTabItem(GeneralTab,setActive);
+const ScrollbarsNavItem = WithTabItem(ScrollbarsTab,setActive);
+const CalculationNavItem = WithTabItem(CalcuationTab,setActive);
+const WorksheetLabelNavItem = WithTabItem(WorksheetLabel,setActive);
 
 export default function () {
     const dispatch = useDispatch();
-    const { isOpenforWorkbookSetting, active, ...options } = useSelector(
+    const { opened, active, ...options } = useSelector(
         ({ workbookSettingSlice }) => workbookSettingSlice
     );
 
@@ -89,13 +41,13 @@ export default function () {
         withBatchUpdate(spread, () => {
             Object.assign(spread.options, options);
         });
-        dispatch(setIsOpenforWorkbookSetting(false));
+        dispatch(setOpened(false));
     };
     const handleCancel = () => {
-        dispatch(setIsOpenforWorkbookSetting(false));
+        dispatch(setOpened(false));
     };
     const handleClose = () => {
-        dispatch(setIsOpenforWorkbookSetting(false));
+        dispatch(setOpened(false));
     };
     useEffect(() => {
         if (spread) {
@@ -180,7 +132,7 @@ export default function () {
             title='工作簿设置'
             width='730px'
             height='630px'
-            open={isOpenforWorkbookSetting}
+            open={opened}
             onClose={handleClose}
         >
             <TabPanel>
@@ -207,14 +159,14 @@ export default function () {
                 </Tabs>
             </TabPanel>
 
-            <TabBottomButtons>
+            <Operations>
                 <Button title={'确定'} onClick={handleApply}>
                     确定
                 </Button>
                 <Button title={'取消'} onClick={handleCancel}>
                     取消
                 </Button>
-            </TabBottomButtons>
+            </Operations>
         </Dialog>
     );
 }

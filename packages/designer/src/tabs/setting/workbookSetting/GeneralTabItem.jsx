@@ -31,12 +31,12 @@ import {
 
 import {
   HLayout,
+  InputWrap,
   ItemList,
   Label,
-  Selector,
-  SelectTittle,
-  SelectWrapper,
+  Title,
   VGroupItem,
+  WithTitleItem,
   Wrapper,
 } from '../Components';
 
@@ -153,9 +153,9 @@ function Index(props) {
                                 );
                             }}
                         ></CheckBox>
-                        <Selector>
-                            <SelectTittle>行调整模式</SelectTittle>
-                            <SelectWrapper>
+                        <WithTitleItem>
+                            <Title>行调整模式</Title>
+                            <InputWrap>
                                 <Select
                                     datas={RowResizeMode}
                                     value={rowResizeMode}
@@ -167,11 +167,11 @@ function Index(props) {
                                     }}
                                     optionStyle={{ width: '100px' }}
                                 ></Select>
-                            </SelectWrapper>
-                        </Selector>
-                        <Selector>
-                            <SelectTittle>列调整模式</SelectTittle>
-                            <SelectWrapper>
+                            </InputWrap>
+                        </WithTitleItem>
+                        <WithTitleItem>
+                            <Title>列调整模式</Title>
+                            <InputWrap>
                                 <Select
                                     datas={ColumnResizeMode}
                                     value={columnResizeMode}
@@ -183,11 +183,11 @@ function Index(props) {
                                     }}
                                     optionStyle={{ width: '100px' }}
                                 ></Select>
-                            </SelectWrapper>
-                        </Selector>
-                        <Selector>
-                            <SelectTittle>撤销/恢复栈最大长度</SelectTittle>
-                            <SelectWrapper>
+                            </InputWrap>
+                        </WithTitleItem>
+                        <WithTitleItem>
+                            <Title>撤销/恢复栈最大长度</Title>
+                            <InputWrap>
                                 <Integer
                                     value={maxUndoStack}
                                     style={{ width: '102px', height: 27 }}
@@ -197,8 +197,8 @@ function Index(props) {
                                         dispatch(setMaxUndoStack(countNumber))
                                     }
                                 />
-                            </SelectWrapper>
-                        </Selector>
+                            </InputWrap>
+                        </WithTitleItem>
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>

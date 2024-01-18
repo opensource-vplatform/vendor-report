@@ -6,7 +6,7 @@ export const workbookSettingSlice = createSlice({
     name: 'workbookSettingSlice',
     initialState: {
         spread: null,
-        isOpenforWorkbookSetting: false,
+        opened: false,
         active: null,
 
         // 允许拖拽
@@ -73,8 +73,8 @@ export const workbookSettingSlice = createSlice({
             const data = action.payload;
             Object.assign(state,data);
         },
-        setIsOpenforWorkbookSetting(state, action) {
-            state.isOpenforWorkbookSetting = action.payload;
+        setOpened(state, action) {
+            state.opened = action.payload;
         },
         setActive(state, action) {
             if (state.active != action.payload.code) {
@@ -194,7 +194,7 @@ export const workbookSettingSlice = createSlice({
 
 export const {
     init,
-    setIsOpenforWorkbookSetting,
+    setOpened,
     setActive,
     setAllowUserDragDrop,
     setAllowUserDragFill,

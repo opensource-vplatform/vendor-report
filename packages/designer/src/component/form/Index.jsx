@@ -1,5 +1,7 @@
 import CheckBox from './CheckBox';
+import ColorPicker from './ColorPicker';
 import Float from './Float';
+import { Group } from './Group';
 import Integer from './Integer';
 import {
   Radio,
@@ -8,4 +10,14 @@ import {
 import Search from './Search';
 import Select from './Select';
 
-export { CheckBox, Float, Integer, Radio, RadioGroup, Search, Select };
+export {
+  CheckBox,
+  ColorPicker,
+  Float,
+  Group,
+  Integer,
+  Radio,
+  RadioGroup,
+  Search,
+  Select,
+};
