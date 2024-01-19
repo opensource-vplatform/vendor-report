@@ -7,6 +7,7 @@ export const appSlice = createSlice({
         mode: 'edit',
         waitMsg: null,
         errorMsg: null,
+        navStyle: 'normal',
     },
     reducers: {
         setSpread(state, action) {
@@ -21,7 +22,11 @@ export const appSlice = createSlice({
         setErrorMsg(state, action) {
             state.errorMsg = action.payload.message;
         },
+        setNavStyle(state, action) {
+            state.navStyle = action.payload;
+        },
     },
 });
-export const { setSpread, setMode, setWaitMsg, setErrorMsg } = appSlice.actions;
+export const { setSpread, setMode, setWaitMsg, setErrorMsg, setNavStyle } =
+    appSlice.actions;
 export default appSlice.reducer;

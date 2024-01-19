@@ -34,6 +34,9 @@ import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
 
 import DesignerContext from './DesignerContext';
+import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
+import VerticalAlignTop from './icons/arrow/VerticalAlignTop';
+import { setNavStyle } from './store/appSlice/appSlice';
 import Formula from './tabs/formula/Index';
 
 const FileTabTitle = styled.a`
@@ -78,7 +81,7 @@ const ReportNavItem = WithNavItem(ReportTab);
 export default function () {
     const dispatch = useDispatch();
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
-    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const { spread, navStyle } = useSelector(({ appSlice }) => appSlice);
     const { finalDsList } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
@@ -149,8 +152,36 @@ export default function () {
             value={active}
             hideCodes={hideCodes}
             onChange={(code) => dispatch(setActive({ code }))}
+            appearance={navStyle}
             tool={
                 <Fragment>
+                    {navStyle == 'normal' ? (
+                        <VerticalAlignTop
+                            tips='自动隐藏功能区域'
+                            style={{
+                                marginRight: 8,
+                            }}
+                            pathAttrs={{ fill: '#999' }}
+                            onClick={() => {
+                                dispatch(setActive({ code: null }));
+                                dispatch(setNavStyle('toolbar'));
+                            }}
+                        ></VerticalAlignTop>
+                    ) : (
+                        <VerticalAlignBottom
+                            tips='显示功能区域'
+                            style={{
+                                marginRight: 8,
+                            }}
+                            pathAttrs={{ fill: '#999' }}
+                            onClick={() => {
+                                if (active == null) {
+                                    dispatch(setActive({ code: 'start' }));
+                                }
+                                dispatch(setNavStyle('normal'));
+                            }}
+                        ></VerticalAlignBottom>
+                    )}
                     <Button
                         style={{
                             marginRight: 8,

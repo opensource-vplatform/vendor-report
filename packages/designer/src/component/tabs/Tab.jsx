@@ -7,7 +7,14 @@ const Wrap = styled.div`
     padding: 0px;
     display: none;
     &[data-active='true'] {
-        display: block;
+        display: block !important;
+    }
+    &[data-appearance='toolbar'] {
+        position: absolute;
+        width: 100%;
+        background-color: #fff;
+        z-index: 5;
+        display: none;
     }
 `;
 
@@ -15,12 +22,28 @@ function Tab(props) {
     const { code, children, style = {} } = props;
     return (
         <Context.Consumer>
-            {(active) => {
-                return active == code ? (
-                    <Wrap data-active={active == code} style={style}>
-                        {children}
-                    </Wrap>
-                ) : null;
+            {({ active, appearance }) => {
+                if (appearance == 'normal') {
+                    return active == code ? (
+                        <Wrap
+                            data-active={active == code}
+                            data-appearance={appearance}
+                            style={style}
+                        >
+                            {children}
+                        </Wrap>
+                    ) : null;
+                } else {
+                    return (
+                        <Wrap
+                            data-active={active == code}
+                            data-appearance={appearance}
+                            style={style}
+                        >
+                            {children}
+                        </Wrap>
+                    );
+                }
             }}
         </Context.Consumer>
     );

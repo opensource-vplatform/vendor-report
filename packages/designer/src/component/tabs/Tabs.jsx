@@ -1,6 +1,7 @@
 import {
   Fragment,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -16,15 +17,18 @@ const Headers = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    &[data-appearance='toolbar'] {
+        position: relative;
+    }
 `;
 
 const HeaderWrap = styled.div`
-    display:flex;
-    width:100%;
+    display: flex;
+    width: 100%;
 `;
 
 const ToolWrap = styled.div`
-    display:flex;
+    display: flex;
     width: max-content;
 `;
 
@@ -62,7 +66,7 @@ const TitleWrap = styled.a`
     &[data-active='true'] {
         cursor: text;
     }
-    &[data-type='card']{
+    &[data-type='card'] {
         color: #333;
     }
     &[data-active='true'][data-type='line'] {
@@ -100,11 +104,38 @@ const getValidTabCode = function (code, children) {
     }
 };
 
+const hasParent = function (ele, parent, parents) {
+    parents = parents || [];
+    const parentNode = ele.parentNode;
+    if (parentNode === parent) {
+        return true;
+    } else if (parentNode) {
+        if (parents.indexOf(parentNode) != -1) {
+            return false;
+        } else {
+            return hasParent(parentNode, parent, parents);
+        }
+    } else {
+        return false;
+    }
+};
+
 function Tabs(props) {
-    let { value, onChange,type="card", hideCodes = [],headerStyle={},style={}, children, tool } = props;
+    let {
+        value,
+        onChange,
+        type = 'card',
+        appearance = 'normal',
+        hideCodes = [],
+        headerStyle = {},
+        style = {},
+        children,
+        tool,
+    } = props;
     const tabs = Array.isArray(children) ? children : [children];
     const [active, setActive] = useState(() => {
-        const activeCode = getValidTabCode(value, tabs);
+        const activeCode =
+            appearance == 'normal' ? getValidTabCode(value, tabs) : value;
         if (activeCode != value) {
             onChange && onChange(activeCode);
         }
@@ -116,11 +147,33 @@ function Tabs(props) {
             onChange && onChange(code);
         }
     };
+    const ref = useRef(null);
     useEffect(() => {
-        handleActive(getValidTabCode(value, tabs));
+        handleActive(
+            appearance == 'normal' ? getValidTabCode(value, tabs) : value
+        );
     }, [value]);
+    useEffect(() => {
+        let handler = null;
+        if (appearance == 'toolbar') {
+            handler = (evt) => {
+                if (ref.current) {
+                    const target = evt.target;
+                    if (!hasParent(target, ref.current)) {
+                        onChange && onChange(null);
+                    }
+                }
+            };
+            document.addEventListener('click', handler);
+        }
+        return () => {
+            if (handler != null) {
+                document.removeEventListener('click', handler);
+            }
+        };
+    }, [appearance]);
     const headers = (
-        <Headers>
+        <Headers data-appearance={appearance}>
             <HeaderWrap>
                 {children.map((child) => {
                     const childProps = child.props;
@@ -168,10 +221,11 @@ function Tabs(props) {
             {tool ? <ToolWrap>{tool}</ToolWrap> : null}
         </Headers>
     );
+    const ctx = { active, appearance };
     return (
         <Fragment>
-            <Context.Provider value={active}>
-                <div style={style}>
+            <Context.Provider value={ctx}>
+                <div style={style} ref={ref}>
                     {headers}
                     {children}
                 </div>

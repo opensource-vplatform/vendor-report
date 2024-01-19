@@ -84,7 +84,7 @@ const SpreadWrap = styled.div`
 function Designer(props) {
     const { conf } = props;
     const dispatch = useDispatch();
-    const { mode, spread, waitMsg, errorMsg } = useSelector(
+    const { mode, spread, waitMsg, errorMsg, navStyle } = useSelector(
         ({ appSlice }) => appSlice
     );
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
@@ -123,6 +123,11 @@ function Designer(props) {
         },
         [conf?.dataSource?.dataSourceDefinition]
     );
+    useEffect(() => {
+        if (spread) {
+            spread.refresh();
+        }
+    }, [navStyle]);
     //是否显示导航
     const isShowNav = conf?.nav !== false;
     return (
@@ -144,6 +149,7 @@ function Designer(props) {
                         <SpreadWrap
                             style={{
                                 overflow: 'hidden',
+                                marginTop: isShowNav ? 8:0
                             }}
                         >
                             <SplitPane

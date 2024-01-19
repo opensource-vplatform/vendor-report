@@ -5,7 +5,6 @@ const GroupWrap = styled.div`
     width: 100%;
     min-height: 110px;
     border-bottom: 1px solid lightgray;
-    margin-bottom: 8px;
     font-family: Tahoma, Arial, Helvetica, "Microsoft YaHei New", "Microsoft Yahei", "微软雅黑", "宋体", SimSun, STXihei, "华文细黑", sans-serif;
 `;
 
