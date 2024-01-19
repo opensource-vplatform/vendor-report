@@ -13,19 +13,23 @@ import {
 } from '@toone/report-excel';
 import { getNamespace } from '@utils/spreadUtil';
 
-import DesignerContext from '../../../../DesignerContext';
+import DesignerContext from '../../../DesignerContext';
 
 const GC = getNamespace();
 const spreadNS = GC.Spread.Sheets;
 
 function preview(params) {
     const { value, field = [], exclude = [], spread } = params;
-
+    const groups = ['type_name'];
     //构造表格字段
     const tableColumns = field.reduce(function (result, { id, code, name }) {
         if (!exclude.includes(code)) {
             const tableColumn = new spreadNS.Tables.TableColumn(id, code, name);
-            result.push(tableColumn);
+            if (groups.includes(code)) {
+                result.unshift(tableColumn);
+            } else {
+                result.push(tableColumn);
+            }
         }
         return result;
     }, []);
@@ -46,8 +50,9 @@ function preview(params) {
         if (Array.isArray(datas)) {
             const rowCount = sheet.getRowCount();
             const datasLen = datas.length;
+            //debugger;
             if (rowCount < datasLen) {
-                sheet.setRowCount(datasLen + 2);
+                sheet.setRowCount(datasLen + 5);
             }
         }
 
@@ -59,6 +64,10 @@ function preview(params) {
         for (let i = 0; i < colCount; i++) {
             table.filterButtonVisible(i, false);
         }
+
+        const range = table.range();
+        range.colCount = 1;
+        //sheet.autoMerge(range, 1, 0, 3, 1);
     }
 
     spread.resumePaint();
@@ -70,6 +79,7 @@ const Wrap = styled.div`
     height: 100%;
     width: 100%;
     overflow: hidden;
+    flex: 1;
 `;
 
 const Header = styled.div`

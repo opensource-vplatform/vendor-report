@@ -2,6 +2,21 @@ import otherData from './jsonData/otherData.json';
 import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
 
+function sortData(data, sortFields) {
+    const sortedData = [...data]; // 创建数据的副本
+    sortedData.sort((a, b) => {
+        for (let field of sortFields) {
+            if (a[field] < b[field]) {
+                return -1;
+            } else if (a[field] > b[field]) {
+                return 1;
+            }
+        }
+        return 0;
+    });
+    return sortedData;
+}
+
 export default {
     nav: {
         //file:false | true //文件。默认值true
@@ -36,7 +51,7 @@ export default {
         dataSourceDefinition: [...otherData.ds, salesData.ds, tourismData.ds], //数据源定义
         datas: {
             ...otherData.data,
-            sales: salesData.data,
+            sales: sortData(salesData.data, ['type_name']),
             tourism: tourismData.data,
         }, //数据源数据
         allowToView: true, //是否允许查看数据源

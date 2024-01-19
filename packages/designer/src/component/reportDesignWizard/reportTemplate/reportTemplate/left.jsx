@@ -33,7 +33,7 @@ const Header = styled.div`
     position: relative;
     z-index: 2;
 `;
-const FooterWrap = styled.div`
+const FieldListWrap = styled.div`
     font-size: 12px;
     height: 100%;
     overflow: hidden;
@@ -43,7 +43,7 @@ const FooterWrap = styled.div`
     z-index: 1;
 `;
 
-const FieldWrap = styled.div`
+const FieldListItemWrap = styled.div`
     display: flex;
     align-items: center;
     cursor: pointer;
@@ -92,10 +92,10 @@ const DragHandle = sortableHandle(() => (
     <SortableHandle className='dragHandle'></SortableHandle>
 ));
 
-const FooterItem = SortableElement(function (props) {
+const FieldListItem = SortableElement(function (props) {
     const { code, isChecked, changeHandler, name } = props;
     return (
-        <FieldWrap
+        <FieldListItemWrap
             onClick={function () {
                 changeHandler(code, !isChecked);
             }}
@@ -108,11 +108,11 @@ const FooterItem = SortableElement(function (props) {
             ></CheckBox>
             <FieldText>{name}</FieldText>
             <DragHandle></DragHandle>
-        </FieldWrap>
+        </FieldListItemWrap>
     );
 });
 
-const Footer = SortableContainer(function (props) {
+const FieldList = SortableContainer(function (props) {
     const [_exclude, setExclude] = useState({});
     const { datas, onChange = () => {}, tableCode } = props;
     useEffect(
@@ -138,22 +138,22 @@ const Footer = SortableContainer(function (props) {
     };
 
     return (
-        <FooterWrap>
+        <FieldListWrap>
             {datas.map(function (item, index) {
                 const { name, id, code } = item;
                 const isChecked = _exclude[code] !== false;
                 return (
-                    <FooterItem
+                    <FieldListItem
                         key={id}
                         name={name}
                         code={code}
                         isChecked={isChecked}
                         changeHandler={changeHandler}
                         index={index}
-                    ></FooterItem>
+                    ></FieldListItem>
                 );
             })}
-        </FooterWrap>
+        </FieldListWrap>
     );
 });
 
@@ -188,7 +188,7 @@ export default function Index(props) {
                     }}
                 ></Select>
             </Header>
-            <Footer
+            <FieldList
                 tableCode={value}
                 datas={field}
                 onChange={onChange}
@@ -196,7 +196,8 @@ export default function Index(props) {
                 lockAxis='y'
                 lockToContainerEdges={true}
                 useDragHandle
-            ></Footer>
+            ></FieldList>
+            {<div>分组</div>}
         </Wrap>
     );
 }

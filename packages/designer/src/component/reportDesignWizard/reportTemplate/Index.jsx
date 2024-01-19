@@ -24,7 +24,7 @@ import {
   Button,
   ButtonText,
   FooterWrap,
-} from '../../Index';
+} from '../Index';
 import Left from './left';
 import Right from './right';
 
@@ -203,9 +203,9 @@ export default function Index(props) {
                 <Right value={value} field={field} exclude={exclude}></Right>
             </HeaderWrap>
             <FooterWrap>
-                {/*  <Button type='button' onClick={backHandler}>
+                <Button type='button' onClick={backHandler}>
                     <ButtonText>返回</ButtonText>
-                </Button> */}
+                </Button>
                 <Button
                     type='button'
                     onClick={confirmHandler}
