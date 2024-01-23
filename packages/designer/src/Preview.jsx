@@ -14,6 +14,7 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
+import { sortData } from '@utils/commonUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
 import DesignerContext from './DesignerContext';
@@ -102,9 +103,8 @@ function handleDatas(params) {
 export default function () {
     const context = useContext(DesignerContext);
     const dispatch = useDispatch();
-    const { previewViewDatas } = useSelector(
-        ({ datasourceSlice }) => datasourceSlice
-    );
+    const { previewViewDatas, tableGroups, previewViewDatasHasInit } =
+        useSelector(({ datasourceSlice }) => datasourceSlice);
 
     const { rowMerge, columnMerge } = useSelector(
         ({ tableDesignSlice }) => tableDesignSlice
@@ -114,22 +114,76 @@ export default function () {
     const sourceJson = JSON.stringify(sourceSpread.toJSON(), replacer);
     const json = JSON.parse(sourceJson);
     const workbookInitializedHandler = useCallback(function (spread) {
+        spread.suspendPaint();
         spread.sheets.forEach(function (sheet) {
             const dataSource = JSON.parse(JSON.stringify(previewViewDatas));
-            handleDatas({
-                sheet,
-                rowMerge,
-                columnMerge,
-                dataSource,
-            });
+            const tables = sheet.tables.all();
+            const tablesSpans = [];
+
+            //对数据进行分组排序
+            if (tables.length > 0) {
+                tables.forEach(function (table, index) {
+                    const groups = tableGroups[table.name()];
+                    if (Array.isArray(groups) && groups.length > 0) {
+                        const path = table.bindingPath();
+                        const { datas, spans } = sortData(
+                            dataSource[path],
+                            groups
+                        );
+                        dataSource[path] = datas;
+                        tablesSpans[index] = spans;
+                    }
+                });
+            }
+
+            !previewViewDatasHasInit &&
+                handleDatas({
+                    sheet,
+                    rowMerge,
+                    columnMerge,
+                    dataSource,
+                });
+
             const source = new GCsheets.Bindings.CellBindingSource(dataSource);
             sheet.setDataSource(source);
+
+            //合并表格区域
+            if (tables.length > 0) {
+                tables.forEach(function (table, index) {
+                    const groups = tableGroups[table.name()];
+                    if (!(Array.isArray(groups) && groups.length > 0)) {
+                        return;
+                    }
+
+                    const spans = tablesSpans[index];
+                    if (!Array.isArray(spans)) {
+                        return;
+                    }
+
+                    const { row, col } = table.range();
+                    spans.forEach(function (span, groupIndex) {
+                        let preEndSpan = row;
+                        span.forEach(function (spanCount) {
+                            const startSpan = preEndSpan + 1;
+                            preEndSpan = startSpan + spanCount - 1;
+                            sheet.addSpan(
+                                startSpan,
+                                col + groupIndex,
+                                spanCount,
+                                1
+                            );
+                        });
+                    });
+                });
+            }
+
             tableMerge({
                 sheet,
                 rowMerge,
                 columnMerge,
             });
         });
+        spread.resumePaint();
     });
     //许可证
     const license = context?.conf?.license;

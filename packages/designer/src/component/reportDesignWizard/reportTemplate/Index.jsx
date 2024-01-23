@@ -18,6 +18,7 @@ import {
 } from '@components/defineDatasource/utils/utils';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { toggleReportDesignWizard } from '@store/navSlice/navSlice';
+import { clearGroups } from '@store/wizardSlice';
 import { getNamespace } from '@utils/spreadUtil';
 
 import {
@@ -55,7 +56,7 @@ function showHhighlight(spread = 0, row = 0, col, rowCount = 1, colCount = 1) {
 }
 
 function createTable(params) {
-    const { field, exclude, spread, dispatch, value } = params;
+    const { field, exclude, spread, dispatch, value, groups = [] } = params;
     //构造表格字段
     const tableColumns = field.filter(({ code }) => !exclude.includes(code));
     const colCount = tableColumns.length;
@@ -88,6 +89,7 @@ function createTable(params) {
                 dataPath: value,
                 filterButtonVisible: false,
                 addingMode: 'wizard',
+                groups,
             });
             spread.resumePaint();
             mousedownHandlerAfter();
@@ -133,6 +135,7 @@ export default function Index(props) {
     );
 
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
+    let { groups } = useSelector(({ wizardSlice }) => wizardSlice);
     const dispatch = useDispatch();
 
     const [tableCode, setTablleCode] = useState('');
@@ -172,6 +175,7 @@ export default function Index(props) {
             exclude,
             dispatch,
             value,
+            groups,
         });
     };
 
@@ -186,6 +190,7 @@ export default function Index(props) {
                     dataSource={finalDsList}
                     selectOnChange={function (value) {
                         setTablleCode(value.tableCode);
+                        dispatch(clearGroups());
                     }}
                     onChange={function (datas) {
                         setExclude(datas);

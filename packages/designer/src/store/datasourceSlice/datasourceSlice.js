@@ -22,6 +22,7 @@ export const datasourceSlice = createSlice({
                 [dsCode]:'drag' || 'wizard'
             } */
         },
+        tableGroups: {},
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -255,7 +256,11 @@ export const datasourceSlice = createSlice({
             }
         },
         saveTables(state, { payload }) {
-            const { sheetInstanceId, tableInfo = {} } = payload;
+            const {
+                sheetInstanceId,
+                tableInfo = {},
+                tableGroups = {},
+            } = payload;
             if (!state.tables[sheetInstanceId]) {
                 state.tables[sheetInstanceId] = {};
             }
@@ -266,6 +271,9 @@ export const datasourceSlice = createSlice({
                     delete state.tables[sheetInstanceId][dsCode];
                 }
             });
+
+            //分组
+            state.tableGroups = { ...tableGroups, ...tableGroups };
         },
     },
 });

@@ -35,6 +35,7 @@ export function addTable(params) {
         dataPath,
         filterButtonVisible,
         addingMode = 'drag',
+        groups = [],
     } = params;
 
     const tableColumnsCount = Array.isArray(columnsTemp)
@@ -73,16 +74,23 @@ export function addTable(params) {
 
     if (Array.isArray(columnsTemp)) {
         const tableColumns = [];
+        const groupsFields = [];
         columnsTemp.forEach(function ({ id, name, code }, index) {
             //以数据源id作为表格列的唯一id，将数据源与列关联起来，方便处理当数据源发生变化时候，同步更改列
             const tableColumn = new spreadNS.Tables.TableColumn(id, code, name);
-            tableColumns.push(tableColumn);
+            const inGroupsIndex = groups.findIndex((group) => group.id === id);
+            if (inGroupsIndex > -1) {
+                groupsFields[inGroupsIndex] = tableColumn;
+            } else {
+                tableColumns.push(tableColumn);
+            }
+
             setCellTag(sheet, row, col + index, 'bindInfo', {
                 bindType: 'tableColumn',
                 bindDsInstanceId: id,
             });
         });
-
+        tableColumns.unshift(...groupsFields);
         tableColumns.length > 0 && table.bindColumns(tableColumns);
         const { colCount } = table.range();
         if (!filterButtonVisible) {
@@ -108,6 +116,9 @@ export function addTable(params) {
             sheetInstanceId,
             tableInfo: {
                 [dataPath]: addingMode,
+            },
+            tableGroups: {
+                [tableName]: groups,
             },
         })
     );

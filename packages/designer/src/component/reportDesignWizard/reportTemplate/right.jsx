@@ -1,6 +1,7 @@
 import {
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -11,6 +12,7 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
+import { sortData } from '@utils/commonUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
 import DesignerContext from '../../../DesignerContext';
@@ -19,23 +21,25 @@ const GC = getNamespace();
 const spreadNS = GC.Spread.Sheets;
 
 function preview(params) {
-    const { value, field = [], exclude = [], spread } = params;
-    const groups = ['type_name'];
+    const { value, field = [], exclude = [], spread, groups = [] } = params;
+
     //构造表格字段
+    const groupsField = [];
     const tableColumns = field.reduce(function (result, { id, code, name }) {
         if (!exclude.includes(code)) {
             const tableColumn = new spreadNS.Tables.TableColumn(id, code, name);
-            if (groups.includes(code)) {
-                result.unshift(tableColumn);
+            const inGroupsIndex = groups.findIndex((group) => group?.id === id);
+            if (inGroupsIndex > -1) {
+                groupsField[inGroupsIndex] = tableColumn;
             } else {
                 result.push(tableColumn);
             }
         }
         return result;
     }, []);
+    tableColumns.unshift(...groupsField);
     spread.suspendPaint();
     const sheet = spread.getActiveSheet();
-
     //创建表格前先移除所有的表格
     sheet.tables.all().forEach(function (table) {
         sheet.tables.remove(table);
@@ -50,24 +54,35 @@ function preview(params) {
         if (Array.isArray(datas)) {
             const rowCount = sheet.getRowCount();
             const datasLen = datas.length;
-            //debugger;
             if (rowCount < datasLen) {
                 sheet.setRowCount(datasLen + 5);
             }
         }
+        const tableStyle = new GC.Spread.Sheets.Tables.TableTheme();
 
         const tableName = '预览';
-        const table = sheet.tables.add(tableName, 0, 0, 3, colCount);
+        const table = sheet.tables.add(
+            tableName,
+            0,
+            0,
+            3,
+            colCount,
+            tableStyle
+        );
+
         table.autoGenerateColumns(false);
         table.bindColumns(tableColumns);
         table.bindingPath(value);
         for (let i = 0; i < colCount; i++) {
             table.filterButtonVisible(i, false);
         }
-
-        const range = table.range();
-        range.colCount = 1;
-        //sheet.autoMerge(range, 1, 0, 3, 1);
+        if (groups.length > 0) {
+            try {
+                const range = table.range();
+                range.colCount = groups.length;
+                sheet.autoMerge(range, 1, 1, 3, 1);
+            } catch (error) {}
+        }
     }
 
     spread.resumePaint();
@@ -101,6 +116,10 @@ export default function Index(props) {
     const { previewViewDatas } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
+    const _refState = useRef({});
+    let { groups } = useSelector(({ wizardSlice }) => wizardSlice);
+
+    _refState.current.groups = groups;
 
     const [spread, setSpread] = useState(null);
     const { value, field, exclude } = props;
@@ -115,15 +134,21 @@ export default function Index(props) {
     useEffect(
         function () {
             if (spread) {
+                spread.removeSheet(0);
+                spread.addSheet();
                 const sheet = spread.getActiveSheet();
                 const dataSource = JSON.parse(JSON.stringify(previewViewDatas));
+                if (groups.length > 0) {
+                    const { datas } = sortData(dataSource[value], groups);
+                    dataSource[value] = datas;
+                }
                 const source = new spreadNS.Bindings.CellBindingSource(
                     dataSource
                 );
                 sheet.setDataSource(source);
             }
         },
-        [previewViewDatas, spread]
+        [previewViewDatas, spread, groups, value]
     );
 
     useEffect(
@@ -134,10 +159,11 @@ export default function Index(props) {
                     field,
                     exclude,
                     spread,
+                    groups: _refState.current.groups,
                 });
             }
         },
-        [value, field, exclude, spread]
+        [value, field, exclude, spread, groups]
     );
     return (
         <Wrap>

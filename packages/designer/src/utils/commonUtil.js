@@ -95,3 +95,48 @@ export function getActiveSheetTablesPath(params) {
         return result;
     }, {});
 }
+
+export function sortData(datas, groups) {
+    //初始化分组数据(二维数组)
+    const groupedDatas = [datas];
+    const groupFields = groups.map(({ code }) => code);
+    const spans = []; //二维数组，用于收集每一组合并单元格的数量，[[]]
+    let groupNumber = 0;
+
+    while (groupFields.length > 0) {
+        spans[groupNumber] = [];
+        const field = groupFields.shift();
+        const pendingGroupDatas = [];
+        while (groupedDatas.length > 0) {
+            //对当前分组的数据再次分组
+            const currentGroupDatas = groupedDatas.shift();
+            //子分组
+            const childrenGroupedDatas = {};
+            currentGroupDatas.forEach(function (item) {
+                if (!childrenGroupedDatas[item[field]]) {
+                    childrenGroupedDatas[item[field]] = [];
+                }
+                childrenGroupedDatas[item[field]].push(item);
+            });
+
+            //将当前分组进行分组后的数据推入栈中，再次分组，以此类推
+            //放while循环里面，避免不同分组之间数据一样时导致数据问题
+            Object.values(childrenGroupedDatas).forEach(function (group) {
+                //1,将分组后数据推入栈中
+                pendingGroupDatas.push(group);
+
+                //2，统计每一组应该合并的单元格数量
+                spans[groupNumber].push(group.length);
+            });
+        }
+        groupedDatas.push(...pendingGroupDatas);
+        groupNumber += 1;
+    }
+
+    //合并分组后的数据
+    const result = groupedDatas.reduce((res, cur) => [...res, ...cur], []);
+    return {
+        datas: result,
+        spans,
+    };
+}

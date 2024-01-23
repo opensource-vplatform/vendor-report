@@ -11,6 +11,7 @@ import workbookSettingSlice from './settingSlice/workbookSettingSlice';
 import worksheetSettingSlice from './settingSlice/worksheetSettingSlice';
 import tableDesignSlice from './tableDesignSlice/tableDesignSlice';
 import viewSlice from './viewSlice/viewSlice';
+import wizardSlice from './wizardSlice';
 
 //不可序列化的值存储在redux中控制台会报错，需添加忽略动作和路径
 const serializableCheck = {
@@ -44,6 +45,7 @@ export default configureStore({
         workbookSettingSlice,
         worksheetSettingSlice,
         formulaEditorSlice,
+        wizardSlice,
     },
     middleware: function (getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });
