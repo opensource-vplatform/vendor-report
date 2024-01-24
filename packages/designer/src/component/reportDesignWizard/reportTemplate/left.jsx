@@ -325,7 +325,7 @@ export default function Index(props) {
                     lockToContainerEdges={true}
                     useDragHandle
                 ></FieldList>
-                {groupReport && (
+                {reportType === 'groupReport' && (
                     <Groups
                         lockAxis='y'
                         lockToContainerEdges={true}
