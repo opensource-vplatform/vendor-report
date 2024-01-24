@@ -8,11 +8,7 @@ import { createPortal } from 'react-dom';
 
 import styled from 'styled-components';
 
-let Z_INDEX = 2000;
-
-const getNextZIndex = () => {
-    return Z_INDEX++;
-};
+import { getNext } from '@utils/zIndexUtil';
 
 const Mask = styled.div`
     z-index: 2000;
@@ -127,9 +123,9 @@ function Index(props) {
     }, []);
     return opened ? (
         <Fragment>
-            {mask ? <Mask style={{ zIndex: getNextZIndex() }}></Mask> : null}
+            {mask ? <Mask style={{ zIndex: getNext() }}></Mask> : null}
             <Wrap
-                style={{ zIndex: getNextZIndex(), width, height }}
+                style={{ zIndex: getNext(), width, height }}
                 ref={dialogEl}
             >
                 <TitleWrap

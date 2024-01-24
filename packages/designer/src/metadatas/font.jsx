@@ -2,45 +2,37 @@ const FONT_FAMILIES = [
     {
         value: '微软雅黑',
         title: '微软雅黑',
-        text: (
-            <span style={{ fontFamily: '微软雅黑', fontSize: 14 }}>
-                微软雅黑
-            </span>
-        ),
+        text: '微软雅黑',
     },
     {
         value: '黑体',
         title: '黑体',
-        text: <span style={{ fontFamily: '黑体', fontSize: 14 }}>黑体</span>,
+        text: '黑体',
     },
     {
         value: '新宋体',
         title: '新宋体',
-        text: (
-            <span style={{ fontFamily: '新宋体', fontSize: 14 }}>新宋体</span>
-        ),
+        text: '新宋体',
     },
     {
         value: '仿宋',
         title: '仿宋',
-        text: <span style={{ fontFamily: '仿宋', fontSize: 14 }}>仿宋</span>,
+        text: '仿宋',
     },
     {
         value: '隶书',
         title: '隶书',
-        text: <span style={{ fontFamily: '隶书', fontSize: 14 }}>隶书</span>,
+        text: '隶书',
     },
     {
         value: '楷体',
         title: '楷体',
-        text: <span style={{ fontFamily: '楷体', fontSize: 14 }}>楷体</span>,
+        text: '楷体',
     },
     {
         value: 'SimSun',
         title: 'SimSun',
-        text: (
-            <span style={{ fontFamily: 'SimSun', fontSize: 14 }}>SimSun</span>
-        ),
+        text: 'SimSun',
     },
     { value: 'KaiTi', title: 'KaiTi', text: 'KaiTi' },
     { value: 'FangSong', title: 'FangSong', text: 'FangSong' },

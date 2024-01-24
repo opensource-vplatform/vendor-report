@@ -7,18 +7,18 @@ import styled from 'styled-components';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Highlight } from '@components/highlight/Index';
+import List from '@components/list/List';
 import Select from '@components/select/Index';
-
-import List from '../../../component/list/List';
 import {
   getCatalogs,
   getFormulaMetadata,
-} from '../../../metadatas/formula';
+} from '@metadatas/formula';
 import {
   filterFormula,
   getFormulaMetadatasByCatalog,
   updateRecentFormula,
-} from '../../../utils/formulaUtil';
+} from '@utils/formulaUtil';
+
 import {
   FormulaButton,
   FormulaDesc,
@@ -66,7 +66,11 @@ export default function (props) {
     const filterRef = createRef(null);
     const [data, setData] = useState(() => {
         let catalogs = getCatalogs();
-        catalogs = [{code:'useful',name:'常用函数'},{ code: 'all', name: '全部' }, ...catalogs];
+        catalogs = [
+            { code: 'useful', name: '常用函数' },
+            { code: 'all', name: '全部' },
+            ...catalogs,
+        ];
         catalogs = catalogs.map((catalog) => {
             return {
                 filterSkips: [],
@@ -228,8 +232,8 @@ export default function (props) {
                     text={metadata ? metadata.desc : ''}
                     highlight={data.filter}
                     style={{
-                        wordBreak: "break-word",
-                        wordWrap: "normal"
+                        wordBreak: 'break-word',
+                        wordWrap: 'normal',
                     }}
                 ></Highlight>
             </FormulaDesc>

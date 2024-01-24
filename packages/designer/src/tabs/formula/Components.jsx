@@ -53,7 +53,6 @@ export const IconMenu = function (props) {
         <Menu
             datas={datas}
             frozien={-1}
-            optionStyle={{ marginTop: 45, marginLeft: 4 }}
             {...others}
         >
             <VItem

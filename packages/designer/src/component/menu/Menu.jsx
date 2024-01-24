@@ -18,6 +18,7 @@ export default function (props) {
         value,
     } = props;
     let contentStyle = {
+        fontSize: 12,
         ...optionStyle,
         border: 'none',
         maxHeight: 'unset',

@@ -185,7 +185,6 @@ function AutoSumItem(props) {
                     getFormulaMetadatasByCatalog('sum')
                 )}
                 frozien={-1}
-                optionStyle={{ marginTop: -6, marginLeft: 0 }}
                 {...props}
             >
                 <TitleWrap>

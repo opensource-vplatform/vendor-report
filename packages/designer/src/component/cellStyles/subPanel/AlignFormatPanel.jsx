@@ -1,11 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from 'react';
 
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Select from '@components/Select/Index';
+
 import Integer from '../../integer/Index';
-import { TextAlignmentHorizontal, TextAlignmentVertical } from '.././constant';
+import {
+  TextAlignmentHorizontal,
+  TextAlignmentVertical,
+} from '../constant';
 
 const AlignmentTabPanel = styled.div`
     height: 245px;
@@ -363,9 +370,6 @@ const AlignFormatPanel = (props) => {
                                     width: '160px',
                                     height: '24px',
                                 }}
-                                optionStyle={{
-                                    width: '100%',
-                                }}
                                 onChange={handleSelectTextHAlign}
                                 value={hAlign}
                             />
@@ -377,9 +381,6 @@ const AlignFormatPanel = (props) => {
                                 style={{
                                     width: '160px',
                                     height: '24px',
-                                }}
-                                optionStyle={{
-                                    width: '100%',
                                 }}
                                 onChange={handleSelectTextVAlign}
                                 value={vAlign}

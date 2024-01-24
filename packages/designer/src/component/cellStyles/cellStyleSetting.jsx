@@ -1,61 +1,67 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+import styled from 'styled-components';
 
 import Select from '@components/Select/Index';
+import {
+  setIsOpenCellSetting,
+  setTabValueCellSetting,
+} from '@store/borderSlice/borderSlice';
+import {
+  setFontFamily,
+  setFontSize,
+  setFontStyle,
+  setFontWeight,
+  setForeColor,
+  setHAlign,
+  setTextDecoration,
+  setTextOrientation,
+  setVAlign,
+  setWordWrap,
+} from '@store/fontSlice/fontSlice.js';
+import {
+  setShowEllipsis,
+  setShrinkToFit,
+} from '@utils/borderUtil.js';
+import {
+  mergeCells,
+  setBorderByType,
+  setIndentByCounter,
+  toDoubleUnderline,
+  toLineThrough,
+  toUnderline,
+  unMergeCell,
+} from '@utils/fontUtil.js';
+
 import Button from '../button/Index';
 import Index from '../dialog/Index';
 import Integer from '../integer/Index';
 import List from '../list/List';
 import Tab from '../tabs/Tab';
 import Tabs from '../tabs/Tabs';
-import FontFormatPanel from './subPanel/FontFormatPanel';
 import {
-    AccountingSymbol,
-    Categories,
-    CurrencyNegativeNumbers,
-    CustomFormats,
-    DateFormats,
-    DateFormatsChina,
-    FormatNumber,
-    FractionType,
-    LocaleType,
-    SpecialFormats,
-    TimeFormats,
+  AccountingSymbol,
+  Categories,
+  CurrencyNegativeNumbers,
+  CustomFormats,
+  DateFormats,
+  DateFormatsChina,
+  FormatNumber,
+  FractionType,
+  LocaleType,
+  SpecialFormats,
+  TimeFormats,
 } from './constant';
-import {
-    setBorderByType,
-    mergeCells,
-    unMergeCell,
-    setIndentByCounter,
-    toUnderline,
-    toDoubleUnderline,
-    toLineThrough,
-} from '@utils/fontUtil.js';
-import {
-    setTabValueCellSetting,
-    setIsOpenCellSetting,
-} from '@store/borderSlice/borderSlice';
-import {
-    setHAlign,
-    setTextOrientation,
-    setVAlign,
-    setWordWrap,
-} from '@store/fontSlice/fontSlice.js';
-import {
-    setFontFamily,
-    setFontSize,
-    setFontStyle,
-    setFontWeight,
-    setForeColor,
-    setTextDecoration,
-} from '@store/fontSlice/fontSlice.js';
-
-import { setShowEllipsis, setShrinkToFit } from '@utils/borderUtil.js';
-
-import styled from 'styled-components';
 import AlignFormatPanel from './subPanel/AlignFormatPanel';
 import BorderFormatPanel from './subPanel/BorderFormatPanel';
+import FontFormatPanel from './subPanel/FontFormatPanel';
 
 const TabPanel = styled.div`
     margin: 10px 13px;
@@ -708,9 +714,6 @@ function CellStyleSetting(props) {
                                         style={{
                                             width: '253px',
                                             height: '25px',
-                                        }}
-                                        optionStyle={{
-                                            width: '100%',
                                         }}
                                         onChange={handleSelectSymbolChange}
                                         value={selectedSymbol}

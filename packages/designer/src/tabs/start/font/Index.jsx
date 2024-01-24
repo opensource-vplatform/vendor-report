@@ -1,9 +1,16 @@
 import { useEffect } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+import styled from 'styled-components';
 
 import ColorEditor from '@components/color/Index';
-import { GroupItem, ItemList } from '@components/group/Index';
+import {
+  GroupItem,
+  ItemList,
+} from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Menu.jsx';
 import Select from '@components/select/Index';
@@ -18,30 +25,49 @@ import ForeColor from '@icons/font/ForeColor';
 import Italic from '@icons/font/Italic';
 import Underline from '@icons/font/Underline';
 import { getBorderEnums } from '@metadatas/border';
-import { getFontFamilies, getFontSizes } from '@metadatas/font';
 import {
-    setIsOpenCellSetting,
-    setTabValueCellSetting,
+  getFontFamilies,
+  getFontSizes,
+} from '@metadatas/font';
+import {
+  setIsOpenCellSetting,
+  setTabValueCellSetting,
 } from '@store/borderSlice/borderSlice';
 import {
-    setBackColor,
-    setFontFamily,
-    setFontSize,
-    setFontStyle,
-    setFontWeight,
-    setForeColor,
-    setTextDecoration,
+  setBackColor,
+  setFontFamily,
+  setFontSize,
+  setFontStyle,
+  setFontWeight,
+  setForeColor,
+  setTextDecoration,
 } from '@store/fontSlice/fontSlice.js';
 import {
-    decreasedFontSize,
-    increasedFontSize,
-    isDoubleUnderline,
-    isUnderline,
-    setBorderByType,
-    setFont,
-    toDoubleUnderline,
-    toUnderline,
+  decreasedFontSize,
+  increasedFontSize,
+  isDoubleUnderline,
+  isUnderline,
+  setBorderByType,
+  setFont,
+  toDoubleUnderline,
+  toUnderline,
 } from '@utils/fontUtil.js';
+
+const FontItem = styled.span`
+    font-family: ${(props) => props.fontFamily};
+    padding: 8px 10px;
+`;
+
+const toFontFamilyDatas = function () {
+    const fontFamilies = getFontFamilies();
+    return fontFamilies.map(({ value, text, title }) => {
+        return {
+            value,
+            title,
+            text: <FontItem fontFamily={value}>{text}</FontItem>,
+        };
+    });
+};
 
 export default function () {
     const dispatch = useDispatch();
@@ -132,7 +158,7 @@ export default function () {
     const handleForeColor = function (color) {
         dispatch(setForeColor({ foreColor: color }));
     };
-    const fontFamilies = getFontFamilies();
+    const fontFamilies = toFontFamilyDatas();
     const fontSizes = getFontSizes();
     const borders = getBorderEnums();
     useEffect(() => {
@@ -173,7 +199,7 @@ export default function () {
                 <Select
                     datas={fontSizes}
                     style={{ width: '50px', borderLeft: 'none' }}
-                    optionStyle={{ width: '52px' }}
+                    optionStyle={{ width: '52px', fontSize: 12 }}
                     value={fontSize}
                     onChange={handleFontSize}
                 ></Select>
@@ -214,11 +240,7 @@ export default function () {
                         handleBorder('bottomBorder');
                     }}
                 ></BorderBottom>
-                <Menu
-                    datas={borders}
-                    optionStyle={{ left: -24 }}
-                    onNodeClick={handleBorder}
-                >
+                <Menu datas={borders} onNodeClick={handleBorder}>
                     <ArrowDown tips='边框'></ArrowDown>
                 </Menu>
                 <LineSepatator></LineSepatator>
