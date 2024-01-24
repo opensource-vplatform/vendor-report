@@ -292,6 +292,7 @@ export default function Index(props) {
         fields,
         field,
         onSortEnd = () => {},
+        reportType = 'statementDetail',
     } = props;
 
     return (
@@ -324,13 +325,15 @@ export default function Index(props) {
                     lockToContainerEdges={true}
                     useDragHandle
                 ></FieldList>
-                <Groups
-                    lockAxis='y'
-                    lockToContainerEdges={true}
-                    onSortEnd={function ({ oldIndex, newIndex }) {
-                        dispatch(sortGroups({ oldIndex, newIndex }));
-                    }}
-                ></Groups>
+                {groupReport && (
+                    <Groups
+                        lockAxis='y'
+                        lockToContainerEdges={true}
+                        onSortEnd={function ({ oldIndex, newIndex }) {
+                            dispatch(sortGroups({ oldIndex, newIndex }));
+                        }}
+                    ></Groups>
+                )}
             </Wrap>
         </DndProvider>
     );

@@ -129,7 +129,7 @@ function genDatas(datas, activeSheetTablePath) {
 }
 
 export default function Index(props) {
-    const { onChange = () => {} } = props;
+    const { onChange = () => {}, reportType } = props;
     const { finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
@@ -204,6 +204,7 @@ export default function Index(props) {
                         arrayMoveMutable(newDatas, oldIndex, newIndex);
                         setField(newDatas);
                     }}
+                    reportType={reportType}
                 ></Left>
                 <Right value={value} field={field} exclude={exclude}></Right>
             </HeaderWrap>
