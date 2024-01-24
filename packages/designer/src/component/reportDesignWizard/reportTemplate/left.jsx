@@ -124,7 +124,7 @@ const GroupItemWrap = styled.div`
     padding: 3px 4px;
     display: flex;
     justify-content: space-between;
-    z-index: 2002;
+    z-index: 2003;
     cursor: row-resize;
     &:hover {
         background-color: #dadada;
