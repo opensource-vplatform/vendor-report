@@ -42,9 +42,13 @@ function preview(params) {
     const sheet = spread.getActiveSheet();
     //创建表格前先移除所有的表格
     sheet.tables.all().forEach(function (table) {
+        const range = table.range();
+        sheet.autoMerge(range, 0);
         sheet.tables.remove(table);
     });
 
+    spread.resumePaint();
+    spread.suspendPaint();
     //表格字段数量大于0才创建表格
     const colCount = tableColumns.length;
     if (colCount > 0) {
@@ -154,13 +158,18 @@ export default function Index(props) {
     useEffect(
         function () {
             if (spread) {
-                preview({
-                    value,
-                    field,
-                    exclude,
-                    spread,
-                    groups: _refState.current.groups,
-                });
+                if (_refState.current.previewSetTimeoutId) {
+                    clearTimeout(_refState.current.previewSetTimeoutId);
+                }
+                _refState.current.previewSetTimeoutId = setTimeout(() => {
+                    preview({
+                        value,
+                        field,
+                        exclude,
+                        spread,
+                        groups: _refState.current.groups,
+                    });
+                }, 0);
             }
         },
         [value, field, exclude, spread, groups]

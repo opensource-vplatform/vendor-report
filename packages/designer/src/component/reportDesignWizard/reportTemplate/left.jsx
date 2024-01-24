@@ -65,7 +65,7 @@ const FieldListItemWrap = styled.div`
     align-items: center;
     cursor: pointer;
     user-select: none;
-    z-index: 2002;
+    z-index: 2003;
     position: relative;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
