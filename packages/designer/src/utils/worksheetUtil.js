@@ -339,8 +339,68 @@ export function unFrozen(spread) {
     });
 }
 
-export function setShowFormulas(spread,isShow){
+export function setShowFormulas(spread, isShow) {
     withBatchUpdate(spread, (sheet) => {
         sheet.options.showFormulas = isShow;
+    });
+}
+
+export function setRowFilter(spread) {
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        if (selections && selections.length > 0) {
+            let selection = selections[0];
+            const GC = getNamespace();
+            if (selection.rowCount === 1 && selection.colCount === 1) {
+                selection = sheet.expandSelection(sheet, selection);
+                sheet.deleteBlankContent(sheet, selection);
+            }
+            sheet.rowFilter(
+                new GC.Spread.Sheets.Filter.HideRowFilter(selection)
+            );
+        }
+    });
+}
+
+export function clearRowFilter(spread) {
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        if (selections && selections.length > 0) {
+            let selection = selections[0];
+            const GC = getNamespace();
+            if (selection.rowCount === 1 && selection.colCount === 1) {
+                selection = sheet.expandSelection(sheet, selection);
+                sheet.deleteBlankContent(sheet, selection);
+            }
+            if (sheet.rowFilter()) {
+                sheet.rowFilter().unfilter();
+                sheet.rowFilter(undefined);
+            }
+        }
+    });
+}
+
+export function sortRange(spread, ascending) {
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        if (selections && selections.length > 0) {
+            const { row, col, rowCount, colCount } = selections[0];
+            sheet.sortRange(row, col, rowCount, colCount, true, [
+                {
+                    index: -1 === col ? 0 : col,
+                    ascending: ascending,
+                },
+            ]);
+        }
+    });
+}
+
+export function sortSelection(spread, byCol,sorts){
+    withBatchUpdate(spread, (sheet) => {
+        const selections = sheet.getSelections();
+        if (selections && selections.length > 0) {
+            const { row, col, rowCount, colCount } = selections[0];
+            sheet.sortRange(row, col, rowCount, colCount, byCol, sorts);
+        }
     });
 }

@@ -5,14 +5,14 @@ const IconWrap = styled.label`
     display: flex;
     align-items: center;
     &[data-hoverable='true']:hover {
-        cursor:pointer;
+        cursor: pointer;
         background-color: #dadada;
     }
-    &[data-disabled='true']{
-        cursor:not-allowed;
+    &[data-disabled='true'] {
+        cursor: not-allowed;
         opacity: 0.5;
     }
-    &[data-disabled='true']:hover{
+    &[data-disabled='true']:hover {
         background-color: transparent;
     }
 `;
@@ -25,19 +25,37 @@ const Icon = styled.svg`
 `;
 
 function Index(pros) {
-    const { icon, tips, active = false, hoverable=true,onClick,disabled=false, style={},svgAttrs={},pathAttrs={},iconStyle={},iconChildren=null,children } = pros;
-    const st = {...style}
-    if(active){
+    const {
+        icon,
+        tips,
+        active = false,
+        hoverable = true,
+        onClick,
+        disabled = false,
+        style = {},
+        svgAttrs = {},
+        pathAttrs = {},
+        iconStyle = {},
+        iconChildren = null,
+        children,
+    } = pros;
+    const st = { ...style };
+    if (active) {
         st.backgroundColor = '#dadada';
     }
-    const icSt = {...iconStyle};
+    const icSt = { ...iconStyle };
     return (
-        <IconWrap title={tips} onClick={onClick} style={st} data-disabled={disabled} data-hoverable={hoverable}>
-            <Icon
-                style={icSt}
-                viewBox="0 0 24 24"
-                {...svgAttrs}
-            ><path d={icon} {...pathAttrs}></path>{iconChildren}</Icon>
+        <IconWrap
+            title={tips}
+            onClick={onClick}
+            style={st}
+            data-disabled={disabled}
+            data-hoverable={hoverable}
+        >
+            <Icon style={icSt} viewBox='0 0 24 24' {...svgAttrs}>
+                {icon||pathAttrs ? <path d={icon} {...pathAttrs}></path> : null}
+                {iconChildren}
+            </Icon>
             {children}
         </IconWrap>
     );

@@ -8,6 +8,12 @@ import { createPortal } from 'react-dom';
 
 import styled from 'styled-components';
 
+let Z_INDEX = 2000;
+
+const getNextZIndex = () => {
+    return Z_INDEX++;
+};
+
 const Mask = styled.div`
     z-index: 2000;
     background-color: #aaaaaa;
@@ -21,7 +27,6 @@ const Mask = styled.div`
 
 const Wrap = styled.div`
     position: absolute;
-    z-index: 2001 !important;
     top: 50%;
     left: 50%;
     min-width: 100px;
@@ -91,7 +96,7 @@ function Index(props) {
         open = true,
         mask = true,
         closable = true,
-        anchor=false,
+        anchor = false,
         onClose,
     } = props;
     const dialogEl = createRef(null);
@@ -109,21 +114,24 @@ function Index(props) {
             elStyle.transform = 'unset';
         }
     };
-    useEffect(()=>{
-        if(anchor){
+    useEffect(() => {
+        if (anchor) {
             const wrapEl = dialogEl.current;
-            if(wrapEl){
-                const {left,top} = wrapEl.getBoundingClientRect();
+            if (wrapEl) {
+                const { left, top } = wrapEl.getBoundingClientRect();
                 wrapEl.style.top = `${top}px`;
                 wrapEl.style.left = `${left}px`;
-                wrapEl.style.transform = "none";
+                wrapEl.style.transform = 'none';
             }
         }
-    },[]);
+    }, []);
     return opened ? (
         <Fragment>
-            {mask ? <Mask></Mask> : null}
-            <Wrap style={{ width, height }} ref={dialogEl}>
+            {mask ? <Mask style={{ zIndex: getNextZIndex() }}></Mask> : null}
+            <Wrap
+                style={{ zIndex: getNextZIndex(), width, height }}
+                ref={dialogEl}
+            >
                 <TitleWrap
                     onMouseDown={(evt) => {
                         if (evt.currentTarget === evt.target) {
@@ -151,7 +159,7 @@ function Index(props) {
                     <Title>{title}</Title>
                     <CloseButton
                         onClick={() => {
-                            if(closable){
+                            if (closable) {
                                 setOpened(false);
                             }
                             if (onClose) {
@@ -168,6 +176,6 @@ function Index(props) {
     ) : null;
 }
 
-export default function(props){
-    return createPortal(<Index {...props}></Index>,document.body);
-};
+export default function (props) {
+    return createPortal(<Index {...props}></Index>, document.body);
+}

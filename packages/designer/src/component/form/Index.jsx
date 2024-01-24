@@ -1,3 +1,4 @@
+import Button from './Button';
 import CheckBox from './CheckBox';
 import ColorPicker from './ColorPicker';
 import Float from './Float';
@@ -11,6 +12,7 @@ import Search from './Search';
 import Select from './Select';
 
 export {
+  Button,
   CheckBox,
   ColorPicker,
   Float,

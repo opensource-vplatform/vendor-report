@@ -6,6 +6,7 @@ import {
 import styled from 'styled-components';
 
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
+import { isReactNode } from '@utils/reactUtil';
 
 import LineSepatator from '../lineSeparator/lineSeparator';
 import ItemsPanel from './ItemsPanel';
@@ -50,7 +51,7 @@ const WithMenuItem = function (Component) {
         } = props;
         const [data, setData] = useState({ show: false, left: 0, top: 0 });
         const handleMouseEnter = (evt) => {
-            if(disabled)return;
+            if (disabled) return;
             const target = evt.target;
             const itemWrap = target.closest('.menuItemWrap');
             const itemsWrap = target.closest('.menuItemsWrap');
@@ -64,7 +65,7 @@ const WithMenuItem = function (Component) {
         };
 
         const handleMouseLeave = (evt) => {
-            if(disabled)return;
+            if (disabled) return;
             setData({ show: false });
         };
         return (
@@ -77,7 +78,7 @@ const WithMenuItem = function (Component) {
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 onClick={() => {
-                    !disabled&&onClick(value);
+                    !disabled && onClick(value);
                 }}
             >
                 <Component
@@ -112,7 +113,7 @@ export const MenuItem = WithMenuItem(function (props) {
     return (
         <Fragment>
             {icon ? <IconWrap>{icon}</IconWrap> : null}
-            <Title>{text}</Title>
+            { isReactNode(text) ? text : (<Title>{text}</Title>)}
             {!disabled && hasChildren(datas) ? (
                 <ArrowDownIcon
                     style={{ transform: 'rotate(270deg)' }}

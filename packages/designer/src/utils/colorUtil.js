@@ -2,7 +2,7 @@ export function hexToRgb(hex) {
     hex = hex.replace('#', '');
     const len = hex.length;
     if (len % 3) {
-        throw Error('hex颜色格式不正确！颜色值：'+hex);
+        throw Error('hex颜色格式不正确！颜色值：' + hex);
     }
     const count = len / 3;
     const pow = 6 / len;
@@ -16,12 +16,24 @@ export function hexToRgb(hex) {
     };
 }
 
+export function rgbStrToHex(rgbStr) {
+    rgbStr = rgbStr.replace('rgb', '').replace('(', '').replace(')', '');
+    const arr = rgbStr.split(',');
+    return rgbToHex({
+        r: parseInt(arr[0]),
+        g: parseInt(arr[1]),
+        b: parseInt(arr[2]),
+    });
+}
+
 export function rgbToHex(rgb) {
     const { r, g, b } = rgb;
     const h = parseInt(r).toString(16);
     const e = parseInt(g).toString(16);
     const x = parseInt(b).toString(16);
-    return `#${h.length>1 ? h:'0'+h}${e.length>1 ? e:'0'+e}${x.length>1 ? x:'0'+x}`;
+    return `#${h.length > 1 ? h : '0' + h}${e.length > 1 ? e : '0' + e}${
+        x.length > 1 ? x : '0' + x
+    }`;
 }
 
 export function hueToRGB(n1, n2, hue) {
@@ -133,30 +145,33 @@ export function getCustomColors() {
         LOCAL_STOREAGE_CUSTOM_COLOR_KEY
     );
     try {
-        return JSON.parse(customColorStr)||[];
+        return JSON.parse(customColorStr) || [];
     } catch (e) {
         return [];
     }
 }
 
 export function updateCustomColor(color) {
-  const colors = getCustomColors();
-  const index = colors.indexOf(color);
-  let newColors = null;
-  if(index == -1){
-    colors.splice(0,0,color);
-    if(colors.length>10){
-      colors.length = 10;
+    const colors = getCustomColors();
+    const index = colors.indexOf(color);
+    let newColors = null;
+    if (index == -1) {
+        colors.splice(0, 0, color);
+        if (colors.length > 10) {
+            colors.length = 10;
+        }
+        newColors = colors;
+    } else if (index != colors.length - 1) {
+        const tmp = colors[index];
+        colors[index] = colors[colors.length - 1];
+        colors[colors.length - 1] = tmp;
+        newColors = colors;
     }
-    newColors = colors;
-  }else if(index != colors.length-1){
-    const tmp = colors[index];
-    colors[index] = colors[colors.length-1];
-    colors[colors.length-1] = tmp;
-    newColors = colors;
-  }
-  if(newColors!==null){
-    localStorage.setItem(LOCAL_STOREAGE_CUSTOM_COLOR_KEY,JSON.stringify(newColors));
-  }
-  return newColors;
+    if (newColors !== null) {
+        localStorage.setItem(
+            LOCAL_STOREAGE_CUSTOM_COLOR_KEY,
+            JSON.stringify(newColors)
+        );
+    }
+    return newColors;
 }
