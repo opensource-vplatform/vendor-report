@@ -326,7 +326,7 @@ export default function (props) {
             conditions: [
                 {
                     id: genUUID(),
-                    index: data.sortType == 'sortByCol' ? data.col : data.row,
+                    index: newData.sortType == 'sortByCol' ? newData.col : newData.row,
                     sortBy: 'value',
                     sort: 'asc',
                 },
