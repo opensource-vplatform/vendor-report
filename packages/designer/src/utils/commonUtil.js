@@ -96,13 +96,146 @@ export function getActiveSheetTablesPath(params) {
     }, {});
 }
 
-export function sortData(datas, groups) {
+function sum(datas, groupFields = [], fields = []) {
+    const results = [];
+    const countCol = ['quantity'];
+    const field = fields.filter(function ({ code }) {
+        return !groupFields.includes(code) && !countCol.includes(code);
+    });
+    const spansInfo = [];
+    const fieldLen = field.length;
+    function handleDatas(groups) {
+        let lastChild = null;
+        groups.forEach(function ({
+            childrenGroups,
+            allChildrens,
+            groupCode,
+            groupName,
+        }) {
+            if (childrenGroups) {
+                lastChild = handleDatas(childrenGroups);
+                spansInfo.push({
+                    field,
+                    isNull: true,
+                    groupCode,
+                });
+            } else {
+                let virtualDatasLen = 0;
+                allChildrens.forEach(function (item) {
+                    lastChild = item;
+                    const virtualDatas = [];
+                    const preFiledData = {};
+                    groupFields.forEach(function (field) {
+                        preFiledData[field] = item[field];
+                    });
+                    for (let i = 0; i < fieldLen - 1; i++) {
+                        const currentFieldCode = field[i].code;
+                        preFiledData[currentFieldCode] = item[currentFieldCode];
+                        const nextFieldCode = field[i + 1].code;
+                        const virtualData = {
+                            ...preFiledData,
+                            [nextFieldCode]: '小计',
+                        };
+                        Object.defineProperty(virtualData, 'quantity', {
+                            get() {
+                                return item['quantity'];
+                            },
+                        });
+                        virtualDatas.unshift(virtualData);
+                    }
+                    virtualDatasLen = virtualDatas.length;
+                    results.push(item, ...virtualDatas);
+                });
+                spansInfo.push({
+                    virtualDatasLen,
+                    datasLen: allChildrens.length,
+                    field,
+                    groupCode,
+                });
+            }
+            const virtualData = {};
+            if (groupCode) {
+                const index = groupFields.indexOf(groupCode);
+                groupFields.forEach(function (item, curIndex) {
+                    curIndex <= index && (virtualData[item] = lastChild[item]);
+                });
+                let code = groupFields[index + 1];
+                if (index + 1 === groupFields.length) {
+                    code = field[0].code;
+                }
+
+                virtualData[groupCode] = groupName;
+                virtualData[code] = '小计';
+            } else {
+                virtualData[groupFields[0]] = '小计';
+            }
+            Object.defineProperty(virtualData, 'quantity', {
+                get() {
+                    return allChildrens.reduce(function (res, item) {
+                        return res + item['quantity'];
+                    }, 0);
+                },
+            });
+            results.push(virtualData);
+        });
+        return lastChild;
+    }
+    handleDatas(datas);
+    window.spansInfo = spansInfo;
+    console.log(spansInfo);
+    return results;
+}
+
+function groupData(datas, groups) {
+    function group(datas, groups) {
+        const cobyGroups = [...groups];
+        const groupedDatas = new Map();
+        const groupField = cobyGroups.shift();
+        datas.forEach(function (data) {
+            const groupName = data[groupField];
+            if (!groupedDatas.has(groupName)) {
+                groupedDatas.set(groupName, {
+                    groupName,
+                    groupCode: groupField,
+                    allChildrens: [],
+                });
+            }
+            const currentGroups = groupedDatas.get(groupName);
+            currentGroups.allChildrens.push(data);
+        });
+
+        groupedDatas.forEach(function (groupInfo) {
+            if (cobyGroups.length > 0 && groupInfo.allChildrens.length > 0) {
+                groupInfo.childrenGroups = group(
+                    groupInfo.allChildrens,
+                    cobyGroups
+                );
+            }
+        });
+        return groupedDatas;
+    }
+    const groupedDatas = new Map([
+        [
+            '总',
+            {
+                groupName: '总',
+                groupCode: null,
+                allChildrens: [...datas],
+                childrenGroups: group(datas, groups),
+            },
+        ],
+    ]);
+    return groupedDatas;
+}
+
+export function sortData(datas, groups, fields) {
     //初始化分组数据(二维数组)
     const groupedDatas = [datas];
     const groupFields = groups.map(({ code }) => code);
     const spans = []; //二维数组，用于收集每一组合并单元格的数量，[[]]
     let groupNumber = 0;
-
+    const resultDatas = groupData(datas, groupFields);
+    const sumRes = sum(resultDatas, groupFields, fields);
     while (groupFields.length > 0) {
         spans[groupNumber] = [];
         const field = groupFields.shift();
@@ -135,8 +268,9 @@ export function sortData(datas, groups) {
 
     //合并分组后的数据
     const result = groupedDatas.reduce((res, cur) => [...res, ...cur], []);
+    window.sumRes = sumRes;
     return {
-        datas: result,
+        datas: sumRes || result,
         spans,
     };
 }

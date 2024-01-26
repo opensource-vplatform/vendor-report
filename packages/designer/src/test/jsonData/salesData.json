@@ -67,15 +67,6 @@
                 "parentId": "salesId"
             },
             {
-                "id": "salesId_quantity_id",
-                "type": "integer",
-                "typeName": "整数",
-                "desc": "购买数量",
-                "code": "quantity",
-                "name": "购买数量",
-                "parentId": "salesId"
-            },
-            {
                 "id": "salesId_unit_price_id",
                 "type": "decimals",
                 "typeName": "小数",
@@ -190,6 +181,15 @@
                 "desc": "顾客电话",
                 "code": "cus_phone",
                 "name": "顾客电话",
+                "parentId": "salesId"
+            },
+            {
+                "id": "salesId_quantity_id",
+                "type": "integer",
+                "typeName": "整数",
+                "desc": "购买数量",
+                "code": "quantity",
+                "name": "购买数量",
                 "parentId": "salesId"
             }
         ]
