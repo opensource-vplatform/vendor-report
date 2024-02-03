@@ -96,97 +96,192 @@ export function getActiveSheetTablesPath(params) {
     }, {});
 }
 
-function sum(datas, groupFields = [], fields = []) {
+function flatGrouped(datas, groupFields = [], fields = [], sumColumns = []) {
     const results = [];
-    const countCol = ['quantity'];
-    const field = fields.filter(function ({ code }) {
+    //求和字段
+    const countCol = sumColumns.map(({ code }) => code);
+    const isSum = countCol.length > 0;
+    //普通字段。不参与分组和求和的字段
+    const commonFields = fields.filter(function ({ code }) {
         return !groupFields.includes(code) && !countCol.includes(code);
     });
-    const spansInfo = [];
-    const fieldLen = field.length;
-    function handleDatas(groups) {
+
+    const commonFieldsLen = commonFields.length;
+    const a = {
+        backColor: null,
+        foreColor: null,
+        hAlign: 0,
+        vAlign: 1,
+        font: '11pt Calibri',
+        locked: true,
+        wordWrap: false,
+        textDecoration: 0,
+        imeMode: 1,
+        isVerticalText: false,
+    };
+
+    function handleDatas(groupedDatas) {
         let lastChild = null;
-        groups.forEach(function ({
-            childrenGroups,
-            allChildrens,
-            groupCode,
-            groupName,
-        }) {
+        let totalRowCount = 0;
+        const spansTree = [];
+
+        groupedDatas.forEach(function (groupedDataItem, a, b) {
+            let spansTreeItem = {
+                children: [],
+                verticalSpans: [],
+            };
+            const { childrenGroups, allChildrens, groupCode, groupName } =
+                groupedDataItem;
+
+            let rowCount = 0;
+            const groupIndex = groupFields.indexOf(groupCode);
+
             if (childrenGroups) {
-                lastChild = handleDatas(childrenGroups);
-                spansInfo.push({
-                    field,
-                    isNull: true,
-                    groupCode,
-                });
+                const res = handleDatas(childrenGroups);
+                lastChild = res.lastChild;
+                rowCount += res.totalRowCount;
+                totalRowCount += res.totalRowCount;
+
+                spansTreeItem.children.push(...res.spansTree);
             } else {
-                let virtualDatasLen = 0;
                 allChildrens.forEach(function (item) {
                     lastChild = item;
                     const virtualDatas = [];
-                    const preFiledData = {};
-                    groupFields.forEach(function (field) {
-                        preFiledData[field] = item[field];
-                    });
-                    for (let i = 0; i < fieldLen - 1; i++) {
-                        const currentFieldCode = field[i].code;
-                        preFiledData[currentFieldCode] = item[currentFieldCode];
-                        const nextFieldCode = field[i + 1].code;
-                        const virtualData = {
-                            ...preFiledData,
-                            [nextFieldCode]: '小计',
-                        };
-                        Object.defineProperty(virtualData, 'quantity', {
-                            get() {
-                                return item['quantity'];
-                            },
+                    if (isSum) {
+                        const preFiledData = {};
+                        groupFields.forEach(function (field) {
+                            preFiledData[field] = item[field];
                         });
-                        virtualDatas.unshift(virtualData);
+                        for (let i = 0; i < commonFieldsLen - 1; i++) {
+                            const fieldCode = commonFields[i].code;
+                            preFiledData[fieldCode] = item[fieldCode];
+                            const nextFieldCode = commonFields[i + 1].code;
+                            const virtualData = {
+                                ...preFiledData,
+                                [nextFieldCode]: '小计',
+                            };
+                            countCol.forEach((key) => {
+                                const numberData = Number(item[key]);
+                                item[key] = !Number.isNaN(numberData)
+                                    ? numberData
+                                    : 0;
+                                Object.defineProperty(virtualData, key, {
+                                    get() {
+                                        return item[key];
+                                    },
+                                });
+                            });
+
+                            virtualDatas.unshift(virtualData);
+                            //纵向合并
+                            if (!spansTreeItem.verticalSpans[i]) {
+                                spansTreeItem.verticalSpans[i] = [];
+                            }
+                            spansTreeItem.verticalSpans[i].push({
+                                rowCount: commonFieldsLen - i,
+                                col: groupIndex + i + 1,
+                                colCount: 1,
+                                row: 0,
+                                subtotalSpan: {
+                                    rowCount: 1,
+                                    col: groupIndex + i + 1 + 1,
+                                    colCount: commonFieldsLen - i - 1,
+                                    row: 0,
+                                },
+                                style: {
+                                    vAlign: 1,
+                                },
+                            });
+
+                            rowCount++;
+                            totalRowCount++;
+                        }
                     }
-                    virtualDatasLen = virtualDatas.length;
+
+                    rowCount++;
+                    totalRowCount++;
                     results.push(item, ...virtualDatas);
                 });
-                spansInfo.push({
-                    virtualDatasLen,
-                    datasLen: allChildrens.length,
-                    field,
-                    groupCode,
-                });
             }
+
             const virtualData = {};
             if (groupCode) {
-                const index = groupFields.indexOf(groupCode);
-                groupFields.forEach(function (item, curIndex) {
-                    curIndex <= index && (virtualData[item] = lastChild[item]);
-                });
-                let code = groupFields[index + 1];
-                if (index + 1 === groupFields.length) {
-                    code = field[0].code;
+                if (isSum) {
+                    //虚拟数据，用于对当前分组的数据进行求和
+                    const index = groupFields.indexOf(groupCode);
+                    groupFields.forEach(function (item, curIndex) {
+                        curIndex <= index &&
+                            (virtualData[item] = lastChild[item]);
+                    });
+                    let code = groupFields[index + 1];
+                    if (index + 1 === groupFields.length) {
+                        code = commonFields[0].code;
+                    }
+
+                    virtualData[groupCode] = groupName;
+                    virtualData[code] = '小计';
+
+                    //生成虚拟数据合并的单元格数据量
+                    spansTreeItem.subtotalSpan = {
+                        row: 0,
+                        col: index + 1,
+                        rowCount: 1,
+                        colCount:
+                            commonFieldsLen + (groupFields.length - index) - 1,
+                    };
+
+                    rowCount++;
+                    totalRowCount++;
                 }
 
-                virtualData[groupCode] = groupName;
-                virtualData[code] = '小计';
-            } else {
-                virtualData[groupFields[0]] = '小计';
+                //生成分组需要合并的单元格数量
+                const _span = {
+                    rowCount,
+                    col: groupIndex,
+                    colCount: 1,
+                    row: 0,
+                    style: {
+                        vAlign: 1,
+                    },
+                };
+                spansTreeItem = { ...spansTreeItem, ..._span };
+            } else if (isSum) {
+                //虚拟数据，用于对所有数据进行求和
+                virtualData[groupFields[0] || commonFields?.[0].code] = '小计';
+                //生成虚拟数据合并的单元格数据量
+                spansTreeItem = {
+                    ...spansTreeItem,
+                    row: totalRowCount,
+                    rowCount: 1,
+                    col: 0,
+                    colCount: groupFields.length + commonFieldsLen,
+                    isTotal: true,
+                };
             }
-            Object.defineProperty(virtualData, 'quantity', {
-                get() {
-                    return allChildrens.reduce(function (res, item) {
-                        return res + item['quantity'];
-                    }, 0);
-                },
-            });
-            results.push(virtualData);
+
+            //对当前分组的数据根据求和字段进行求和
+            if (isSum) {
+                countCol.forEach((key) => {
+                    Object.defineProperty(virtualData, key, {
+                        get() {
+                            return allChildrens.reduce(function (res, item) {
+                                return res + item[key];
+                            }, 0);
+                        },
+                    });
+                });
+                results.push(virtualData);
+            }
+            spansTree.push(spansTreeItem);
         });
-        return lastChild;
+        return { lastChild, totalRowCount, spansTree };
     }
-    handleDatas(datas);
-    window.spansInfo = spansInfo;
-    console.log(spansInfo);
-    return results;
+    const { spansTree } = handleDatas(datas);
+
+    return { datas: results, spansTree };
 }
 
-function groupData(datas, groups) {
+function groupData(datas, groups = []) {
     function group(datas, groups) {
         const cobyGroups = [...groups];
         const groupedDatas = new Map();
@@ -214,6 +309,9 @@ function groupData(datas, groups) {
         });
         return groupedDatas;
     }
+
+    const childrenGroups = groups.length > 0 ? group(datas, groups) : undefined;
+
     const groupedDatas = new Map([
         [
             '总',
@@ -221,56 +319,129 @@ function groupData(datas, groups) {
                 groupName: '总',
                 groupCode: null,
                 allChildrens: [...datas],
-                childrenGroups: group(datas, groups),
+                childrenGroups,
             },
         ],
     ]);
     return groupedDatas;
 }
 
-export function sortData(datas, groups, fields) {
-    //初始化分组数据(二维数组)
-    const groupedDatas = [datas];
+export function sortData(datas, groups, fields, sumColumns) {
     const groupFields = groups.map(({ code }) => code);
-    const spans = []; //二维数组，用于收集每一组合并单元格的数量，[[]]
-    let groupNumber = 0;
-    const resultDatas = groupData(datas, groupFields);
-    const sumRes = sum(resultDatas, groupFields, fields);
-    while (groupFields.length > 0) {
-        spans[groupNumber] = [];
-        const field = groupFields.shift();
-        const pendingGroupDatas = [];
-        while (groupedDatas.length > 0) {
-            //对当前分组的数据再次分组
-            const currentGroupDatas = groupedDatas.shift();
-            //子分组
-            const childrenGroupedDatas = {};
-            currentGroupDatas.forEach(function (item) {
-                if (!childrenGroupedDatas[item[field]]) {
-                    childrenGroupedDatas[item[field]] = [];
-                }
-                childrenGroupedDatas[item[field]].push(item);
-            });
-
-            //将当前分组进行分组后的数据推入栈中，再次分组，以此类推
-            //放while循环里面，避免不同分组之间数据一样时导致数据问题
-            Object.values(childrenGroupedDatas).forEach(function (group) {
-                //1,将分组后数据推入栈中
-                pendingGroupDatas.push(group);
-
-                //2，统计每一组应该合并的单元格数量
-                spans[groupNumber].push(group.length);
-            });
-        }
-        groupedDatas.push(...pendingGroupDatas);
-        groupNumber += 1;
-    }
-
-    //合并分组后的数据
-    const result = groupedDatas.reduce((res, cur) => [...res, ...cur], []);
-    window.sumRes = sumRes;
+    const groupedDatas = groupData(datas, groupFields);
+    const { datas: _datas, spansTree } = flatGrouped(
+        groupedDatas,
+        groupFields,
+        fields,
+        sumColumns
+    );
     return {
-        datas: sumRes || result,
-        spans,
+        datas: _datas,
+        spansTree,
     };
+}
+
+export function genSpans(datas, row = 0, col = 0) {
+    const spans = [];
+    const dataTableStyle = {};
+    function parseJsonDataToSpans(jsonData, parentRow = 0, parentCol = 0) {
+        let rowStart = parentRow;
+        jsonData.forEach(function (item) {
+            const {
+                row = 0,
+                col = 0,
+                rowCount = 1,
+                colCount = 1,
+                children = [],
+                verticalSpans = [],
+                subtotalSpan,
+                isTotal = false,
+            } = item;
+
+            if (children.length > 0) {
+                parseJsonDataToSpans(children, rowStart);
+            }
+            if (verticalSpans.length > 0) {
+                verticalSpans.forEach(function (verticalSpan, index) {
+                    let preRowStart = rowStart;
+                    verticalSpan.forEach(function (item) {
+                        if (item.hasOwnProperty('style')) {
+                            const { col, style } = item;
+                            if (!dataTableStyle[preRowStart]) {
+                                dataTableStyle[preRowStart] = {};
+                            }
+
+                            if (!dataTableStyle[preRowStart][col]) {
+                                dataTableStyle[preRowStart][col] = {};
+                            }
+
+                            dataTableStyle[preRowStart][col].style = {
+                                ...style,
+                            };
+                        }
+
+                        spans.push({
+                            row: preRowStart,
+                            col: item.col + parentCol,
+                            rowCount: item.rowCount,
+                            colCount: item.colCount,
+                        });
+
+                        if (item.subtotalSpan.colCount > 1) {
+                            spans.push({
+                                row: preRowStart + item.rowCount - 1,
+                                col: item.subtotalSpan.col + parentCol,
+                                rowCount: item.subtotalSpan.rowCount,
+                                colCount: item.subtotalSpan.colCount,
+                            });
+                        }
+
+                        preRowStart += item.rowCount + index;
+                    });
+                });
+            }
+            if (item.hasOwnProperty('style')) {
+                const { col, style } = item;
+                if (!dataTableStyle[rowStart]) {
+                    dataTableStyle[rowStart] = {};
+                }
+
+                if (!dataTableStyle[rowStart][col]) {
+                    dataTableStyle[rowStart][col] = {};
+                }
+
+                dataTableStyle[rowStart][col].style = { ...style };
+            }
+            if (item.hasOwnProperty('row')) {
+                if (isTotal) {
+                    spans.push({
+                        row: row + parentRow,
+                        col: col + parentCol,
+                        rowCount,
+                        colCount,
+                    });
+                } else {
+                    spans.push({
+                        row: rowStart,
+                        col: col + parentCol,
+                        rowCount,
+                        colCount,
+                    });
+                }
+
+                if (subtotalSpan) {
+                    spans.push({
+                        row: rowStart + rowCount - 1,
+                        col: subtotalSpan.col + parentCol,
+                        rowCount: subtotalSpan.rowCount,
+                        colCount: subtotalSpan.colCount,
+                    });
+                }
+                rowStart = rowStart + rowCount;
+            }
+        });
+    }
+    parseJsonDataToSpans(datas, row, col);
+    console.log(dataTableStyle);
+    return { spans, dataTableStyle };
 }

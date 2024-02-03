@@ -36,6 +36,7 @@ export function addTable(params) {
         filterButtonVisible,
         addingMode = 'drag',
         groups = [],
+        sumColumns = [],
     } = params;
 
     const tableColumnsCount = Array.isArray(columnsTemp)
@@ -75,12 +76,16 @@ export function addTable(params) {
     if (Array.isArray(columnsTemp)) {
         const tableColumns = [];
         const groupsFields = [];
+        const sumFields = [];
         columnsTemp.forEach(function ({ id, name, code }, index) {
             //以数据源id作为表格列的唯一id，将数据源与列关联起来，方便处理当数据源发生变化时候，同步更改列
             const tableColumn = new spreadNS.Tables.TableColumn(id, code, name);
             const inGroupsIndex = groups.findIndex((group) => group.id === id);
-            if (inGroupsIndex > -1) {
+            const inSumIndex = sumColumns.findIndex((sum) => sum.id === id);
+            if (inGroupsIndex >= 0) {
                 groupsFields[inGroupsIndex] = tableColumn;
+            } else if (inSumIndex >= 0) {
+                sumFields[inSumIndex] = tableColumn;
             } else {
                 tableColumns.push(tableColumn);
             }
@@ -91,6 +96,7 @@ export function addTable(params) {
             });
         });
         tableColumns.unshift(...groupsFields);
+        tableColumns.push(...sumFields);
         tableColumns.length > 0 && table.bindColumns(tableColumns);
         const { colCount } = table.range();
         if (!filterButtonVisible) {
@@ -119,6 +125,9 @@ export function addTable(params) {
             },
             tableGroups: {
                 [tableName]: groups,
+            },
+            sumColumns: {
+                [tableName]: sumColumns,
             },
         })
     );

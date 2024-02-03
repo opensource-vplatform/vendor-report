@@ -18,7 +18,10 @@ import {
 } from '@components/defineDatasource/utils/utils';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { toggleReportDesignWizard } from '@store/navSlice/navSlice';
-import { clearGroups } from '@store/wizardSlice';
+import {
+  clear,
+  clearGroups,
+} from '@store/wizardSlice';
 import { getNamespace } from '@utils/spreadUtil';
 
 import {
@@ -56,7 +59,15 @@ function showHhighlight(spread = 0, row = 0, col, rowCount = 1, colCount = 1) {
 }
 
 function createTable(params) {
-    const { field, exclude, spread, dispatch, value, groups = [] } = params;
+    const {
+        field,
+        exclude,
+        spread,
+        dispatch,
+        value,
+        groups = [],
+        sumColumns = [],
+    } = params;
     //构造表格字段
     const tableColumns = field.filter(({ code }) => !exclude.includes(code));
     const colCount = tableColumns.length;
@@ -90,6 +101,7 @@ function createTable(params) {
                 filterButtonVisible: false,
                 addingMode: 'wizard',
                 groups,
+                sumColumns,
             });
             spread.resumePaint();
             mousedownHandlerAfter();
@@ -135,7 +147,7 @@ export default function Index(props) {
     );
 
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
-    let { groups } = useSelector(({ wizardSlice }) => wizardSlice);
+    let { groups, sumColumns } = useSelector(({ wizardSlice }) => wizardSlice);
     const dispatch = useDispatch();
 
     const [tableCode, setTablleCode] = useState('');
@@ -161,6 +173,8 @@ export default function Index(props) {
 
     useEffect(function () {
         dispatch(genPreviewDatas());
+        dispatch(clearGroups());
+        dispatch(clear({ code: 'sumColumns' }));
     }, []);
 
     const backHandler = function () {
@@ -176,12 +190,19 @@ export default function Index(props) {
             dispatch,
             value,
             groups,
+            sumColumns,
         });
     };
 
     const cancleHandler = function () {
         dispatch(toggleReportDesignWizard());
     };
+
+    const columnsDatas = field.filter(
+        ({ code }) =>
+            !groups.find(({ code: inCode }) => code === inCode) &&
+            !sumColumns.find(({ code: inCode }) => code === inCode)
+    );
 
     return (
         <Wrap>
@@ -191,11 +212,12 @@ export default function Index(props) {
                     selectOnChange={function (value) {
                         setTablleCode(value.tableCode);
                         dispatch(clearGroups());
+                        dispatch(clear({ code: 'sumColumns' }));
                     }}
                     onChange={function (datas) {
                         setExclude(datas);
                     }}
-                    field={field}
+                    field={columnsDatas}
                     value={value}
                     selectDatas={selectDatas}
                     fields={fields}
@@ -206,7 +228,11 @@ export default function Index(props) {
                     }}
                     reportType={reportType}
                 ></Left>
-                <Right value={value} field={field} exclude={exclude}></Right>
+                <Right
+                    value={value}
+                    field={columnsDatas}
+                    exclude={exclude}
+                ></Right>
             </HeaderWrap>
             <FooterWrap>
                 <Button type='button' onClick={backHandler}>

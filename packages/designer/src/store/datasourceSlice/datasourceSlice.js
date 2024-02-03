@@ -23,6 +23,7 @@ export const datasourceSlice = createSlice({
             } */
         },
         tableGroups: {},
+        sumColumns: {},
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -260,6 +261,7 @@ export const datasourceSlice = createSlice({
                 sheetInstanceId,
                 tableInfo = {},
                 tableGroups = {},
+                sumColumns = {},
             } = payload;
             if (!state.tables[sheetInstanceId]) {
                 state.tables[sheetInstanceId] = {};
@@ -273,7 +275,10 @@ export const datasourceSlice = createSlice({
             });
 
             //分组
-            state.tableGroups = { ...tableGroups, ...tableGroups };
+            state.tableGroups = { ...state.tableGroups, ...tableGroups };
+
+            //求和
+            state.sumColumns = { ...state.sumColumns, ...sumColumns };
         },
     },
 });

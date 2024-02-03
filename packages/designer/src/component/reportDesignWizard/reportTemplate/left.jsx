@@ -24,8 +24,9 @@ import styled from 'styled-components';
 import { CheckBox } from '@components/form/Index';
 import Select from '@components/select/Index';
 import {
-  removeGroup,
-  saveGroups,
+  remove,
+  save,
+  sort,
   sortGroups,
 } from '@store/wizardSlice';
 
@@ -107,17 +108,10 @@ const SortableHandle = styled.div`
 
 const GroupWrap = styled.div`
     position: relative;
-    height: 200px;
+    height: 100px;
     border: 1px solid #ddd;
-    margin-top: 40px;
     font-size: 12px;
-    &::before {
-        content: '分组列';
-        position: absolute;
-        top: -25px;
-        right: 0;
-        font-size: 12px;
-    }
+    overflow-y: auto;
 `;
 
 const GroupItemWrap = styled.div`
@@ -125,6 +119,7 @@ const GroupItemWrap = styled.div`
     display: flex;
     justify-content: space-between;
     z-index: 2003;
+    position: relative;
     cursor: row-resize;
     &:hover {
         background-color: #dadada;
@@ -139,12 +134,26 @@ const ClearIcon = styled.div`
     background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8IS0tIEdlbmVyYXRvcjogU2tldGNoIDU1LjIgKDc4MTgxKSAtIGh0dHBzOi8vc2tldGNoYXBwLmNvbSAtLT4KICAgIDx0aXRsZT5jbG9zZTwvdGl0bGU+CiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4KICAgIDxnIGlkPSJjbG9zZSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPHBhdGggZD0iTTkuMTQ1MTkwODUsOC4wMDAxNTM1NyBMMTIuNzYxOTkxNCw0LjM4MjE4MTEyIEMxMy4wNzkzMzYyLDQuMDY2MDAyMzUgMTMuMDc5MzM2MiwzLjU1MzMxNjc2IDEyLjc2MTk5MTQsMy4yMzcxMzQwOCBDMTIuNDQ2NDc5NiwyLjkyMDk1NTMxIDExLjkzNDQ2MTEsMi45MjA5NTUzMSAxMS42MTc3ODQyLDMuMjM3MTM0MDggTDguMDAwMzE5Niw2Ljg1NDkzMDc0IEw0LjM4MjE4MTEyLDMuMjM3MTM0MDggQzQuMDY2MDAyMzUsMi45MjA5NTUzMSAzLjU1MzMxNjc2LDIuOTIwOTU1MzEgMy4yMzcxMzQwOCwzLjIzNzEzNDA4IEMyLjkyMDk1NTMxLDMuNTUzMzEyODUgMi45MjA5NTUzMSw0LjA2NTk5ODQ0IDMuMjM3MTM0MDgsNC4zODIxODExMiBMNi44NTUxMDY1Myw4LjAwMDE1MzU3IEwzLjIzNzEzNDA4LDExLjYxODYyNDEgQzIuOTIwOTU1MzEsMTEuOTM0OTY4OSAyLjkyMDk1NTMxLDEyLjQ0NjY1NDQgMy4yMzcxMzQwOCwxMi43NjI5OTczIEMzLjU1MzMxMjg1LDEzLjA3OTM0MjEgNC4wNjU5OTg0NCwxMy4wNzkzNDIxIDQuMzgyMTgxMTIsMTIuNzYyOTk3MyBMOC4wMDAzMTk2LDkuMTQ1MjAwNjEgTDExLjYxNzc4NDIsMTIuNzYyOTk3MyBDMTEuOTM0NDYzLDEzLjA3OTM0MjEgMTIuNDQ2NjQ4NiwxMy4wNzkzNDIxIDEyLjc2MTk5MTQsMTIuNzYyOTk3MyBDMTMuMDc5MzM2MiwxMi40NDcxNTI1IDEzLjA3OTMzNjIsMTEuOTM0OTY2OSAxMi43NjE5OTE0LDExLjYxODYyNDEgTDkuMTQ1MTkwODUsOC4wMDAxNTM1NyBMOS4xNDUxOTA4NSw4LjAwMDE1MzU3IFoiIGlkPSLot6/lvoQiIGZpbGw9IiM2NjY2NjYiIGZpbGwtcnVsZT0ibm9uemVybyI+PC9wYXRoPgogICAgPC9nPgo8L3N2Zz4=);
 `;
 
+const SumColumnsWrap = styled.div`
+    position: relative;
+    height: 100px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    overflow-y: auto;
+`;
+
+const Title = styled.div`
+    font-size: 12px;
+    padding-top: 12px;
+    padding-bottom: 6px;
+    text-align: right;
+`;
+
 const DragHandle = sortableHandle(() => (
     <SortableHandle className='dragHandle'></SortableHandle>
 ));
 
 const FieldListItem = SortableElement(function (props) {
-    const dispatch = useDispatch();
     const _refState = useRef({});
     const { code, isChecked, changeHandler, name, id } = props;
     _refState.current.isChecked = isChecked;
@@ -163,15 +172,7 @@ const FieldListItem = SortableElement(function (props) {
     }));
 
     const resolveChangeHandler = function () {
-        const newResult = !isChecked;
-        changeHandler(code, newResult);
-        if (!newResult) {
-            dispatch(
-                removeGroup({
-                    groupId: id,
-                })
-            );
-        }
+        changeHandler(code, !isChecked);
     };
 
     return (
@@ -233,7 +234,7 @@ const FieldList = SortableContainer(function (props) {
 });
 
 const GroupItem = SortableElement(function (props) {
-    const { text, groupId } = props;
+    const { text, groupId, groupType } = props;
     const dispatch = useDispatch();
 
     return (
@@ -242,8 +243,9 @@ const GroupItem = SortableElement(function (props) {
             <ClearIcon
                 onMouseDownCapture={function (e) {
                     dispatch(
-                        removeGroup({
-                            groupId,
+                        remove({
+                            id: groupId,
+                            code: groupType,
                         })
                     );
                 }}
@@ -253,34 +255,53 @@ const GroupItem = SortableElement(function (props) {
 });
 
 const Groups = SortableContainer(function (props) {
+    const { groupType = 'groups', title = '分组列' } = props;
     const dispatch = useDispatch();
-    let { groups } = useSelector(({ wizardSlice }) => wizardSlice);
+    let { groups, sumColumns } = useSelector(({ wizardSlice }) => wizardSlice);
 
     const [collectedProps, drop] = useDrop(() => ({
         accept: 'box',
         drop: (item, monitor) => {
-            dispatch(saveGroups({ newGroup: item }));
+            dispatch(save({ datas: item, code: groupType }));
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
         }),
     }));
 
+    const datas = groupType === 'groups' ? groups : sumColumns;
+
     return (
         <GroupWrap ref={drop}>
-            {groups.map(function ({ id, name }, index) {
+            {datas.map(function ({ id, name }, index) {
                 return (
                     <GroupItem
                         key={id}
                         text={name}
                         index={index}
                         groupId={id}
+                        groupType={groupType}
                     ></GroupItem>
                 );
             })}
         </GroupWrap>
     );
 });
+
+const GroupsContainer = function (props) {
+    const { onSortEnd, title = '分组列', groupType = 'groups' } = props;
+    return (
+        <>
+            <Title>{title}</Title>
+            <Groups
+                lockAxis='y'
+                lockToContainerEdges={true}
+                onSortEnd={onSortEnd}
+                groupType={groupType}
+            ></Groups>
+        </>
+    );
+};
 
 export default function Index(props) {
     const dispatch = useDispatch();
@@ -326,13 +347,26 @@ export default function Index(props) {
                     useDragHandle
                 ></FieldList>
                 {reportType === 'groupReport' && (
-                    <Groups
-                        lockAxis='y'
-                        lockToContainerEdges={true}
-                        onSortEnd={function ({ oldIndex, newIndex }) {
-                            dispatch(sortGroups({ oldIndex, newIndex }));
-                        }}
-                    ></Groups>
+                    <>
+                        <GroupsContainer
+                            onSortEnd={function ({ oldIndex, newIndex }) {
+                                dispatch(sortGroups({ oldIndex, newIndex }));
+                            }}
+                        ></GroupsContainer>
+                        <GroupsContainer
+                            onSortEnd={function ({ oldIndex, newIndex }) {
+                                dispatch(
+                                    sort({
+                                        oldIndex,
+                                        newIndex,
+                                        code: 'sumColumns',
+                                    })
+                                );
+                            }}
+                            groupType='sumColumns'
+                            title='求和列'
+                        ></GroupsContainer>
+                    </>
                 )}
             </Wrap>
         </DndProvider>

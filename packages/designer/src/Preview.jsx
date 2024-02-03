@@ -14,7 +14,10 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
-import { sortData } from '@utils/commonUtil';
+import {
+  genSpans,
+  sortData,
+} from '@utils/commonUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
 import DesignerContext from './DesignerContext';
@@ -103,8 +106,12 @@ function handleDatas(params) {
 export default function () {
     const context = useContext(DesignerContext);
     const dispatch = useDispatch();
-    const { previewViewDatas, tableGroups, previewViewDatasHasInit } =
-        useSelector(({ datasourceSlice }) => datasourceSlice);
+    const {
+        previewViewDatas,
+        tableGroups,
+        sumColumns,
+        previewViewDatasHasInit,
+    } = useSelector(({ datasourceSlice }) => datasourceSlice);
 
     const { rowMerge, columnMerge } = useSelector(
         ({ tableDesignSlice }) => tableDesignSlice
@@ -122,16 +129,29 @@ export default function () {
 
             //对数据进行分组排序
             if (tables.length > 0) {
-                tables.forEach(function (table, index) {
-                    const groups = tableGroups[table.name()];
-                    if (Array.isArray(groups) && groups.length > 0) {
+                tables.forEach(function (table) {
+                    const tableName = table.name();
+                    const groups = tableGroups[tableName];
+                    const sums = sumColumns[tableName];
+                    if (
+                        (Array.isArray(groups) && groups.length > 0) ||
+                        (Array.isArray(sums) && sums.length > 0)
+                    ) {
                         const path = table.bindingPath();
-                        const { datas, spans } = sortData(
+                        const { row, col } = table.range();
+                        const fields = [];
+                        table.BSt.forEach(function (item) {
+                            fields.push({ code: item.dataField() });
+                        });
+                        const { datas, spansTree } = sortData(
                             dataSource[path],
-                            groups
+                            groups,
+                            fields,
+                            sums
                         );
                         dataSource[path] = datas;
-                        tablesSpans[index] = spans;
+                        const result = genSpans(spansTree, row + 1, col);
+                        tablesSpans.push(...result.spans);
                     }
                 });
             }
@@ -146,37 +166,10 @@ export default function () {
 
             const source = new GCsheets.Bindings.CellBindingSource(dataSource);
             sheet.setDataSource(source);
-
-            //合并表格区域
-            if (tables.length > 0) {
-                tables.forEach(function (table, index) {
-                    const groups = tableGroups[table.name()];
-                    if (!(Array.isArray(groups) && groups.length > 0)) {
-                        return;
-                    }
-
-                    const spans = tablesSpans[index];
-                    if (!Array.isArray(spans)) {
-                        return;
-                    }
-
-                    const { row, col } = table.range();
-                    spans.forEach(function (span, groupIndex) {
-                        let preEndSpan = row;
-                        span.forEach(function (spanCount) {
-                            const startSpan = preEndSpan + 1;
-                            preEndSpan = startSpan + spanCount - 1;
-                            sheet.addSpan(
-                                startSpan,
-                                col + groupIndex,
-                                spanCount,
-                                1
-                            );
-                        });
-                    });
-                });
-            }
-
+            const json = sheet.toJSON();
+            json.spans = tablesSpans;
+            sheet.fromJSON(json);
+            sheet.setDataSource(source);
             tableMerge({
                 sheet,
                 rowMerge,

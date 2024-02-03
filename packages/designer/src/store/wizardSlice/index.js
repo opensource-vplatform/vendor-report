@@ -6,6 +6,7 @@ export const wizardSlice = createSlice({
     name: 'wizardSlice',
     initialState: {
         groups: [],
+        sumColumns: [],
     },
     reducers: {
         saveGroups(state, { payload }) {
@@ -34,8 +35,41 @@ export const wizardSlice = createSlice({
         clearGroups(state, { payload }) {
             state.groups = [];
         },
+        save(state, { payload }) {
+            const { datas, code } = payload;
+            const result = [...state[code]];
+            const isExist = result.some(function (res) {
+                return res.id === datas.id;
+            });
+            if (!isExist) {
+                result.push({ ...datas });
+            }
+            state[code] = result;
+        },
+        sort(state, { payload }) {
+            const { oldIndex, newIndex, code } = payload;
+            const newDatas = [...state[code]];
+            arrayMoveMutable(newDatas, oldIndex, newIndex);
+            state[code] = newDatas;
+        },
+        remove(state, { payload }) {
+            const { id, code } = payload;
+            state[code] = state[code].filter(({ id: _id }) => _id !== id);
+        },
+        clear(state, { payload }) {
+            const { code } = payload;
+            state[code] = [];
+        },
     },
 });
-export const { saveGroups, sortGroups, removeGroup, clearGroups } =
-    wizardSlice.actions;
+export const {
+    saveGroups,
+    sortGroups,
+    removeGroup,
+    clearGroups,
+    save,
+    sort,
+    clear,
+    remove,
+} = wizardSlice.actions;
 export default wizardSlice.reducer;
