@@ -222,8 +222,14 @@ export default function Index(props) {
                     selectDatas={selectDatas}
                     fields={fields}
                     onSortEnd={function ({ oldIndex, newIndex }) {
+                        const _oldIndex = field.findIndex(
+                            ({ id }) => columnsDatas?.[oldIndex]?.id === id
+                        );
+                        const _newIndex = field.findIndex(
+                            ({ id }) => columnsDatas?.[newIndex]?.id === id
+                        );
                         const newDatas = [...field];
-                        arrayMoveMutable(newDatas, oldIndex, newIndex);
+                        arrayMoveMutable(newDatas, _oldIndex, _newIndex);
                         setField(newDatas);
                     }}
                     reportType={reportType}
