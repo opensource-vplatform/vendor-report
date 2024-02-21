@@ -7,12 +7,9 @@ import {
   CheckBox,
   Group,
   Integer,
-} from '@components/form/Index';
-
-import {
   Radio,
   RadioGroup,
-} from '../../../component/form/RadioGroup';
+} from '@components/form/Index';
 import {
   setAllowCellOverflow,
   setColCount,
@@ -27,7 +24,8 @@ import {
   setRowCount,
   setSelectionPolicy,
   setShowZeros,
-} from '../../../store/settingSlice/worksheetSettingSlice';
+} from '@store/settingSlice/worksheetSettingSlice';
+
 import {
   HLayout,
   InputWrap,

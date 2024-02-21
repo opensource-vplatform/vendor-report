@@ -46,7 +46,7 @@ export default function (props) {
         ...others
     } = props;
     return (
-        <Dialog {...others}>
+        <Dialog {...others} onClose={onCancel}>
             <Wrap>
                 <Content>
                     {children}

@@ -15,7 +15,6 @@ const Mask = styled.div`
     left: 0px;
     width: 100%;
     height: 100%;
-    z-index: ${(props) => props.zIndex};
 `;
 
 const Wrap = styled.div`
@@ -58,13 +57,13 @@ export default function (props) {
             {data.contentVisible
                 ? createPortal(
                       <Mask
-                          zIndex={getNext()}
                           onClick={() => {
                               setData({
                                   ...data,
                                   contentVisible: false,
                               });
                           }}
+                          style={{ zIndex: getNext() }}
                       ></Mask>,
                       document.body
                   )

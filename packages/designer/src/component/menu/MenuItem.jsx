@@ -113,7 +113,7 @@ export const MenuItem = WithMenuItem(function (props) {
     return (
         <Fragment>
             {icon ? <IconWrap>{icon}</IconWrap> : null}
-            { isReactNode(text) ? text : (<Title>{text}</Title>)}
+            {isReactNode(text) ? text : <Title>{text}</Title>}
             {!disabled && hasChildren(datas) ? (
                 <ArrowDownIcon
                     style={{ transform: 'rotate(270deg)' }}
@@ -125,7 +125,15 @@ export const MenuItem = WithMenuItem(function (props) {
 
 export const DividerMenuItem = function () {
     return (
-        <div style={{ marginTop: 2, marginBottom: 2 }}>
+        <div
+            style={{
+                marginTop: 2,
+                marginBottom: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+            }}
+        >
             <LineSepatator type='horizontal'></LineSepatator>
         </div>
     );

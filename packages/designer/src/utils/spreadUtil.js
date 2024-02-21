@@ -131,6 +131,28 @@ export const applyToSelectedCell = function (sheet, func) {
     }
 };
 
+export const applyToSelectedRow = function(sheet,func){
+    const selections = sheet.getSelections();
+    for (let  index = 0; index < selections.length; index++){
+        const selection = selections[index];
+        const rowStart = -1 === selection.row ? 0 : selection.row;
+        for (let index1 = 0; index1 < selection.rowCount; index1++){
+            func(sheet, rowStart + index1)
+        }
+    }
+}
+
+export const applyToSelectedColumn = function(sheet,func){
+    const selections = sheet.getSelections();
+    for (let index = 0; index < selections.length; index++){
+        const selection = selections[index];
+        const colStart = -1 === selection.col ? 0 : selection.col;
+        for (let index1 = 0; index1 < selection.colCount; index1++){
+            func(sheet, colStart + index1)
+        }
+    }
+}
+
 /**
  * 获取命令空间
  */

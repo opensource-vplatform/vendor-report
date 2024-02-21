@@ -4,6 +4,7 @@ import { Group } from '@components/group/Index';
 
 import DesignerContext from '../../DesignerContext';
 import Align from './align/Index';
+import Cell from './cell/Index';
 import Font from './font/Index';
 
 function Index() {
@@ -20,10 +21,13 @@ function Index() {
     //是否显示 align
     const isSHowAlign = context?.conf?.nav?.start?.align !== false;
 
+    const isShowCell = context?.conf?.nav?.start?.isShowCell !== false;
+
     return (
         <Group>
             {isShowFont && <Font></Font>}
             {isSHowAlign && <Align></Align>}
+            {isShowCell && <Cell></Cell>}
         </Group>
     );
 }

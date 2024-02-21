@@ -18,10 +18,10 @@ const Title = styled.span`
 `;
 
 export const Group = function (props) {
-    const { style = {}, title = '', children } = props;
+    const { style = {}, title = '', children, titleStyle={} } = props;
     return (
         <Wrap style={style}>
-            <GroupTitle>{title}</GroupTitle>
+            <GroupTitle style={titleStyle}>{title}</GroupTitle>
             {children}
         </Wrap>
     );
