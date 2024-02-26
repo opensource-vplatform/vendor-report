@@ -62,6 +62,8 @@ export function addTable(params) {
 
     const tableName = `tableName_${genUUID()}`;
     const table = sheet.tables.add(tableName, row, col, 3, tableColumnsCount);
+    table.style(undefined);
+    table.allowAutoExpand(false);
     table.autoGenerateColumns(false);
 
     //设置表格的四个角标

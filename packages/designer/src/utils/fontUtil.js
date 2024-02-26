@@ -3,9 +3,9 @@ import { getFontSizeValues } from '@metadatas/font';
 import { getNamespace } from '@utils/spreadUtil';
 
 import {
-    applyStyleToSelectedCell,
-    applyToSelectedCell,
-    withBatchUpdate,
+  applyStyleToSelectedCell,
+  applyToSelectedCell,
+  withBatchUpdate,
 } from './spreadUtil';
 
 const tempSpan = document.createElement('span');
@@ -228,9 +228,6 @@ export function setAlign(params) {
             style.isVerticalText = isVerticalText;
             style.wordWrap = wordWrap;
             sheet.setStyle(row, col, style);
-            if (sheet.defaults.rowHeight === sheet.getRowHeight(row)) {
-                sheet.autoFitRow(row);
-            }
         });
     });
 }

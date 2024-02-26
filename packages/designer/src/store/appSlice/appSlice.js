@@ -12,6 +12,7 @@ export const appSlice = createSlice({
     reducers: {
         setSpread(state, action) {
             state.spread = action.payload.spread;
+            window._spread = action.payload.spread;
         },
         setMode(state, action) {
             state.mode = action.payload.mode;

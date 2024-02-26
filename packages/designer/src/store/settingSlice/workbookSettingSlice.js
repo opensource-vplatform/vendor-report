@@ -1,11 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { setSpread } from '../appSlice/appSlice';
-
 export const workbookSettingSlice = createSlice({
     name: 'workbookSettingSlice',
     initialState: {
-        spread: null,
         opened: false,
         active: null,
 
@@ -184,11 +181,6 @@ export const workbookSettingSlice = createSlice({
         setTabEditable(state, action){
             state.tabEditable = action.payload;
         },
-    },
-    extraReducers: (builder) => {
-        builder.addCase(setSpread, (state, action) => {
-            state.spread = action.payload.spread;
-        });
     },
 });
 

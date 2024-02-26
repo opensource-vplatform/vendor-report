@@ -28,12 +28,14 @@ import {
 import Common from './Common';
 import GridLine from './GridLine';
 import Label from './Label';
+import Protect from './Protect';
 import Title from './Title';
 
 const CommonTab = WithTabItem(Common, setActive);
 const GridLineTab = WithTabItem(GridLine, setActive);
 const TitleTab = WithTabItem(Title, setActive);
 const LabelTab = WithTabItem(Label, setActive);
+const ProtectTab = WithTabItem(Protect, setActive);
 
 export default function () {
     const dispatch = useDispatch();
@@ -72,6 +74,20 @@ export default function () {
                 rowHeaderDefColWidth,
                 rowHeaderVisible,
                 sheetTabColor,
+                isProtected,
+                allowSelectLockedCells,
+                allowSelectUnlockedCells,
+                allowFilter,
+                allowSort,
+                allowResizeRows,
+                allowResizeColumns,
+                allowEditObjects,
+                allowDragInsertRows,
+                allowDragInsertColumns,
+                allowInsertRows,
+                allowInsertColumns,
+                allowDeleteRows,
+                allowDeleteColumns,
             } = options;
             sheet.setColumnCount(colCount);
             sheet.setRowCount(rowCount);
@@ -115,6 +131,22 @@ export default function () {
             if (!isNullOrUndef(sheetTabColor)) {
                 sheet.options.sheetTabColor = sheetTabColor;
             }
+            sheet.options.isProtected = isProtected;
+            sheet.options.protectionOptions = {
+                allowSelectLockedCells,
+                allowSelectUnlockedCells,
+                allowFilter,
+                allowSort,
+                allowResizeRows,
+                allowResizeColumns,
+                allowEditObjects,
+                allowDragInsertRows,
+                allowDragInsertColumns,
+                allowInsertRows,
+                allowInsertColumns,
+                allowDeleteRows,
+                allowDeleteColumns,
+            };
         });
         dispatch(setOpened(false));
     };
@@ -162,6 +194,22 @@ export default function () {
                 )
                     ? 40
                     : sheet.defaults.rowHeaderColWidth;
+                const {
+                    allowSelectLockedCells = true,
+                    allowSelectUnlockedCells = true,
+                    allowFilter = true,
+                    allowSort = true,
+                    allowResizeRows = true,
+                    allowResizeColumns = true,
+                    allowEditObjects = false,
+                    allowDragInsertRows = false,
+                    allowDragInsertColumns = false,
+                    allowInsertRows = false,
+                    allowInsertColumns = false,
+                    allowDeleteRows = false,
+                    allowDeleteColumns = false,
+                } = sheet.options.protectionOptions;
+                const isProtected = sheet.options.isProtected;
                 dispatch(
                     init({
                         colCount: sheet.getColumnCount(),
@@ -194,6 +242,20 @@ export default function () {
                         rowHeaderDefColWidth,
                         rowHeaderVisible,
                         sheetTabColor,
+                        isProtected,
+                        allowSelectLockedCells,
+                        allowSelectUnlockedCells,
+                        allowFilter,
+                        allowSort,
+                        allowResizeRows,
+                        allowResizeColumns,
+                        allowEditObjects,
+                        allowDragInsertRows,
+                        allowDragInsertColumns,
+                        allowInsertRows,
+                        allowInsertColumns,
+                        allowDeleteRows,
+                        allowDeleteColumns,
                     })
                 );
             }
@@ -215,6 +277,7 @@ export default function () {
                     <CommonTab code='common' title='常规'></CommonTab>
                     <GridLineTab code='gridline' title='网格线'></GridLineTab>
                     <TitleTab code='title' title='标题'></TitleTab>
+                    <ProtectTab code='protect' title='保护'></ProtectTab>
                     <LabelTab code='label' title='工作表标签'></LabelTab>
                 </Tabs>
             </TabPanel>

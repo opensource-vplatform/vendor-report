@@ -32,6 +32,20 @@ export const worksheetSettingSlice = createSlice({
         rowHeaderDefColWidth: 40,
         rowHeaderVisible: true,
         sheetTabColor:'',
+        isProtected: false,
+        allowSelectLockedCells: true,
+        allowSelectUnlockedCells: true,
+        allowFilter: true,
+        allowSort: true,
+        allowResizeRows: true,
+        allowResizeColumns: true,
+        allowEditObjects: true,
+        allowDragInsertRows: false,
+        allowDragInsertColumns: false,
+        allowInsertRows: false,
+        allowInsertColumns: false,
+        allowDeleteRows: false,
+        allowDeleteColumns: false,
     },
     reducers: {
         init(state, action) {
@@ -126,6 +140,9 @@ export const worksheetSettingSlice = createSlice({
         setSheetTabColor(state, action) {
             state.sheetTabColor = action.payload;
         },
+        setProtectOptions(state,action){
+            Object.assign(state, action.payload);
+        }
     },
 });
 export const {
@@ -159,5 +176,6 @@ export const {
     setRowHeaderDefColWidth,
     setRowHeaderVisible,
     setSheetTabColor,
+    setProtectOptions,
 } = worksheetSettingSlice.actions;
 export default worksheetSettingSlice.reducer;

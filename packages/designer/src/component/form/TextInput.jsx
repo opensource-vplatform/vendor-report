@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import styled from 'styled-components';
 
 const Wrap = styled.div`
@@ -11,8 +13,16 @@ const Wrap = styled.div`
     background-color: #fff;
     border-radius: 4px;
     box-sizing: border-box;
+    cursor: pointer;
+    &:hover {
+        outline: 2px solid #ddd;
+    }
     &:focus-within {
         outline: 2px solid #ddd;
+    }
+    &[data-disabled='true'] {
+        outline: none !important;
+        cursor: not-allowed;
     }
 `;
 
@@ -46,14 +56,19 @@ export default function Index(props) {
         maxLength = 20,
         style = {},
     } = props;
-
+    const ref = useRef();
     const { Component: SuffixComponent, props: SuffixComponentProps = {} } =
         SuffixIcon;
 
     return (
-        <Wrap style={{ minWidth, width, ...style }}>
+        <Wrap style={{ minWidth, width, ...style }} data-disabled={disabled} onClick={()=>{
+            if(ref.current&&!disabled){
+                ref.current.focus();
+            }
+        }}>
             <Input
                 type='text'
+                ref={ref}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}

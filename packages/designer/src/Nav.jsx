@@ -1,6 +1,7 @@
 import {
   Fragment,
   useContext,
+  useEffect,
 } from 'react';
 
 import {
@@ -147,6 +148,11 @@ export default function () {
     const isHiddenTable = context?.conf?.nav?.table === false;
     //是否隐藏设置导航
     const isHiddenSetting = context?.conf?.nav?.setting === false;
+    useEffect(()=>{
+        if(spread){
+            spread.refresh();
+        }
+    },[navStyle]);
     return (
         <Tabs
             value={active}

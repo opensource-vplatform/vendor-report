@@ -20,6 +20,13 @@ export const viewSlice = createSlice({
         tabStripVisible:true
     },
     reducers: {
+        init(state,action){
+            const {colHeaderVisible,rowHeaderVisible,showHorizontalGridline,showVerticalGridline} = action.payload;
+            state.colHeaderVisible = colHeaderVisible;
+            state.rowHeaderVisible = rowHeaderVisible;
+            state.showHorizontalGridline = showHorizontalGridline;
+            state.showVerticalGridline = showVerticalGridline;
+        },
         setColHeaderVisible(state,action){
             const visible = action.payload.visible;
             state.colHeaderVisible = visible;
@@ -62,6 +69,7 @@ export const viewSlice = createSlice({
     },
 });
 export const {
+    init,
     setColHeaderVisible,
     setRowHeaderVisible,
     setShowHorizontalGridline,

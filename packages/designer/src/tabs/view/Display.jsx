@@ -13,6 +13,7 @@ import {
 } from '@components/group/Index';
 import ItemList from '@components/group/ItemList';
 import {
+  init,
   setColHeaderVisible,
   setNewTabVisible,
   setRowHeaderVisible,
@@ -34,6 +35,22 @@ export default function () {
         tabStripVisible,
     } = useSelector(({ viewSlice }) => viewSlice);
     useEffect(() => {
+        const sheet = spread.getActiveSheet();
+        if (sheet) {
+            const { colHeaderVisible, rowHeaderVisible } = sheet.options;
+            const { showHorizontalGridline, showVerticalGridline } =
+                sheet.options.gridline;
+            dispatch(
+                init({
+                    colHeaderVisible,
+                    rowHeaderVisible,
+                    showHorizontalGridline,
+                    showVerticalGridline,
+                })
+            );
+        }
+    }, []);
+    useEffect(() => {
         withBatchUpdate(spread, () => {
             spread.options.newTabVisible = newTabVisible;
             spread.options.tabStripVisible = tabStripVisible;
@@ -52,7 +69,7 @@ export default function () {
         newTabVisible,
         tabStripVisible,
     ]);
-    const groupStyle = {padding:'4px 6px'};
+    const groupStyle = { padding: '4px 6px' };
     return (
         <GroupItem title='显示/隐藏'>
             <HLayout>
