@@ -17,6 +17,7 @@ import { setTableStyleName } from '@utils/tableUtil';
 
 import ClearCard from './ClearCard';
 import { ContentWrap } from './Components';
+import CustomCard from './CustomCard';
 import DarkColorCard from './DarkColorCard';
 import LightColorCard from './LightColorCard';
 import MediumColorCard from './MediumColorCard';
@@ -44,6 +45,7 @@ export default function () {
             <Popper
                 content={
                     <ContentWrap>
+                        <CustomCard onClick={handleClick}></CustomCard>
                         <LightColorCard onClick={handleClick}></LightColorCard>
                         <MediumColorCard
                             onClick={handleClick}
@@ -57,7 +59,7 @@ export default function () {
                         ></ClearCard>
                     </ContentWrap>
                 }
-                contentStyle={{ top: 75, left: 8, overflowX: 'hidden' }}
+                contentStyle={{overflowX: 'hidden' }}
             >
                 <VItem
                     title='套用表格样式'

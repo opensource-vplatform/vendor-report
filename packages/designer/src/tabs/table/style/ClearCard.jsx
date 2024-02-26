@@ -8,6 +8,7 @@ const Wrap = styled.div`
     margin: 4px;
     padding: 4px 8px;
     align-items: center;
+    cursor: pointer;
     &:hover{
         background-color: lightgray;
     }
@@ -23,7 +24,7 @@ const Title = styled.span`
 export default function(props){
     const {onClick} = props;
     return <Wrap onClick={onClick}>
-        <Clear iconStyle={{width:10,height:10}}></Clear>
+        <Clear style={{background:'transparent !important'}} iconStyle={{width:10,height:10}}></Clear>
         <Title>清除</Title>
     </Wrap>
 }

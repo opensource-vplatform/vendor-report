@@ -1,4 +1,7 @@
-import { getNamespace, withBatchUpdate } from './spreadUtil';
+import {
+  getNamespace,
+  withBatchUpdate,
+} from './spreadUtil';
 
 //设置角标
 function setCornerMark(params) {
@@ -145,10 +148,16 @@ function getTableStyle(styleName) {
 
 export function setTableStyleName(params) {
     const { spread, styleName } = params;
+    setTableStyle(spread,styleName);
+}
+
+export function setTableStyle(spread,style){
+    style = typeof style == 'string' ? getTableStyle(style):style;
+    if(!style) return;
     withBatchUpdate(spread, (sheet) => {
         const table = getTable(sheet);
         if (table) {
-            table.style(getTableStyle(styleName));
+            table.style(style);
         }
     });
 }
