@@ -3,6 +3,8 @@ import {
   withBatchUpdate,
 } from './spreadUtil';
 
+const GC = getNamespace();
+
 //设置角标
 function setCornerMark(params) {
     const {
@@ -148,12 +150,12 @@ function getTableStyle(styleName) {
 
 export function setTableStyleName(params) {
     const { spread, styleName } = params;
-    setTableStyle(spread,styleName);
+    setTableStyle(spread, styleName);
 }
 
-export function setTableStyle(spread,style){
-    style = typeof style == 'string' ? getTableStyle(style):style;
-    if(!style) return;
+export function setTableStyle(spread, style) {
+    style = typeof style == 'string' ? getTableStyle(style) : style;
+    if (!style) return;
     withBatchUpdate(spread, (sheet) => {
         const table = getTable(sheet);
         if (table) {
@@ -187,6 +189,7 @@ export function setTableStyles(params) {
 
             table.showHeader(showHeader);
             table.showFooter(showFooter);
+            debugger;
             table.useFooterDropDownList(footerDropDownList);
             table.bandColumns(bandColumn);
             table.bandRows(bandRow);
