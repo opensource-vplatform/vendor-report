@@ -167,7 +167,8 @@ export default function () {
             const source = new GCsheets.Bindings.CellBindingSource(dataSource);
             sheet.setDataSource(source);
             const json = sheet.toJSON();
-            json.spans = tablesSpans;
+            json.spans = Array.isArray(json.spans) ? json.spans : [];
+            json.spans.push(...tablesSpans);
             sheet.fromJSON(json);
             sheet.setDataSource(source);
             tableMerge({
