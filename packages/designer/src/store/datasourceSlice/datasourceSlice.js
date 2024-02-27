@@ -14,6 +14,8 @@ export const datasourceSlice = createSlice({
         finalDsList: [],
         dsList: [],
         previewViewDatas: {},
+        originalDatasource: null, //原始数据源不允许编辑与删除，但是允许扩展
+        originalDatasourceIds: {},
         previewViewDatasHasInit: false,
         isShowDatasource: false,
         activeSheetTablePath: {},
@@ -82,9 +84,9 @@ export const datasourceSlice = createSlice({
             }
         },
         genPreviewDatas(state, { payload }) {
-            if (state.previewViewDatasHasInit) {
+            /*  if (state.previewViewDatasHasInit) {
                 return;
-            }
+            } */
             function mergeColumnDatas(params) {
                 const {
                     instanceObject,
@@ -144,7 +146,12 @@ export const datasourceSlice = createSlice({
                 code,
                 name,
                 children,
+                id,
             }) {
+                if (state.originalDatasourceIds[id]) {
+                    return;
+                }
+
                 if (type !== 'table') {
                     datas[code] = genValueByType(name, type, 1);
                 } else {
@@ -250,6 +257,10 @@ export const datasourceSlice = createSlice({
             datasource = Array.isArray(datasource) ? datasource : [];
             state.dsList = [...datasource];
             state.finalDsList = [...datasource];
+            datasource.forEach(({ id }) => {
+                state.originalDatasourceIds[id] = true;
+            });
+            state.originalDatasource = JSON.stringify(datasource);
             if (datas) {
                 state.previewViewDatas = datas;
                 state.previewViewDatasHasInit = true;

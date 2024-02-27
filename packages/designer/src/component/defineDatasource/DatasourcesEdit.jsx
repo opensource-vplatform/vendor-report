@@ -71,6 +71,7 @@ export default function Index(props) {
         activeDs,
         finalDsList,
         tables: tablesBindInfos,
+        originalDatasourceIds,
     } = useSelector(({ datasourceSlice }) => datasourceSlice);
 
     if (!activeDs.id && dsList.length > 0) {
@@ -176,6 +177,14 @@ export default function Index(props) {
         }
     };
 
+    let disabled = !isAllowToEdit;
+    if (
+        originalDatasourceIds[activeDs.id] ||
+        originalDatasourceIds[activeDs.parentId]
+    ) {
+        disabled = true;
+    }
+
     return (
         <DatasourceBox>
             {isShowConfirmDialog ? (
@@ -251,7 +260,7 @@ export default function Index(props) {
                             onBlur={checkIsUnique}
                             itemType='code'
                             maxLength={20}
-                            disabled={!isAllowToEdit}
+                            disabled={disabled}
                             width='500px'
                         ></TextInput>
                     </div>
@@ -262,7 +271,7 @@ export default function Index(props) {
                             onChange={dataChangeHandler}
                             itemType='name'
                             maxLength={20}
-                            disabled={!isAllowToEdit}
+                            disabled={disabled}
                             width='500px'
                         ></TextInput>
                     </div>
@@ -277,7 +286,7 @@ export default function Index(props) {
                                 height: 30,
                                 borderRadius: 4,
                             }}
-                            disabled={!isAllowToEdit}
+                            disabled={disabled}
                             optionStyle={{ minWidth: 500, width: 506 }}
                             value={activeDs.type}
                             onChange={function (value) {
@@ -299,7 +308,7 @@ export default function Index(props) {
                             value={activeDs.desc}
                             itemType='desc'
                             maxLength={200}
-                            disabled={!isAllowToEdit}
+                            disabled={disabled}
                         ></Textarea>
                     </div>
                 </DatasourceOptBoxRight>

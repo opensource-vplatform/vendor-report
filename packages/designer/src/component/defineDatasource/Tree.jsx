@@ -1,9 +1,13 @@
 import {
   useContext,
+  useEffect,
   useRef,
 } from 'react';
 
-import { useDispatch } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { Highlight } from '@components/highlight/Index';
 import {
@@ -26,6 +30,11 @@ import {
 export default function Index(props) {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
+    const container = useRef();
+
+    let { originalDatasourceIds } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
     //是否允许编辑数据源
 
     const datasObj = useRef({}).current;
@@ -101,13 +110,26 @@ export default function Index(props) {
         }
     };
 
+    useEffect(() => {
+        if (container.current) {
+            container.current
+                .querySelector('.active')
+                ?.scrollIntoView?.({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'nearest',
+                });
+        }
+    });
+
     return (
         <DatasourceListOl
             onClick={listClickHandler}
             style={{ width: width + 'px' }}
+            ref={container}
         >
             {_datas.map(function (dataItem) {
-                const { name, id, children, type, code } = dataItem;
+                const { name, id, children, type, code, parentId } = dataItem;
                 datasObj[id] = dataItem;
 
                 let draggableClass = '';
@@ -172,7 +194,8 @@ export default function Index(props) {
                                 ></Highlight>
                             </div>
                             {type === 'table' && isShowAddSubDatasource
-                                ? isAllowToEdit && (
+                                ? isAllowToEdit &&
+                                  !originalDatasourceIds[id] && (
                                       <DddSubDatasource
                                           data-not-allow={isNotAllow}
                                           onClick={addSubDatasourceClickHandler}
@@ -180,7 +203,9 @@ export default function Index(props) {
                                   )
                                 : ''}
                             {isShowAddSubDatasource
-                                ? isAllowToEdit && (
+                                ? isAllowToEdit &&
+                                  !originalDatasourceIds[id] &&
+                                  !originalDatasourceIds[parentId] && (
                                       <DelDatasource
                                           data-item-id={id}
                                           onClick={delDatasourceClickHandler}
