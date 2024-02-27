@@ -240,7 +240,7 @@ export const datasourceSlice = createSlice({
                 }
             });
 
-            state.previewViewDatas = datas;
+            state.previewViewDatas = { ...state.previewViewDatas, ...datas };
         },
         setIsShowDatasource(state, { payload }) {
             if (
