@@ -395,7 +395,7 @@ export function sortRange(spread, ascending) {
     });
 }
 
-export function sortSelection(spread, byCol,sorts){
+export function sortSelection(spread, byCol, sorts) {
     withBatchUpdate(spread, (sheet) => {
         const selections = sheet.getSelections();
         if (selections && selections.length > 0) {

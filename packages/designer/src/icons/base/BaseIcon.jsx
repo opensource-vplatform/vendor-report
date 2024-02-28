@@ -28,7 +28,7 @@ const Icon = styled.div`
 `;
 
 function Index(pros) {
-    const { icon, tips, active = false,hoverable=true, onClick,disabled=false, style={},iconStyle={},children } = pros;
+    const { icon, tips, active = false,hoverable=true, onClick,disabled=false, style={},iconStyle={},children,...others } = pros;
     const st = {...style}
     if(active){
         st.backgroundColor = '#dadada';
@@ -36,7 +36,7 @@ function Index(pros) {
     const icSt = {...iconStyle};
     icSt.backgroundImage = icon;
     return (
-        <IconWrap title={tips} onClick={onClick} style={st} data-disabled={disabled} data-hoverable={hoverable}>
+        <IconWrap {...others} title={tips} onClick={onClick} style={st} data-disabled={disabled} data-hoverable={hoverable}>
             <Icon
                 style={icSt}
             ></Icon>

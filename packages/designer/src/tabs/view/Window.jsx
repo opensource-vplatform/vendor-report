@@ -72,7 +72,6 @@ export default function () {
             <HLayout>
                 <Menu
                     datas={menuDatas}
-                    optionStyle={{ marginTop: 45, marginLeft: 4 }}
                     onNodeClick={handleNodeClick}
                 >
                     <VItem
