@@ -28,7 +28,7 @@ import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
-import InsertTab from '@tabs/insert/Index';
+//import InsertTab from '@tabs/insert/Index';
 import ReportTab from '@tabs/report/Index';
 import SettingTab from '@tabs/setting/Index';
 import StartTab from '@tabs/start/Index';
@@ -79,7 +79,7 @@ const DataNavItem = WithNavItem(DataTab);
 const FormulaNavItem = WithNavItem(Formula);
 const SettingNavItem = WithNavItem(SettingTab);
 const ReportNavItem = WithNavItem(ReportTab);
-const InsertNavItem = WithNavItem(InsertTab);
+//const InsertNavItem = WithNavItem(InsertTab);
 
 export default function () {
     const dispatch = useDispatch();
@@ -227,11 +227,6 @@ export default function () {
                 title='开始'
                 tabProps={{ hidden: isHiddenStart }}
             ></StartNavItem>
-            <InsertNavItem
-                code='insert'
-                title='插入'
-                tabProps={{ hidden: isHiddenInsert }}
-            ></InsertNavItem>
             <FormulaNavItem
                 code='formula'
                 title='公式'

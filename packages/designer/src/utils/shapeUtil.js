@@ -299,3 +299,63 @@ export function insertShape(spread, shapeType, error) {
         })
         .catch(error);
 }
+
+const FORM_CONTROL_RECT = {};
+
+const fillFormControlRect = function (params) {
+    params.forEach((param) => {
+        FORM_CONTROL_RECT[param[0]] = {
+            width: param[1],
+            height: param[2],
+        };
+    });
+};
+
+fillFormControlRect([
+    ['spinButton', 100, 50],
+    ['optionButton', 120, 24],
+    ['checkBox', 120, 24],
+    ['comboBox', 200, 30],
+    ['scrollBar', 200, 30],
+    ['listBox', 200, 120],
+    ['label', 100, 24],
+    ['groupBox', 180, 150],
+]);
+
+const FORM_CONTROL_PREFIX = {
+    button: 'Button',
+    optionButton: 'Option Button',
+    checkBox: 'Check Box',
+    label: 'Label',
+    groupBox: 'Group Box',
+};
+
+export function insertFormControlShape(spread, shapeType) {
+    withBatchUpdate(spread, (sheet) => {
+        const GC = getNamespace();
+        if (sheet && GC.Spread.Sheets.Shapes) {
+            const rect = FORM_CONTROL_RECT[shapeType];
+            let width = 150,
+                height = 150;
+            if (rect) {
+                width = rect.width;
+                height = rect.height;
+            }
+            const text = FORM_CONTROL_PREFIX[shapeType] || '';
+            const position = getShapePosition(sheet, width, height);
+            const left = position.x;
+            const top = position.y;
+            const shape = sheet.shapes.addFormControl(
+                '',
+                shapeType,
+                left,
+                top,
+                width,
+                height
+            );
+            if (text) {
+                shape.text(text);
+            }
+        }
+    });
+}
