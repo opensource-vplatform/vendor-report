@@ -359,3 +359,10 @@ export function insertFormControlShape(spread, shapeType) {
         }
     });
 }
+
+
+export const getSelectedShapes = function(sheet) {
+    return sheet && sheet.shapes ? sheet.shapes.all().filter(function(shape) {
+        return shape.isSelected()
+    }) : []
+}

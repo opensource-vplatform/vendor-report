@@ -387,7 +387,7 @@ export default function (props) {
                     <Menu
                         value={data.sortType}
                         datas={MENU_DATAS}
-                        optionStyle={{ top: 34, width: 80 }}
+                        optionStyle={{width: 80 }}
                         onNodeClick={handleSortTypeChange}
                     >
                         <Button style={btnStyle}>选项...</Button>

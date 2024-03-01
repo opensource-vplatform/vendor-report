@@ -31,6 +31,7 @@ import FileTab from '@tabs/file/Index';
 //import InsertTab from '@tabs/insert/Index';
 import ReportTab from '@tabs/report/Index';
 import SettingTab from '@tabs/setting/Index';
+import SparklinesTab from '@tabs/sparklines/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
@@ -79,6 +80,7 @@ const DataNavItem = WithNavItem(DataTab);
 const FormulaNavItem = WithNavItem(Formula);
 const SettingNavItem = WithNavItem(SettingTab);
 const ReportNavItem = WithNavItem(ReportTab);
+const SparklinesNavItem = WithNavItem(SparklinesTab);
 //const InsertNavItem = WithNavItem(InsertTab);
 
 export default function () {
@@ -152,11 +154,13 @@ export default function () {
     const isHiddenSetting = context?.conf?.nav?.setting === false;
     //是否隐藏插入导航
     const isHiddenInsert = context?.conf?.nav?.insert === false;
-    useEffect(()=>{
-        if(spread){
+    //是否隐藏迷你图导航
+    const isHiddenSparklines = context?.conf?.nav?.sparklines === false;
+    useEffect(() => {
+        if (spread) {
             spread.refresh();
         }
-    },[navStyle]);
+    }, [navStyle]);
     return (
         <Tabs
             value={active}
@@ -253,6 +257,11 @@ export default function () {
                 tabProps={{ hidden: isHiddenSetting }}
             ></SettingNavItem>
             <ReportNavItem code='Report' title='报表设计'></ReportNavItem>
+            <SparklinesNavItem
+                code='sparklines'
+                title='迷你图'
+                tabProps={{ hidden: isHiddenSparklines }}
+            ></SparklinesNavItem>
         </Tabs>
     );
 }

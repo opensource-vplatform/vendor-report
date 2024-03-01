@@ -5,6 +5,9 @@ import {
   getFormulaMetadatas,
   getFormulasByCatalog,
 } from '../metadatas/formula';
+import { getSelectedChart } from './chartUtil';
+import { getSelectedShapes } from './shapeUtil';
+import { getSelectedSlicers } from './slicerUtil';
 import {
   getNamespace,
   getSelectionType,
@@ -552,4 +555,64 @@ export const setAutoFormula = function (spread, formula) {
             }
         }
     });
+};
+
+export const parseFormulaSparkline = function (spread, sheet, row, col, formula) {
+    if (!sheet) {
+        return null;
+    }
+    formula = formula || sheet.getFormula(row, col);
+    if (!formula) {
+        return null;
+    }
+    const service = sheet.getCalcService();
+    const GC = getNamespace();
+    try {
+        const res = service.parse(null, formula, row, col);
+        if (res.type === GC.Spread.CalcEngine.ExpressionType.function) {
+            const funcName = res.functionName;
+            if (funcName && spread.getSparklineEx(funcName)) {
+                return res;
+            }
+        }
+    } catch (e) {}
+    return null;
+};
+
+export const isFormulaSparklineSelected = function (spread, sheet) {
+    let result = false;
+    if (sheet) {
+        const slicer = getSelectedSlicers(sheet)[0];
+        const chart = getSelectedChart(sheet);
+        const shape = getSelectedShapes(sheet)[0];
+        const plugin = slicer || chart || shape;
+        const row = sheet.getActiveRowIndex();
+        const col = sheet.getActiveColumnIndex();
+        //const selections = sheet.getSelections();
+        //if (selections && selections.length >= 1) {
+        let flag = false;
+        const res = parseFormulaSparkline(spread, sheet, row, col);
+        if (
+            res &&
+            [
+                'BC_QRCODE',
+                'BC_EAN13',
+                'BC_EAN8',
+                'BC_CODABAR',
+                'BC_CODE39',
+                'BC_CODE93',
+                'BC_CODE128',
+                'BC_GS1_128',
+                'BC_CODE49',
+                'BC_PDF417',
+                'BC_DATAMATRIX',
+            ].indexOf(res.functionName) === -1
+        ) {
+            flag = true;
+        }
+        result = flag && !plugin;
+        //}
+        return result;
+    }
+    return result;
 };

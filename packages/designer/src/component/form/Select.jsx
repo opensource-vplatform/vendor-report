@@ -103,7 +103,7 @@ export default function (props) {
                         {data.text}
                     </Text>
                 )}
-                <ArrowDown></ArrowDown>
+                <ArrowDown disabled={disabled}></ArrowDown>
             </Wrap>
         </Menu>
     );

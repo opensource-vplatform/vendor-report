@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const navSlice = createSlice({
     name: 'navSlice',
     initialState: {
-        hideCodes: ['table'],
+        hideCodes: ['table','sparklines'],
         tableName: null,
         active: null,
         reportDesignWizard: false,

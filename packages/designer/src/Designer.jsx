@@ -32,6 +32,7 @@ import DesignerContext from './DesignerContext';
 import Excel from './Excel';
 import Nav from './Nav';
 import Preview from './Preview';
+import { isFormulaSparklineSelected } from './utils/formulaUtil';
 
 const GlobalStyle = createGlobalStyle`
     ::-webkit-scrollbar {
@@ -106,7 +107,22 @@ function Designer(props) {
                 //不在表格区域，且存在表设计页签，需要隐藏表设计页签
                 dispatch(hideTab({ code: 'table' }));
             }
-            if (!inTable && data.active == 'table') {
+            const sparklinesSel = isFormulaSparklineSelected(
+                data.spread,
+                sheet
+            );
+            if (sparklinesSel) {
+                if (data.hideCodes.indexOf('sparklines') != -1) {
+                    dispatch(showTab({ code: 'sparklines' }));
+                    dispatch(setActive({ code: 'sparklines' }));
+                }
+            } else if (data.hideCodes.indexOf('sparklines') == -1) {
+                dispatch(hideTab({ code: 'sparklines' }));
+            }
+            if (
+                (!inTable && data.active == 'table') ||
+                (!sparklinesSel && data.active == 'sparklines')
+            ) {
                 dispatch(setActive({ code: 'start' }));
             }
         },
@@ -149,7 +165,7 @@ function Designer(props) {
                         <SpreadWrap
                             style={{
                                 overflow: 'hidden',
-                                marginTop: isShowNav ? 8:0
+                                marginTop: isShowNav ? 8 : 0,
                             }}
                         >
                             <SplitPane

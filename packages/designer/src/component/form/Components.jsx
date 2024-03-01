@@ -21,6 +21,10 @@ export const NumberInput = styled.input`
         border: solid 1px #5292f7;
         outline: none;
     }
+    &:disabled {
+        background-color: #f3f3f3;
+        cursor: not-allowed;
+    }
 `;
 
 export const NumberIconWrap = styled.div`
