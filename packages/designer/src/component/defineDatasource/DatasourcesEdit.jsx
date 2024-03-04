@@ -82,8 +82,13 @@ export default function Index(props) {
         ? types.filter(({ value }) => value !== 'table')
         : [...types];
 
-    const isCanBeSaved = activeDs.code && activeDs.name;
-    const isCanAdd = (isCanBeSaved && dsList.length > 0) || dsList.length === 0;
+    let isCanBeSaved = activeDs.code && activeDs.name;
+    let isCanAdd = (isCanBeSaved && dsList.length > 0) || dsList.length === 0;
+    const _hasSameNode = hasSameNode(activeDs, dsList);
+    if (_hasSameNode) {
+        isCanAdd = false;
+        isCanBeSaved = false;
+    }
 
     //添加
     const addDatasourceClickHandler = function () {
@@ -237,6 +242,7 @@ export default function Index(props) {
                     <Datasources
                         activeId={activeDs.id}
                         click={datasourceListClickHandler}
+                        isCanAdd={isCanAdd}
                     ></Datasources>
                 </DatasourceOptBoxLeft>
                 <DatasourceOptBoxRight

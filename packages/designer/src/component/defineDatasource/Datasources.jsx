@@ -4,7 +4,7 @@ import Tree from './Tree.jsx';
 
 //数据源列表
 export default function Index(props) {
-    const { draggable, isEditData = true } = props;
+    const { draggable, isEditData = true, isCanAdd = true } = props;
     let { dsList, activeDs, finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
@@ -17,7 +17,7 @@ export default function Index(props) {
         <Tree
             {...props}
             datas={dsList}
-            isNotAllow={isNotAllow}
+            isNotAllow={!isCanAdd}
             activeSheetTablePath={activeSheetTablePath}
         ></Tree>
     );

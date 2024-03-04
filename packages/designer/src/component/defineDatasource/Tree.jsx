@@ -38,6 +38,17 @@ export default function Index(props) {
     //是否允许编辑数据源
 
     const datasObj = useRef({}).current;
+
+    useEffect(() => {
+        if (container.current) {
+            container.current.querySelector('.active')?.scrollIntoView?.({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest',
+            });
+        }
+    });
+
     const {
         datas,
         activeId,
@@ -109,18 +120,6 @@ export default function Index(props) {
             onDoubleClick(data);
         }
     };
-
-    useEffect(() => {
-        if (container.current) {
-            container.current
-                .querySelector('.active')
-                ?.scrollIntoView?.({
-                    behavior: 'smooth',
-                    block: 'nearest',
-                    inline: 'nearest',
-                });
-        }
-    });
 
     return (
         <DatasourceListOl

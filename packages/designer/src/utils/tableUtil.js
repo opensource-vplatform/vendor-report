@@ -186,10 +186,10 @@ export function setTableStyles(params) {
                 sheet,
                 setType: 'onlyRemove',
             });
-
+            let showHeaderOldValue = table.showHeader();
             table.showHeader(showHeader);
             table.showFooter(showFooter);
-            debugger;
+
             table.useFooterDropDownList(footerDropDownList);
             table.bandColumns(bandColumn);
             table.bandRows(bandRow);
@@ -200,6 +200,25 @@ export function setTableStyles(params) {
                 table.filterButtonVisible(i, filterButtonVisible);
             }
 
+            //如果显示表头，则在表尾添加一行。避免移动表格后覆盖表格后面已经编辑的单元格
+            if (showHeader && showHeader !== showHeaderOldValue) {
+                sheet.addRows(oldRange.row + oldRange.rowCount, 1);
+            }
+
+            sheet.tables.move(table, oldRange.row, oldRange.col);
+
+            //如果活动单元格不在表格区域内，则移动活动单元格
+            if (!showHeader) {
+                const _table = getTable(sheet);
+                if (!_table) {
+                    const selections = sheet.getSelections();
+                    selections.forEach(({ row, col, rowCount, colCount }) => {
+                        sheet.setSelection(row - 1, col, rowCount, colCount);
+                    });
+                }
+            }
+
+            debugger;
             //添加表格区域样式
             const newRange = table.range();
             setTableCornerMarks({
