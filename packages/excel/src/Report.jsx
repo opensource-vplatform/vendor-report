@@ -8,13 +8,22 @@ import Workbook from './Workbook';
 class Report {
     conf = {};
 
+    spread = null;
+
     constructor(conf) {
         this.conf = conf;
     }
 
     mount(el) {
         GC.Spread.Common.CultureManager.culture('zh-cn');
-        createRoot(el).render(<Workbook {...this.conf}></Workbook>);
+        const {onInited,...others} = this.conf;
+        const onInitHandler = (spread)=>{
+            this.spread = spread;
+            if(onInited){
+                onInited(spread);
+            }
+        }
+        createRoot(el).render(<Workbook onInited={onInitHandler} {...others}></Workbook>);
     }
 
     /**
@@ -31,11 +40,11 @@ class Report {
                     .then(() => {
                         const GC = getNamespace();
                         const excelIO = new GC.Spread.Excel.IO();
-                        const json = JSON.stringify(spread.toJSON());
+                        const json = JSON.stringify(this.spread.toJSON());
                         excelIO.save(
                             json,
                             (blob) => {
-                                download(blob, filename + '.xlsx');
+                                download(blob, filename);
                                 resolve();
                             },
                             (err) => {
@@ -87,7 +96,7 @@ class Report {
                         'vendor/plugins/pdf.min.js',
                     ])
                     .then(() => {
-                        spread.savePDF(
+                        this.spread.savePDF(
                             (data) => {
                                 download(data, filename);
                                 resolve();
