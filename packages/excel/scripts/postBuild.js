@@ -30,6 +30,10 @@ if(indexScriptName!=null){
     });
     fs.writeFileSync(indexHtmlPath,content);
     const distScriptPath = path.resolve(distPath,indexScriptName);
-    fs.copyFileSync(distScriptPath, path.resolve(distPath,'script',indexScriptName));
+    const distDir = path.resolve(distPath,'script');
+    if(!fs.existsSync(distDir)){
+        fs.mkdirSync(distDir,{ recursive: true });
+    }
+    fs.copyFileSync(distScriptPath, path.resolve(distDir,indexScriptName));
     fs.unlinkSync(distScriptPath);
 }
