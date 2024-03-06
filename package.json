@@ -3,7 +3,8 @@
   "private":true,
   "scripts": {
     "designer": "pnpm -F report-designer dev",
-    "build-designer": "pnpm -F report-designer build",
+    "postbuild": "node scripts/postBuild.js",
+    "build": "pnpm -F report-designer build && pnpm -F report-excel build && pnpm -F report-plugin-jasperreport build",
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {

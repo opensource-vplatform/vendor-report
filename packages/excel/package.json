@@ -4,11 +4,14 @@
     "description": "报表excel",
     "main": "src/index.jsx",
     "scripts": {
-        "build": "vite build -c=vite.config.build.js"
+        "postBuild": "node scripts/postBuild.js",
+        "build": "vite build -c=vite.config.build.js && npm run postBuild"
     },
     "dependencies": {
         "react": "^18.2.0",
-        "styled-components": "^6.1.1"
+        "styled-components": "^6.1.1",
+        "react-dom": "^18.2.0",
+        "resource-manager-js": "^5.0.7"
     },
     "devDependencies": {
         "@babel/plugin-transform-runtime": "^7.23.7",

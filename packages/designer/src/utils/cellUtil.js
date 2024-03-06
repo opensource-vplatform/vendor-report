@@ -74,9 +74,8 @@ const getSortedRowSelections = function (selections) {
 
 const canShiftCell = function (sheet, range) {
     const tables = sheet.tables.all();
-    const range1 = null;
     for (let index = 0; index < tables.length; index++) {
-        range1 = tables[index].range();
+        let range1 = tables[index].range();
         if (
             !range.containsRange(range1) &&
             !range1.containsRange(range) &&

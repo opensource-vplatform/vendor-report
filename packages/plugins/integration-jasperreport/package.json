@@ -6,9 +6,9 @@
     "scripts": {
         "dev": "vite --host",
         "test": "node test/index.js",
-        "build": "vite build"
+        "postBuild": "node scripts/postBuild.js",
+        "build": "vite build -c=vite.config.build.js && npm run postBuild"
     },
-    "type": "module",
     "dependencies": {},
     "devDependencies": {
         "@babel/plugin-transform-runtime": "^7.23.7",

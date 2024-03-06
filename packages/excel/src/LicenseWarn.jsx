@@ -1,15 +1,15 @@
-import styled from 'styled-components';
+import { withDivStyled } from './utils/componentUtil';
 
-const WarnWrap = styled.div`
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
-    color: #6a6a6a;
-    z-index: 999;
-    text-align: right;
-    font-size: 14px;
-    pointer-events: none;
-`;
+const WarnWrap = withDivStyled({
+    position: 'absolute',
+    bottom: '50px',
+    right: '50px',
+    color: '#6a6a6a',
+    zIndex: '999',
+    textAlign: 'right',
+    fontSize: '14px',
+    pointerEvents: 'none',
+});
 
 export default function () {
     return (
@@ -18,4 +18,4 @@ export default function () {
             vdept@toone.com.cn咨询
         </WarnWrap>
     );
-};
+}

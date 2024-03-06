@@ -1,40 +1,43 @@
-import styled from 'styled-components';
-
 import ErrorImgIcon from './assets/images/error_icon.png';
+import {
+  withDivStyled,
+  withImgStyled,
+  withSpanStyled,
+} from './utils/componentUtil';
 
-const ErrorWrap = styled.div`
-    color: #6a6a6a;
-    text-align: center;
-    vertical-align: middle;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 440px;
-    white-space: nowrap;
-`;
+const ErrorWrap = withDivStyled({
+    color: '#6a6a6a',
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '440px',
+    whiteSpace: 'nowrap',
+});
 
-const ErrorIcon = styled.img`
-    display: inline-block;
-    width: 100px;
-    height: 105px;
-    vertical-align: middle;
-`;
+const ErrorIcon = withImgStyled({
+    display: 'inline-block',
+    width: '100px',
+    height: '105px',
+    verticalAlign: 'middle',
+});
 
-const ErrorContent = styled.span`
-    display: inline-block;
-    padding-left: 10px;
-    text-align: left;
-    vertical-align: middle;
-    font-size: 14px;
-`;
+const ErrorContent = withSpanStyled({
+    display: 'inline-block',
+    paddingLeft: '10px',
+    textAlign: 'left',
+    verticalAlign: 'middle',
+    fontSize: '14px',
+});
 
-const ErrorTitle = styled.span`
-    display: inline-block;
-    font-size: 20px;
-    font-weight: 600;
-    opacity: 0.8;
-`;
+const ErrorTitle = withSpanStyled({
+    display: 'inline-block',
+    fontSize: '20px',
+    fontWeight: '600',
+    opacity: '0.8',
+});
 
 export default function () {
     return (
@@ -49,4 +52,4 @@ export default function () {
             </ErrorContent>
         </ErrorWrap>
     );
-};
+}

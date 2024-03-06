@@ -1,14 +1,13 @@
 import {
-  createRef,
   useEffect,
+  useRef,
   useState,
 } from 'react';
-
-import styled from 'styled-components';
 
 import { register } from './custom/index';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
+import { withDivStyled } from './utils/componentUtil';
 import {
   checkLicense,
   getLicense,
@@ -19,20 +18,20 @@ import {
   withBatchCalcUpdate,
 } from './utils/spreadUtil';
 
-const Wrap = styled.div`
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    user-select: none;
-`;
+const Wrap = withDivStyled({
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    overflow: 'visible',
+    userSelect: 'none',
+});
 
-const ExcelWrap = styled.div`
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    user-select: none;
-`;
+const ExcelWrap = withDivStyled({
+    width: '100%',
+    height: '100%',
+    overflow: 'visible',
+    userSelect: 'none',
+});
 
 const bindEvent = function (spread, typeName, handler) {
     if (handler) {
@@ -44,9 +43,9 @@ const bindEvent = function (spread, typeName, handler) {
 
 export default function (props) {
     const {
-        newTabVisible=true,
+        newTabVisible = true,
         tabEditable = true,
-        tabStripVisible=true,
+        tabStripVisible = true,
         onInited,
         onEnterCell,
         onActiveSheetChanged,
@@ -54,7 +53,7 @@ export default function (props) {
         onSelectionChanged,
         onSelectionChanging,
         license,
-        json=null,
+        json = null,
         children,
     } = props;
     if (license) {
@@ -80,7 +79,7 @@ export default function (props) {
         };
     });
 
-    const el = createRef(null);
+    const el = useRef(null);
     useEffect(() => {
         if (el.current && !data.showError) {
             let spread = null;
@@ -101,24 +100,29 @@ export default function (props) {
             spread.suspendEvent();
             try {
                 if (unInited) {
-                    if(json){
-                        withBatchCalcUpdate(spread,()=>{
+                    if (json) {
+                        withBatchCalcUpdate(spread, () => {
                             spread.fromJSON(json);
                             register(spread);
                             const sheets = spread.sheets;
-                            if(sheets&&sheets.length>0){
-                                sheets.forEach(sheet=>{
+                            if (sheets && sheets.length > 0) {
+                                sheets.forEach((sheet) => {
                                     sheet.recalcAll(true);
                                 });
                             }
                         });
-                    }else if (children) {
-                        const sheetList = Array.isArray(children)
-                            ? children
-                            : [children];
+                    } else {
+                        let sheetList;
+                        if (children) {
+                            sheetList = Array.isArray(children)
+                                ? children
+                                : [children];
+                        } else {
+                            sheetList = [{ props: { name: 'Sheet1' } }];
+                        }
                         sheetList.forEach((sheet, index) => {
                             const {
-                                name = `sheet${index + 1}`,
+                                name = `Sheet${index + 1}`,
                                 rowCount = 20,
                                 colCount = 20,
                             } = sheet.props;
@@ -139,7 +143,9 @@ export default function (props) {
                 bindEvent(spread, 'ValueChanged', onValueChanged);
                 bindEvent(spread, 'SelectionChanged', onSelectionChanged);
                 bindEvent(spread, 'SelectionChanging', onSelectionChanging);
-                bindEvent(spread, 'SheetChanged',()=>{debugger});
+                bindEvent(spread, 'SheetChanged', () => {
+                    debugger;
+                });
             } finally {
                 spread.resumePaint();
                 spread.resumeEvent();
@@ -159,7 +165,15 @@ export default function (props) {
             {data.showError ? (
                 <LicenseError></LicenseError>
             ) : (
-                <ExcelWrap ref={el}></ExcelWrap>
+                <div
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        overflow: 'visible',
+                        userSelect: 'none',
+                    }}
+                    ref={el}
+                ></div>
             )}
             {!data.showError && data.showWarn ? (
                 <LicenseWarn></LicenseWarn>

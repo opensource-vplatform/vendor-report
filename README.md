@@ -29,6 +29,9 @@ pnpm install
 pnpm run designer
 ```
 
+## Build说明
+注意：build时会删除dist目录，如果该目录有私有数据，在build前请备份私有数据。
+
 ## 相关参考文档
 
 ### pnpm

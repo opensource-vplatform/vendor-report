@@ -15,7 +15,7 @@ export default defineConfig({
         lib: {
             name: 'TOONE.JasperReportTransform',
             entry: 'src/index.js',
-            fileName: 'integration-jasperreport',
+            fileName: 'jasperreport-transform-[hash]',
             formats: ['umd'],
         },
     },

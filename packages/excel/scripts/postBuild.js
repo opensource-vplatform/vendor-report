@@ -2,17 +2,17 @@ const path = require('path');
 
 const fs = require('fs');
 
-const indexHtmlPath = path.resolve(__dirname, '../dist/designer.html');
+const indexHtmlPath = path.resolve(__dirname, '../dist/report.html');
 
 const distPath = path.resolve(__dirname,'../dist');
 
-const filenames = fs.readdirSync(distPath);
+const filenames = fs.readdirSync(path.resolve(__dirname,'../dist'));
 
 let indexScriptName = null;
 
-const INDEX_SCRIPT_REG = /^designer\-[\w\d]+\.umd\.js$/;
+const INDEX_SCRIPT_REG = /^report\-[\w\d]+\.umd\.js$/;
 
-const SCRIPT_REG = /<script\s+src=["'](\.\/designer.+?umd\.js)["']\s*>/;
+const SCRIPT_REG = /<script\s+src=["'](\.\/report.+?umd\.js)["']\s*>/;
 
 for (let index = 0; index < filenames.length; index++) {
     const filename = filenames[index];
