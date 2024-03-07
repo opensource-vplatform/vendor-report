@@ -18,3 +18,11 @@ export const withBatchCalcUpdate = function (spread, updateHandler) {
         }
     }
 };
+
+const PLUGIN_SRCS = {
+    print: ['./vendor/plugins/print.min.js']
+};
+
+export const getPluginSrc = function(type){
+    return PLUGIN_SRCS[type];
+}

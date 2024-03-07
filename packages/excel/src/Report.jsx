@@ -10,20 +10,31 @@ class Report {
 
     spread = null;
 
+    printHandler = null;
+
     constructor(conf) {
         this.conf = conf;
     }
 
     mount(el) {
+        const GC = getNamespace();
         GC.Spread.Common.CultureManager.culture('zh-cn');
-        const {onInited,...others} = this.conf;
-        const onInitHandler = (spread)=>{
+        const { onInited, ...others } = this.conf;
+        const onInitHandler = (spread) => {
             this.spread = spread;
-            if(onInited){
+            if (onInited) {
                 onInited(spread);
             }
-        }
-        createRoot(el).render(<Workbook onInited={onInitHandler} {...others}></Workbook>);
+        };
+        createRoot(el).render(
+            <Workbook
+                onInited={onInitHandler}
+                onPrintHandler={(handler) => {
+                    this.printHandler = handler;
+                }}
+                {...others}
+            ></Workbook>
+        );
     }
 
     /**
@@ -118,6 +129,25 @@ class Report {
                     });
             } else {
                 reject(Error('导出pdf失败，原因:没有传递导出文件名'));
+            }
+        });
+    }
+    /**
+     * 打印
+     */
+    print(
+        params = {
+            showBorder: false,
+            showColumnHeader: true,
+            showRowHeader: true,
+            showGridLine: true,
+        }
+    ) {
+        return new Promise((resolve, reject) => {
+            if (this.printHandler) {
+                this.printHandler(params).then(resolve).catch(reject);
+            } else {
+                reject(Error('打印失败，原因：报表未初始化'));
             }
         });
     }

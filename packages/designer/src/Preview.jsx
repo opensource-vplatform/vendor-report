@@ -181,9 +181,20 @@ export default function () {
     });
     //许可证
     const license = context?.conf?.license;
+    let printHandler = null;
+    const handlePrint = () => {
+        printHandler && printHandler();
+    };
     return (
         <Wrap>
             <Toolbar>
+                <Button
+                    style={{ marginRight: 8 }}
+                    type='primary'
+                    onClick={handlePrint}
+                >
+                    打印
+                </Button>
                 <Button
                     style={{ marginRight: 8 }}
                     onClick={() => {
@@ -197,6 +208,10 @@ export default function () {
                 <Workbook
                     license={license}
                     json={json}
+                    enablePrint={true}
+                    onPrintHandler={(handler) => {
+                        printHandler = handler;
+                    }}
                     onInited={workbookInitializedHandler}
                 >
                     <Worksheet></Worksheet>
