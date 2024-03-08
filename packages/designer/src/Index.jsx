@@ -1,3 +1,3 @@
 import ReportDesigner from './ReportDesigner';
 
-export default ReportDesigner;
+export default { Designer: ReportDesigner };

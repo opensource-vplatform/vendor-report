@@ -67,8 +67,8 @@ const parseFontStr = function (font) {
     let fontStyle = 'normal',
         fontVariant = 'normal',
         fontWeight = 'normal',
-        fontFamily,
-        fontSize,
+        fontFamily = 'Calibri',
+        fontSize = 11,
         lineHeight = 'normal';
     if (font) {
         const elements = font.split(/\s+/);
@@ -240,11 +240,15 @@ const dealFontFamily = function (fontFamily) {
         : fontFamily;
 };
 
+const toValue = function (value, def) {
+    return value === null || typeof value == 'undefined' ? def : value;
+};
+
 /**
  * 字体相关设置
  */
 export function setFont(params) {
-    const {
+    let {
         spread,
         fontFamily,
         fontSize,
@@ -261,10 +265,17 @@ export function setFont(params) {
             const style = new GC.Spread.Sheets.Style();
             const preStyle = sheet.getStyle(row, col);
             Object.assign(style, preStyle);
+            fontFamily = toValue(fontFamily, preFont.fontFamily);
+            fontSize = toValue(fontSize, preFont.fontSize);
+            fontStyle = toValue(fontStyle, preFont.fontStyle);
+            fontWeight = toValue(fontWeight, preFont.fontWeight);
+            textDecoration = toValue(textDecoration, preStyle.textDecoration);
+            backColor = toValue(backColor, preStyle.backColor);
+            foreColor = toValue(foreColor, preStyle.foreColor);
             const fontFamilyVal = dealFontFamily(fontFamily);
             const font = toFontStr({
                 fontFamily: fontFamilyVal,
-                fontSize: `${fontSize}pt`,
+                fontSize: fontSize ? `${fontSize}pt` : '',
                 fontStyle,
                 fontWeight,
             });

@@ -128,7 +128,7 @@ export default function (props) {
                                     ? children
                                     : [children];
                             } else {
-                                sheetList = [{ props: { name: 'Sheet1' } }];
+                                sheetList = [/*{ props: { name: 'Sheet1' } }*/];
                             }
                             sheetList.forEach((sheet, index) => {
                                 const {

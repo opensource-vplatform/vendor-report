@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>同望Web版报表API说明文档</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <script type="text/javascript" src="scripts/jquery/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery/jquery.v3Navigator.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/nav.css">
+</head>
+<body>
+
+<div id="contentWrapper">
+  <div id="contentLeft">
+  </div>
+  <iframe id="content-ifr" style="display:none;border:0;margin:0;padding:0;width:100%;height:100%;"></iframe>
+  <div id="contentRight"  style="display:none;">
+      <?js if (title != 'Home') { ?>
+      <h1 class="page-title"><?js= title ?></h1>
+      <?js } ?>
+
+      <?js= content ?>
+  </div>
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+<script>
+  var href = window.location.href;
+  var mode = "navigator";
+  try{
+    var queryStr = href.split("#")[0].split("?")[1];
+    var queryPair = queryStr.split("&");
+    for(var i=0,l=queryPair.length;i<l;i++){
+      var pair = queryPair[i].split('=');
+      if(pair[0]=="mode"){
+        mode = pair[1];
+        break;
+      }
+    }
+  }catch(e){}
+  if(mode=="navigator"){
+    $("#contentLeft").show();
+    $("#content-ifr").show();
+    $("#contentRight").hide();
+    var datas = <?js= this.nav ?>;
+    function dealData(data){
+      var url = data.url;
+      if(url){
+        var href = $(url).attr("href")
+        var hrefArray = href.split('#');
+        hrefArray[0] += "?_open="+data.id;
+        hrefArray[0] += "&mode=content";
+        data.url = hrefArray.join('#');
+      }
+      var children = data.children;
+      if(children&&children.length){
+        for(var i=0,l=children.length;i<l;i++){
+          dealData(children[i]);
+        }
+      }
+    }
+    for(var i=0,l=datas.length;i<l;i++){
+      dealData(datas[i]);
+    }
+    var v3Navigator = $("#contentLeft").v3Navigator({
+      datas : datas,
+      itemClick : function(itemId,item,url){
+        if(url){
+          $("#content-ifr").attr("src",item.url);
+        }else{
+          if(item.url){
+            $("#content-ifr").attr("src",item.url);
+          }else{
+            this.toggle(itemId);
+          }
+        }
+      }
+    });
+    window.addEventListener("message",function(ev){
+      if(ev&&ev.data){
+        var data;
+        try{
+          var data = JSON.parse(ev.data);
+        }catch(e){}
+        if(data&&data.type=="v3"&&data.action=="openNav"){
+          var url = data.url;
+          v3Navigator.fireByUrl(url);
+        }
+      }
+    });
+  }else if(mode=="content"){
+    $("#contentLeft").hide();
+    $("#content-ifr").hide();
+    $("#contentRight").show();
+  }
+  function jumpTo(url){
+    window.parent.postMessage('{"type":"v3","action":"openNav","url":"'+url+'"}',"*")
+  }
+  $("#contentRight").find("a").each(function(index,dom){
+    var el = $(dom);
+    var href = el.attr("href");
+    if(href){
+      el.attr("href","javascript:jumpTo('"+href+"')");
+    }
+  });
+</script>
+
+</body>
+</html>

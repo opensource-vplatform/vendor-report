@@ -20,9 +20,22 @@ export const withBatchCalcUpdate = function (spread, updateHandler) {
 };
 
 const PLUGIN_SRCS = {
-    print: ['./vendor/plugins/print.min.js']
+    print: ['./vendor/plugins/print.min.js'],
 };
 
-export const getPluginSrc = function(type){
+export const getPluginSrc = function (type) {
     return PLUGIN_SRCS[type];
-}
+};
+
+/**
+ * 将样式应用到选择的单元格
+ * @returns
+ */
+export const applyToRange = function (cellRange, sheet, func) {
+    const { col, row, rowCount, colCount } = cellRange;
+    for (let i = 0; i < rowCount; i++) {
+        for (let j = 0; j < colCount; j++) {
+            func(sheet, row + i, col + j);
+        }
+    }
+};

@@ -4,7 +4,11 @@
   "scripts": {
     "designer": "pnpm -F report-designer dev",
     "postbuild": "node scripts/postBuild.js",
-    "build": "pnpm -F report-designer build && pnpm -F report-excel build && pnpm -F report-plugin-jasperreport build",
+    "build-designer": "pnpm -F report-designer build",
+    "build-report":"pnpm -F report-excel build",
+    "build-jasperreport":"pnpm -F report-plugin-jasperreport build",
+    "build-docs":"pm -F report-docs build",
+    "build": "npm run build-designer && npm run build-report && npm run build-jasperreport && build-docs",
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {

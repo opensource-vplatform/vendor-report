@@ -49,7 +49,7 @@ const plugins = [
               target: 'es2015',
               lib: {
                   name: 'TOONE.Report',
-                  entry: 'src/Report.jsx',
+                  entry: 'src/Api.jsx',
                   fileName: 'report-[hash]',
                   formats: ['umd'],
               },
