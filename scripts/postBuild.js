@@ -46,6 +46,9 @@ copyDirectory(reportDistDir,distDir)
 const jasperreportDist = path.resolve(__dirname,'../packages/plugins/integration-jasperreport/dist');
 copyDirectory(jasperreportDist,distDir);
 
+const docsDist = path.resolve(__dirname,'../packages/docs/dist');
+copyDirectory(docsDist,distDir);
+
 const jasperreportDesignerHtmlPath = path.resolve(distDir, 'jasperreport-transform.html');
 
 const DESIGNER_SCRIPT_REG = /^designer\-[\w\d]+\.umd\.js$/;

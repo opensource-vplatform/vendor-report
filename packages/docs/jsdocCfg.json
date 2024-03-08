@@ -27,7 +27,7 @@
         }
     },
     "opts": {
-        "destination": "../../dist/docs",
+        "destination": "dist/docs",
         "encoding": "utf8",
         "private": true,
         "recurse": true,
