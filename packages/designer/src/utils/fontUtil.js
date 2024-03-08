@@ -263,8 +263,9 @@ export function setFont(params) {
             //需要实例化一个新的Style，否则字体设置无效
             const GC = getNamespace();
             const style = new GC.Spread.Sheets.Style();
-            const preStyle = sheet.getStyle(row, col);
+            const preStyle = sheet.getStyle(row, col)||{};
             Object.assign(style, preStyle);
+            const preFont = parseFontStr(preStyle.font);
             fontFamily = toValue(fontFamily, preFont.fontFamily);
             fontSize = toValue(fontSize, preFont.fontSize);
             fontStyle = toValue(fontStyle, preFont.fontStyle);

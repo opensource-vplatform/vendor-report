@@ -13,7 +13,7 @@ import Workbook from './Workbook';
 
 /**
  * 报表
- * @class Report
+ * @class Preview
  * @example
  * var report = new TOONE.Report.Preview();
  * report.mount(document.getElementById('app'));

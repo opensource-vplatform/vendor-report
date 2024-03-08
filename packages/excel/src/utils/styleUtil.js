@@ -129,6 +129,7 @@ export const setStyle = function (sheet, cellRange, styleParams) {
         textDecoration,
         backColor,
         foreColor,
+        wordWrap
     } = styleParams;
     applyToRange(cellRange, sheet, (sheet, row, col) => {
         const style = new GC.Spread.Sheets.Style();
@@ -153,6 +154,7 @@ export const setStyle = function (sheet, cellRange, styleParams) {
         style.textDecoration = textDecoration;
         style.backColor = backColor;
         style.foreColor = foreColor;
+        style.wordWrap = wordWrap;
         sheet.setStyle(row, col, style);
     });
 };

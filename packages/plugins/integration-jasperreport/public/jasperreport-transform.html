@@ -18,7 +18,7 @@
         <script src="./vendor/plugins/jasperreport-transform.umd.js"></script>
         <script>
             //实例化设计器
-            var designer = new TOONE.ReportDesigner({
+            var designer = new TOONE.Report.Designer({
                 event: {
                     onSave: function (json, context) {
                         return new Promise(function (resolve, reject) {

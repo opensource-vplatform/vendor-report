@@ -101,6 +101,14 @@ class CellRange {
         //this.cellRange.fontWeight(weight);
         setStyle(this.sheet,this.cellRange,{fontWeight:weight});
     }
+
+    /**
+     * 自动换行
+     * @param {Boolean} flag 自动换行
+     */
+    wordWrap(flag){
+        setStyle(this.sheet,this.cellRange,{wordWrap:flag}); 
+    }
 }
 
 export default CellRange;

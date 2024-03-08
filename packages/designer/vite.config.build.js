@@ -44,7 +44,7 @@ const plugins = [
               },
               target: 'es2015',
               lib: {
-                  name: 'TOONE.ReportDesigner',
+                  name: 'TOONE.Report',
                   entry: 'src/Index.jsx',
                   fileName: 'designer-[hash]',
                   formats: ['umd'],
