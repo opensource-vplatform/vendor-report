@@ -12,20 +12,28 @@ import {
 import Workbook from './Workbook';
 
 /**
- * 报表
+ * 报表预览
  * @class Preview
  * @example
  * var report = new TOONE.Report.Preview();
  * report.mount(document.getElementById('app'));
  * report.exportExcel("test.xlsx")
  */
-class Report {
+class Preview {
     conf = {};
 
     spread = null;
 
     printHandler = null;
 
+    /**
+     * @constructor
+     * @param {Object} conf 配置信息<br/>
+     * ready: Function<{@link WorkBook}> 初始化完成回调<br/>
+     * enablePrint: Boolean 是否启用打印功能<br/>
+     * json: Object 报表配置数据<br/>
+     * license：String 报表许可证<br/>
+     */
     constructor(conf) {
         this.conf = conf;
     }
@@ -37,7 +45,7 @@ class Report {
     mount(el) {
         const GC = getNamespace();
         GC.Spread.Common.CultureManager.culture('zh-cn');
-        const { onInited, ready, ...others } = this.conf;
+        const { onInited, ready, ...others } = this.conf||{};
         const onInitHandler = (spread) => {
             this.spread = spread;
             if (onInited) {
@@ -166,6 +174,18 @@ class Report {
     }
     /**
      * 打印
+     * @description 报表打印，使用打印时，须在Preview初始化时将属性enablePrint设置为true
+     * @example
+     * var report = new TOONE.Report.Preview({
+     *  enablePrint: true
+     * });
+     * var promise = report.print();
+     * promise.then(function(){
+     *  //打印成功
+     * }).catch(function(e){
+     *  //错误处理
+     * });
+     * @returns Promise
      */
     print(
         params = {
@@ -185,4 +205,4 @@ class Report {
     }
 }
 
-export default Report;
+export default Preview;
