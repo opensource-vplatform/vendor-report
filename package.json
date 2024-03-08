@@ -7,8 +7,8 @@
     "build-designer": "pnpm -F report-designer build",
     "build-report":"pnpm -F report-excel build",
     "build-jasperreport":"pnpm -F report-plugin-jasperreport build",
-    "build-docs":"pm -F report-docs build",
-    "build": "npm run build-designer && npm run build-report && npm run build-jasperreport && build-docs",
+    "build-docs":"pnpm -F report-docs build",
+    "build": "npm run build-designer && npm run build-report && npm run build-jasperreport && npm run build-docs",
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
