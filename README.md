@@ -32,6 +32,26 @@ pnpm run designer
 ## Build说明
 注意：build时会删除dist目录，如果该目录有私有数据，在build前请备份私有数据。
 
+### 构建整个报表
+执行以下命令：
+```sh
+npm run build
+```
+执行完后，将会生成整个打包结果到dist目录下，其中：
+designer.html为设计器使用样例
+report.html为报表使用样例
+jasperreport-transform.html为集成jasperreport使用样例
+
+### 构建与vdata集成
+执行以下命令：
+```sh
+npm run build-vdata
+```
+执行完后，将会生成整个打包结果到dist目录下，其中：
+designer.html为设计器使用样例
+report.html为报表使用样例
+readme.md为与vdata服务api交互说明文档。
+
 ## 相关参考文档
 
 ### pnpm
