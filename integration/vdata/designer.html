@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="./css/styles.css" />
+        <link rel="stylesheet" href="./vendor/styles/excel.all.16.2.6.min.css"/>
+        <title>同望Web报表设计器</title>
+    </head>
+    <body>
+        <div id="app"></div>
+        <script src="./vendor/excel.all.16.2.6.min.js"></script>
+        <script src="./vendor/resources/zh/excel.resources.zh.16.2.6.min.js"></script>
+        <script src="./vendor/react/react.production.min.js"></script>
+        <script src="./vendor/react/react-dom.production.min.js"></script>
+        <script src="./vendor/polyfill.min.js"></script>
+        <script src="./designer-370b8027.umd.js"></script>
+        <script>
+            //实例化设计器
+            var designer = new TOONE.Report.Designer({
+                //配置详情参考README.md
+                nav: {
+                    file: false, //隐藏文件页签页，
+                },
+                event: {
+                    onSave: function (json, context) {
+                        return new Promise(function (resolve, reject) {
+                            try {
+                                //保存json与context
+                                //....
+                                setTimeout(function () {
+                                    //保存成功后执行resolve
+                                    resolve({ success: true });
+                                }, 2000);
+                                //异常处理
+                                //reject("错误信息")
+                            } catch (e) {
+                                reject('出现未知异常！');
+                            }
+                        });
+                    },
+                },
+            });
+            //设计器挂载到指定dom元素
+            designer.mount(document.getElementById('app'));
+        </script>
+    </body>
+</html>
