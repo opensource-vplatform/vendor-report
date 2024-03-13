@@ -68,7 +68,7 @@ const parseFontStr = function (font) {
         fontVariant = 'normal',
         fontWeight = 'normal',
         fontFamily = 'Calibri',
-        fontSize = 11,
+        fontSize,
         lineHeight = 'normal';
     if (font) {
         const elements = font.split(/\s+/);
@@ -122,6 +122,9 @@ const parseFontStr = function (font) {
                     }
             }
         }
+    }
+    if(!fontSize){
+        fontSize = 11;
     }
     return {
         fontStyle,
@@ -222,11 +225,11 @@ export function setAlign(params) {
     withBatchUpdate(spread, (sheet) => {
         applyStyleToSelectedCell(sheet, function (sheet, row, col) {
             const style = sheet.getActualStyle(row, col);
-            style.vAlign = vAlign;
-            style.hAlign = hAlign;
-            style.textOrientation = textOrientation;
-            style.isVerticalText = isVerticalText;
-            style.wordWrap = wordWrap;
+            style.vAlign = toValue(vAlign,style.vAlign);
+            style.hAlign = toValue(hAlign,style.hAlign);
+            style.textOrientation = toValue(textOrientation,style.textOrientation);
+            style.isVerticalText = toValue(isVerticalText,style.isVerticalText);
+            style.wordWrap = toValue(wordWrap,style.wordWrap);
             sheet.setStyle(row, col, style);
         });
     });

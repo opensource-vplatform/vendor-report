@@ -8,6 +8,7 @@ import resourceManager from 'resource-manager-js';
 import styled from 'styled-components';
 
 import Select from '@components/select/Index';
+import { getBaseUrl } from '@utils/environmentUtil';
 import { download } from '@utils/fileUtil';
 import {
   showErrorMessage,
@@ -93,10 +94,11 @@ function Index(props) {
             return;
         } else {
             showLoadingMessage(dispatch, '导出中...');
+            const baseUrl = getBaseUrl();
             resourceManager
                 .loadScript([
-                    'vendor/plugins/print.min.js',
-                    'vendor/plugins/pdf.min.js',
+                    baseUrl+'/vendor/plugins/print.min.js',
+                    baseUrl+'/vendor/plugins/pdf.min.js',
                 ])
                 .then(() => {
                     spread.savePDF(

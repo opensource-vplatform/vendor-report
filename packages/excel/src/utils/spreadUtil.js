@@ -1,3 +1,5 @@
+import { getBaseUrl } from './environmentUtil';
+
 /**
  * 获取命令空间
  */
@@ -20,11 +22,12 @@ export const withBatchCalcUpdate = function (spread, updateHandler) {
 };
 
 const PLUGIN_SRCS = {
-    print: ['./vendor/plugins/print.min.js'],
+    print: ['/vendor/plugins/print.min.js'],
 };
 
 export const getPluginSrc = function (type) {
-    return PLUGIN_SRCS[type];
+    const baseUrl = getBaseUrl();
+    return PLUGIN_SRCS[type].map((src) => baseUrl + src);
 };
 
 /**

@@ -22,6 +22,7 @@ import { getNamespace } from '@utils/spreadUtil';
 
 import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
+import { getBaseUrl } from './utils/environmentUtil';
 
 const GC = getNamespace();
 const GCsheets = GC.Spread.Sheets;
@@ -209,6 +210,7 @@ export default function () {
                     license={license}
                     json={json}
                     enablePrint={true}
+                    baseUrl={getBaseUrl()}
                     onPrintHandler={(handler) => {
                         printHandler = handler;
                     }}

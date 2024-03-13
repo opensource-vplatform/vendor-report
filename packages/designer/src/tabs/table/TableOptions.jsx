@@ -64,11 +64,15 @@ export default function () {
         filterButtonVisible,
         footerDropDownList,
     ]);
+    const itemListStyle={
+        paddingTop: '5px',
+        paddingBottom: '5px'
+    }
     return (
         <GroupItem title='表格选项'>
             <HLayout>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='标题行'
                             value={showHeader}
@@ -82,7 +86,7 @@ export default function () {
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='汇总行'
                             desc='显示/隐藏汇总行。汇总行中可以对数据进行求和、平均值、最大值、最小值等计算'
@@ -98,7 +102,7 @@ export default function () {
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='镶边行'
                             value={bandRow}
@@ -112,7 +116,7 @@ export default function () {
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='镶边列'
                             value={bandColumn}
@@ -128,7 +132,7 @@ export default function () {
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='第一列'
                             value={highlightFirstColumn}
@@ -142,7 +146,7 @@ export default function () {
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='最后一列'
                             value={highlightLastColumn}
@@ -158,7 +162,7 @@ export default function () {
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='筛选按钮'
                             value={filterButtonVisible}
@@ -171,7 +175,7 @@ export default function () {
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='汇总工具箱'
                             desc='勾选此项，汇总行将提供下拉选择工具，方便进行求和、平均值、最大值、最小值等汇总设置，使用此选项需启用汇总行。'
@@ -188,7 +192,7 @@ export default function () {
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='行合并'
                             desc='勾选此项，同行数据存在连续相同时，将合并成一个单元格'
@@ -202,7 +206,7 @@ export default function () {
                             }}
                         ></CheckBox>
                     </ItemList>
-                    <ItemList>
+                    <ItemList style={itemListStyle}>
                         <CheckBox
                             title='列合并'
                             desc='勾选此项，同列数据存在连续相同时，将合并成一个单元格'

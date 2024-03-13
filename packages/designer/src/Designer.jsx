@@ -26,6 +26,7 @@ import {
   setActive,
   showTab,
 } from '@store/navSlice/navSlice';
+import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 
 import DesignerContext from './DesignerContext';
@@ -84,6 +85,9 @@ const SpreadWrap = styled.div`
 
 function Designer(props) {
     const { conf } = props;
+    if(conf && conf.baseUrl){
+        setBaseUrl(conf.baseUrl)
+    }
     const dispatch = useDispatch();
     const { mode, spread, waitMsg, errorMsg, navStyle } = useSelector(
         ({ appSlice }) => appSlice

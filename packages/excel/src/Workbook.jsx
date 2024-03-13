@@ -10,6 +10,7 @@ import { register } from './custom/index';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
 import { withDivStyled } from './utils/componentUtil';
+import { setBaseUrl } from './utils/environmentUtil';
 import {
   checkLicense,
   getLicense,
@@ -44,6 +45,12 @@ const bindEvent = function (spread, typeName, handler) {
     }
 };
 
+const setValue = function(val,fn){
+    if(val !==null && typeof val !== undefined){
+        fn(val);
+    }
+}
+
 export default function (props) {
     const {
         newTabVisible = true,
@@ -60,9 +67,13 @@ export default function (props) {
         json = null,
         onPrintHandler,
         children,
+        baseUrl
     } = props;
     if (license) {
         setLicense(license);
+    }
+    if(baseUrl){
+        setBaseUrl(baseUrl)
     }
     const GC = getNamespace();
     const licenseKey = getLicense();
@@ -157,18 +168,9 @@ export default function (props) {
                     bindEvent(spread, 'SelectionChanged', onSelectionChanged);
                     bindEvent(spread, 'SelectionChanging', onSelectionChanging);
                     bindEvent(spread, 'SheetChanged', () => {
-                        debugger;
                     });
                     if (onPrintHandler) {
-                        onPrintHandler(
-                            (
-                                params = {
-                                    showBorder: false,
-                                    showColumnHeader: true,
-                                    showRowHeader: true,
-                                    showGridLine: true,
-                                }
-                            ) => {
+                        onPrintHandler((params) => {
                                 return new Promise((resolve, reject) => {
                                     if (spread) {
                                         if (enablePrint) {
@@ -177,6 +179,7 @@ export default function (props) {
                                             const visibleType =
                                                 GC.Spread.Sheets.Print
                                                     .PrintVisibilityType;
+                                            const {showBorder=false,showGridLine,showColumnHeader,showRowHeader} = params||{};
                                             sheets.forEach((sheet) => {
                                                 const printInfo =
                                                     sheet.printInfo();
@@ -188,23 +191,18 @@ export default function (props) {
                                                 printInfo.rowEnd(
                                                     sheet.getRowCount()
                                                 );
-                                                printInfo.showBorder(
-                                                    params.showBorder === true
-                                                );
-                                                printInfo.showGridLine(
-                                                    params.showGridLine !==
-                                                        false
-                                                );
-                                                printInfo.showColumnHeader(
-                                                    params.showColumnHeader
-                                                        ? visibleType.inherit
-                                                        : visibleType.hide
-                                                );
-                                                printInfo.showRowHeader(
-                                                    params.showRowHeader
-                                                        ? visibleType.inherit
-                                                        : visibleType.hide
-                                                );
+                                                setValue(showBorder,(val)=>{
+                                                    printInfo.showBorder(val);
+                                                });
+                                                setValue(showGridLine,(val)=>{
+                                                    printInfo.showGridLine(val);
+                                                });
+                                                setValue(showColumnHeader,(val)=>{
+                                                    printInfo.showColumnHeader(val);
+                                                });
+                                                setValue(showRowHeader,(val)=>{
+                                                    printInfo.showRowHeader(val);
+                                                });
                                                 sheet.printInfo(printInfo);
                                             });
                                             spread.print();

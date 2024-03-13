@@ -49,6 +49,9 @@ copyDirectory(jasperreportDist,distDir);
 const docsDist = path.resolve(__dirname,'../packages/docs/dist');
 copyDirectory(docsDist,distDir);
 
+const jlzfDist = path.resolve(__dirname, '../integration/计量支付');
+copyDirectory(jlzfDist,path.resolve(distDir,'计量支付'));
+
 const jasperreportDesignerHtmlPath = path.resolve(distDir, 'jasperreport-transform.html');
 
 const DESIGNER_SCRIPT_REG = /^designer\-[\w\d]+\.umd\.js$/;
@@ -74,4 +77,12 @@ if(designerScriptName!=null){
         return "<script src='./script/"+designerScriptName+"'>";
     });
     fs.writeFileSync(jasperreportDesignerHtmlPath,content);
+
+    const jlzfHtmlPath = path.resolve(distDir,'计量支付/清单支付报表/designer.html');
+    content = fs.readFileSync(jlzfHtmlPath)
+    content = new String(content);
+    content = content.replace(SCRIPT_REG,function(){
+        return "<script src='../../script/"+designerScriptName+"'>";
+    });
+    fs.writeFileSync(jlzfHtmlPath,content);
 }

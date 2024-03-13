@@ -4,6 +4,10 @@ import { createRoot } from 'react-dom/client';
 import resourceManager from 'resource-manager-js';
 
 import WorkBookApi from './api/WorkBook';
+import {
+  getBaseUrl,
+  setBaseUrl,
+} from './utils/environmentUtil';
 import { download } from './utils/fileUtil';
 import {
   getNamespace,
@@ -36,6 +40,9 @@ class Preview {
      */
     constructor(conf) {
         this.conf = conf;
+        if(conf.baseUrl){
+            setBaseUrl(conf.baseUrl);
+        }
     }
 
     /**
@@ -84,7 +91,7 @@ class Preview {
                     ? filename
                     : filename + '.xlsx';
                 resourceManager
-                    .loadScript(['vendor/plugins/excelio.min.js'])
+                    .loadScript([getBaseUrl()+'/vendor/plugins/excelio.min.js'])
                     .then(() => {
                         const GC = getNamespace();
                         const excelIO = new GC.Spread.Excel.IO();
@@ -141,10 +148,11 @@ class Preview {
                 filename = filename.endsWith('.pdf')
                     ? filename
                     : filename + '.pdf';
+                const baseUrl = getBaseUrl();
                 resourceManager
                     .loadScript([
-                        'vendor/plugins/print.min.js',
-                        'vendor/plugins/pdf.min.js',
+                        baseUrl+'/vendor/plugins/print.min.js',
+                        baseUrl+'/vendor/plugins/pdf.min.js',
                     ])
                     .then(() => {
                         this.spread.savePDF(
@@ -175,6 +183,12 @@ class Preview {
     /**
      * 打印
      * @description 报表打印，使用打印时，须在Preview初始化时将属性enablePrint设置为true
+     * @param {Object} params 打印参数<br/>
+     * showBorder：显示excel外边框
+     * showColumnHeader：显示列头
+     * showRowHeader：显示行头
+     * showGridLine：显示网格线
+     * 如未设置，则使用工作表内的配置值
      * @example
      * var report = new TOONE.Report.Preview({
      *  enablePrint: true
@@ -187,14 +201,7 @@ class Preview {
      * });
      * @returns Promise
      */
-    print(
-        params = {
-            showBorder: false,
-            showColumnHeader: true,
-            showRowHeader: true,
-            showGridLine: true,
-        }
-    ) {
+    print(params) {
         return new Promise((resolve, reject) => {
             if (this.printHandler) {
                 this.printHandler(params).then(resolve).catch(reject);

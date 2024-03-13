@@ -1,5 +1,6 @@
 import resourceManager from 'resource-manager-js';
 
+import { getBaseUrl } from './environmentUtil';
 import {
   isNullOrUndef,
   isUndefined,
@@ -237,7 +238,7 @@ const getShapePosition = function (sheet, width, height) {
 
 export function insertShape(spread, shapeType, error) {
     resourceManager
-        .loadScript(['vendor/plugins/shapes.min.js'])
+        .loadScript([getBaseUrl()+'/vendor/plugins/shapes.min.js'])
         .then(() => {
             withBatchUpdate(spread, (sheet) => {
                 if (sheet) {

@@ -7,6 +7,7 @@ import {
 import resourceManager from 'resource-manager-js';
 
 import { CheckBox } from '@components/form/Index';
+import { getBaseUrl } from '@utils/environmentUtil';
 import { download } from '@utils/fileUtil';
 import {
   showErrorMessage,
@@ -45,7 +46,7 @@ export default function (props) {
             return;
         } else {
             resourceManager
-                .loadScript(['vendor/plugins/excelio.min.js'])
+                .loadScript([getBaseUrl()+'/vendor/plugins/excelio.min.js'])
                 .then(() => {
                     const GC = getNamespace();
                     const excelIO = new GC.Spread.Excel.IO();

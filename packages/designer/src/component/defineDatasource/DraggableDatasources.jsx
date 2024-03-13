@@ -324,19 +324,22 @@ export default function Index() {
             document.addEventListener(
                 'drag',
                 function (event) {
+                    const childrenCount = Number(dragged.dataset.childrenCount);
                     const { spread } = cacheDatasRef.current;
-                    const { cell, row, col } =
-                        getCellInfo({ event, spread }) || {};
+                    const { cell, row, col, rowCount, colCount } =
+                        getCellInfo({
+                            event,
+                            spread,
+                        }) || {};
                     if (!cell) {
                         return;
                     }
-                    const childrenCount = Number(dragged.dataset.childrenCount);
                     const GC = getNamespace();
                     const cellRange = new GC.Spread.Sheets.Range(
                         row,
                         col,
-                        1,
-                        childrenCount > 0 ? childrenCount : 1
+                        childrenCount > 0 ? 1 : rowCount,
+                        childrenCount > 0 ? childrenCount : colCount
                     );
                     highlightBlock(spread, cellRange);
                 },

@@ -399,7 +399,7 @@ export function getCellInfo(params) {
     if (!target) {
         return result;
     }
-    const { row, col } = target?.worksheetHitInfo || {};
+    let { row, col } = target?.worksheetHitInfo || {};
 
     //目标区域中不存在单元格，则退出
     if (typeof row !== 'number' || typeof col !== 'number') {
@@ -408,7 +408,29 @@ export function getCellInfo(params) {
 
     const sheet = spread.getActiveSheet();
     const cell = sheet.getCell(row, col);
-    return { cell, col, row };
+    const GC = getNamespace();
+    //add by xiedh 2024-3-13 解决拖拽数据源到合并单元格中只高亮一个单元格大小问题
+    let rowCount = 1,
+        colCount = 1;
+    const range = new GC.Spread.Sheets.Range(row, col, 1, 1);
+    const spans = sheet.getSpans(range);
+    if (spans && spans.length > 0) {
+        spans.forEach((span) => {
+            if (span.row < row) {
+                row = span.row;
+            }
+            if (span.col < col) {
+                col = span.col;
+            }
+            if (rowCount < span.rowCount) {
+                rowCount = span.rowCount;
+            }
+            if (colCount < span.colCount) {
+                colCount = span.colCount;
+            }
+        });
+    }
+    return { cell, col, row, rowCount, colCount };
 }
 
 export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
