@@ -93,7 +93,7 @@ function clearContents(params) {
     //清除动作。当触发清除动作的时候，需要调用接口清除已经绑定的数据源路径
     commandManager.addListener(
         'gc.spread.contextMenu.clearContents',
-        function ({ command: { selections } }) {
+        function ({ command: { ranges: selections } }) {
             const activeSheet = spread.getActiveSheet();
             Array.isArray(selections) &&
                 selections.forEach(function ({ col, row, colCount, rowCount }) {
@@ -326,6 +326,9 @@ export default function Index() {
                 function (event) {
                     const childrenCount = Number(dragged.dataset.childrenCount);
                     const { spread } = cacheDatasRef.current;
+                    if (!spread) {
+                        return;
+                    }
                     const { cell, row, col, rowCount, colCount } =
                         getCellInfo({
                             event,
@@ -422,8 +425,10 @@ export default function Index() {
                     }
                 } catch (error) {
                 } finally {
-                    cacheDatasRef.current.spread.resumePaint();
-                    removeHighlightOneBlock();
+                    if (cacheDatasRef?.current?.spread?.resumePaint) {
+                        cacheDatasRef.current.spread.resumePaint();
+                        removeHighlightOneBlock();
+                    }
                 }
             });
         }

@@ -17,11 +17,17 @@ import {
   setLicense,
 } from './utils/licenseUtil';
 import {
+  genSpans,
+  sortData,
+} from './utils/other';
+import {
   getNamespace,
   getPluginSrc,
   withBatchCalcUpdate,
 } from './utils/spreadUtil';
 
+const GC = getNamespace();
+const GCsheets = GC.Spread.Sheets;
 const Wrap = withDivStyled({
     position: 'relative',
     width: '100%',
@@ -45,11 +51,103 @@ const bindEvent = function (spread, typeName, handler) {
     }
 };
 
-const setValue = function(val,fn){
-    if(val !==null && typeof val !== undefined){
+const setValue = function (val, fn) {
+    if (val !== null && typeof val !== undefined) {
         fn(val);
     }
-}
+};
+//表格合并
+const tableMerge = function (params) {
+    const { sheet, rowMerge, columnMerge } = params;
+    const tables = sheet.tables.all();
+    if (tables.length > 0 && (rowMerge || columnMerge)) {
+        let direction = GCsheets.AutoMerge.AutoMergeDirection.column; //1
+        let mode = GCsheets.AutoMerge.AutoMergeMode.free; //0
+        let sheetArea = GCsheets.SheetArea.viewport; //3
+        let selectionMode = GCsheets.AutoMerge.SelectionMode.merged; //0
+        if (rowMerge && columnMerge) {
+            direction = GCsheets.AutoMerge.AutoMergeDirection.rowColumn; //值等于4。在行方向上优先于列方向应用自动合并
+        } else if (rowMerge) {
+            direction = GCsheets.AutoMerge.AutoMergeDirection.row; //值等于2.在行方向上应用自动合并
+        }
+
+        sheet.suspendPaint();
+        tables.forEach(function (table) {
+            const range = table.range();
+            sheet.autoMerge(range, direction, mode, sheetArea, selectionMode);
+        });
+        sheet.resumePaint();
+    }
+};
+
+//绑定数据源
+const bindDataSource = function (params) {
+    const {
+        spread,
+        dataSource,
+        sumColumns,
+        groupColumns,
+        rowMerge,
+        columnMerge,
+    } = params;
+
+    if (!spread) {
+        return;
+    }
+    spread.sheets.forEach((sheet) => {
+        const _dataSource = JSON.parse(JSON.stringify(dataSource));
+        const tables = sheet.tables.all();
+        const tablesSpans = [];
+
+        //对数据进行分组排序
+        if (tables.length > 0) {
+            tables.forEach((table) => {
+                const tableName = table.name();
+                const groups = groupColumns[tableName];
+                const sums = sumColumns[tableName];
+                if (
+                    (Array.isArray(groups) && groups.length > 0) ||
+                    (Array.isArray(sums) && sums.length > 0)
+                ) {
+                    const path = table.bindingPath();
+                    const { row, col } = table.range();
+                    const fields = [];
+                    table.BSt.forEach(function (item) {
+                        fields.push({ code: item.dataField() });
+                    });
+                    if (_dataSource?.[path]) {
+                        const { datas, spansTree } = sortData(
+                            _dataSource[path],
+                            groups,
+                            fields,
+                            sums
+                        );
+                        _dataSource[path] = datas;
+                        const result = genSpans(spansTree, row + 1, col);
+                        tablesSpans.push(...result.spans);
+                    }
+                }
+            });
+        }
+        let source = null;
+        if (_dataSource) {
+            source = new GCsheets.Bindings.CellBindingSource(_dataSource);
+            sheet.setDataSource(source);
+        }
+
+        const json = sheet.toJSON();
+        json.spans = Array.isArray(json.spans) ? json.spans : [];
+        json.spans.push(...tablesSpans);
+        sheet.fromJSON(json);
+        //执行sheet.fromJSON(json);后数据源丢失，需要再次设置数据源
+        source && sheet.setDataSource(source);
+        tableMerge({
+            sheet,
+            rowMerge,
+            columnMerge,
+        });
+    });
+};
 
 export default function (props) {
     const {
@@ -67,15 +165,21 @@ export default function (props) {
         json = null,
         onPrintHandler,
         children,
-        baseUrl
+        baseUrl,
+        dataSource = null,
+        sumColumns = [],
+        groupColumns = [],
+        rowMerge = false,
+        columnMerge = false,
     } = props;
     if (license) {
         setLicense(license);
     }
-    if(baseUrl){
-        setBaseUrl(baseUrl)
+    if (baseUrl) {
+        setBaseUrl(baseUrl);
     }
     const GC = getNamespace();
+
     const licenseKey = getLicense();
     if (licenseKey) {
         GC.Spread.Sheets.LicenseKey = licenseKey;
@@ -117,6 +221,7 @@ export default function (props) {
                 } else {
                     spread = data.spread;
                 }
+
                 spread.suspendPaint();
                 spread.suspendEvent();
                 try {
@@ -139,7 +244,9 @@ export default function (props) {
                                     ? children
                                     : [children];
                             } else {
-                                sheetList = [/*{ props: { name: 'Sheet1' } }*/];
+                                sheetList = [
+                                    /*{ props: { name: 'Sheet1' } }*/
+                                ];
                             }
                             sheetList.forEach((sheet, index) => {
                                 const {
@@ -167,63 +274,78 @@ export default function (props) {
                     bindEvent(spread, 'ValueChanged', onValueChanged);
                     bindEvent(spread, 'SelectionChanged', onSelectionChanged);
                     bindEvent(spread, 'SelectionChanging', onSelectionChanging);
-                    bindEvent(spread, 'SheetChanged', () => {
-                    });
+                    bindEvent(spread, 'SheetChanged', () => {});
+
+                    dataSource &&
+                        bindDataSource({
+                            spread: data.spread,
+                            dataSource,
+                            sumColumns,
+                            groupColumns,
+                            rowMerge,
+                            columnMerge,
+                        });
                     if (onPrintHandler) {
                         onPrintHandler((params) => {
-                                return new Promise((resolve, reject) => {
-                                    if (spread) {
-                                        if (enablePrint) {
-                                            const sheets = spread.sheets;
-                                            const GC = getNamespace();
-                                            const visibleType =
-                                                GC.Spread.Sheets.Print
-                                                    .PrintVisibilityType;
-                                            const {showBorder=false,showGridLine,showColumnHeader,showRowHeader} = params||{};
-                                            sheets.forEach((sheet) => {
-                                                const printInfo =
-                                                    sheet.printInfo();
-                                                printInfo.columnStart(0);
-                                                printInfo.columnEnd(
-                                                    sheet.getColumnCount()
-                                                );
-                                                printInfo.rowStart(0);
-                                                printInfo.rowEnd(
-                                                    sheet.getRowCount()
-                                                );
-                                                setValue(showBorder,(val)=>{
-                                                    printInfo.showBorder(val);
-                                                });
-                                                setValue(showGridLine,(val)=>{
-                                                    printInfo.showGridLine(val);
-                                                });
-                                                setValue(showColumnHeader,(val)=>{
-                                                    printInfo.showColumnHeader(val);
-                                                });
-                                                setValue(showRowHeader,(val)=>{
-                                                    printInfo.showRowHeader(val);
-                                                });
-                                                sheet.printInfo(printInfo);
-                                            });
-                                            spread.print();
-                                            resolve();
-                                        } else {
-                                            reject(
-                                                Error(
-                                                    '打印失败，原因：初始化报表时未开启打印功能'
-                                                )
+                            return new Promise((resolve, reject) => {
+                                if (spread) {
+                                    if (enablePrint) {
+                                        const sheets = spread.sheets;
+                                        const GC = getNamespace();
+                                        const visibleType =
+                                            GC.Spread.Sheets.Print
+                                                .PrintVisibilityType;
+                                        const {
+                                            showBorder = false,
+                                            showGridLine,
+                                            showColumnHeader,
+                                            showRowHeader,
+                                        } = params || {};
+                                        sheets.forEach((sheet) => {
+                                            const printInfo = sheet.printInfo();
+                                            printInfo.columnStart(0);
+                                            printInfo.columnEnd(
+                                                sheet.getColumnCount()
                                             );
-                                        }
+                                            printInfo.rowStart(0);
+                                            printInfo.rowEnd(
+                                                sheet.getRowCount()
+                                            );
+                                            setValue(showBorder, (val) => {
+                                                printInfo.showBorder(val);
+                                            });
+                                            setValue(showGridLine, (val) => {
+                                                printInfo.showGridLine(val);
+                                            });
+                                            setValue(
+                                                showColumnHeader,
+                                                (val) => {
+                                                    printInfo.showColumnHeader(
+                                                        val
+                                                    );
+                                                }
+                                            );
+                                            setValue(showRowHeader, (val) => {
+                                                printInfo.showRowHeader(val);
+                                            });
+                                            sheet.printInfo(printInfo);
+                                        });
+                                        spread.print();
+                                        resolve();
                                     } else {
                                         reject(
                                             Error(
-                                                '打印失败，原因：报表未初始化'
+                                                '打印失败，原因：初始化报表时未开启打印功能'
                                             )
                                         );
                                     }
-                                });
-                            }
-                        );
+                                } else {
+                                    reject(
+                                        Error('打印失败，原因：报表未初始化')
+                                    );
+                                }
+                            });
+                        });
                     }
                 } finally {
                     spread.resumePaint();
@@ -245,6 +367,11 @@ export default function (props) {
         onValueChanged,
         onSelectionChanged,
         onSelectionChanging,
+        dataSource,
+        sumColumns,
+        groupColumns,
+        rowMerge,
+        columnMerge,
     ]);
 
     return (

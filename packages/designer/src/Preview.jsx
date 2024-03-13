@@ -1,7 +1,4 @@
-import {
-  useCallback,
-  useContext,
-} from 'react';
+import { useContext } from 'react';
 
 import {
   useDispatch,
@@ -14,18 +11,10 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
-import {
-  genSpans,
-  sortData,
-} from '@utils/commonUtil';
-import { getNamespace } from '@utils/spreadUtil';
 
 import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
 import { getBaseUrl } from './utils/environmentUtil';
-
-const GC = getNamespace();
-const GCsheets = GC.Spread.Sheets;
 
 const Wrap = styled.div`
     display: flex;
@@ -62,43 +51,23 @@ function replacer(key, value) {
     return value;
 }
 
-//表格合并
-function tableMerge(params) {
-    const { sheet, rowMerge, columnMerge } = params;
-    const tables = sheet.tables.all();
-    if (tables.length > 0 && (rowMerge || columnMerge)) {
-        let direction = GCsheets.AutoMerge.AutoMergeDirection.column; //1
-        let mode = GCsheets.AutoMerge.AutoMergeMode.free; //0
-        let sheetArea = GCsheets.SheetArea.viewport; //3
-        let selectionMode = GCsheets.AutoMerge.SelectionMode.merged; //0
-
-        if (rowMerge && columnMerge) {
-            direction = GCsheets.AutoMerge.AutoMergeDirection.rowColumn; //值等于4。在行方向上优先于列方向应用自动合并
-        } else if (rowMerge) {
-            direction = GCsheets.AutoMerge.AutoMergeDirection.row; //值等于2.在行方向上应用自动合并
-        }
-
-        sheet.suspendPaint();
-        tables.forEach(function (table) {
-            const range = table.range();
-            sheet.autoMerge(range, direction, mode, sheetArea, selectionMode);
-        });
-        sheet.resumePaint();
-    }
-}
-
+//如果表格允许行合并或者列合并(相邻单元格数据相同会自动合并成一个单元格)，则对数据进行处理
 function handleDatas(params) {
-    const { sheet, rowMerge, columnMerge, dataSource } = params;
-    const tables = sheet.tables.all();
-    if (tables.length > 0 && (rowMerge || columnMerge)) {
-        tables.forEach(function (table) {
-            const path = table.bindingPath();
-            if (rowMerge && columnMerge) {
-                dataSource[path] = dataSource.mergeDatas.rowColumn[path];
-            } else if (rowMerge) {
-                dataSource[path] = dataSource.mergeDatas.row[path];
-            } else if (columnMerge) {
-                dataSource[path] = dataSource.mergeDatas.column[path];
+    const { rowMerge, columnMerge, dataSource, originalDatasourceCodes } =
+        params;
+    if (rowMerge || columnMerge) {
+        Object.keys(dataSource).forEach((key) => {
+            if (
+                !originalDatasourceCodes[key] &&
+                Array.isArray(dataSource[key])
+            ) {
+                if (rowMerge && columnMerge) {
+                    dataSource[key] = dataSource.mergeDatas.rowColumn[key];
+                } else if (rowMerge) {
+                    dataSource[key] = dataSource.mergeDatas.row[key];
+                } else if (columnMerge) {
+                    dataSource[key] = dataSource.mergeDatas.column[key];
+                }
             }
         });
     }
@@ -111,75 +80,25 @@ export default function () {
         previewViewDatas,
         tableGroups,
         sumColumns,
-        previewViewDatasHasInit,
+        originalDatasourceCodes,
     } = useSelector(({ datasourceSlice }) => datasourceSlice);
 
     const { rowMerge, columnMerge } = useSelector(
         ({ tableDesignSlice }) => tableDesignSlice
     );
-
-    const { spread: sourceSpread } = useSelector(({ appSlice }) => appSlice);
-    const sourceJson = JSON.stringify(sourceSpread.toJSON(), replacer);
-    const json = JSON.parse(sourceJson);
-    const workbookInitializedHandler = useCallback(function (spread) {
-        spread.suspendPaint();
-        spread.sheets.forEach(function (sheet) {
-            const dataSource = JSON.parse(JSON.stringify(previewViewDatas));
-            const tables = sheet.tables.all();
-            const tablesSpans = [];
-
-            //对数据进行分组排序
-            if (tables.length > 0) {
-                tables.forEach(function (table) {
-                    const tableName = table.name();
-                    const groups = tableGroups[tableName];
-                    const sums = sumColumns[tableName];
-                    if (
-                        (Array.isArray(groups) && groups.length > 0) ||
-                        (Array.isArray(sums) && sums.length > 0)
-                    ) {
-                        const path = table.bindingPath();
-                        const { row, col } = table.range();
-                        const fields = [];
-                        table.BSt.forEach(function (item) {
-                            fields.push({ code: item.dataField() });
-                        });
-                        const { datas, spansTree } = sortData(
-                            dataSource[path],
-                            groups,
-                            fields,
-                            sums
-                        );
-                        dataSource[path] = datas;
-                        const result = genSpans(spansTree, row + 1, col);
-                        tablesSpans.push(...result.spans);
-                    }
-                });
-            }
-
-            !previewViewDatasHasInit &&
-                handleDatas({
-                    sheet,
-                    rowMerge,
-                    columnMerge,
-                    dataSource,
-                });
-
-            const source = new GCsheets.Bindings.CellBindingSource(dataSource);
-            sheet.setDataSource(source);
-            const json = sheet.toJSON();
-            json.spans = Array.isArray(json.spans) ? json.spans : [];
-            json.spans.push(...tablesSpans);
-            sheet.fromJSON(json);
-            sheet.setDataSource(source);
-            tableMerge({
-                sheet,
-                rowMerge,
-                columnMerge,
-            });
-        });
-        spread.resumePaint();
+    debugger;
+    handleDatas({
+        rowMerge,
+        columnMerge,
+        dataSource: previewViewDatas,
+        originalDatasourceCodes,
     });
+    const { spread: sourceSpread } = useSelector(({ appSlice }) => appSlice);
+    const sourceJson = JSON.stringify(
+        sourceSpread ? sourceSpread?.toJSON?.() : '',
+        replacer
+    );
+    const json = JSON.parse(sourceJson);
     //许可证
     const license = context?.conf?.license;
     let printHandler = null;
@@ -214,7 +133,11 @@ export default function () {
                     onPrintHandler={(handler) => {
                         printHandler = handler;
                     }}
-                    onInited={workbookInitializedHandler}
+                    rowMerge={rowMerge}
+                    columnMerge={columnMerge}
+                    dataSource={previewViewDatas}
+                    sumColumns={sumColumns}
+                    groupColumns={tableGroups}
                 >
                     <Worksheet></Worksheet>
                 </Workbook>

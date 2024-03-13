@@ -38,8 +38,11 @@ import {
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
+import { BindingPathCellType } from './component/defineDatasource/utils/utils';
 import DesignerContext from './DesignerContext';
 import { isLineThrough } from './utils/fontUtil';
+
+const bindingPathCellType = new BindingPathCellType();
 
 export default function () {
     const dispatch = useDispatch();
@@ -117,6 +120,27 @@ export default function () {
         dispatch(updateActiveSheetTablePath({ tablePaths }));
 
         dispatch(setSpread({ spread }));
+
+        //对已经绑定了数据源的单元格进行类型设置，设置后就可以看到当前单元格已经绑定了哪个数据源
+        spread.sheets.forEach((sheet) => {
+            const dataTable = sheet.toJSON().data.dataTable;
+            if (!dataTable) {
+                return;
+            }
+            Object.entries(dataTable).forEach(([rowStr, colValue]) => {
+                const row = Number(rowStr);
+                Object.entries(colValue).forEach(
+                    ([colStr, { bindingPath }]) => {
+                        if (bindingPath) {
+                            const col = Number(colStr);
+                            sheet
+                                .getCell(row, col)
+                                .cellType(bindingPathCellType);
+                        }
+                    }
+                );
+            });
+        });
     });
     const handleSelectionChanged = useCallback((type, data) => {
         fire({
@@ -140,9 +164,7 @@ export default function () {
     //许可证
     const license = context?.conf?.license;
 
-    const spreadJson = localStorage.getItem('spreadJson');
-    const json = JSON.parse(spreadJson);
-
+    const json = context?.conf?.json?.reportJson;
     return (
         <Fragment>
             <Workbook

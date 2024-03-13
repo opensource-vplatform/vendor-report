@@ -387,6 +387,9 @@ export function checkHasBind(params) {
 export function getCellInfo(params) {
     const result = {};
     const { spread, event } = params;
+    if (!spread) {
+        return;
+    }
     const targetElement = spread.getHost();
     const { x: offsetLeft, y: offsetTop } =
         targetElement.getBoundingClientRect();

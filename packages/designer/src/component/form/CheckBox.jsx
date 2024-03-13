@@ -9,7 +9,7 @@ const Label = styled.label`
     cursor: pointer;
     padding: 4px;
     box-sizing: border-box;
-    &:hover {
+    &.defaultHover:hover {
         background-color: #dadada;
     }
     &[data-disabled='true'] {
@@ -29,14 +29,30 @@ const Title = styled.span`
 `;
 
 export default function (props) {
-    const { title, value, onChange,style={}, disabled, desc = '',children } = props;
+    const {
+        title,
+        value,
+        onChange,
+        style = {},
+        disabled,
+        desc = '',
+        children,
+        titleStyle = {},
+        hover = 'defaultHover',
+    } = props;
     const dsb = !!disabled;
     const checked = !!value;
     const defaultStyle = dsb
         ? { backgroundColor: 'transparent', cursor: 'not-allowed' }
         : {};
     return (
-        <Label data-disabled={dsb} style={style} title={desc} onClick={() => !disabled && onChange && onChange(!checked)}>
+        <Label
+            className={hover}
+            data-disabled={dsb}
+            style={style}
+            title={desc}
+            onClick={() => !disabled && onChange && onChange(!checked)}
+        >
             {checked ? (
                 <FillCheckIcon
                     style={{
@@ -56,7 +72,7 @@ export default function (props) {
                     {children}
                 </FillUnCheckIcon>
             )}
-            {title && <Title>{title}</Title>}
+            {title && <Title style={titleStyle}>{title}</Title>}
         </Label>
     );
 }

@@ -138,6 +138,7 @@ function Designer(props) {
                 initDatasource({
                     datasource: conf?.dataSource?.dataSourceDefinition,
                     datas: conf?.dataSource?.datas,
+                    datasourceSlice: conf?.json?.context?.datasourceSlice,
                 })
             );
         },

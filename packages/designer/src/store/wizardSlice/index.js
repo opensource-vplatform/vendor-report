@@ -37,7 +37,7 @@ export const wizardSlice = createSlice({
         },
         save(state, { payload }) {
             const { datas, code } = payload;
-            const result = [...state[code]];
+            const result = Array.isArray(state[code]) ? [...state[code]] : [];
             const isExist = result.some(function (res) {
                 return res.id === datas.id;
             });

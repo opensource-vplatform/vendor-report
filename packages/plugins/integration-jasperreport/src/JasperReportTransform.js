@@ -1,20 +1,21 @@
 import { testTransform } from './transform';
 
-class JasperReportTransform{
-
+class JasperReportTransform {
     data = {};
 
-    ctx = {};
+    //ctx = {};
 
-    constructor(data,ctx){
+    constructor(data /* ,ctx */) {
         this.data = data;
-        this.ctx = ctx;
+        //this.ctx = ctx;
     }
 
-    transform(){
-        return testTransform({spreadJsonData:this.data,dsList:this.ctx.dsList});
+    transform() {
+        return testTransform({
+            spreadJsonData: this?.data?.reportJson,
+            dsList: this?.data?.context?.datasourceSlice?.finalDsList,
+        });
     }
-
 }
 
 export default JasperReportTransform;

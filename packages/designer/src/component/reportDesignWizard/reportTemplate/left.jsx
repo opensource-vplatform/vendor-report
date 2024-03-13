@@ -29,9 +29,10 @@ import {
   sort,
   sortGroups,
 } from '@store/wizardSlice';
+import { getNext } from '@utils/zIndexUtil';
 
 const Wrap = styled.div`
-    width: 300px;
+    width: 320px;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -149,6 +150,11 @@ const Title = styled.div`
     text-align: right;
 `;
 
+const GroupsContainerLine = styled.div`
+    display: flex;
+    gap: 10px;
+`;
+
 const DragHandle = sortableHandle(() => (
     <SortableHandle className='dragHandle'></SortableHandle>
 ));
@@ -176,7 +182,11 @@ const FieldListItem = SortableElement(function (props) {
     };
 
     return (
-        <FieldListItemWrap onClick={resolveChangeHandler} ref={drag}>
+        <FieldListItemWrap
+            onClick={resolveChangeHandler}
+            ref={drag}
+            style={{ zIndex: getNext() }}
+        >
             <CheckBox
                 value={isChecked}
                 onChange={resolveChangeHandler}
@@ -238,7 +248,7 @@ const GroupItem = SortableElement(function (props) {
     const dispatch = useDispatch();
 
     return (
-        <GroupItemWrap>
+        <GroupItemWrap style={{ zIndex: getNext() }}>
             {text}
             <ClearIcon
                 onMouseDownCapture={function (e) {
@@ -257,7 +267,7 @@ const GroupItem = SortableElement(function (props) {
 const Groups = SortableContainer(function (props) {
     const { groupType = 'groups', title = '分组列' } = props;
     const dispatch = useDispatch();
-    let { groups, sumColumns } = useSelector(({ wizardSlice }) => wizardSlice);
+    let wizardSlice = useSelector(({ wizardSlice }) => wizardSlice);
 
     const [collectedProps, drop] = useDrop(() => ({
         accept: 'box',
@@ -269,7 +279,9 @@ const Groups = SortableContainer(function (props) {
         }),
     }));
 
-    const datas = groupType === 'groups' ? groups : sumColumns;
+    const datas = Array.isArray(wizardSlice[groupType])
+        ? wizardSlice[groupType]
+        : [];
 
     return (
         <GroupWrap ref={drop}>
@@ -289,17 +301,23 @@ const Groups = SortableContainer(function (props) {
 });
 
 const GroupsContainer = function (props) {
-    const { onSortEnd, title = '分组列', groupType = 'groups' } = props;
+    const {
+        onSortEnd,
+        title = '分组列',
+        groupType = 'groups',
+        titleAlign = 'right',
+        styles = {},
+    } = props;
     return (
-        <>
-            <Title>{title}</Title>
+        <div style={{ flex: 1, ...styles }}>
+            {title && <Title style={{ textAlign: titleAlign }}>{title}</Title>}
             <Groups
                 lockAxis='y'
                 lockToContainerEdges={true}
                 onSortEnd={onSortEnd}
                 groupType={groupType}
             ></Groups>
-        </>
+        </div>
     );
 };
 
@@ -346,6 +364,40 @@ export default function Index(props) {
                     lockToContainerEdges={true}
                     useDragHandle
                 ></FieldList>
+                {reportType === 'statementDetail1' && (
+                    <div>
+                        <div style={{ display: 'flex' }}>
+                            <CheckBox
+                                title='行合并'
+                                desc='勾选此项，同行数据存在连续相同时，将合并成一个单元格'
+                                value={false}
+                                onChange={(checked) => {
+                                    console.log(1);
+                                }}
+                                titleStyle={{ marginLeft: 0 }}
+                                hover='none'
+                            ></CheckBox>
+                            <CheckBox
+                                title='列合并'
+                                desc='勾选此项，同列数据存在连续相同时，将合并成一个单元格'
+                                value={false}
+                                onChange={(checked) => {
+                                    console.log(1);
+                                }}
+                                titleStyle={{ marginLeft: 0 }}
+                                hover='none'
+                            ></CheckBox>
+                        </div>
+                        <GroupsContainer
+                            onSortEnd={function ({ oldIndex, newIndex }) {
+                                console.log(1234);
+                            }}
+                            groupType='spanColumns'
+                            title=''
+                            styles={{ flex: 'unset' }}
+                        ></GroupsContainer>
+                    </div>
+                )}
                 {reportType === 'groupReport' && (
                     <>
                         <GroupsContainer
@@ -366,6 +418,50 @@ export default function Index(props) {
                             groupType='sumColumns'
                             title='求和列'
                         ></GroupsContainer>
+                    </>
+                )}
+                {reportType === 'crossStatement' && (
+                    <>
+                        <GroupsContainerLine>
+                            <div
+                                style={{
+                                    flex: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    fontStyle: 'italic',
+                                    color: '#616161',
+                                    fontSize: '12px',
+                                }}
+                            >
+                                拖拽列到相应的区域来创建交叉报表
+                            </div>
+                            <GroupsContainer
+                                onSortEnd={function ({ oldIndex, newIndex }) {
+                                    console.log('asdf');
+                                }}
+                                groupType='col'
+                                title='列'
+                                titleAlign='left'
+                            ></GroupsContainer>
+                        </GroupsContainerLine>
+                        <GroupsContainerLine>
+                            <GroupsContainer
+                                onSortEnd={function ({ oldIndex, newIndex }) {
+                                    console.log('asdf');
+                                }}
+                                groupType='row'
+                                title='行'
+                                titleAlign='left'
+                            ></GroupsContainer>
+                            <GroupsContainer
+                                onSortEnd={function ({ oldIndex, newIndex }) {
+                                    console.log('asdf');
+                                }}
+                                groupType='sumColumns'
+                                title='求和'
+                                titleAlign='left'
+                            ></GroupsContainer>
+                        </GroupsContainerLine>
                     </>
                 )}
             </Wrap>

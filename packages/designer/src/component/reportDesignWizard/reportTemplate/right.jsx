@@ -10,13 +10,12 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
+  genSpans,
+  sortData,
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
-import {
-  genSpans,
-  sortData,
-} from '@utils/commonUtil';
+import CrossDatas from '@utils/crossDatas';
 import { getNamespace } from '@utils/spreadUtil';
 
 import DesignerContext from '../../../DesignerContext';
@@ -33,10 +32,16 @@ function preview(params) {
         spansTree,
         source: datasource,
         wizardSlice: { groups = [], sumColumns = [] },
+        reportType,
+        crossColumns = [],
     } = params;
 
     //构造表格字段
-    const _field = [...groups, ...field, ...sumColumns];
+    let _field = [...groups, ...field, ...sumColumns];
+    if (reportType === 'crossStatement') {
+        _field = crossColumns;
+    }
+
     const { columns, filterButtonVisibleInfo } = _field.reduce(
         function (result, { id, code, name }, index) {
             if (!exclude.includes(code)) {
@@ -91,13 +96,17 @@ function preview(params) {
     let spans = [];
     let dataTableStyle = {};
     if (Array.isArray(spansTree)) {
+        debugger;
         const res = genSpans(spansTree, 1, 0);
         spans = res.spans;
         dataTableStyle = res.dataTableStyle;
     }
+    if (colCount > sheet.getColumnCount()) {
+        sheet.addColumns(0, colCount - sheet.getColumnCount());
+    }
 
     const json = sheet.toJSON();
-    //json.data.dataTable = { ...json.data.dataTable, ...dataTableStyle };
+    json.data.dataTable = { ...json.data.dataTable, ...dataTableStyle };
     json.tables = tables;
     json.spans = spans;
 
@@ -139,7 +148,7 @@ export default function Index(props) {
     const wizardSlice = useSelector(({ wizardSlice }) => wizardSlice);
 
     const [spread, setSpread] = useState(null);
-    const { value, field, exclude } = props;
+    const { value, field, exclude, reportType } = props;
     const context = useContext(DesignerContext);
     //许可证
     const license = context?.conf?.license;
@@ -151,10 +160,19 @@ export default function Index(props) {
     //数据源
     const source = useMemo(() => {
         const dataSource = JSON.parse(JSON.stringify(previewViewDatas));
-        const { groups = [], sumColumns = [] } = wizardSlice;
+        const {
+            groups = [],
+            sumColumns = [],
+            row = [],
+            col = [],
+        } = wizardSlice;
 
         _refState.spansTree = null;
-        if (groups.length > 0 || sumColumns.length > 0) {
+        if (
+            (groups.length > 0 || sumColumns.length > 0) &&
+            reportType !== 'crossStatement' &&
+            Array.isArray(dataSource[value])
+        ) {
             const { datas, spansTree } = sortData(
                 dataSource[value],
                 groups,
@@ -163,6 +181,22 @@ export default function Index(props) {
             );
             dataSource[value] = datas;
             _refState.spansTree = spansTree;
+        }
+        if (
+            reportType === 'crossStatement' &&
+            (!!sumColumns.length || !!row.length || !!col.length)
+        ) {
+            const crossDatas = new CrossDatas({
+                datas: dataSource[value],
+                rowFields: row,
+                colFields: col,
+                summationFields: sumColumns,
+            });
+            dataSource[value] = crossDatas.sumDatas;
+            _refState.crossColumns = crossDatas.tableColumns;
+            _refState.spansTree = crossDatas.spansArr;
+            console.log(_refState.spansTree);
+            debugger;
         }
 
         return new spreadNS.Bindings.CellBindingSource(dataSource);
@@ -179,6 +213,8 @@ export default function Index(props) {
                 wizardSlice,
                 spansTree: _refState.spansTree,
                 source,
+                reportType,
+                crossColumns: _refState.crossColumns,
             });
         }
     }, [value, exclude, spread, source]);

@@ -45,6 +45,14 @@ class Preview {
         }
     }
 
+    replacer(key, value) {
+        //删除角标信息
+        if (key === 'cornerFold' && value?.markType === 'table') {
+            return undefined;
+        }
+        return value;
+    }
+
     /**
      * 报表挂载
      * @param {DOMElement} el 挂载dom对象
@@ -52,7 +60,7 @@ class Preview {
     mount(el) {
         const GC = getNamespace();
         GC.Spread.Common.CultureManager.culture('zh-cn');
-        const { onInited, ready, ...others } = this.conf||{};
+        const { onInited, ready, dataSource, ...others } = this.conf || {};
         const onInitHandler = (spread) => {
             this.spread = spread;
             if (onInited) {
@@ -64,13 +72,30 @@ class Preview {
                 });
             }
         };
+        let json = this.conf?.json?.reportJson;
+        if (json) {
+            json = JSON.parse(JSON.stringify(json, this.replacer));
+        }
+
+        const { rowMerge, columnMerge } =
+            this.conf?.json?.context?.tableDesignSlice || {};
+
+        const { sumColumns, tableGroups: groupColumns } =
+            this.conf?.json?.context?.datasourceSlice || {};
+
         createRoot(el).render(
             createElement(Workbook, {
                 onInited: onInitHandler,
                 onPrintHandler: (handler) => {
                     this.printHandler = handler;
                 },
+                rowMerge,
+                columnMerge,
+                sumColumns,
+                groupColumns,
+                dataSource,
                 ...others,
+                json,
             })
         );
     }

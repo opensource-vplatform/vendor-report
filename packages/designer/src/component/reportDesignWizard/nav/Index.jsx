@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+//import CrossStatementIcon from './icons/CrossStatementIcon';
 import GroupReportIcon from './icons/GroupReportIcon';
 import StatementDetailIcon from './icons/StatementDetailIcon';
 import NavItem from './NavItem';
@@ -27,6 +28,12 @@ export default function Index(props) {
                 text='分组报表'
                 Icon={GroupReportIcon}
             ></NavItem>
+            {/*  <NavItem
+                {...props}
+                type='crossStatement'
+                text='交叉报表'
+                Icon={CrossStatementIcon}
+            ></NavItem> */}
         </Wrap>
     );
 }

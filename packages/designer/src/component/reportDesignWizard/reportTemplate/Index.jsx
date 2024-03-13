@@ -238,6 +238,7 @@ export default function Index(props) {
                     value={value}
                     field={columnsDatas}
                     exclude={exclude}
+                    reportType={reportType}
                 ></Right>
             </HeaderWrap>
             <FooterWrap>

@@ -6,6 +6,13 @@ import {
   genValueByType,
 } from '../../utils/commonUtil.js';
 
+const typesMap = {
+    text: '文本',
+    integer: '整数',
+    decimals: '小数',
+    table: '表',
+};
+
 export const datasourceSlice = createSlice({
     name: 'datasourceSlice',
     initialState: {
@@ -14,9 +21,8 @@ export const datasourceSlice = createSlice({
         finalDsList: [],
         dsList: [],
         previewViewDatas: {},
-        originalDatasource: null, //原始数据源不允许编辑与删除，但是允许扩展
-        originalDatasourceIds: {},
-        previewViewDatasHasInit: false,
+        originalDatasourceIds: {}, //原始数据源不允许编辑与删除，但是允许扩展
+        originalDatasourceCodes: {},
         isShowDatasource: false,
         activeSheetTablePath: {},
         tables: {
@@ -84,9 +90,6 @@ export const datasourceSlice = createSlice({
             }
         },
         genPreviewDatas(state, { payload }) {
-            /*  if (state.previewViewDatasHasInit) {
-                return;
-            } */
             function mergeColumnDatas(params) {
                 const {
                     instanceObject,
@@ -113,24 +116,27 @@ export const datasourceSlice = createSlice({
                 }
 
                 //第二列
-                const key2 = mergeInfos[1].key;
-                const value2 = mergeInfos[1].values;
-                if (i <= 3) {
-                    if (value2[0] === null || value2[0] === undefined) {
-                        value2[0] = data[key2];
+                if (mergeInfos[1]) {
+                    const key2 = mergeInfos[1].key;
+                    const value2 = mergeInfos[1].values;
+                    if (i <= 3) {
+                        if (value2[0] === null || value2[0] === undefined) {
+                            value2[0] = data[key2];
+                        }
+                        data[key2] = value2[0];
+                    } else if (i <= 6) {
+                        if (value2[1] === null || value2[1] === undefined) {
+                            value2[1] = data[key2];
+                        }
+                        data[key2] = value2[1];
+                    } else {
+                        if (value2[2] === null || value2[2] === undefined) {
+                            value2[2] = data[key2];
+                        }
+                        data[key2] = value2[2];
                     }
-                    data[key2] = value2[0];
-                } else if (i <= 6) {
-                    if (value2[1] === null || value2[1] === undefined) {
-                        value2[1] = data[key2];
-                    }
-                    data[key2] = value2[1];
-                } else {
-                    if (value2[2] === null || value2[2] === undefined) {
-                        value2[2] = data[key2];
-                    }
-                    data[key2] = value2[2];
                 }
+
                 datas.mergeDatas[type][code].push(data);
             }
 
@@ -253,18 +259,62 @@ export const datasourceSlice = createSlice({
             }
         },
         initDatasource(state, { payload }) {
-            let { datasource, datas } = payload;
+            let { datasource, datas, datasourceSlice } = payload;
+            //从配置项json还原仓库数据
+            if (datasourceSlice && typeof datasourceSlice === 'object') {
+                Object.entries(datasourceSlice).forEach(([key, value]) => {
+                    state[key] = value;
+                });
+            }
+
+            //配置项中数据源定义覆盖json中的仓库数据。并且这些数据源不可编辑
             datasource = Array.isArray(datasource) ? datasource : [];
-            state.dsList = [...datasource];
-            state.finalDsList = [...datasource];
-            datasource.forEach(({ id }) => {
+            datasource.forEach((_item) => {
+                const item = { ..._item };
+                if (!item?.id) {
+                    item.id = item.code;
+                }
+                item.typeName = typesMap[item?.typeCode];
+                if (Array.isArray(item.children)) {
+                    item.children = item.children.map(function (_children) {
+                        const children = { ..._children };
+                        if (!children?.id) {
+                            children.id = children.code;
+                        }
+                        children.typeName = typesMap[children?.typeCode];
+                        children.parentId = item.id;
+                        return children;
+                    });
+                }
+                const { id, code } = item;
+                const itemInDsListIndex = state.dsList.findIndex(
+                    ({ id: _id, code: _code }) => {
+                        return id === _id || code === _code;
+                    }
+                );
+                if (itemInDsListIndex >= 0) {
+                    state.dsList.splice(itemInDsListIndex, 1, item);
+                } else {
+                    state.dsList.push(item);
+                }
+
+                const itemInFinalDsListIndex = state.finalDsList.findIndex(
+                    ({ id: _id, code: _code }) => {
+                        return id === _id || code === _code;
+                    }
+                );
+                if (itemInFinalDsListIndex >= 0) {
+                    state.finalDsList.splice(itemInFinalDsListIndex, 1, item);
+                } else {
+                    state.finalDsList.push(item);
+                }
+
+                //标识当前数据源是通过配置项数据源定义生成的，这些数据源不可编辑
                 state.originalDatasourceIds[id] = true;
+                state.originalDatasourceCodes[code] = true;
             });
-            state.originalDatasource = JSON.stringify(datasource);
             if (datas) {
                 state.previewViewDatas = datas;
-                state.previewViewDatasHasInit = true;
-                console.log(1234);
             }
         },
         saveTables(state, { payload }) {

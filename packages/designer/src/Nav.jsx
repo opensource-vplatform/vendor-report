@@ -87,15 +87,54 @@ export default function () {
     const dispatch = useDispatch();
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     const { spread, navStyle } = useSelector(({ appSlice }) => appSlice);
-    const { finalDsList } = useSelector(
+    const datasourceSlice = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
+    const tableDesignSlice = useSelector(
+        ({ tableDesignSlice }) => tableDesignSlice
+    );
+    const { finalDsList } = datasourceSlice;
     const handleSave = () => {
         if (spread) {
-            const data = spread.toJSON();
+            const json = {
+                reportJson: spread.toJSON(),
+                context: { datasourceSlice, tableDesignSlice },
+            };
+            const dsCodes = [];
+            spread.sheets.forEach(function (sheet) {
+                const sheetJson = sheet.toJSON();
+                //收集表格已经绑定的数据源编码
+                if (Array.isArray(sheetJson.tables)) {
+                    sheetJson.tables.forEach(({ bindingPath }) => {
+                        if (bindingPath && !dsCodes.includes(bindingPath)) {
+                            dsCodes.push(bindingPath);
+                        }
+                    });
+                }
+                //收集单元格已经绑定的数据源编码
+                const dataTable = sheetJson?.data?.dataTable;
+                if (dataTable && typeof dataTable === 'object') {
+                    Object.values(dataTable).forEach((cols) => {
+                        if (cols) {
+                            Object.values(cols).forEach(({ bindingPath }) => {
+                                if (
+                                    bindingPath &&
+                                    !dsCodes.includes(bindingPath)
+                                ) {
+                                    dsCodes.push(bindingPath);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            //收集报表已经绑定的数据源
+            const define = finalDsList.filter(({ code }) => {
+                return dsCodes.includes(code);
+            });
             const result = fire({
                 event: EVENTS.onSave,
-                args: [data, { dsList: finalDsList }],
+                args: [json, { dsList: finalDsList, define }],
             });
             if (result.length > 0) {
                 dispatch(setWaitMsg({ message: '正在保存，请稍候...' }));
