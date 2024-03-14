@@ -1,15 +1,12 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
 import {
-  DownIcon,
-  IconWrap,
-  NumberIconWrap,
-  NumberInput,
-  NumberWrap,
-  UpIcon,
+    DownIcon,
+    IconWrap,
+    NumberIconWrap,
+    NumberInput,
+    NumberWrap,
+    UpIcon,
 } from './Components';
 
 export default function (props) {
@@ -19,7 +16,9 @@ export default function (props) {
         style = {},
         showIcon = true,
         disabled = false,
-        step=1,
+        onFocus,
+        onBlur,
+        step = 1,
         min = Number.MIN_SAFE_INTEGER,
         max = Number.MAX_SAFE_INTEGER,
     } = props;
@@ -42,7 +41,7 @@ export default function (props) {
         }
     };
     const increase = () => {
-        if(disabled)return;
+        if (disabled) return;
         let newVal = parseFloat(data.innerVal) + step;
         newVal = newVal <= max ? newVal : max;
         if (newVal != data.innerVal) {
@@ -51,7 +50,7 @@ export default function (props) {
         }
     };
     const decrease = () => {
-        if(disabled)return;
+        if (disabled) return;
         let newVal = parseFloat(data.innerVal) - step;
         newVal = newVal >= min ? newVal : min;
         if (newVal != data.innerVal) {
@@ -79,10 +78,12 @@ export default function (props) {
             setVal(newVal);
             fireChange(newVal);
         }
+        onBlur && onBlur(evt);
     };
     const handleFocus = (evt) => {
         try {
             evt.nativeEvent.target.select();
+            onFocus && onFocus(evt);
         } catch (e) {}
     };
     useEffect(() => {
@@ -94,7 +95,12 @@ export default function (props) {
         });
     }, [value]);
     return (
-        <NumberWrap style={style}>
+        <NumberWrap
+            style={style}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            tabIndex={1}
+        >
             <NumberInput
                 value={data.innerVal}
                 onInput={handleInput}

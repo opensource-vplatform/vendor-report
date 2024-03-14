@@ -5,23 +5,25 @@ export const navSlice = createSlice({
     initialState: {
         active: null,
         //方向
-        orientation:null,
+        orientation: null,
         //缩放类型
-        scaleType:null,
+        scaleType: null,
         //缩放：页高
-        fitPagesTall:null,
+        fitPagesTall: null,
         //缩放：页宽
-        fitPagesWide:null,
+        fitPagesWide: null,
         //缩放比例
         zoomFactor: null,
         //打印质量
         printQuality: null,
         //起始页码
-        firstPageNumber:null,
+        firstPageNumber: null,
         //纸张大小
-        paperKind:null,
+        paperKind: null,
         //页边距
         margin: null,
+        //页眉和页脚
+        headerAndFooter: null,
     },
     reducers: {
         /**
@@ -36,49 +38,51 @@ export const navSlice = createSlice({
         },
         /**
          * 设置信息
-         * @param {*} state 
-         * @param {*} action 
+         * @param {*} state
+         * @param {*} action
          */
-        setInfo(state,action){
-            Object.assign(state,action.payload)
+        setInfo(state, action) {
+            Object.assign(state, action.payload);
         },
 
-        setOrientation(state,action){
+        setOrientation(state, action) {
             state.orientation = action.payload;
         },
 
-        setScaleType(state,action){
-            state.scaleType = action.payload
+        setScaleType(state, action) {
+            state.scaleType = action.payload;
         },
 
-        setFitPagesWide(state,action){
-            state.fitPagesWide = action.payload
+        setFitPagesWide(state, action) {
+            state.fitPagesWide = action.payload;
         },
 
-        setFitPagesTall(state,action){
-            state.fitPagesTall = action.payload
+        setFitPagesTall(state, action) {
+            state.fitPagesTall = action.payload;
         },
 
-        setZoomFactor(state,action){
-            state.zoomFactor = action.payload
+        setZoomFactor(state, action) {
+            state.zoomFactor = action.payload;
         },
 
-        setPrintQuality(state,action){
-            state.printQuality = action.payload
+        setPrintQuality(state, action) {
+            state.printQuality = action.payload;
         },
 
-        setFirstPageNumber(state,action){
-            state.firstPageNumber = action.payload
+        setFirstPageNumber(state, action) {
+            state.firstPageNumber = action.payload;
         },
 
-        setPaperKind(state,action){
-            state.paperKind = action.payload
+        setPaperKind(state, action) {
+            state.paperKind = action.payload;
         },
-        
-        setMargin(state,action){
-            state.margin = action.payload
+
+        setMargin(state, action) {
+            state.margin = action.payload;
         },
-        
+        setHeaderAndFooter(state, action) {
+            state.headerAndFooter = action.payload;
+        },
     },
 });
 export const {
@@ -93,5 +97,6 @@ export const {
     setFirstPageNumber,
     setPaperKind,
     setMargin,
+    setHeaderAndFooter,
 } = navSlice.actions;
 export default navSlice.reducer;
