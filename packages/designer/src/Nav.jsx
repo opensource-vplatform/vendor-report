@@ -28,6 +28,7 @@ import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
+import LayoutTab from '@tabs/layout/Index';
 //import InsertTab from '@tabs/insert/Index';
 import ReportTab from '@tabs/report/Index';
 import SettingTab from '@tabs/setting/Index';
@@ -82,6 +83,7 @@ const SettingNavItem = WithNavItem(SettingTab);
 const ReportNavItem = WithNavItem(ReportTab);
 const SparklinesNavItem = WithNavItem(SparklinesTab);
 //const InsertNavItem = WithNavItem(InsertTab);
+const LayoutNavItem = WithNavItem(LayoutTab);
 
 export default function () {
     const dispatch = useDispatch();
@@ -195,6 +197,8 @@ export default function () {
     const isHiddenInsert = context?.conf?.nav?.insert === false;
     //是否隐藏迷你图导航
     const isHiddenSparklines = context?.conf?.nav?.sparklines === false;
+    //是否隐藏页面布局
+    const isHiddenLayout = context?.conf?.nav?.layout === false;
     useEffect(() => {
         if (spread) {
             spread.refresh();
@@ -270,6 +274,11 @@ export default function () {
                 title='开始'
                 tabProps={{ hidden: isHiddenStart }}
             ></StartNavItem>
+            <LayoutNavItem
+                code='layout'
+                title='页面布局'
+                tabProps={{ hidden: isHiddenLayout }}
+            ></LayoutNavItem>
             <FormulaNavItem
                 code='formula'
                 title='公式'

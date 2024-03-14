@@ -170,6 +170,7 @@ export default function () {
             <Workbook
                 license={license}
                 json={json}
+                enablePrint={true}
                 newTabVisible={newTabVisible}
                 tabEditable={tabEditable}
                 tabStripVisible={tabStripVisible}

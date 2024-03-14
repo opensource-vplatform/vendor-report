@@ -6,6 +6,7 @@ import fontCellSettingSlice from './cellSettingSlice/FontCellSettingSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
 import fontSlice from './fontSlice/fontSlice';
 import formulaEditorSlice from './formulaEditorSlice/formulaEditorSlice';
+import layoutSlice from './layoutSlice/layoutSlice';
 import navSlice from './navSlice/navSlice';
 import workbookSettingSlice from './settingSlice/workbookSettingSlice';
 import worksheetSettingSlice from './settingSlice/worksheetSettingSlice';
@@ -47,6 +48,7 @@ export default configureStore({
         worksheetSettingSlice,
         formulaEditorSlice,
         wizardSlice,
+        layoutSlice,
     },
     middleware: function (getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });

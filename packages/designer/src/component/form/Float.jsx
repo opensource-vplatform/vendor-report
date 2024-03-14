@@ -19,6 +19,7 @@ export default function (props) {
         style = {},
         showIcon = true,
         disabled = false,
+        step=1,
         min = Number.MIN_SAFE_INTEGER,
         max = Number.MAX_SAFE_INTEGER,
     } = props;
@@ -42,7 +43,7 @@ export default function (props) {
     };
     const increase = () => {
         if(disabled)return;
-        let newVal = parseFloat(data.innerVal) + 1;
+        let newVal = parseFloat(data.innerVal) + step;
         newVal = newVal <= max ? newVal : max;
         if (newVal != data.innerVal) {
             setVal(newVal);
@@ -51,7 +52,7 @@ export default function (props) {
     };
     const decrease = () => {
         if(disabled)return;
-        let newVal = parseFloat(data.innerVal) - 1;
+        let newVal = parseFloat(data.innerVal) - step;
         newVal = newVal >= min ? newVal : min;
         if (newVal != data.innerVal) {
             setVal(newVal);

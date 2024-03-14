@@ -27,6 +27,9 @@ const MenuItemWrap = styled.div`
         background-color: transparent !important;
         opacity: 0.5;
     }
+    &[data-type='custom'] {
+        height: auto;
+    }
 `;
 
 const Title = styled.span`
@@ -46,6 +49,7 @@ const WithMenuItem = function (Component) {
             disabled = false,
             onClick,
             optionMaxSize,
+            text,
             datas,
             ...others
         } = props;
@@ -74,6 +78,7 @@ const WithMenuItem = function (Component) {
                 className='menuItemWrap'
                 data-selected={active == value}
                 data-disabled={disabled}
+                data-type={isReactNode(text) ? 'custom':'text'}
                 title={title}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
@@ -84,6 +89,7 @@ const WithMenuItem = function (Component) {
                 <Component
                     datas={datas}
                     disabled={disabled}
+                    text={text}
                     {...others}
                 ></Component>
                 {!disabled && hasChildren(datas) && data.show ? (

@@ -311,12 +311,15 @@ export default function (props) {
                                             printInfo.rowEnd(
                                                 sheet.getRowCount()
                                             );
+                                            printInfo.orientation(GC.Spread.Sheets.Print.PrintPageOrientation.landscape);
+                                            printInfo.centering(GC.Spread.Sheets.Print.PrintCentering.horizontal);
                                             setValue(showBorder, (val) => {
                                                 printInfo.showBorder(val);
                                             });
                                             setValue(showGridLine, (val) => {
                                                 printInfo.showGridLine(val);
                                             });
+                                            printInfo.margin({top:0, bottom:0, left:0, right:0, header:10, footer:20});
                                             setValue(
                                                 showColumnHeader,
                                                 (val) => {
