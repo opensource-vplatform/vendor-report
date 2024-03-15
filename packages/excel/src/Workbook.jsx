@@ -20,6 +20,7 @@ import {
   genSpans,
   sortData,
 } from './utils/other';
+import { setPrintInfo } from './utils/printUtil';
 import {
   getNamespace,
   getPluginSrc,
@@ -291,47 +292,8 @@ export default function (props) {
                                 if (spread) {
                                     if (enablePrint) {
                                         const sheets = spread.sheets;
-                                        const GC = getNamespace();
-                                        const visibleType =
-                                            GC.Spread.Sheets.Print
-                                                .PrintVisibilityType;
-                                        const {
-                                            showBorder = false,
-                                            showGridLine,
-                                            showColumnHeader,
-                                            showRowHeader,
-                                        } = params || {};
                                         sheets.forEach((sheet) => {
-                                            const printInfo = sheet.printInfo();
-                                            printInfo.columnStart(0);
-                                            printInfo.columnEnd(
-                                                sheet.getColumnCount()
-                                            );
-                                            printInfo.rowStart(0);
-                                            printInfo.rowEnd(
-                                                sheet.getRowCount()
-                                            );
-                                            printInfo.orientation(GC.Spread.Sheets.Print.PrintPageOrientation.landscape);
-                                            printInfo.centering(GC.Spread.Sheets.Print.PrintCentering.horizontal);
-                                            setValue(showBorder, (val) => {
-                                                printInfo.showBorder(val);
-                                            });
-                                            setValue(showGridLine, (val) => {
-                                                printInfo.showGridLine(val);
-                                            });
-                                            printInfo.margin({top:0, bottom:0, left:0, right:0, header:10, footer:20});
-                                            setValue(
-                                                showColumnHeader,
-                                                (val) => {
-                                                    printInfo.showColumnHeader(
-                                                        val
-                                                    );
-                                                }
-                                            );
-                                            setValue(showRowHeader, (val) => {
-                                                printInfo.showRowHeader(val);
-                                            });
-                                            sheet.printInfo(printInfo);
+                                            setPrintInfo(sheet,params||{});
                                         });
                                         spread.print();
                                         resolve();

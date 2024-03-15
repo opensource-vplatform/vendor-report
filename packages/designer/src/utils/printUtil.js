@@ -1,3 +1,5 @@
+import { setPrintInfo as printInfoHandler } from '@toone/report-excel';
+
 import {
   deepClone,
   isNullOrUndef,
@@ -95,6 +97,8 @@ const setValue = function (val, fn) {
     }
 };
 
+export const setPrintInfo = printInfoHandler;
+
 export const setPageLayout = function (spread, layout) {
     const GC = getNamespace();
     withBatchCalcUpdate(spread, (sheet) => {
@@ -112,51 +116,7 @@ export const setPageLayout = function (spread, layout) {
             differentFirst,
             pageHeaderFooter,
         } = layout;
-        setValue(showHeader, (val) => {
-            const showHeader = val
-                ? GC.Spread.Sheets.Print.PrintVisibilityType.show
-                : GC.Spread.Sheets.Print.PrintVisibilityType.hide;
-            printInfo.showRowHeader(showHeader);
-            printInfo.showColumnHeader(showHeader);
-        });
-        setValue(orientation, (val) => {
-            printInfo.orientation(val);
-        });
-        setValue(paperSize, (val) => {
-            printInfo.paperSize(val);
-        });
-        setValue(printQuality, (val) => {
-            printInfo.qualityFactor(val);
-        });
-        setValue(firstPageNumber, (val) => {
-            printInfo.firstPageNumber(val);
-        });
-        setValue(margin, (val) => {
-            printInfo.margin(val);
-        });
-        setValue(centering, (val) => {
-            printInfo.centering(val);
-        });
-        setValue(differentOddEven, (val) => {
-            printInfo.differentOddAndEvenPages(val);
-        });
-        setValue(differentFirst, (val) => {
-            printInfo.differentFirstPage(val);
-        });
-        setValue(pageHeaderFooter, (val) => {
-            printInfo.pageHeaderFooter(val);
-        });
-        setValue(scaleType, (val) => {
-            if (val === u.fitPage) {
-                printInfo.zoomFactor(1);
-                printInfo.fitPagesWide(t.fitPagesWide);
-                printInfo.fitPagesTall(t.fitPagesTall);
-            } else if (val === u.zoomFactor) {
-                printInfo.zoomFactor(t.zoomFactor);
-                printInfo.fitPagesTall(-1);
-                printInfo.fitPagesWide(-1);
-            }
-        });
+        setPrintInfo(sheet,layout)
 
         var i = rowStart,
             l = rowEnd,

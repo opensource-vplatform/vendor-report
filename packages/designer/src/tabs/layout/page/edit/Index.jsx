@@ -12,8 +12,15 @@ import {
   Tab,
   Tabs,
 } from '../../../../component/tabs/Index';
-import { setInfo } from '../../../../store/layoutSlice/layoutSlice';
-import { parsePrintInfo } from '../../../../utils/printUtil';
+import {
+  setActive,
+  setInfo,
+} from '../../../../store/layoutSlice/layoutSlice';
+import {
+  parsePrintInfo,
+  setPrintInfo,
+} from '../../../../utils/printUtil';
+import { getNamespace } from '../../../../utils/spreadUtil';
 import HeaderFooter from './HeaderFooter';
 import Padding from './Padding';
 import Page from './Page';
@@ -26,28 +33,53 @@ const Wrap = styled.div`
     justify-content: end;
 `;
 
+
+let pre_print_info = null;
+
 export default function (props) {
     const { onConfirm, onCancel } = props;
-    const { active } = useSelector(({ layoutSlice }) => layoutSlice);
+    const { active,...printInfo } = useSelector(({ layoutSlice }) => layoutSlice);
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatch = useDispatch();
     useEffect(() => {
         const sheet = spread.getActiveSheet();
         if (sheet) {
             const printInfo = parsePrintInfo(spread);
-            dispatch(
-                setInfo(printInfo)
-            );
+            dispatch(setInfo(printInfo));
         }
     }, []);
+    const handlePrintView = ()=>{
+        const sheet = spread.getActiveSheet();
+        if (sheet) {
+            pre_print_info = sheet.printInfo();
+            const GC = getNamespace();
+            const print = new GC.Spread.Sheets.Print.PrintInfo();
+            sheet.printInfo(print);
+            setPrintInfo(sheet,printInfo);
+            spread.print();
+        }
+    }
     return (
         <OperationDialog
-            onConfirm={onConfirm}
-            onCancel={onCancel}
+            onConfirm={()=>{
+                const sheet = spread.getActiveSheet();
+                if(sheet){
+                    setPrintInfo(sheet,printInfo);
+                    pre_print_info = null;
+                }
+                onConfirm&&onConfirm();
+            }}
+            onCancel={()=>{
+                if(pre_print_info!=null){
+                    const sheet = spread.getActiveSheet();
+                    sheet&&sheet.printInfo(pre_print_info);
+                }
+                onCancel&&onCancel();
+            }}
             width='560px'
             height='560px'
         >
-            <Tabs active={active}>
+            <Tabs value={active} onChange={(code) => dispatch(setActive(code))}>
                 <Tab code='page' title='页面'>
                     <Page></Page>
                 </Tab>
@@ -62,7 +94,7 @@ export default function (props) {
                 </Tab>
             </Tabs>
             <Wrap>
-                <Button style={{ height: 26 }}>打印预览</Button>
+                <Button style={{ height: 26 }} onClick={handlePrintView}>打印预览</Button>
             </Wrap>
         </OperationDialog>
     );

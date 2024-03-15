@@ -24,6 +24,14 @@ export const navSlice = createSlice({
         margin: null,
         //页眉和页脚
         headerAndFooter: null,
+        //网格线
+        showGridLine:null,
+        //行列标题
+        showHeader:null,
+        //单色打印
+        blackAndWhite:null,
+        //打印顺序
+        pageOrder:null,
     },
     reducers: {
         /**
@@ -83,6 +91,21 @@ export const navSlice = createSlice({
         setHeaderAndFooter(state, action) {
             state.headerAndFooter = action.payload;
         },
+        setShowGridLine(state, action) {
+            state.showGridLine = action.payload;
+        },
+        setShowHeader(state, action) {
+            state.showHeader = action.payload;
+        },
+
+        setBlackAndWhite(state, action) {
+            state.blackAndWhite = action.payload;
+        },
+        
+        setPageOrder(state, action) {
+            state.pageOrder = action.payload;
+        },
+        
     },
 });
 export const {
@@ -98,5 +121,9 @@ export const {
     setPaperKind,
     setMargin,
     setHeaderAndFooter,
+    setShowGridLine,
+    setShowHeader,
+    setBlackAndWhite,
+    setPageOrder,
 } = navSlice.actions;
 export default navSlice.reducer;

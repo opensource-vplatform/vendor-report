@@ -3,7 +3,10 @@ import {
   useState,
 } from 'react';
 
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import {
   GroupItem,
@@ -20,6 +23,7 @@ import SizeIcon from '@icons/layout/page/size/Size';
 import SplitIcon from '@icons/layout/page/Split';
 import { WithIconMenu } from '@utils/componentUtils';
 
+import { setActive } from '../../../store/layoutSlice/layoutSlice';
 import {
   clearPrintArea,
   insertPageSplit,
@@ -196,9 +200,11 @@ export default function () {
         showDialog: false,
     });
     const { spread } = useSelector(({ appSlice }) => appSlice);
+    const dispatch = useDispatch();
     const handlePaddingSet = (type) => {
         if (type == 'custom') {
             setData({ showDialog: true });
+            dispatch(setActive('padding'));
         }
     };
     const handleDirectionSet = (direction) => {};
@@ -234,7 +240,12 @@ export default function () {
             </GroupItem>
             {data.showDialog ? (
                 <EditDialog
-                    onConfirm={() => {}}
+                    onConfirm={() => {
+                        setData({
+                            ...data,
+                            showDialog: false,
+                        });
+                    }}
                     onCancel={() => {
                         setData({
                             ...data,
