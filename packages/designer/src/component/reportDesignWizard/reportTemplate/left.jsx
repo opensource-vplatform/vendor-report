@@ -364,39 +364,37 @@ export default function Index(props) {
                     lockToContainerEdges={true}
                     useDragHandle
                 ></FieldList>
-                {reportType === 'statementDetail1' && (
-                    <div>
-                        <div style={{ display: 'flex' }}>
-                            <CheckBox
-                                title='行合并'
-                                desc='勾选此项，同行数据存在连续相同时，将合并成一个单元格'
-                                value={false}
-                                onChange={(checked) => {
-                                    console.log(1);
-                                }}
-                                titleStyle={{ marginLeft: 0 }}
-                                hover='none'
-                            ></CheckBox>
-                            <CheckBox
-                                title='列合并'
-                                desc='勾选此项，同列数据存在连续相同时，将合并成一个单元格'
-                                value={false}
-                                onChange={(checked) => {
-                                    console.log(1);
-                                }}
-                                titleStyle={{ marginLeft: 0 }}
-                                hover='none'
-                            ></CheckBox>
-                        </div>
+                {reportType === 'statementDetail' && (
+                    <>
                         <GroupsContainer
                             onSortEnd={function ({ oldIndex, newIndex }) {
-                                console.log(1234);
+                                dispatch(
+                                    sort({
+                                        oldIndex,
+                                        newIndex,
+                                        code: 'mergeColumns',
+                                    })
+                                );
                             }}
-                            groupType='spanColumns'
-                            title=''
+                            groupType='rowMergeColumns'
+                            title='行合并'
                             styles={{ flex: 'unset' }}
                         ></GroupsContainer>
-                    </div>
+                        <GroupsContainer
+                            onSortEnd={function ({ oldIndex, newIndex }) {
+                                dispatch(
+                                    sort({
+                                        oldIndex,
+                                        newIndex,
+                                        code: 'mergeColumns',
+                                    })
+                                );
+                            }}
+                            groupType='colMergeColumns'
+                            title='列合并'
+                            styles={{ flex: 'unset' }}
+                        ></GroupsContainer>
+                    </>
                 )}
                 {reportType === 'groupReport' && (
                     <>

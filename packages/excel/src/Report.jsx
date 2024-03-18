@@ -40,7 +40,7 @@ class Preview {
      */
     constructor(conf) {
         this.conf = conf;
-        if(conf.baseUrl){
+        if (conf.baseUrl) {
             setBaseUrl(conf.baseUrl);
         }
     }
@@ -80,8 +80,12 @@ class Preview {
         const { rowMerge, columnMerge } =
             this.conf?.json?.context?.tableDesignSlice || {};
 
-        const { sumColumns, tableGroups: groupColumns } =
-            this.conf?.json?.context?.datasourceSlice || {};
+        const {
+            sumColumns,
+            tableGroups: groupColumns,
+            rowMergeColumns = {},
+            colMergeColumns = {},
+        } = this.conf?.json?.context?.datasourceSlice || {};
 
         createRoot(el).render(
             createElement(Workbook, {
@@ -93,6 +97,8 @@ class Preview {
                 columnMerge,
                 sumColumns,
                 groupColumns,
+                rowMergeColumns,
+                colMergeColumns,
                 dataSource,
                 ...others,
                 json,
@@ -116,7 +122,9 @@ class Preview {
                     ? filename
                     : filename + '.xlsx';
                 resourceManager
-                    .loadScript([getBaseUrl()+'/vendor/plugins/excelio.min.js'])
+                    .loadScript([
+                        getBaseUrl() + '/vendor/plugins/excelio.min.js',
+                    ])
                     .then(() => {
                         const GC = getNamespace();
                         const excelIO = new GC.Spread.Excel.IO();
@@ -176,8 +184,8 @@ class Preview {
                 const baseUrl = getBaseUrl();
                 resourceManager
                     .loadScript([
-                        baseUrl+'/vendor/plugins/print.min.js',
-                        baseUrl+'/vendor/plugins/pdf.min.js',
+                        baseUrl + '/vendor/plugins/print.min.js',
+                        baseUrl + '/vendor/plugins/pdf.min.js',
                     ])
                     .then(() => {
                         this.spread.savePDF(

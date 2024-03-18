@@ -32,6 +32,8 @@ export const datasourceSlice = createSlice({
         },
         tableGroups: {},
         sumColumns: {},
+        rowMergeColumns: {},
+        colMergeColumns: {},
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -323,6 +325,8 @@ export const datasourceSlice = createSlice({
                 tableInfo = {},
                 tableGroups = {},
                 sumColumns = {},
+                rowMergeColumns = {},
+                colMergeColumns = {},
             } = payload;
             if (!state.tables[sheetInstanceId]) {
                 state.tables[sheetInstanceId] = {};
@@ -340,6 +344,16 @@ export const datasourceSlice = createSlice({
 
             //求和
             state.sumColumns = { ...state.sumColumns, ...sumColumns };
+
+            state.rowMergeColumns = {
+                ...state.rowMergeColumns,
+                ...rowMergeColumns,
+            };
+
+            state.colMergeColumns = {
+                ...state.colMergeColumns,
+                ...colMergeColumns,
+            };
         },
     },
 });

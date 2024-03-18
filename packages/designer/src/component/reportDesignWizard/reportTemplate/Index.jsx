@@ -67,6 +67,8 @@ function createTable(params) {
         value,
         groups = [],
         sumColumns = [],
+        rowMergeColumns = [],
+        colMergeColumns = [],
     } = params;
     //构造表格字段
     const tableColumns = field.filter(({ code }) => !exclude.includes(code));
@@ -102,6 +104,8 @@ function createTable(params) {
                 addingMode: 'wizard',
                 groups,
                 sumColumns,
+                rowMergeColumns,
+                colMergeColumns,
             });
             spread.resumePaint();
             mousedownHandlerAfter();
@@ -147,7 +151,14 @@ export default function Index(props) {
     );
 
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
-    let { groups, sumColumns } = useSelector(({ wizardSlice }) => wizardSlice);
+    let {
+        groups,
+        sumColumns,
+        row = [],
+        col = [],
+        rowMergeColumns = [],
+        colMergeColumns = [],
+    } = useSelector(({ wizardSlice }) => wizardSlice);
     const dispatch = useDispatch();
 
     const [tableCode, setTablleCode] = useState('');
@@ -175,6 +186,8 @@ export default function Index(props) {
         dispatch(genPreviewDatas());
         dispatch(clearGroups());
         dispatch(clear({ code: 'sumColumns' }));
+        dispatch(clear({ code: 'row' }));
+        dispatch(clear({ code: 'col' }));
     }, []);
 
     const backHandler = function () {
@@ -191,6 +204,8 @@ export default function Index(props) {
             value,
             groups,
             sumColumns,
+            rowMergeColumns,
+            colMergeColumns,
         });
     };
 
@@ -201,7 +216,9 @@ export default function Index(props) {
     const columnsDatas = field.filter(
         ({ code }) =>
             !groups.find(({ code: inCode }) => code === inCode) &&
-            !sumColumns.find(({ code: inCode }) => code === inCode)
+            !sumColumns.find(({ code: inCode }) => code === inCode) &&
+            !row.find(({ code: inCode }) => code === inCode) &&
+            !col.find(({ code: inCode }) => code === inCode)
     );
 
     return (

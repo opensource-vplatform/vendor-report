@@ -37,6 +37,8 @@ export function addTable(params) {
         addingMode = 'drag',
         groups = [],
         sumColumns = [],
+        rowMergeColumns = [],
+        colMergeColumns = [],
     } = params;
 
     const tableColumnsCount = Array.isArray(columnsTemp)
@@ -130,6 +132,12 @@ export function addTable(params) {
             },
             sumColumns: {
                 [tableName]: sumColumns,
+            },
+            rowMergeColumns: {
+                [tableName]: rowMergeColumns,
+            },
+            colMergeColumns: {
+                [tableName]: colMergeColumns,
             },
         })
     );

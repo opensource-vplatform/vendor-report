@@ -17,6 +17,7 @@ import {
   setLicense,
 } from './utils/licenseUtil';
 import {
+  genAutoMergeRangeInfos,
   genSpans,
   sortData,
 } from './utils/other';
@@ -90,6 +91,8 @@ const bindDataSource = function (params) {
         groupColumns,
         rowMerge,
         columnMerge,
+        rowMergeColumns = {},
+        colMergeColumns = {},
     } = params;
 
     if (!spread) {
@@ -99,13 +102,22 @@ const bindDataSource = function (params) {
         const _dataSource = JSON.parse(JSON.stringify(dataSource));
         const tables = sheet.tables.all();
         const tablesSpans = [];
-
+        let autoMergeRangeInfos = [];
+        let source = null;
+        if (_dataSource) {
+            source = new GCsheets.Bindings.CellBindingSource(_dataSource);
+            sheet.setDataSource(source);
+        }
         //对数据进行分组排序
         if (tables.length > 0) {
             tables.forEach((table) => {
                 const tableName = table.name();
                 const groups = groupColumns[tableName];
                 const sums = sumColumns[tableName];
+
+                const rowMergeCol = rowMergeColumns[tableName];
+                const colMergeCol = colMergeColumns[tableName];
+
                 if (
                     (Array.isArray(groups) && groups.length > 0) ||
                     (Array.isArray(sums) && sums.length > 0)
@@ -128,17 +140,33 @@ const bindDataSource = function (params) {
                         tablesSpans.push(...result.spans);
                     }
                 }
+
+                if (rowMergeCol.length > 0 || colMergeCol > 0) {
+                    const _field = table.BSt.map(function (bst) {
+                        return {
+                            id: bst.id(),
+                            code: bst.dataField(),
+                            name: bst.name(),
+                        };
+                    });
+                    const { row, rowCount } = table.range();
+                    debugger;
+                    const res = genAutoMergeRangeInfos({
+                        rowMergeColumns: rowMergeCol,
+                        colMergeColumns: colMergeCol,
+                        tableColumns: _field,
+                        row: row + 1,
+                        rowCount,
+                    });
+                    autoMergeRangeInfos.push(...res);
+                }
             });
-        }
-        let source = null;
-        if (_dataSource) {
-            source = new GCsheets.Bindings.CellBindingSource(_dataSource);
-            sheet.setDataSource(source);
         }
 
         const json = sheet.toJSON();
         json.spans = Array.isArray(json.spans) ? json.spans : [];
         json.spans.push(...tablesSpans);
+        json.autoMergeRangeInfos = autoMergeRangeInfos;
         sheet.fromJSON(json);
         //执行sheet.fromJSON(json);后数据源丢失，需要再次设置数据源
         source && sheet.setDataSource(source);
@@ -172,6 +200,8 @@ export default function (props) {
         groupColumns = [],
         rowMerge = false,
         columnMerge = false,
+        rowMergeColumns = {},
+        colMergeColumns = {},
     } = props;
     if (license) {
         setLicense(license);
@@ -285,6 +315,8 @@ export default function (props) {
                             groupColumns,
                             rowMerge,
                             columnMerge,
+                            rowMergeColumns,
+                            colMergeColumns,
                         });
                     if (onPrintHandler) {
                         onPrintHandler((params) => {
@@ -293,7 +325,7 @@ export default function (props) {
                                     if (enablePrint) {
                                         const sheets = spread.sheets;
                                         sheets.forEach((sheet) => {
-                                            setPrintInfo(sheet,params||{});
+                                            setPrintInfo(sheet, params || {});
                                         });
                                         spread.print();
                                         resolve();
@@ -337,6 +369,8 @@ export default function (props) {
         groupColumns,
         rowMerge,
         columnMerge,
+        rowMergeColumns,
+        colMergeColumns,
     ]);
 
     return (

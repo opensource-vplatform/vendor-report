@@ -1,3 +1,7 @@
+import { getNamespace } from './spreadUtil';
+
+const GC = getNamespace();
+const spreadNS = GC.Spread.Sheets;
 function flatGrouped(datas, groupFields = [], fields = [], sumColumns = []) {
     const results = [];
     //求和字段
@@ -354,4 +358,127 @@ export function genSpans(datas, row = 0, col = 0) {
     parseJsonDataToSpans(datas, row, col);
 
     return { spans, dataTableStyle };
+}
+
+export function genAutoMergeRangeInfos(params) {
+    const {
+        rowMergeColumns,
+        colMergeColumns,
+        tableColumns,
+        row = 0,
+        col = 0,
+        rowCount = 0,
+    } = params;
+
+    let autoMergeRangeInfos = [];
+
+    if (rowMergeColumns.length || colMergeColumns.length) {
+        const mergeColumns = rowMergeColumns.map(function (item) {
+            return {
+                ...item,
+                rowMerge: true,
+                colMerge: false,
+            };
+        });
+
+        colMergeColumns.forEach(function (item) {
+            const _item = mergeColumns.find(function ({ code }) {
+                return code === item?.code;
+            });
+            if (_item) {
+                _item.colMerge = true;
+            } else {
+                mergeColumns.push({
+                    ...item,
+                    rowMerge: false,
+                    colMerge: true,
+                });
+            }
+        });
+
+        mergeColumns.sort(function (current, next) {
+            const currentIndex = tableColumns.findIndex(function ({ code }) {
+                return code === current.code;
+            });
+            const nextIndex = tableColumns.findIndex(function ({ code }) {
+                return code === next.code;
+            });
+            return currentIndex - nextIndex;
+        });
+
+        let { rowMerge, colMerge } = mergeColumns[0];
+
+        let direction = spreadNS.AutoMerge.AutoMergeDirection.column; //1
+        let mode = spreadNS.AutoMerge.AutoMergeMode.free; //0
+        let sheetArea = spreadNS.SheetArea.viewport; //3
+        let selectionMode = spreadNS.AutoMerge.SelectionMode.merged; //0
+        if (rowMerge && colMerge) {
+            direction = spreadNS.AutoMerge.AutoMergeDirection.rowColumn; //值等于4。在行方向上优先于列方向应用自动合并
+        } else if (rowMerge) {
+            direction = spreadNS.AutoMerge.AutoMergeDirection.row; //值等于2.在行方向上应用自动合并
+        }
+
+        let range = {
+            row,
+            col: -1,
+            rowCount,
+            colCount: 1,
+        };
+
+        let preIndex = -1;
+
+        mergeColumns.forEach(function ({
+            code,
+            rowMerge: _rowMerge,
+            colMerge,
+        }) {
+            const index = tableColumns.findIndex(function ({ code: _code }) {
+                return _code === code;
+            });
+            if (range.col === -1) {
+                range.col = index;
+            } else if (preIndex + 1 === index && rowMerge === _rowMerge) {
+                range.colCount += 1;
+            } else {
+                autoMergeRangeInfos.push({
+                    range,
+                    direction,
+                    mode,
+                    sheetArea,
+                    selectionMode,
+                });
+                rowMerge = _rowMerge;
+                range = {
+                    row: 1,
+                    col: index,
+                    rowCount: rowCount + 1,
+                    colCount: 1,
+                };
+
+                direction = spreadNS.AutoMerge.AutoMergeDirection.column; //1
+                if (_rowMerge && colMerge) {
+                    direction = spreadNS.AutoMerge.AutoMergeDirection.rowColumn; //值等于4。在行方向上优先于列方向应用自动合并
+                } else if (_rowMerge) {
+                    direction = spreadNS.AutoMerge.AutoMergeDirection.row; //值等于2.在行方向上应用自动合并
+                }
+            }
+            preIndex = index;
+        });
+
+        if (
+            (autoMergeRangeInfos.length > 0 &&
+                autoMergeRangeInfos[autoMergeRangeInfos.length - 1] !== range &&
+                range.col > -1) ||
+            (autoMergeRangeInfos.length <= 0 && range.col > -1)
+        ) {
+            autoMergeRangeInfos.push({
+                range,
+                direction,
+                mode,
+                sheetArea,
+                selectionMode,
+            });
+        }
+    }
+    return autoMergeRangeInfos;
 }

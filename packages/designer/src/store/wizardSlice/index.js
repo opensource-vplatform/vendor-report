@@ -7,6 +7,8 @@ export const wizardSlice = createSlice({
     initialState: {
         groups: [],
         sumColumns: [],
+        rowMerge: true,
+        columnMerge: false,
     },
     reducers: {
         saveGroups(state, { payload }) {
@@ -48,7 +50,7 @@ export const wizardSlice = createSlice({
         },
         sort(state, { payload }) {
             const { oldIndex, newIndex, code } = payload;
-            const newDatas = [...state[code]];
+            const newDatas = [...(state?.[code] || [])];
             arrayMoveMutable(newDatas, oldIndex, newIndex);
             state[code] = newDatas;
         },
@@ -59,6 +61,14 @@ export const wizardSlice = createSlice({
         clear(state, { payload }) {
             const { code } = payload;
             state[code] = [];
+        },
+        toggleBooleanValue(state, { payload }) {
+            const { code, value } = payload;
+            if (typeof value === 'boolean') {
+                state[code] = value;
+            } else {
+                state[code] = !state[code];
+            }
         },
     },
 });
@@ -71,5 +81,6 @@ export const {
     sort,
     clear,
     remove,
+    toggleBooleanValue,
 } = wizardSlice.actions;
 export default wizardSlice.reducer;

@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
+  genAutoMergeRangeInfos,
   genSpans,
   sortData,
   Workbook,
@@ -24,6 +25,7 @@ const GC = getNamespace();
 const spreadNS = GC.Spread.Sheets;
 
 function preview(params) {
+    debugger;
     const {
         value,
         field = [],
@@ -31,9 +33,15 @@ function preview(params) {
         spread,
         spansTree,
         source: datasource,
-        wizardSlice: { groups = [], sumColumns = [] },
+        wizardSlice: {
+            groups = [],
+            sumColumns = [],
+            rowMergeColumns = [],
+            colMergeColumns = [],
+        },
         reportType,
         crossColumns = [],
+        headerDatas = [],
     } = params;
 
     //构造表格字段
@@ -60,6 +68,8 @@ function preview(params) {
     const sheet = spread.getActiveSheet();
     const colCount = columns.length;
     const tables = [];
+    let autoMergeRangeInfos = [];
+    let headDataTableStyle = {};
     if (colCount > 0) {
         let rowCount = 0;
         //如果sheet的行数小于当前表格所绑定的数据长度，需要增加sheet的行数
@@ -90,14 +100,62 @@ function preview(params) {
                 tableName: '预览',
             },
             columns,
+            showHeader: reportType === 'crossStatement' ? false : true,
         });
+
+        if (rowMergeColumns.length || colMergeColumns.length) {
+            const res = genAutoMergeRangeInfos({
+                rowMergeColumns,
+                colMergeColumns,
+                tableColumns: _field,
+                row: 1,
+                rowCount,
+            });
+
+            autoMergeRangeInfos.push(...res);
+        }
+
+        //如果是交叉报表，合并表头
+        if (reportType === 'crossStatement' && headerDatas.length > 2) {
+            let direction = spreadNS.AutoMerge.AutoMergeDirection.row;
+            let mode = spreadNS.AutoMerge.AutoMergeMode.restricted;
+            let sheetArea = spreadNS.SheetArea.viewport;
+            let selectionMode = spreadNS.AutoMerge.SelectionMode.merged;
+            autoMergeRangeInfos.push({
+                range: {
+                    row: 1,
+                    col: 0,
+                    rowCount: headerDatas.length - 2,
+                    colCount: colCount,
+                },
+                direction,
+                mode,
+                sheetArea,
+                selectionMode,
+            });
+        }
+
+        if (reportType === 'crossStatement') {
+            const endRow = headerDatas.length;
+
+            for (let i = 1; i < endRow; i++) {
+                const dataTableStyle = {};
+                headDataTableStyle[i] = dataTableStyle;
+                for (let j = 0; j < colCount; j++) {
+                    dataTableStyle[j] = { style: { hAlign: 1 } };
+                }
+            }
+        }
     }
 
     let spans = [];
     let dataTableStyle = {};
     if (Array.isArray(spansTree)) {
-        debugger;
-        const res = genSpans(spansTree, 1, 0);
+        const res = genSpans(
+            spansTree,
+            reportType === 'crossStatement' ? 0 : 1,
+            0
+        );
         spans = res.spans;
         dataTableStyle = res.dataTableStyle;
     }
@@ -105,14 +163,36 @@ function preview(params) {
         sheet.addColumns(0, colCount - sheet.getColumnCount());
     }
 
-    const json = sheet.toJSON();
+    //这些代码会导致sheet的autoMergeRangeInfos一致追加，无法清除，即一旦设置了行合并或列合并，就无法取消
+    /* const json = JSON.parse(JSON.stringify(sheet.toJSON()));
     json.data.dataTable = { ...json.data.dataTable, ...dataTableStyle };
     json.tables = tables;
     json.spans = spans;
+    json.autoMergeRangeInfos = autoMergeRangeInfos;
 
     spread.suspendPaint();
     sheet.fromJSON(json);
     sheet.setDataSource(datasource);
+    spread.resumePaint(); */
+
+    const spreadJson = spread.toJSON();
+
+    Object.values(spreadJson.sheets).forEach((value) => {
+        value.data.dataTable = {
+            /* ...value.data.dataTable, */
+            ...dataTableStyle,
+            ...headDataTableStyle,
+        };
+        value.tables = tables;
+        value.spans = spans;
+        value.autoMergeRangeInfos = autoMergeRangeInfos;
+    });
+
+    spread.suspendPaint();
+    spread.fromJSON(spreadJson);
+    spread.sheets.forEach(function (sheet) {
+        sheet.setDataSource(datasource);
+    });
     spread.resumePaint();
 }
 
@@ -195,8 +275,11 @@ export default function Index(props) {
             dataSource[value] = crossDatas.sumDatas;
             _refState.crossColumns = crossDatas.tableColumns;
             _refState.spansTree = crossDatas.spansArr;
-            console.log(_refState.spansTree);
-            debugger;
+            _refState.headerDatas = crossDatas.headerDatas;
+        } else if (reportType === 'crossStatement') {
+            _refState.crossColumns = [];
+            _refState.spansTree = [];
+            _refState.headerDatas = [];
         }
 
         return new spreadNS.Bindings.CellBindingSource(dataSource);
@@ -215,6 +298,7 @@ export default function Index(props) {
                 source,
                 reportType,
                 crossColumns: _refState.crossColumns,
+                headerDatas: _refState.headerDatas,
             });
         }
     }, [value, exclude, spread, source]);

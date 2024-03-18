@@ -81,6 +81,8 @@ export default function () {
         tableGroups,
         sumColumns,
         originalDatasourceCodes,
+        rowMergeColumns,
+        colMergeColumns,
     } = useSelector(({ datasourceSlice }) => datasourceSlice);
 
     const { rowMerge, columnMerge } = useSelector(
@@ -138,6 +140,11 @@ export default function () {
                     dataSource={previewViewDatas}
                     sumColumns={sumColumns}
                     groupColumns={tableGroups}
+                    rowMergeColumns={rowMergeColumns}
+                    colMergeColumns={colMergeColumns}
+                    onInited={function (a) {
+                        debugger;
+                    }}
                 >
                     <Worksheet></Worksheet>
                 </Workbook>

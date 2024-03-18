@@ -38,7 +38,7 @@ export default class Main {
     }
 
     genRowFieldsSpans(rowCount) {
-        //生效合并表格头部需要的数据
+        //生成合并表格头部需要的数据
         const spanItem = {
             row: 0,
             col: 0,
@@ -101,17 +101,21 @@ export default class Main {
             this.handleGroupedDatas(groupedDatas, sumDatas);
         } else if (summationFieldsLen) {
             //不存在行字段和列字段，则直接根据求和字段构造数据，数据形如:{求和字段1：100,求和字段2：222}
-            const res = summationFields.reduce((res, { code }) => {
+            const result = summationFields.reduce((res, { code }) => {
                 res[code] = 0;
                 this.initialDatas.forEach((data) => {
-                    res[code] += data[code];
+                    const value = Number(data[code]);
+                    if (Number.isFinite(value)) {
+                        res[code] += value;
+                    }
                 });
                 return res;
             }, {});
-            sumDatas.push(res);
+            sumDatas.push(result);
         }
 
         const rowFieldsSpanItem = this.genRowFieldsSpans(headerDatas.length);
+
         const spanItem = {
             row: 0,
             col: rowFieldsSpanItem.col + 1,
@@ -173,8 +177,30 @@ export default class Main {
             headerDatas.push(res);
         }
 
+        //空白字段补0
+        const dataCol = tableColumns.slice(this.rowFields.length);
+        dataCol.forEach(function ({ code }) {
+            sumDatas.forEach(function (data) {
+                if (!data[code]) {
+                    data[code] = 0;
+                }
+            });
+        });
+
         this.tableColumns = tableColumns;
         this.sumDatas = [...headerDatas, ...sumDatas];
+        this.headerDatas = headerDatas;
+
+        if (this.summationFields.length) {
+            this.spansArr.push({
+                row: 0,
+                col: 0,
+                rowCount: 1,
+                colCount: this.rowFields.length,
+            });
+        }
+
+        debugger;
     }
 
     handleGroupedDatas(groupedDatas, result = []) {
@@ -234,8 +260,6 @@ export default class Main {
 
                         subtotal[groupCode] = '小计';
                     });
-                    debugger;
-                    console.log(groupedDataItem);
                 } else if (
                     !this.rowFields.length &&
                     !groupCode &&
@@ -311,6 +335,7 @@ export default class Main {
         datas.forEach((data) => {
             const groupName = data[groupCode];
             if (!groupedDatas.has(groupName)) {
+                //当前分组合并单元格信息
                 const spansItem = {
                     groupName,
                     groupCode,
@@ -358,13 +383,15 @@ export default class Main {
             const _sumDatas = sumDatas || { ...sumDatas };
             groupedDatas.forEach((groupInfo) => {
                 const { allChildrensDatas, groupName, groupCode } = groupInfo;
-                groupInfo.zonaColCount = summationFieldsLen;
                 if (summationFieldsLen) {
                     this.summationFields.forEach(({ name, code }) => {
-                        const res = allChildrensDatas.reduce(
-                            (res, cur) => res + cur[code],
-                            0
-                        );
+                        const res = allChildrensDatas.reduce((res, cur) => {
+                            const value = Number(cur[code]);
+                            if (Number.isFinite(value)) {
+                                return res + value;
+                            }
+                            return res;
+                        }, 0);
 
                         let columnKey = parentGroupsColKey + groupName;
 
@@ -425,6 +452,7 @@ export default class Main {
                 children: spansItem?.children,
                 col: col + 1,
             });
+
             spansItem.children = spansItem?.children.filter((item) => {
                 if (item.rowCount > 1) {
                     spansItem.rowCount += item.rowCount;
@@ -434,21 +462,25 @@ export default class Main {
 
                 return true;
             });
+
             if (this.summationFields.length && spansItem.rowCount >= 1) {
                 spansItem.rowCount += 1;
-            }
-
-            groupInfo.zonaColCount = 0;
-            groupInfo.spansChildren = [];
-            groupInfo.childrenGroups.forEach(
-                ({ zonaColCount = 0, spansChildren = [] }) => {
-                    groupInfo.zonaColCount += zonaColCount;
-                    groupInfo.spansChildren.push({
-                        colCount: zonaColCount,
-                        spansChildren,
-                    });
+                //生成小计所在单元格的合并信息
+                const index = this.rowFields.findIndex(function (item) {
+                    return item.code === spansItem.groupCode;
+                });
+                if (index >= 0) {
+                    const diff = this.rowFields.length - index;
+                    if (diff >= 2) {
+                        spansItem.children.push({
+                            row: 0,
+                            col: index + 1,
+                            rowCount: 1,
+                            colCount: diff - 1,
+                        });
+                    }
                 }
-            );
+            }
 
             groupInfo.type = _newType;
             groupInfo.childType = _newType;
