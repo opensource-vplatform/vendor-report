@@ -176,6 +176,7 @@ function Tabs(props) {
         <Headers data-appearance={appearance}>
             <HeaderWrap>
                 {children.map((child) => {
+                    if(!child) return null;
                     const childProps = child.props;
                     //隐藏导航
                     const hidden = childProps?.tabProps?.hidden;

@@ -12,6 +12,7 @@ import {
 import {
   setBlackAndWhite,
   setPageOrder,
+  setShowBorder,
   setShowGridLine,
   setShowHeader,
 } from '../../../../store/layoutSlice/layoutSlice';
@@ -38,7 +39,7 @@ const RowToColumn = styled.div`
 `;
 
 export default function () {
-    const { showHeader, showGridLine, blackAndWhite, pageOrder } = useSelector(
+    const { showHeader, showGridLine, blackAndWhite, pageOrder,showBorder } = useSelector(
         ({ layoutSlice }) => layoutSlice
     );
     const dispatch = useDispatch();
@@ -80,6 +81,12 @@ export default function () {
                         style={checkboxStyle}
                         value={showHeader}
                         onChange={(val) => dispatch(setShowHeader(val))}
+                    ></CheckBox>
+                    <CheckBox
+                        title='边框'
+                        style={checkboxStyle}
+                        value={showBorder}
+                        onChange={(val) => dispatch(setShowBorder(val))}
                     ></CheckBox>
                 </VGroupItem>
             </Padding>

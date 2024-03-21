@@ -91,6 +91,10 @@ export default function () {
         dispatch(setFontStyles({ styles }));
         dispatch(resetView());
         dispatch(hideTab({ code: 'table' }));
+        fire({
+            event: EVENTS.ActiveSheetChanged,
+            args: [args],
+        });
     });
     const handleWorkbookInitialized = useCallback((spread) => {
         const menuDatas = spread.contextMenu.menuData;
@@ -154,6 +158,12 @@ export default function () {
             args: [data],
         });
     });
+    const handleSheetChanged = useCallback((type, data)=>{
+        fire({
+            event: EVENTS.SheetChanged,
+            args: [data],
+        });
+    });
     const sheetsConf = context?.conf?.sheets || {};
     //是否显示添加选项卡按钮
     const newTabVisible = sheetsConf.newTabVisible !== false;
@@ -180,6 +190,7 @@ export default function () {
                 onValueChanged={handleValueChanged}
                 onSelectionChanged={handleSelectionChanged}
                 onSelectionChanging={handleSelectionChanging}
+                onSheetChanged={handleSheetChanged}
             >
                 <Worksheet
                     name={sheetName}

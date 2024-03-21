@@ -10,6 +10,7 @@ import {
 } from './RadioGroup';
 import Search from './Search';
 import Select from './Select';
+import TextArea from './Textarea';
 import TextInput from './TextInput';
 
 export {
@@ -23,5 +24,6 @@ export {
   RadioGroup,
   Search,
   Select,
+  TextArea,
   TextInput,
 };

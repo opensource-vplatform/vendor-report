@@ -11,6 +11,10 @@ export const EVENTS = {
      * 保存
      */
     onSave: "onSave",
+    /**
+     * 激活工作表变更事件
+     */
+    ActiveSheetChanged: "ActiveSheetChanged",
 };
 
 const check = function (params) {

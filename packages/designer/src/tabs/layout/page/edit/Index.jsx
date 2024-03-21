@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import {
   useDispatch,
   useSelector,
@@ -12,14 +10,8 @@ import {
   Tab,
   Tabs,
 } from '../../../../component/tabs/Index';
-import {
-  setActive,
-  setInfo,
-} from '../../../../store/layoutSlice/layoutSlice';
-import {
-  parsePrintInfo,
-  setPrintInfo,
-} from '../../../../utils/printUtil';
+import { setActive } from '../../../../store/layoutSlice/layoutSlice';
+import { setPrintInfo } from '../../../../utils/printUtil';
 import { getNamespace } from '../../../../utils/spreadUtil';
 import HeaderFooter from './HeaderFooter';
 import Padding from './Padding';
@@ -33,48 +25,46 @@ const Wrap = styled.div`
     justify-content: end;
 `;
 
-
 let pre_print_info = null;
 
 export default function (props) {
     const { onConfirm, onCancel } = props;
-    const { active,...printInfo } = useSelector(({ layoutSlice }) => layoutSlice);
+    const { active, ...printInfo } = useSelector(
+        ({ layoutSlice }) => layoutSlice
+    );
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatch = useDispatch();
-    useEffect(() => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            const printInfo = parsePrintInfo(spread);
-            dispatch(setInfo(printInfo));
-        }
-    }, []);
-    const handlePrintView = ()=>{
+    const handlePrintView = () => {
         const sheet = spread.getActiveSheet();
         if (sheet) {
             pre_print_info = sheet.printInfo();
             const GC = getNamespace();
             const print = new GC.Spread.Sheets.Print.PrintInfo();
             sheet.printInfo(print);
-            setPrintInfo(sheet,printInfo);
+            setPrintInfo(sheet, printInfo);
             spread.print();
         }
-    }
+    };
     return (
         <OperationDialog
-            onConfirm={()=>{
+            onConfirm={() => {
                 const sheet = spread.getActiveSheet();
-                if(sheet){
-                    setPrintInfo(sheet,printInfo);
+                if (sheet) {
+                    setPrintInfo(sheet, printInfo);
+                    localStorage.setItem(
+                        'TOONE_REPORT_DESIGNER_PAGE_CUSTOM_PADDING',
+                        JSON.stringify(printInfo.margin)
+                    );
                     pre_print_info = null;
                 }
-                onConfirm&&onConfirm();
+                onConfirm && onConfirm();
             }}
-            onCancel={()=>{
-                if(pre_print_info!=null){
+            onCancel={() => {
+                if (pre_print_info != null) {
                     const sheet = spread.getActiveSheet();
-                    sheet&&sheet.printInfo(pre_print_info);
+                    sheet && sheet.printInfo(pre_print_info);
                 }
-                onCancel&&onCancel();
+                onCancel && onCancel();
             }}
             width='560px'
             height='560px'
@@ -94,7 +84,9 @@ export default function (props) {
                 </Tab>
             </Tabs>
             <Wrap>
-                <Button style={{ height: 26 }} onClick={handlePrintView}>打印预览</Button>
+                <Button style={{ height: 26 }} onClick={handlePrintView}>
+                    打印预览
+                </Button>
             </Wrap>
         </OperationDialog>
     );

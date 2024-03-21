@@ -49,3 +49,48 @@ export const Text = styled.span`
 font-size: 12px;
 margin-left: 8px;
 `;
+
+export const toDatas = function (datas) {
+    return datas.map((data) => {
+        return {
+            value: data.value,
+            text: data.text,
+            title: data.text,
+        };
+    });
+};
+
+const getDisplayText = function (val, datas) {
+    let text = '';
+    for (let i = 0, l = datas.length; i < l; i++) {
+        const data = datas[i];
+        if (val == data.value) {
+            text = data.text;
+            break;
+        }
+    }
+    return text == '(无)' ? '' : text;
+};
+
+export const toAttrs = function (val, datas) {
+    const text = datas ? getDisplayText(val, datas):val;
+    const list = text.split(',');
+    let left = '',
+        center = '',
+        right = '';
+    if (list.length == 1) {
+        center = list[0];
+    } else if (list.length == 2) {
+        center = list[0];
+        right = list[1];
+    } else if (list.length == 3) {
+        left = list[0];
+        center = list[1];
+        right = list[2];
+    }
+    return {
+        left,
+        center,
+        right,
+    };
+};

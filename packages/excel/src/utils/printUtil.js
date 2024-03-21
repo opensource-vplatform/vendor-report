@@ -17,6 +17,7 @@ export const setPrintInfo = function (sheet, printInfo) {
         showHeader,
         blackAndWhite,
         pageOrder,
+        showBorder,
     } = printInfo;
     const print = sheet.printInfo();
     const setValue = (value, handlerName) => {
@@ -43,7 +44,7 @@ export const setPrintInfo = function (sheet, printInfo) {
     setValue(firstPageNumber, 'firstPageNumber');
     setValue(paperKind,()=>{
         const GC = getNamespace();
-        const size = new GC.Spread.Sheets.Print.PaperSize(paperKind);
+        const size = new GC.Spread.Sheets.Print.PaperSize(parseInt(paperKind));
         print.paperSize(size);
     });
     setValue(margin,()=>{
@@ -77,5 +78,6 @@ export const setPrintInfo = function (sheet, printInfo) {
     });
     setValue(blackAndWhite,"blackAndWhite");
     setValue(pageOrder,"pageOrder");
+    setValue(showBorder,"showBorder");
     sheet.printInfo(print);
 };

@@ -32,6 +32,8 @@ export const navSlice = createSlice({
         blackAndWhite:null,
         //打印顺序
         pageOrder:null,
+        //显示边框
+        showBorder:null,
     },
     reducers: {
         /**
@@ -105,6 +107,10 @@ export const navSlice = createSlice({
         setPageOrder(state, action) {
             state.pageOrder = action.payload;
         },
+
+        setShowBorder(state, action) {
+            state.showBorder = action.payload;
+        },
         
     },
 });
@@ -125,5 +131,6 @@ export const {
     setShowHeader,
     setBlackAndWhite,
     setPageOrder,
+    setShowBorder,
 } = navSlice.actions;
 export default navSlice.reducer;

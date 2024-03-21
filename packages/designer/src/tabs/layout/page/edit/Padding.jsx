@@ -1,11 +1,21 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import CheckBox from '../../../../component/form/CheckBox';
 import { Float } from '../../../../component/form/Index';
 import { setMargin } from '../../../../store/layoutSlice/layoutSlice';
-import { Divider, Padding, Title, VGroupItem, Wrapper } from '../../Component';
-import { useState } from 'react';
+import {
+  Divider,
+  Padding,
+  Title,
+  VGroupItem,
+  Wrapper,
+} from '../../Component';
 
 const Sheet = styled.div`
     background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSJyZ2IoMCwwLDAsMCkiLz4KPHBhdGggZD0iTTAgMEg2NFY2MkgwVjBaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTQ5IDFINjNWNEg0OVYxWk02NCAwVjRWNVY4VjlWMTJWMTNWMTZWMTdWMjBWMjFWMjRWMjVWMjhWMjlWMzJWMzNWMzZWMzdWNDBWNDFWNDRWNDVWNDhWNDlWNTJWNTNWNTZWNTdWNjJINDlINDhIMzNIMzJIMTdIMTZIMFY1N1Y1NlY1M1Y1MlY0OVY0OFY0NVY0NFY0MVY0MFYzN1YzNlYzM1YzMlYyOVYyOFYyNVYyNFYyMVYyMFYxN1YxNlYxM1YxMlY5VjhWNVY0VjBIMTZIMTdIMzJIMzNINDhINDlINjRaTTEgMzNWMzZIMTZWMzNIMVpNMTYgMzJIMVYyOUgxNlYzMlpNMTcgMzNWMzZIMzJWMzNIMTdaTTMyIDMySDE3VjI5SDMyVjMyWk0zMyAzM1YzNkg0OFYzM0gzM1pNNDggMzJIMzNWMjlINDhWMzJaTTQ5IDMzVjM2SDYzVjMzSDQ5Wk02MyAzMkg0OVYyOUg2M1YzMlpNNjMgNDFWNDRINDlWNDFINjNaTTQ4IDQxVjQ0SDMzVjQxSDQ4Wk00OCA0NUgzM1Y0OEg0OFY0NVpNMzIgNDFWNDRIMTdWNDFIMzJaTTMyIDQ1SDE3VjQ4SDMyVjQ1Wk0xNiA0MVY0NEgxVjQxSDE2Wk0xNiA0NUgxVjQ4SDE2VjQ1Wk02MyA0NUg0OVY0OEg2M1Y0NVpNMSAxN1YyMEgxNlYxN0gxWk0xNiAxNkgxVjEzSDE2VjE2Wk0xNyAxN1YyMEgzMlYxN0gxN1pNMzIgMTZIMTdWMTNIMzJWMTZaTTMzIDE3VjIwSDQ4VjE3SDMzWk00OCAxNkgzM1YxM0g0OFYxNlpNNDkgMTdWMjBINjNWMTdINDlaTTYzIDE2SDQ5VjEzSDYzVjE2Wk02MyA0OVY1Mkg0OVY0OUg2M1pNNDggNDlWNTJIMzNWNDlINDhaTTQ4IDUzSDMzVjU2SDQ4VjUzWk0zMiA0OVY1MkgxN1Y0OUgzMlpNMzIgNTNIMTdWNTZIMzJWNTNaTTE2IDQ5VjUySDFWNDlIMTZaTTE2IDUzSDFWNTZIMTZWNTNaTTYzIDUzSDQ5VjU2SDYzVjUzWk0xIDI1VjI4SDE2VjI1SDFaTTE2IDI0SDFWMjFIMTZWMjRaTTE3IDI1VjI4SDMyVjI1SDE3Wk0zMiAyNEgxN1YyMUgzMlYyNFpNMzMgMjVWMjhINDhWMjVIMzNaTTQ4IDI0SDMzVjIxSDQ4VjI0Wk00OSAyNVYyOEg2M1YyNUg0OVpNNjMgMjRINDlWMjFINjNWMjRaTTQ4IDM3SDMzVjQwSDQ4VjM3Wk0zMiAzN0gxN1Y0MEgzMlYzN1pNMTYgMzdIMVY0MEgxNlYzN1pNNjMgMzdINDlWNDBINjNWMzdaTTEgOVYxMkgxNlY5SDFaTTE2IDhIMVY1SDE2VjhaTTE3IDlWMTJIMzJWOUgxN1pNMzIgOEgxN1Y1SDMyVjhaTTMzIDlWMTJINDhWOUgzM1pNNDggOEgzM1Y1SDQ4VjhaTTQ5IDlWMTJINjNWOUg0OVpNNjMgOEg0OVY1SDYzVjhaTTQ4IDU3SDMzVjYxSDQ4VjU3Wk0zMiA1N0gxN1Y2MUgzMlY1N1pNMTYgNTdIMVY2MUgxNlY1N1pNNjMgNTdINDlWNjFINjNWNTdaTTQ4IDFWNEgzM1YxSDQ4Wk0zMiAxVjRIMTdWMUgzMlpNMTYgMVY0SDFWMUgxNloiIGZpbGw9IiNDNEM0QzQiLz4KPC9zdmc+Cg==);
@@ -273,9 +283,10 @@ const PageSetting = function () {
                 value={margin ? margin.left : null}
                 onFocus={() => setHighlight(() => 'left')}
                 onBlur={() => setHighlight(() => null)}
-                onChange={(val) =>
-                    dispatch(setMargin({ ...margin, left: val }))
-                }
+                onChange={(val) => {
+                    val = parseFloat(parseFloat(val).toFixed(2));
+                    dispatch(setMargin({ ...margin, left: val }));
+                }}
             ></PageSettingItem>
             <div
                 style={{
@@ -293,9 +304,10 @@ const PageSetting = function () {
                     value={margin ? margin.top : null}
                     onFocus={() => setHighlight(() => 'top')}
                     onBlur={() => setHighlight(() => null)}
-                    onChange={(val) =>
-                        dispatch(setMargin({ ...margin, top: val }))
-                    }
+                    onChange={(val) => {
+                        val = parseFloat(parseFloat(val).toFixed(2));
+                        dispatch(setMargin({ ...margin, top: val }));
+                    }}
                 ></PageSettingItem>
                 <Page highlight={highlight}></Page>
                 <PageSettingItem
@@ -304,9 +316,10 @@ const PageSetting = function () {
                     value={margin ? margin.bottom : null}
                     onFocus={() => setHighlight(() => 'bottom')}
                     onBlur={() => setHighlight(() => null)}
-                    onChange={(val) =>
-                        dispatch(setMargin({ ...margin, bottom: val }))
-                    }
+                    onChange={(val) => {
+                        val = parseFloat(parseFloat(val).toFixed(2));
+                        dispatch(setMargin({ ...margin, bottom: val }));
+                    }}
                 ></PageSettingItem>
             </div>
             <div
@@ -325,9 +338,10 @@ const PageSetting = function () {
                     value={margin ? margin.header : null}
                     onFocus={() => setHighlight(() => 'header')}
                     onBlur={() => setHighlight(() => null)}
-                    onChange={(val) =>
-                        dispatch(setMargin({ ...margin, header: val }))
-                    }
+                    onChange={(val) => {
+                        val = parseFloat(parseFloat(val).toFixed(2));
+                        dispatch(setMargin({ ...margin, header: val }));
+                    }}
                 ></PageSettingItem>
                 <PageSettingItem
                     title='右'
@@ -335,9 +349,10 @@ const PageSetting = function () {
                     value={margin ? margin.right : null}
                     onFocus={() => setHighlight(() => 'right')}
                     onBlur={() => setHighlight(() => null)}
-                    onChange={(val) =>
-                        dispatch(setMargin({ ...margin, right: val }))
-                    }
+                    onChange={(val) => {
+                        val = parseFloat(parseFloat(val).toFixed(2));
+                        dispatch(setMargin({ ...margin, right: val }));
+                    }}
                 ></PageSettingItem>
                 <PageSettingItem
                     title='页脚'
@@ -345,9 +360,10 @@ const PageSetting = function () {
                     value={margin ? margin.footer : null}
                     onFocus={() => setHighlight(() => 'footer')}
                     onBlur={() => setHighlight(() => null)}
-                    onChange={(val) =>
-                        dispatch(setMargin({ ...margin, footer: val }))
-                    }
+                    onChange={(val) => {
+                        val = parseFloat(parseFloat(val).toFixed(2));
+                        dispatch(setMargin({ ...margin, footer: val }));
+                    }}
                 ></PageSettingItem>
             </div>
         </div>

@@ -26,6 +26,7 @@ export default function Index(props) {
         maxLength = 200,
         disabled,
         onChange = () => {},
+        style={}
     } = props;
     return (
         <Textarea
@@ -34,6 +35,7 @@ export default function Index(props) {
             data-item-type={itemType}
             maxLength={maxLength}
             disabled={disabled}
+            style={style}
         ></Textarea>
     );
 }

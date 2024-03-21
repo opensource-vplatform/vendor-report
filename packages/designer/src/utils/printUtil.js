@@ -525,8 +525,10 @@ const getHeadersOrFootersArray = function (selectedValue, spread) {
     }));
 };
 
-export const parsePrintInfo = function (spread) {
-    const sheet = getSheet(spread);
+export const parsePrintInfo = function (spread,sheet) {
+    if(!sheet){
+        sheet = getSheet(spread);
+    }
     const printInfo = sheet.printInfo();
     const GC = getNamespace();
     const rowStart = printInfo.rowStart();
@@ -537,6 +539,7 @@ export const parsePrintInfo = function (spread) {
     const repeatColumnStart = printInfo.repeatColumnStart();
     const repeatRowEnd = printInfo.repeatRowEnd();
     const repeatColumnEnd = printInfo.repeatColumnEnd();
+    const showBorder = printInfo.showBorder();
     let formula = '',
         formula1 = '',
         formula2 = '';
@@ -643,6 +646,7 @@ export const parsePrintInfo = function (spread) {
         sheetArea: formula,
         repeatAtLeft: formula2,
         repeatAtTop: formula1,
+        showBorder,
     };
     handleMargin(result.margin, px2inch);
     if (printInfo.fitPagesTall() === -1 && printInfo.fitPagesWide() === -1) {
