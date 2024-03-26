@@ -50,8 +50,9 @@ export function addTable(params) {
     }
     //如果表格的结束索引大于表单的结束索引，则创建表单列以确保表单的结束索引不小于表格的结束索引
     const sheetColumnCount = sheet.getColumnCount(spreadNS.SheetArea.viewport);
-    if (col + tableColumnsCount > sheetColumnCount) {
-        sheet.addColumns(col, tableColumnsCount - 1);
+    const diff = col + tableColumnsCount - sheetColumnCount;
+    if (diff > 0) {
+        sheet.addColumns(sheetColumnCount, diff);
     }
 
     const rowCount = 3;

@@ -133,7 +133,7 @@ export default function Index(props) {
 
                 let draggableClass = '';
                 let isDraggable = draggable;
-                if (draggable && parentType !== 'table') {
+                if (draggable /* && parentType !== 'table' */) {
                     draggableClass = 'draggable';
                     if (
                         type === 'table' &&

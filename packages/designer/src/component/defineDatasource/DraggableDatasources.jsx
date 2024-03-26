@@ -418,6 +418,10 @@ export default function Index() {
                         cell.bindingPath(dataPath).cellType(
                             bindingPathCellType
                         );
+                        if (dataPath.includes('.')) {
+                            cell.value(current.name);
+                        }
+
                         setCellTag(sheet, row, col, 'bindInfo', {
                             bindType: 'cell',
                             bindDsInstanceId: itemId,

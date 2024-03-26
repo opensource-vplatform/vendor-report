@@ -4,6 +4,7 @@ import {
   useEffect,
 } from 'react';
 
+import axios from 'axios';
 import {
   useDispatch,
   useSelector,
@@ -85,6 +86,43 @@ const SparklinesNavItem = WithNavItem(SparklinesTab);
 //const InsertNavItem = WithNavItem(InsertTab);
 const LayoutNavItem = WithNavItem(LayoutTab);
 
+function parseUsedDatasource(spread, finalDsList) {
+    const dsCodes = [];
+    spread.sheets.forEach(function (sheet) {
+        const sheetJson = sheet.toJSON();
+        //收集表格已经绑定的数据源编码
+        if (Array.isArray(sheetJson.tables)) {
+            sheetJson.tables.forEach(({ bindingPath }) => {
+                if (bindingPath && !dsCodes.includes(bindingPath)) {
+                    dsCodes.push(bindingPath);
+                }
+            });
+        }
+        //收集单元格已经绑定的数据源编码
+        const dataTable = sheetJson?.data?.dataTable;
+        if (dataTable && typeof dataTable === 'object') {
+            Object.values(dataTable).forEach((cols) => {
+                if (cols) {
+                    Object.values(cols).forEach(({ bindingPath }) => {
+                        if (bindingPath && !dsCodes.includes(bindingPath)) {
+                            let code = bindingPath;
+                            if (bindingPath.includes('.')) {
+                                code = bindingPath.split('.')[0];
+                            }
+                            dsCodes.push(code);
+                        }
+                    });
+                }
+            });
+        }
+    });
+    //收集报表已经绑定的数据源
+    const define = finalDsList.filter(({ code }) => {
+        return dsCodes.includes(code);
+    });
+    return define;
+}
+
 export default function () {
     const dispatch = useDispatch();
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
@@ -102,38 +140,7 @@ export default function () {
                 reportJson: spread.toJSON(),
                 context: { datasourceSlice, tableDesignSlice },
             };
-            const dsCodes = [];
-            spread.sheets.forEach(function (sheet) {
-                const sheetJson = sheet.toJSON();
-                //收集表格已经绑定的数据源编码
-                if (Array.isArray(sheetJson.tables)) {
-                    sheetJson.tables.forEach(({ bindingPath }) => {
-                        if (bindingPath && !dsCodes.includes(bindingPath)) {
-                            dsCodes.push(bindingPath);
-                        }
-                    });
-                }
-                //收集单元格已经绑定的数据源编码
-                const dataTable = sheetJson?.data?.dataTable;
-                if (dataTable && typeof dataTable === 'object') {
-                    Object.values(dataTable).forEach((cols) => {
-                        if (cols) {
-                            Object.values(cols).forEach(({ bindingPath }) => {
-                                if (
-                                    bindingPath &&
-                                    !dsCodes.includes(bindingPath)
-                                ) {
-                                    dsCodes.push(bindingPath);
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-            //收集报表已经绑定的数据源
-            const define = finalDsList.filter(({ code }) => {
-                return dsCodes.includes(code);
-            });
+            const define = parseUsedDatasource(spread, finalDsList);
             const result = fire({
                 event: EVENTS.onSave,
                 args: [json, { dsList: finalDsList, define }],
@@ -250,8 +257,40 @@ export default function () {
                     </Button>
                     <Button
                         style={{ marginRight: 8 }}
-                        onClick={() => {
-                            dispatch(genPreviewDatas());
+                        onClick={async () => {
+                            let datas = null;
+
+                            const { batchGetDatasURL, datasPath } =
+                                context?.conf || {};
+
+                            if (batchGetDatasURL && datasPath) {
+                                try {
+                                    let define = parseUsedDatasource(
+                                        spread,
+                                        finalDsList
+                                    );
+                                    define = define.map(function (item) {
+                                        return {
+                                            type: item.type,
+                                            code: item.code,
+                                        };
+                                    });
+
+                                    const response = await axios.post(
+                                        batchGetDatasURL,
+                                        {
+                                            datasource: define,
+                                        }
+                                    );
+
+                                    const datasPathArr = datasPath.split('/');
+                                    datas = response?.data;
+                                    while (datasPathArr.length) {
+                                        datas = datas[datasPathArr.shift()];
+                                    }
+                                } catch (error) {}
+                            }
+                            dispatch(genPreviewDatas({ datas }));
                             dispatch(setMode({ mode: 'preview' }));
                         }}
                     >

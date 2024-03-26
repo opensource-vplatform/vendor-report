@@ -92,6 +92,7 @@ export const datasourceSlice = createSlice({
             }
         },
         genPreviewDatas(state, { payload }) {
+            const { datas: _datas = {} } = payload;
             function mergeColumnDatas(params) {
                 const {
                     instanceObject,
@@ -248,7 +249,11 @@ export const datasourceSlice = createSlice({
                 }
             });
 
-            state.previewViewDatas = { ...state.previewViewDatas, ...datas };
+            state.previewViewDatas = {
+                ...state.previewViewDatas,
+                ...datas,
+                ..._datas,
+            };
         },
         setIsShowDatasource(state, { payload }) {
             if (

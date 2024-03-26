@@ -115,8 +115,8 @@ const bindDataSource = function (params) {
                 const groups = groupColumns[tableName];
                 const sums = sumColumns[tableName];
 
-                const rowMergeCol = rowMergeColumns[tableName];
-                const colMergeCol = colMergeColumns[tableName];
+                const rowMergeCol = rowMergeColumns[tableName] || [];
+                const colMergeCol = colMergeColumns[tableName] || [];
 
                 if (
                     (Array.isArray(groups) && groups.length > 0) ||

@@ -137,6 +137,15 @@ export const ListItemText = styled.div`
         position: relative;
         display: flex;
         font-size: 14px;
+        overflow: hidden;
+
+        & > span {
+            overflow: hidden;
+            width: 100%;
+            text-overflow: ellipsis;
+            display: inline-block;
+            white-space: nowrap;
+        }
 
         &::before {
             /*   counter-increment: listCounter;

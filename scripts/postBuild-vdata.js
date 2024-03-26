@@ -1,7 +1,10 @@
 const path = require('path');
 const fs = require('fs');
 
-const distDir = path.resolve(__dirname, '../dist');
+//const distDir = path.resolve(__dirname, '../dist');
+const distDir = path.resolve(
+    `D:\\vdata\\vdata.biz.designer\\resources\\page\\saasvdata`
+);
 
 function deleteDirectory(directory) {
     if (fs.existsSync(directory)) {
@@ -35,14 +38,13 @@ function copyDirectory(sourceDir, destinationDir) {
     });
 }
 
-
 const designerDistDir = path.resolve(__dirname, '../integration/vdata');
-copyDirectory(designerDistDir,distDir)
-
+copyDirectory(designerDistDir, distDir);
 
 const DESIGNER_NAME_REG = /^designer\-[\w\d]+\.umd\.js$/;
 
-const DESIGNER_SCRIPT_REG = /<script\s+src=["'](\.\/designer.+?umd\.js)["']\s*>/;
+const DESIGNER_SCRIPT_REG =
+    /<script\s+src=["'](\.\/designer.+?umd\.js)["']\s*>/;
 
 const REPORT_NAME_REG = /^report\-[\w\d]+\.umd\.js$/;
 
@@ -52,35 +54,35 @@ let designer_script_name = null;
 
 let report_script_name = null;
 
-const filenames = fs.readdirSync(path.resolve(distDir,'script'));
+const filenames = fs.readdirSync(path.resolve(distDir, 'script'));
 
 for (let index = 0; index < filenames.length; index++) {
     const filename = filenames[index];
-    if(DESIGNER_NAME_REG.test(filename)){
+    if (DESIGNER_NAME_REG.test(filename)) {
         designer_script_name = filename;
         continue;
-    }else if(REPORT_NAME_REG.test(filename)){
+    } else if (REPORT_NAME_REG.test(filename)) {
         report_script_name = filename;
         continue;
     }
 }
 
-if(designer_script_name!=null){
-    const designerHtml = path.resolve(distDir,'designer.html');
-    let content = fs.readFileSync(designerHtml)
+if (designer_script_name != null) {
+    const designerHtml = path.resolve(distDir, 'designer.html');
+    let content = fs.readFileSync(designerHtml);
     content = new String(content);
-    content = content.replace(DESIGNER_SCRIPT_REG,function(){
-        return "<script src='./script/"+designer_script_name+"'>";
+    content = content.replace(DESIGNER_SCRIPT_REG, function () {
+        return "<script src='./script/" + designer_script_name + "'>";
     });
-    fs.writeFileSync(designerHtml,content);
+    fs.writeFileSync(designerHtml, content);
 }
 
-if(report_script_name!=null){
-    const reportHtml = path.resolve(distDir,'report.html');
-    let content = fs.readFileSync(reportHtml)
+if (report_script_name != null) {
+    const reportHtml = path.resolve(distDir, 'report.html');
+    let content = fs.readFileSync(reportHtml);
     content = new String(content);
-    content = content.replace(REPORT_SCRIPT_REG,function(){
-        return "<script src='./script/"+report_script_name+"'>";
+    content = content.replace(REPORT_SCRIPT_REG, function () {
+        return "<script src='./script/" + report_script_name + "'>";
     });
-    fs.writeFileSync(reportHtml,content);
+    fs.writeFileSync(reportHtml, content);
 }
