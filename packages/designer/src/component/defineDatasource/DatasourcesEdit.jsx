@@ -33,6 +33,7 @@ import {
   types,
 } from './constant.js';
 import Datasources from './Datasources.jsx';
+import FillConditions from './FillConditions.jsx';
 import {
   AddDatasourceBtn,
   DatasourceBox,
@@ -273,7 +274,7 @@ export default function Index(props) {
                     <div>名称</div>
                     <div>
                         <TextInput
-                            value={activeDs.name}
+                            value={activeDs.name || ''}
                             onChange={dataChangeHandler}
                             itemType='name'
                             maxLength={20}
@@ -317,6 +318,22 @@ export default function Index(props) {
                             disabled={disabled}
                         ></Textarea>
                     </div>
+                    {activeDs.type === 'table_该方案暂时放弃' && (
+                        <FillConditions
+                            conditions={activeDs.fillConditions}
+                            tableFields={activeDs.children}
+                            onConfirm={function (conditions) {
+                                dispatch(
+                                    updateDslist({
+                                        newData: {
+                                            ...activeDs,
+                                            fillConditions: conditions,
+                                        },
+                                    })
+                                );
+                            }}
+                        ></FillConditions>
+                    )}
                 </DatasourceOptBoxRight>
             </DatasourceOptBox>
         </DatasourceBox>

@@ -34,6 +34,7 @@ export const datasourceSlice = createSlice({
         sumColumns: {},
         rowMergeColumns: {},
         colMergeColumns: {},
+        conditions: {},
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -66,6 +67,15 @@ export const datasourceSlice = createSlice({
             }
             if (isSave) {
                 state.finalDsList = deepCopy(state.dsList);
+                state.dsList.forEach(function ({ code, fillConditions }) {
+                    state.conditions[code] = state.conditions[code]
+                        ? state.conditions[code]
+                        : {};
+                    if (fillConditions && fillConditions.length) {
+                        state.conditions[code]['fillConditions'] =
+                            fillConditions;
+                    }
+                });
             }
         },
         toggleActiveDs(state, { payload }) {

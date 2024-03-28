@@ -27,6 +27,7 @@ const Wrap = styled.div`
 `;
 
 const Input = styled.input`
+    width: 100%;
     position: relative;
     border: none;
     cursor: pointer;
@@ -61,11 +62,15 @@ export default function Index(props) {
         SuffixIcon;
 
     return (
-        <Wrap style={{ minWidth, width, ...style }} data-disabled={disabled} onClick={()=>{
-            if(ref.current&&!disabled){
-                ref.current.focus();
-            }
-        }}>
+        <Wrap
+            style={{ minWidth, width, ...style }}
+            data-disabled={disabled}
+            onClick={() => {
+                if (ref.current && !disabled) {
+                    ref.current.focus();
+                }
+            }}
+        >
             <Input
                 type='text'
                 ref={ref}

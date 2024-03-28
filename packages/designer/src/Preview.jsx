@@ -158,7 +158,7 @@ function parseJsonData(jsonData, datas) {
                     col: _col,
                     colCount: _colCount,
                     tableCode: _tableCode,
-                } = tableInfo.data[0];
+                } = tableInfo.data[tableInfo.data.length - 1];
 
                 if (_tableCode === tableCode && _col + _colCount === col) {
                     if (tableInfo.maxRowCount < rowCount) {
