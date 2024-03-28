@@ -101,7 +101,7 @@ export const datasourceSlice = createSlice({
                 }
             }
         },
-        genPreviewDatas(state, { payload }) {
+        genPreviewDatas(state, { payload = {} }) {
             const { datas: _datas = {} } = payload;
             function mergeColumnDatas(params) {
                 const {

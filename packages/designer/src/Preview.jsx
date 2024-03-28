@@ -181,7 +181,6 @@ function parseJsonData(jsonData, datas) {
             }
         });
 
-        debugger;
         const newDataTable = {};
         const newSpans = [];
         const newRows = {};
@@ -196,7 +195,11 @@ function parseJsonData(jsonData, datas) {
                     }
                     //复制样式
                     const curRowDataTable = dataTable[oldStartRow];
-                    newDataTable[endRow] = curRowDataTable;
+                    if (!newDataTable[endRow]) {
+                        newDataTable[endRow] = JSON.parse(
+                            JSON.stringify(curRowDataTable)
+                        );
+                    }
 
                     //复制spans
                     spans.forEach(function (span) {
@@ -279,12 +282,10 @@ function parseJsonData(jsonData, datas) {
         } else {
             sheet.rows = newRows;
         }
-        debugger;
         sheet.spans = newSpans;
         sheet.data = sheet.data ? sheet.data : {};
         sheet.data.dataTable = newDataTable;
         sheet.rowCount = sheetRowCount;
-        debugger;
     });
 }
 
@@ -360,7 +361,6 @@ export default function () {
                     colMergeColumns={colMergeColumns}
                     onInited={function (a) {
                         window.mapTest = a;
-                        debugger;
                     }}
                 >
                     <Worksheet></Worksheet>
