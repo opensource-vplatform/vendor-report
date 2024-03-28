@@ -6,6 +6,7 @@ import {
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import Formula from '@components/formula/Index';
 import {
   GroupItem,
   HLayout,
@@ -38,8 +39,6 @@ import {
 } from '@utils/formulaUtil';
 
 import { WithIconMenu } from './Components';
-import FormulaSelector from './library/FormulaSelector';
-import FormulaSetting from './library/FormulaSetting';
 
 const INSERT_FORMULA_ITEM_ID = 'insert_$_formula';
 
@@ -206,48 +205,20 @@ function AutoSumItem(props) {
 export default function () {
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const [data, setData] = useState({
+        showEditor: false,
         showSelector: false,
         showSetting: false,
         formula: null,
         catalog: null,
     });
-    const handleShowSelector = () => {
-        if (data.showSetting || data.showSetting) {
-            return data;
+    const handleFormulaInsert = () => {
+        if (data.showEditor) {
+            return;
         }
         setData((data) => {
             return {
                 ...data,
-                showSelector: true,
-            };
-        });
-    };
-
-    const handleHideSelector = () => {
-        setData((data) => {
-            return {
-                ...data,
-                showSelector: false,
-            };
-        });
-    };
-
-    const handleFormulaSelect = (formula) => {
-        setData((data) => {
-            return {
-                ...data,
-                formula,
-                showSetting: true,
-                showSelector: false,
-            };
-        });
-    };
-
-    const handleHideSetting = () => {
-        setData((data) => {
-            return {
-                ...data,
-                showSetting: false,
+                showEditor: true,
             };
         });
     };
@@ -259,7 +230,8 @@ export default function () {
                     return {
                         ...data,
                         catalog,
-                        showSelector: true,
+                        formula: null,
+                        showEditor: true,
                     };
                 });
             } else {
@@ -270,7 +242,7 @@ export default function () {
                         return {
                             ...data,
                             formula: menu,
-                            showSetting: true,
+                            showEditor: true,
                         };
                     });
                 }
@@ -288,7 +260,8 @@ export default function () {
                     return {
                         ...data,
                         catalog,
-                        showSelector: true,
+                        formula: null,
+                        showEditor: true,
                     };
                 });
             } else {
@@ -298,17 +271,11 @@ export default function () {
     };
     return (
         <Fragment>
-            {data.showSelector ? (
-                <FormulaSelector
-                    onClose={handleHideSelector}
-                    onSelect={handleFormulaSelect}
-                ></FormulaSelector>
-            ) : null}
-            {data.showSetting ? (
-                <FormulaSetting
-                    code={data.formula}
-                    onClose={handleHideSetting}
-                ></FormulaSetting>
+            {data.showEditor ? (
+                <Formula
+                    formula={data.formula}
+                    onClose={() => setData({ ...data, showEditor: false })}
+                ></Formula>
             ) : null}
             <GroupItem title='函数库'>
                 <HLayout>
@@ -327,7 +294,7 @@ export default function () {
                                     iconStyle={{ width: 28, height: 28 }}
                                 ></FormulaIcon>
                             }
-                            onClick={handleShowSelector}
+                            onClick={handleFormulaInsert}
                         ></VItem>
                     </VGroupItem>
                     <HLayout>

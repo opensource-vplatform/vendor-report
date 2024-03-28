@@ -15,6 +15,13 @@ export const EVENTS = {
      * 激活工作表变更事件
      */
     ActiveSheetChanged: "ActiveSheetChanged",
+
+    EditorStatusChanged: "EditorStatusChanged",
+
+    /**
+     * 初始化后事件
+     */
+    Inited: "Inited",
 };
 
 const check = function (params) {
@@ -54,6 +61,10 @@ export const bind = function (params) {
     const handlers = EVENT_HANDLER_MAP[event] || {};
     handlers[id] = handler
     EVENT_HANDLER_MAP[event] = handlers;
+    if(SPREAD_INITED&&event === EVENTS.Inited){
+        //解决热更新时，Inited事件不再触发引发的一系列问题
+        handler(SPREAD);
+    }
 };
 
 /**
@@ -74,6 +85,10 @@ export const unbind = function (params) {
     }
 };
 
+let SPREAD_INITED = false
+
+let SPREAD = null;
+
 /**
  * 触发事件
  * @param {event:事件名称,args:事件参数} params 
@@ -91,6 +106,10 @@ export const fire = function (params) {
                 handler(null,e);
             }
         }
+    }
+    if(event == EVENTS.Inited){
+        SPREAD_INITED = true;
+        SPREAD = args[0];
     }
     return result;
 };

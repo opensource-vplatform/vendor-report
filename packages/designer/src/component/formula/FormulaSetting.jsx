@@ -1,6 +1,5 @@
 import {
   Fragment,
-  useEffect,
   useState,
 } from 'react';
 
@@ -11,11 +10,6 @@ import {
 import styled from 'styled-components';
 
 import Dialog from '@components/dialog/Index';
-import {
-  bind,
-  EVENTS,
-  unbind,
-} from '@event/EventManager';
 import { getFormulaMetadata } from '@metadatas/formula';
 import { showErrorMessage } from '@utils/messageUtil';
 import { withBatchUpdate } from '@utils/spreadUtil';
@@ -24,10 +18,11 @@ import {
   ButtonWrap,
   FormulaButton,
   FormulaDesc,
-} from '../Components';
+} from './Components';
 import FormulaArgs from './FormulaArgs';
 import FormulaExample from './FormulaExample';
 import RangSelector from './RangSelector';
+import { toArgs } from './utils';
 
 const Wrap = styled.div`
     display: flex;
@@ -70,25 +65,6 @@ const FormulaResult = styled.div`
 
 const EVENT_DOMAIN_ID = 'FORMUAL_SETTING';
 
-const selectionToRang = function (selections, spread) {
-    const rangs = [];
-    if (selections && selections.length > 0) {
-        const r1c1Style =
-            GC.Spread.Sheets.ReferenceStyle.r1c1 ===
-            spread.options.referenceStyle;
-        const allRelative =
-            GC.Spread.Sheets.CalcEngine.RangeReferenceRelative.allRelative;
-        const rangeToFormula = GC.Spread.Sheets.CalcEngine.rangeToFormula;
-        selections.forEach((selection) => {
-            const { row, col } = selection;
-            rangs.push(
-                rangeToFormula(selection, row, col, allRelative, r1c1Style)
-            );
-        });
-    }
-    return rangs.join(',');
-};
-
 /**
  * 是否有区域选择
  * 比如：选择A，B两列
@@ -124,82 +100,59 @@ const argsToFormulaArgs = function (args) {
 };
 
 export default function (props) {
-    const { code, onClose } = props;
+    const { formula, onClose, hostCol, hostRow, hostSheet } = props;
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatch = useDispatch();
-    const metadata = getFormulaMetadata(code);
     const [data, setData] = useState(() => {
-        const args = metadata.args || [];
+        let funCode = null,
+            args = [],
+            metadata = null;
+        try {
+            const expression = GC.Spread.Sheets.CalcEngine.formulaToExpression(
+                hostSheet,
+                formula
+            );
+            if (expression.type == 7) {
+                //公式，如:SUM(1)
+                funCode = expression.functionName;
+                metadata = getFormulaMetadata(funCode);
+                args = toArgs(
+                    metadata.args,
+                    expression.arguments,
+                    hostSheet,
+                    spread
+                );
+            } else if (expression.type == 8) {
+                //公式选择界面选择结果，如：SUM
+                funCode = expression.value;
+                metadata = getFormulaMetadata(funCode);
+                args = metadata.args || [];
+                args = args.map((arg) => {
+                    return { ...arg, exp: '' };
+                });
+            }
+        } catch (e) {}
         return {
-            row: 0,
-            col: 0,
+            hostRow,
+            hostCol,
+            funCode,
             mode: 'base',
             current: 0,
-            args: args.map((arg) => {
-                return { ...arg, exp: '' };
-            }),
+            metadata,
+            args,
+            selectionInfo: null,
         };
     });
-    const handleSelectionChanging = (params) => {
-        const { newSelections, oldSelections } = params;
-        let mode = hasAreaSelection(newSelections) ? 'rangSelect' : data.mode;
-        const current = data.current;
-        const arg = data.args[current];
-        const newRang = selectionToRang(newSelections, spread);
-        const oldRang = selectionToRang(oldSelections, spread);
-        let exp = arg.exp;
-        if (exp.endsWith(oldRang)) {
-            exp = exp.substring(0, exp.length - oldRang.length) + newRang;
-        } else {
-            exp += exp.trim().length > 0 ? `+${newRang}` : newRang;
-        }
-        data.args[current] = { ...arg, exp };
-        setData({
-            ...data,
-            mode,
-        });
-    };
-    const handleSelectionChanged = (params) => {
-        if (data.mode == 'rangSelect') {
-            setData({
-                ...data,
-                mode: 'base',
-            });
-        }
-    };
-    const handleBind = () => {
-        bind({
-            id: EVENT_DOMAIN_ID,
-            event: EVENTS.SelectionChanging,
-            handler: handleSelectionChanging,
-        });
-        bind({
-            id: EVENT_DOMAIN_ID,
-            event: EVENTS.SelectionChanged,
-            handler: handleSelectionChanged,
-        });
-    };
-    const handleUnbind = () => {
-        unbind({
-            id: EVENT_DOMAIN_ID,
-            event: EVENTS.SelectionChanging,
-        });
-        unbind({
-            id: EVENT_DOMAIN_ID,
-            event: EVENTS.SelectionChanged,
-        });
-    };
     const handleFormulaSetting = () => {
-        handleUnbind();
         try {
-            withBatchUpdate(spread, (sheet) => {
-                const { row, col } = data;
-                sheet.setFormula(
-                    row,
-                    col,
-                    `=${code}(${argsToFormulaArgs(data.args).join(',')})`
+            withBatchUpdate(spread, () => {
+                const { hostRow, hostCol, funCode, args } = data;
+                hostSheet.setFormula(
+                    hostRow,
+                    hostCol,
+                    `=${funCode}(${argsToFormulaArgs(args).join(',')})`
                 );
-                sheet.setSelection(row, col, 1, 1);
+                spread.setActiveSheet(hostSheet.name());
             });
         } catch (e) {
             showErrorMessage(dispatch, typeof e == 'string' ? e : e.message);
@@ -217,30 +170,16 @@ export default function (props) {
                 };
             });
         } else {
-            handleUnbind();
             if (typeof onClose == 'function') {
                 onClose();
             }
         }
     };
-    handleBind();
     const formulaArgs = argsToFormulaArgs(data.args);
-    useEffect(() => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            const row = sheet.getActiveRowIndex();
-            const col = sheet.getActiveColumnIndex();
-            setData({
-                ...data,
-                row,
-                col,
-            });
-        }
-    }, []);
     return (
         <Dialog
             title='函数参数'
-            mask={false}
+            mask={data.mode == 'base'}
             onClose={handleDialogClose}
             anchor={true}
             closable={false}
@@ -249,7 +188,7 @@ export default function (props) {
                 {data.mode == 'base' ? (
                     <Fragment>
                         <FormulaWrap>
-                            <FormulaTitle>{code}</FormulaTitle>
+                            <FormulaTitle>{data.funCode}</FormulaTitle>
                             <FormulaArgsWrap>
                                 <FormulaArgs
                                     data={data}
@@ -258,12 +197,12 @@ export default function (props) {
                             </FormulaArgsWrap>
                         </FormulaWrap>
                         <FormulaDesc style={{ marginTop: 8 }}>
-                            {metadata.desc}
+                            {data.metadata?.desc}
                         </FormulaDesc>
                         <FormulaResult>
                             =
                             <FormulaExample
-                                code={code}
+                                code={data.funCode}
                                 style={{ maxWidth: 380 }}
                                 argNames={formulaArgs}
                             ></FormulaExample>
@@ -282,7 +221,11 @@ export default function (props) {
                     </Fragment>
                 ) : null}
                 {data.mode == 'rangSelect' ? (
-                    <RangSelector data={data} setData={setData}></RangSelector>
+                    <RangSelector
+                        data={data}
+                        setData={setData}
+                        hostSheet={hostSheet}
+                    ></RangSelector>
                 ) : null}
             </Wrap>
         </Dialog>

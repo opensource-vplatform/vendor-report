@@ -30,6 +30,7 @@ import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 
 import DesignerContext from './DesignerContext';
+import EditorBar from './EditorBar';
 import Excel from './Excel';
 import Nav from './Nav';
 import Preview from './Preview';
@@ -85,8 +86,8 @@ const SpreadWrap = styled.div`
 
 function Designer(props) {
     const { conf } = props;
-    if(conf && conf.baseUrl){
-        setBaseUrl(conf.baseUrl)
+    if (conf && conf.baseUrl) {
+        setBaseUrl(conf.baseUrl);
     }
     const dispatch = useDispatch();
     const { mode, spread, waitMsg, errorMsg, navStyle } = useSelector(
@@ -167,25 +168,37 @@ function Designer(props) {
                 <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
                     <Wrap>
                         {isShowNav && <Nav></Nav>}
-                        <SpreadWrap
+                        <SplitPane
                             style={{
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
                                 overflow: 'hidden',
-                                marginTop: isShowNav ? 8 : 0,
                             }}
+                            onResize={() => spread.refresh()}
                         >
-                            <SplitPane
-                                style={{ width: '100%' }}
-                                onResize={() => spread.refresh()}
+                            <EditorBar></EditorBar>
+                            <Resizer size={10} minSize={26} direction='v'></Resizer>
+                            <SpreadWrap
+                                style={{
+                                    overflow: 'hidden',
+                                    borderTop: '1px solid #ababab'
+                                }}
                             >
-                                <Pane style={{ width: 248 }}>
-                                    <DraggableDatasources></DraggableDatasources>
-                                </Pane>
-                                <Resizer width={8}></Resizer>
-                                <Pane style={{ width: '100%', flex: 1 }}>
-                                    <Excel></Excel>
-                                </Pane>
-                            </SplitPane>
-                        </SpreadWrap>
+                                <SplitPane
+                                    style={{ width: '100%' }}
+                                    onResize={() => spread.refresh()}
+                                >
+                                    <Pane style={{ width: 248 }}>
+                                        <DraggableDatasources></DraggableDatasources>
+                                    </Pane>
+                                    <Resizer size={8}></Resizer>
+                                    <Pane style={{ width: '100%', flex: 1 }}>
+                                        <Excel></Excel>
+                                    </Pane>
+                                </SplitPane>
+                            </SpreadWrap>
+                        </SplitPane>
                         <CellStyleSetting></CellStyleSetting>
                     </Wrap>
                 </Box>

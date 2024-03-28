@@ -12,6 +12,7 @@ import { isReactNode } from '@utils/reactUtil';
 
 const Wrap = styled.div`
     position: relative;
+    box-sizing: border-box;
     border: 1px solid lightgray;
     display: flex;
     justify-content: space-between;

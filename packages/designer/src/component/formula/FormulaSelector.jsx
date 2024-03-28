@@ -22,7 +22,7 @@ import {
 import {
   FormulaButton,
   FormulaDesc,
-} from '../Components';
+} from './Components';
 import FormulaExample from './FormulaExample';
 
 const Item = styled.div`
@@ -62,7 +62,7 @@ const formulaMetadataToListData = function (metadatas) {
 };
 
 export default function (props) {
-    const { value, onClose, catalog = null, onSelect } = props;
+    const { onClose, catalog = null, onSelect } = props;
     const filterRef = createRef(null);
     const [data, setData] = useState(() => {
         let catalogs = getCatalogs();

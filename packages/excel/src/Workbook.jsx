@@ -189,6 +189,7 @@ export default function (props) {
         onValueChanged,
         onSelectionChanged,
         onSelectionChanging,
+        onEditorStatusChanged,
         license,
         enablePrint = false,
         json = null,
@@ -252,7 +253,6 @@ export default function (props) {
                 } else {
                     spread = data.spread;
                 }
-
                 spread.suspendPaint();
                 spread.suspendEvent();
                 try {
@@ -294,19 +294,30 @@ export default function (props) {
                             register(spread);
                         }
                         onInited && onInited(spread);
+                        bindEvent(spread, 'EnterCell', onEnterCell);
+                        bindEvent(
+                            spread,
+                            'ActiveSheetChanged',
+                            onActiveSheetChanged
+                        );
+                        bindEvent(spread, 'ValueChanged', onValueChanged);
+                        bindEvent(
+                            spread,
+                            'SelectionChanged',
+                            onSelectionChanged
+                        );
+                        bindEvent(
+                            spread,
+                            'SelectionChanging',
+                            onSelectionChanging
+                        );
+                        bindEvent(spread, 'SheetChanged', () => {});
+                        bindEvent(
+                            spread,
+                            'EditorStatusChanged',
+                            onEditorStatusChanged
+                        );
                     }
-                    spread.unbindAll();
-                    bindEvent(spread, 'EnterCell', onEnterCell);
-                    bindEvent(
-                        spread,
-                        'ActiveSheetChanged',
-                        onActiveSheetChanged
-                    );
-                    bindEvent(spread, 'ValueChanged', onValueChanged);
-                    bindEvent(spread, 'SelectionChanged', onSelectionChanged);
-                    bindEvent(spread, 'SelectionChanging', onSelectionChanging);
-                    bindEvent(spread, 'SheetChanged', () => {});
-
                     dataSource &&
                         bindDataSource({
                             spread: data.spread,

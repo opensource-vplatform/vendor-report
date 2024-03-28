@@ -6,32 +6,54 @@ import {
 
 import styled from 'styled-components';
 
+import DotHorizIcon from '@icons/shape/DotHoriz';
 import DotVertIcon from '@icons/shape/DotVert';
 
 import Context from './Context';
 
 const Wrap = styled.div`
     display: flex;
-    align-items: center;
-    cursor: e-resize;
     background-color: #f6f6f6;
     border-right: 1px solid #ababab;
     overflow: hidden;
+    flex-shrink: 0;
     &:hover {
         color: #0075ff;
+    }
+    &[data-collapsable='false'] {
+        color: inherit;
+    }
+    &[data-type='h'] {
+        cursor: e-resize;
+        align-items: center;
+    }
+    &[data-type='v'] {
+        cursor: n-resize;
+        justify-content: center;
     }
 `;
 
 export default function (props) {
-    const { width } = props;
+    const {
+        size,
+        direction = 'h',
+        collapsable = true,
+        style = {},
+        minSize = null,
+    } = props;
+    const isH = direction == 'h';
     const [data, setData] = useState({
         originalWidth: 0,
+        originalHeight: 0,
         collapsed: false,
         timeoutIndexs: [],
         duration: 200,
         onResize: () => {},
     });
-    let mouseX = 0,targetWidth=0;
+    let mouseX = 0,
+        mouseY = 0,
+        targetWidth = 0,
+        targetHeight = 0;
     const ref = createRef(null);
     const mouseMoveHandler = (evt) => {
         const indesx = data.timeoutIndexs;
@@ -43,42 +65,85 @@ export default function (props) {
             data.onResize();
         }, data.duration);
         data.timeoutIndexs.push(index);
-        const targetX = evt.screenX - mouseX;
-        //mouseX = evt.screenX;
-        handleResize(targetWidth+targetX);
-    };
-    const handleResizeByDelta = (delta)=>{
-        if (ref.current) {
-            const preEle = ref.current.previousElementSibling;
-            const {width} = preEle.getBoundingClientRect();
-            handleResize(width+delta);
+        const delta = isH ? evt.screenX - mouseX : evt.screenY - mouseY;
+        let value = isH ? targetWidth + delta : targetHeight + delta;
+        if (minSize != null) {
+            value = value < minSize ? minSize : value;
         }
-    }
-    const handleResize = (newWidth) => {
+        handleResize(value);
+    };
+    const handleResize = (val) => {
         if (ref.current) {
             const preEle = ref.current.previousElementSibling;
-            preEle.style.width = `${newWidth}px`;
+            if (isH) {
+                preEle.style.width = `${val}px`;
+            } else {
+                preEle.style.height = `${val}px`;
+            }
+        }
+    };
+    const hideOrShowPreviousElement = (isShow) => {
+        if (ref.current) {
+            const preEle = ref.current.previousElementSibling;
+            preEle.style.display = isShow ? 'block' : 'none';
         }
     };
     const handleIconClick = () => {
-        if (data.collapsed) {
-            setData({ ...data, collapsed: false });
-            handleResize(data.originalWidth);
-            data.onResize();
-        } else {
-            setData({ ...data, collapsed: true });
-            handleResize(0);
-            data.onResize();
+        if (collapsable) {
+            if (data.collapsed) {
+                setData({ ...data, collapsed: false });
+                if (minSize != null) {
+                    handleResize(
+                        isH ? data.originalWidth : data.originalHeight
+                    );
+                } else {
+                    hideOrShowPreviousElement(true);
+                }
+                //handleResize(isH ? data.originalWidth : data.originalHeight);
+                data.onResize();
+            } else {
+                setData({ ...data, collapsed: true });
+                if (minSize != null) {
+                    handleResize(minSize);
+                } else {
+                    hideOrShowPreviousElement(false);
+                }
+                data.onResize();
+            }
         }
     };
     useEffect(() => {
         if (ref.current) {
             const preEle = ref.current.previousElementSibling;
-            const { width } = preEle.getBoundingClientRect();
+            const { width, height } = preEle.getBoundingClientRect();
             data.originalWidth = width;
+            data.originalHeight = height;
+            //前一个dom元素不允许压缩，否则会导致不跟手问题
+            preEle.style.flexShrink = 0;
             targetWidth = width;
+            targetHeight = height;
         }
     }, []);
+    const handleMouseDown = (evt) => {
+        if (evt.currentTarget === evt.target) {
+            mouseX = evt.nativeEvent.screenX;
+            mouseY = evt.nativeEvent.screenY;
+            if (ref.current) {
+                const preEle = ref.current.previousElementSibling;
+                const rect = preEle.getBoundingClientRect();
+                targetWidth = rect.width;
+                targetHeight = rect.height;
+            }
+            document.addEventListener('mousemove', mouseMoveHandler);
+            const handler = ()=>{
+                document.removeEventListener('mousemove', mouseMoveHandler)
+                document.removeEventListener('mouseup',handler);
+            };
+            document.addEventListener('mouseup',handler);
+            evt.nativeEvent.preventDefault();
+            return false;
+        }
+    };
     return (
         <Context.Consumer>
             {(ctx) => {
@@ -86,43 +151,60 @@ export default function (props) {
                 data.duration = ctx.duration;
                 return (
                     <Wrap
-                        style={{ width }}
+                        style={{
+                            width: isH ? size : 'unset',
+                            height: !isH ? size : 'unset',
+                            ...style,
+                        }}
+                        data-type={direction}
                         ref={ref}
-                        onMouseDown={(evt) => {
-                            if (evt.currentTarget === evt.target) {
-                                mouseX = evt.nativeEvent.screenX;
-                                if (ref.current) {
-                                    const preEle = ref.current.previousElementSibling;
-                                    const rect = preEle.getBoundingClientRect();
-                                    targetWidth = rect.width;
-                                }
-                                document.addEventListener(
-                                    'mousemove',
-                                    mouseMoveHandler
-                                );
-                                evt.nativeEvent.preventDefault();
-                                return false;
-                            }
-                        }}
-                        onMouseUp={(evt) => {
-                            if (evt.currentTarget === evt.target) {
-                                document.removeEventListener(
-                                    'mousemove',
-                                    mouseMoveHandler
-                                );
-                                evt.nativeEvent.preventDefault();
-                                return false;
-                            }
-                        }}
+                        data-collapsable={collapsable}
+                        onMouseDown={handleMouseDown}
                     >
-                        <DotVertIcon
-                            tips={data.collapsed ? '向右展开' : '向左折叠'}
-                            style={{
-                                marginLeft: -8,
-                                backgroundColor: '#dadada',
-                            }}
-                            onClick={handleIconClick}
-                        ></DotVertIcon>
+                        {isH ? (
+                            <DotVertIcon
+                                tips={
+                                    collapsable
+                                        ? data.collapsed
+                                            ? '向右展开'
+                                            : '向左折叠'
+                                        : ''
+                                }
+                                style={{
+                                    marginLeft: collapsable ? -8 : 0,
+                                    backgroundColor: collapsable
+                                        ? '#dadada'
+                                        : 'unset',
+                                    cursor: collapsable
+                                        ? 'pointer'
+                                        : 'e-resize',
+                                    pointerEvents: collapsable ? 'unset' : 'none',
+                                }}
+                                hoverable={false}
+                                onClick={handleIconClick}
+                            ></DotVertIcon>
+                        ) : (
+                            <DotHorizIcon
+                                tips={
+                                    collapsable
+                                        ? data.collapsed
+                                            ? '向下展开'
+                                            : '向上折叠'
+                                        : ''
+                                }
+                                hoverable={false}
+                                style={{
+                                    backgroundColor: collapsable
+                                        ? '#dadada'
+                                        : 'unset',
+                                    cursor: collapsable
+                                        ? 'pointer'
+                                        : 'n-resize',
+                                    pointerEvents: collapsable ? 'unset' : 'none',
+                                }}
+                                onClick={handleIconClick}
+                            ></DotHorizIcon>
+                        )}
                     </Wrap>
                 );
             }}

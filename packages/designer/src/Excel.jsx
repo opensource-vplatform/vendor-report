@@ -145,6 +145,10 @@ export default function () {
                 );
             });
         });
+        fire({
+            event: EVENTS.Inited,
+            args: [spread],
+        });
     });
     const handleSelectionChanged = useCallback((type, data) => {
         fire({
@@ -158,9 +162,21 @@ export default function () {
             args: [data],
         });
     });
-    const handleSheetChanged = useCallback((type, data)=>{
+    const handleSheetChanged = useCallback((type, data) => {
         fire({
             event: EVENTS.SheetChanged,
+            args: [data],
+        });
+    });
+    const handleEditorStatusChanged = useCallback((type, data) => {
+        fire({
+            event: EVENTS.EditorStatusChanged,
+            args: [data],
+        });
+    });
+    const handleRendered = useCallback((data) => {
+        fire({
+            event: EVENTS.Rendered,
             args: [data],
         });
     });
@@ -191,6 +207,8 @@ export default function () {
                 onSelectionChanged={handleSelectionChanged}
                 onSelectionChanging={handleSelectionChanging}
                 onSheetChanged={handleSheetChanged}
+                onEditorStatusChanged={handleEditorStatusChanged}
+                onRendered={handleRendered}
             >
                 <Worksheet
                     name={sheetName}

@@ -22,6 +22,15 @@ const Icon = styled.svg`
     width: 24px;
     transform: scale(0.8);
     fill: currentColor;
+    &[data-disabled='true'] {
+        cursor: not-allowed;
+    }
+`;
+
+const Path = styled.path`
+    &[data-disabled='true'] {
+        cursor: not-allowed;
+    }
 `;
 
 function Index(pros) {
@@ -52,8 +61,8 @@ function Index(pros) {
             data-disabled={disabled}
             data-hoverable={hoverable}
         >
-            <Icon style={icSt} viewBox='0 0 24 24' {...svgAttrs}>
-                {icon||pathAttrs ? <path d={icon} {...pathAttrs}></path> : null}
+            <Icon style={icSt} data-disabled={disabled} viewBox='0 0 24 24' {...svgAttrs}>
+                {icon||pathAttrs ? <Path data-disabled={disabled} d={icon} {...pathAttrs}></Path> : null}
                 {iconChildren}
             </Icon>
             {children}
