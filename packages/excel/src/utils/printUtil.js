@@ -79,5 +79,17 @@ export const setPrintInfo = function (sheet, printInfo) {
     setValue(blackAndWhite,"blackAndWhite");
     setValue(pageOrder,"pageOrder");
     setValue(showBorder,"showBorder");
+    let rowStart = print.rowStart();
+    rowStart = rowStart==-1 ? 0:rowStart;
+    print.rowStart(rowStart);
+    let rowEnd = print.rowEnd();
+    rowEnd = rowEnd==-1 ? sheet.getRowCount():rowEnd;
+    print.rowEnd(rowEnd);
+    let columnStart = print.columnStart();
+    columnStart = columnStart==-1 ? 0:columnStart;
+    print.columnStart(columnStart);
+    let columnEnd = print.columnEnd();
+    columnEnd = columnEnd==-1 ? sheet.getColumnCount():columnEnd;
+    print.columnEnd(columnEnd);
     sheet.printInfo(print);
 };
