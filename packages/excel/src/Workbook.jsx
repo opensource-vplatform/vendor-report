@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -82,6 +83,368 @@ const tableMerge = function (params) {
     }
 };
 
+function parseJsonData(jsonData, datas) {
+    const sheetsInfo = {};
+    Object.values(jsonData.sheets).forEach(function (sheet) {
+        const {
+            name,
+            spans = [],
+            data,
+            tables = [],
+            rows = {} /* 行高 */,
+        } = sheet;
+        const { dataTable } = data;
+
+        const table_dataTable = []; //绑定了实体字段的单元格
+        const other_dataTable = []; //其它单元格(当复制实体字段单元格的时候，行号大于实体字段单元格行号时，这些单元格需要相对的移动)
+
+        //将单元格信息收集到table_dataTable和other_dataTable，包含行号，列号，样式，跨行与跨列等信息
+        if (dataTable) {
+            Object.entries(dataTable).forEach(function ([
+                rowStr,
+                colDataTable,
+            ]) {
+                const row = Number(rowStr);
+                Object.entries(colDataTable).forEach(function ([
+                    colStr,
+                    values,
+                ]) {
+                    const { style, bindingPath } = values;
+                    const col = Number(colStr);
+                    //跨行与跨列信息
+                    const span = spans.find(function (spanItem) {
+                        return spanItem.row === row && spanItem.col === col;
+                    }) || {
+                        rowCount: 1,
+                        colCount: 1,
+                    };
+
+                    const dataTableItem = {
+                        row,
+                        col,
+                        rowCount: span.rowCount,
+                        colCount: span.colCount,
+                        cellInfo: values,
+                        rows: rows[row],
+                    };
+
+                    if (bindingPath?.includes?.('.')) {
+                        const [tableCode, field] = bindingPath.split('.');
+                        table_dataTable.push({
+                            ...dataTableItem,
+                            tableCode,
+                            field,
+                        });
+                    } else if (values && Object.keys(values).length) {
+                        other_dataTable.push(dataTableItem);
+                    }
+                });
+            });
+        }
+        let sheetRowCount = sheet.rowCount;
+        const tableInfos = [
+            {
+                maxRowCount: 0,
+                tableCode: '',
+                startRow: -1,
+                oldStartRow: -1,
+                endRow: -1,
+                startCol: -1,
+                endCol: -1,
+                data: [],
+            },
+        ];
+
+        //对实体字段单元格进行分组处理，连续且是同一个实体，则作为一组(一个表格)
+        table_dataTable.forEach(function (item) {
+            const { tableCode, row, col, rowCount, colCount } = item;
+            const tableInfo = tableInfos[tableInfos.length - 1];
+            if (tableInfo.data.length <= 0) {
+                tableInfo.startRow = row;
+                tableInfo.oldStartRow = row;
+                tableInfo.endRow = row;
+                tableInfo.maxRowCount = rowCount;
+                tableInfo.tableCode = tableCode;
+                tableInfo.startCol = col;
+                tableInfo.endCol = col + colCount;
+                tableInfo.data.push(item);
+            } else {
+                const {
+                    row: _row,
+                    col: _col,
+                    colCount: _colCount,
+                    tableCode: _tableCode,
+                } = tableInfo.data[tableInfo.data.length - 1];
+
+                if (_tableCode === tableCode && _col + _colCount === col) {
+                    if (tableInfo.maxRowCount < rowCount) {
+                        tableInfo.maxRowCount = rowCount;
+                    }
+                    tableInfo.endCol = col + colCount;
+                    tableInfo.data.push(item);
+                } else {
+                    tableInfos.push({
+                        maxRowCount: rowCount,
+                        tableCode,
+                        startRow: row,
+                        oldStartRow: row,
+                        endRow: row,
+                        startCol: col,
+                        endCol: col + colCount,
+                        data: [item],
+                    });
+                }
+            }
+        });
+
+        const newDataTable = {};
+        const newSpans = [];
+        const newRows = {};
+        const newTables = [];
+        let tableEndRow = 0;
+        while (tableInfos.length) {
+            const tableInfo = tableInfos.shift();
+            let { tableCode, startRow, endRow, data, oldStartRow } = tableInfo;
+            const ds = datas?.[tableCode];
+            if (Array.isArray(ds)) {
+                ds.forEach(function (dsItem, i) {
+                    if (i > 0) {
+                        sheetRowCount++;
+                    }
+                    //复制样式
+                    const curRowDataTable = dataTable[oldStartRow];
+                    if (!newDataTable[endRow]) {
+                        newDataTable[endRow] = JSON.parse(
+                            JSON.stringify(curRowDataTable)
+                        );
+                    }
+
+                    //复制spans
+                    spans.forEach(function (span) {
+                        if (span.row === oldStartRow) {
+                            newSpans.push({
+                                ...span,
+                                row: endRow,
+                            });
+                        }
+                    });
+
+                    //复制行高
+                    if (rows?.[oldStartRow]) {
+                        newRows[endRow] = {
+                            ...rows?.[oldStartRow],
+                        };
+                    }
+                    data.forEach(function ({ field, col }) {
+                        delete newDataTable[endRow][col].bindingPath;
+                        newDataTable[endRow][col].value = dsItem[field];
+                    });
+                    endRow++;
+                });
+            }
+
+            other_dataTable.forEach(function (item) {
+                if (item.row > startRow && item.row <= endRow) {
+                    item.row = endRow + (item.row - startRow) - 1;
+                }
+            });
+
+            tableInfos.forEach(function (item) {
+                if (item.startRow > startRow && item.startRow <= endRow) {
+                    item.startRow = endRow + (item.startRow - startRow) - 1;
+                    item.endRow = item.startRow;
+                }
+            });
+
+            tables.forEach(function (table) {
+                if (table.row > startRow && table.row <= endRow) {
+                    table.row = endRow + (table.row - startRow) - 1;
+                }
+            });
+            newTables.push({ startRow, endRow });
+            if (endRow > tableEndRow) {
+                tableEndRow = endRow;
+            }
+        }
+
+        other_dataTable.forEach(function (item) {
+            const { row, col, rowCount, colCount, cellInfo, rows } = item;
+
+            newDataTable[row] = newDataTable[row] ? newDataTable[row] : {};
+            newDataTable[row][col] = {
+                style: cellInfo.style,
+                bindingPath: cellInfo.bindingPath,
+            };
+
+            if (cellInfo.value) {
+                newDataTable[row][col].value = cellInfo.value;
+            }
+
+            if (rowCount > 1 || colCount > 1) {
+                newSpans.push({
+                    row,
+                    col,
+                    rowCount,
+                    colCount,
+                });
+            }
+
+            //行高
+            if (rows) {
+                newRows[row] = rows;
+            }
+        });
+        if (sheet.rows) {
+            Object.keys(sheet.rows).forEach(function (key) {
+                delete sheet.rows[key];
+            });
+            Object.entries(newRows).forEach(function ([key, value]) {
+                sheet.rows[key] = value;
+            });
+        } else {
+            sheet.rows = newRows;
+        }
+        sheet.spans = newSpans;
+        sheet.data = sheet.data ? sheet.data : {};
+        sheet.data.dataTable = newDataTable;
+        sheet.rowCount = sheetRowCount;
+        sheetsInfo[name] = sheetsInfo[name] ? sheetsInfo[name] : {};
+        sheetsInfo[name]['tableEndRow'] = tableEndRow;
+    });
+    return sheetsInfo;
+}
+
+function fillData(sheetJson, source, sheetsInfo = {}) {
+    debugger;
+    const {
+        rows = {}, //行高
+        rowCount: sheetRowCount,
+        printInfo: {
+            paperSize: { height = 1100 },
+            margin = {
+                bottom: 75,
+                footer: 30,
+                header: 30,
+                left: 70,
+                right: 70,
+                top: 75,
+            },
+        },
+        tables = [],
+        data: { dataTable = {} },
+        name,
+    } = sheetJson;
+
+    const {
+        bottom: marginBottom,
+        footer: marginFooter,
+        header: marginHeader,
+        top: marginTop,
+    } = margin;
+
+    const printHeight =
+        height - marginBottom - marginFooter - marginHeader - marginTop;
+    let index = 0;
+    let pageHeight = 0;
+    let tableEndRow = 0;
+    let bindingPath = '';
+    while (index < sheetRowCount) {
+        const rowHeight = rows[index]?.size || 20;
+        pageHeight += rowHeight;
+
+        //收集结束行最大的表格信息，如果需要填充数据，则填充这个表格的数据
+        tables.forEach(function ({ row, rowCount, bindingPath: _bindingPath }) {
+            if (row + rowCount - 1 === index) {
+                tableEndRow = index;
+                bindingPath = _bindingPath;
+            }
+        });
+
+        if (pageHeight > printHeight) {
+            pageHeight = 0;
+        } else {
+            index++;
+        }
+    }
+
+    const diff = printHeight - pageHeight;
+
+    //如果有表格并且表格绑定了数据源，则填充表格绑定的数据源
+    if (diff > 0 && bindingPath) {
+        const rowHeight = rows[tableEndRow]?.size || 20;
+        const rowCount = Math.floor(diff / rowHeight);
+        if (rowCount > 0) {
+            const data = source.getSource();
+            const tableData = data?.[bindingPath];
+            let index = rowCount;
+            while (index > 0) {
+                tableData.push({});
+                index--;
+            }
+        }
+    } else if (
+        diff > 0 &&
+        !bindingPath &&
+        sheetsInfo?.[name]?.tableEndRow >= 0
+    ) {
+        //否则，如果是通过拖拽表字段生成的表格，则复制相对的表格结束行
+        const tableEndRow = sheetsInfo?.[name]?.tableEndRow - 1;
+        const rowHeight = rows[tableEndRow]?.size || 20;
+        const rowCount = Math.floor(diff / rowHeight);
+        if (rowCount > 0) {
+            const otherDataTable = []; //用于收集表格后面的单元格
+            let endDataTalbe = null; //表格的最后一行单元格信息
+            Object.entries(dataTable).forEach(function ([rowStr, value]) {
+                const row = Number(rowStr);
+                if (row > tableEndRow) {
+                    otherDataTable.push({
+                        row,
+                        value,
+                    });
+                }
+                if (row === tableEndRow) {
+                    endDataTalbe = JSON.parse(JSON.stringify(value));
+                }
+            });
+            //复制表格的最后一行单元格信息到新增的行中
+            if (endDataTalbe) {
+                let index = 1;
+                Object.keys(endDataTalbe).forEach(function (key) {
+                    endDataTalbe[key] = {
+                        ...endDataTalbe[key],
+                        value: '',
+                    };
+                });
+                while (index <= rowCount) {
+                    dataTable[tableEndRow + index] = {
+                        ...JSON.parse(JSON.stringify(endDataTalbe)),
+                    };
+                    if (rows) {
+                        rows[tableEndRow + index] = {
+                            size: rowHeight,
+                        };
+                    }
+                    index++;
+                }
+            }
+            //移动表格后面的单元格
+            otherDataTable.forEach(function ({ row, value }) {
+                dataTable[row + rowCount] = value;
+            });
+            //移动位于表格后面的单元格的合并信息
+            if (sheetJson.spans) {
+                sheetJson.spans.forEach(function (span) {
+                    if (span.row > tableEndRow) {
+                        span.row = span.row + rowCount;
+                    }
+                });
+            }
+            //sheet行数增加
+            sheetJson.rowCount = sheetJson.rowCount + rowCount;
+        }
+    }
+}
+
 //绑定数据源
 const bindDataSource = function (params) {
     const {
@@ -93,6 +456,8 @@ const bindDataSource = function (params) {
         columnMerge,
         rowMergeColumns = {},
         colMergeColumns = {},
+        isFillData = false,
+        sheetsInfo,
     } = params;
 
     if (!spread) {
@@ -150,7 +515,7 @@ const bindDataSource = function (params) {
                         };
                     });
                     const { row, rowCount } = table.range();
-                    debugger;
+
                     const res = genAutoMergeRangeInfos({
                         rowMergeColumns: rowMergeCol,
                         colMergeColumns: colMergeCol,
@@ -167,6 +532,7 @@ const bindDataSource = function (params) {
         json.spans = Array.isArray(json.spans) ? json.spans : [];
         json.spans.push(...tablesSpans);
         json.autoMergeRangeInfos = autoMergeRangeInfos;
+        isFillData && fillData(json, source, sheetsInfo);
         sheet.fromJSON(json);
         //执行sheet.fromJSON(json);后数据源丢失，需要再次设置数据源
         source && sheet.setDataSource(source);
@@ -192,7 +558,7 @@ export default function (props) {
         onEditorStatusChanged,
         license,
         enablePrint = false,
-        json = null,
+        json: _json = null,
         onPrintHandler,
         children,
         baseUrl,
@@ -203,6 +569,7 @@ export default function (props) {
         columnMerge = false,
         rowMergeColumns = {},
         colMergeColumns = {},
+        isFillData = false,
     } = props;
     if (license) {
         setLicense(license);
@@ -232,6 +599,22 @@ export default function (props) {
     });
 
     const el = useRef(null);
+
+    const { json, sheetsInfo } = useMemo(
+        function () {
+            let sheetsInfo = null;
+            let json = JSON.parse(JSON.stringify(_json));
+            if (json) {
+                sheetsInfo = dataSource && parseJsonData(json, dataSource);
+            }
+            return {
+                sheetsInfo,
+                json,
+            };
+        },
+        [_json, dataSource]
+    );
+
     useEffect(() => {
         if (el.current && !data.showError) {
             let plugins = [];
@@ -328,6 +711,8 @@ export default function (props) {
                             columnMerge,
                             rowMergeColumns,
                             colMergeColumns,
+                            isFillData,
+                            sheetsInfo,
                         });
                     if (onPrintHandler) {
                         onPrintHandler((params) => {

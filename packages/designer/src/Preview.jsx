@@ -299,6 +299,7 @@ export default function () {
         originalDatasourceCodes,
         rowMergeColumns,
         colMergeColumns,
+        isFillData = false,
     } = useSelector(({ datasourceSlice }) => datasourceSlice);
 
     const { rowMerge, columnMerge } = useSelector(
@@ -317,7 +318,7 @@ export default function () {
         replacer
     );
     const json = JSON.parse(sourceJson);
-    parseJsonData(json, previewViewDatas);
+    //parseJsonData(json, previewViewDatas);
     //许可证
     const license = context?.conf?.license;
     let printHandler = null;
@@ -359,6 +360,7 @@ export default function () {
                     groupColumns={tableGroups}
                     rowMergeColumns={rowMergeColumns}
                     colMergeColumns={colMergeColumns}
+                    isFillData={isFillData}
                     onInited={function (a) {
                         window.mapTest = a;
                     }}

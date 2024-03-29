@@ -4,10 +4,12 @@ import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
+salesData.data.length = 10 || 21;
+tourismData.data.length = 10 || 21;
 export default {
-    /* json: { reportJson: json },
-    batchGetDatasURL,
-    datasPath, */
+    /*json: { reportJson: json },
+     batchGetDatasURL,
+    datasPath,  */
     nav: {
         //file:false | true //文件。默认值true
         file: {
