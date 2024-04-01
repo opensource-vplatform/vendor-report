@@ -85,6 +85,7 @@ const tableMerge = function (params) {
 
 function parseJsonData(jsonData, datas) {
     const sheetsInfo = {};
+    debugger;
     Object.values(jsonData.sheets).forEach(function (sheet) {
         const {
             name,
@@ -176,7 +177,11 @@ function parseJsonData(jsonData, datas) {
                     tableCode: _tableCode,
                 } = tableInfo.data[tableInfo.data.length - 1];
 
-                if (_tableCode === tableCode && _col + _colCount === col) {
+                if (
+                    _tableCode === tableCode &&
+                    _col + _colCount === col &&
+                    row === _row
+                ) {
                     if (tableInfo.maxRowCount < rowCount) {
                         tableInfo.maxRowCount = rowCount;
                     }
@@ -202,6 +207,9 @@ function parseJsonData(jsonData, datas) {
         const newRows = {};
         const newTables = [];
         let tableEndRow = 0;
+        //记录上一次复制的表格开始行位置与结束行位置
+        let lastStartRow = -1;
+        let lastEndRow = -1;
         while (tableInfos.length) {
             const tableInfo = tableInfos.shift();
             let { tableCode, startRow, endRow, data, oldStartRow } = tableInfo;
@@ -236,29 +244,45 @@ function parseJsonData(jsonData, datas) {
                         };
                     }
                     data.forEach(function ({ field, col }) {
-                        delete newDataTable[endRow][col].bindingPath;
+                        if (newDataTable[endRow]?.[col]?.bindingPath) {
+                            delete newDataTable[endRow][col].bindingPath;
+                        }
+                        newDataTable[endRow][col] = newDataTable[endRow][col]
+                            ? newDataTable[endRow][col]
+                            : {};
                         newDataTable[endRow][col].value = dsItem[field];
                     });
                     endRow++;
                 });
             }
 
+            if (startRow === lastStartRow && lastEndRow >= endRow) {
+                continue;
+            }
+            let removeRowCount = endRow - startRow - 1;
+            if (startRow === lastStartRow && lastEndRow < endRow) {
+                removeRowCount = endRow - lastEndRow;
+            }
+
+            lastStartRow = startRow;
+            lastEndRow = endRow;
+
             other_dataTable.forEach(function (item) {
                 if (item.row > startRow && item.row <= endRow) {
-                    item.row = endRow + (item.row - startRow) - 1;
+                    item.row += removeRowCount;
                 }
             });
 
             tableInfos.forEach(function (item) {
                 if (item.startRow > startRow && item.startRow <= endRow) {
-                    item.startRow = endRow + (item.startRow - startRow) - 1;
+                    item.startRow += removeRowCount;
                     item.endRow = item.startRow;
                 }
             });
 
             tables.forEach(function (table) {
                 if (table.row > startRow && table.row <= endRow) {
-                    table.row = endRow + (table.row - startRow) - 1;
+                    table.row += removeRowCount;
                 }
             });
             newTables.push({ startRow, endRow });
