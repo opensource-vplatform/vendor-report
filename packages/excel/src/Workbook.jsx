@@ -205,7 +205,6 @@ function parseJsonData(jsonData, datas) {
         const newDataTable = {};
         const newSpans = [];
         const newRows = {};
-        const newTables = [];
         let tableEndRow = 0;
         //记录上一次复制的表格开始行位置与结束行位置
         let lastStartRow = -1;
@@ -285,7 +284,6 @@ function parseJsonData(jsonData, datas) {
                     table.row += removeRowCount;
                 }
             });
-            newTables.push({ startRow, endRow });
             if (endRow > tableEndRow) {
                 tableEndRow = endRow;
             }
