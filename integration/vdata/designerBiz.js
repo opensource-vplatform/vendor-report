@@ -80,6 +80,14 @@ async function init() {
                 onSave,
             },
             license,
+            toolbar: [
+                {
+                    title: '关闭',
+                    onClick() {
+                        window.parent.close();
+                    },
+                },
+            ],
         });
         //设计器挂载到指定dom元素
         designer.mount(document.getElementById('app'));

@@ -7,9 +7,19 @@ let json = JSON.parse(jsonStr);
 salesData.data.length = 10 || 21;
 tourismData.data.length = 11 || 21;
 export default {
-    /*json: { reportJson: json },
-     batchGetDatasURL,
+    /* json: { reportJson: json }, */
+    /*batchGetDatasURL,
     datasPath,  */
+    /* toolbar: [
+        {
+            title: '关闭',
+            desc: '请点击关闭',
+            onClick() {
+                console.log('asdf');
+                window.close();
+            },
+        },
+    ], */
     nav: {
         //file:false | true //文件。默认值true
         file: {
@@ -42,8 +52,6 @@ export default {
     dataSource: {
         dataSourceDefinition: [
             ...otherData.ds,
-            salesData.ds,
-            tourismData.ds,
             {
                 id: 'stu',
                 type: 'table',
@@ -72,11 +80,23 @@ export default {
                     },
                 ],
             },
+            salesData.ds,
+            tourismData.ds,
         ], //数据源定义
         datas: {
             ...otherData.data,
             sales: salesData.data,
             tourism: tourismData.data,
+            stu: [
+                {
+                    code: 'sheetzs',
+                    name: '张三',
+                },
+                {
+                    code: 'ls2',
+                    name: '李四',
+                },
+            ],
         }, //数据源数据
         allowToView: true, //是否允许查看数据源
         allowToEdit: true, //是否允许编辑数据源

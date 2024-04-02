@@ -321,6 +321,9 @@ export default function () {
     //parseJsonData(json, previewViewDatas);
     //许可证
     const license = context?.conf?.license;
+    const toolbar = Array.isArray(context?.conf?.toolbar)
+        ? context?.conf?.toolbar
+        : [];
     let printHandler = null;
     const handlePrint = () => {
         printHandler && printHandler();
@@ -343,6 +346,19 @@ export default function () {
                 >
                     编辑
                 </Button>
+                {toolbar.map(function ({ title, type, onClick, desc }, index) {
+                    return (
+                        <Button
+                            style={{ marginRight: 8 }}
+                            onClick={onClick}
+                            type={type}
+                            key={index}
+                            title={desc}
+                        >
+                            {title}
+                        </Button>
+                    );
+                })}
             </Toolbar>
             <ExcelWrap>
                 <Workbook

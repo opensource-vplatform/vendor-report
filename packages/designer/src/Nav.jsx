@@ -206,6 +206,9 @@ export default function () {
     const isHiddenSparklines = context?.conf?.nav?.sparklines === false;
     //是否隐藏页面布局
     const isHiddenLayout = context?.conf?.nav?.layout === false;
+    const toolbar = Array.isArray(context?.conf?.toolbar)
+        ? context?.conf?.toolbar
+        : [];
     useEffect(() => {
         if (spread) {
             spread.refresh();
@@ -296,6 +299,22 @@ export default function () {
                     >
                         预览
                     </Button>
+                    {toolbar.map(function (
+                        { title, type, onClick, desc },
+                        index
+                    ) {
+                        return (
+                            <Button
+                                style={{ marginRight: 8 }}
+                                onClick={onClick}
+                                key={index}
+                                type={type}
+                                title={desc}
+                            >
+                                {title}
+                            </Button>
+                        );
+                    })}
                 </Fragment>
             }
         >
