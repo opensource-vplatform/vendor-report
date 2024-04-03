@@ -93,6 +93,7 @@ function Index(props) {
         mask = true,
         closable = true,
         anchor = false,
+        style={},
         onClose,
     } = props;
     const dialogEl = createRef(null);
@@ -125,7 +126,7 @@ function Index(props) {
         <Fragment>
             {mask ? <Mask style={{ zIndex: getNext() }}></Mask> : null}
             <Wrap
-                style={{ zIndex: getNext(), width, height }}
+                style={{ zIndex: getNext(), width, height,...style }}
                 ref={dialogEl}
             >
                 <TitleWrap

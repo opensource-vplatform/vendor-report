@@ -6,16 +6,9 @@ import {
 } from './objectUtil';
 import {
   getNamespace,
+  isTableSheet,
   withBatchCalcUpdate,
 } from './spreadUtil';
-
-function isTableSheet(sheet) {
-    const GC = getNamespace();
-    if (GC.Spread.Sheets.TableSheet && GC.Spread.Sheets.TableSheet.TableSheet) {
-        return sheet instanceof GC.Spread.Sheets.TableSheet.TableSheet;
-    }
-    return false;
-}
 
 const getSheet = function (spread) {
     const sheet = spread.getActiveSheetTab();

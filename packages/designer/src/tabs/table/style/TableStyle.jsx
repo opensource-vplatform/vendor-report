@@ -6,15 +6,12 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  GroupItem,
-  VItem,
-} from '@components/group/Index';
-import Popper from '@components/popper/Index';
+import { GroupItem } from '@components/group/Index';
 import TableStyle from '@icons/table/Style';
 import { setStyleName } from '@store/tableDesignSlice/tableDesignSlice';
 import { setTableStyleName } from '@utils/tableUtil';
 
+import { WithIconPopper } from '../../../utils/componentUtils';
 import ClearCard from './ClearCard';
 import { ContentWrap } from './Components';
 import CustomCard from './CustomCard';
@@ -29,6 +26,8 @@ const Divider = styled.div`
     width: 100%;
 `;
 
+const IconPopper = WithIconPopper('套用表格样式',TableStyle);
+
 export default function () {
     const dispatch = useDispatch();
     const { spread,styleName } = useSelector(
@@ -42,7 +41,7 @@ export default function () {
     };
     return (
         <GroupItem title='表格样式'>
-            <Popper
+            <IconPopper
                 content={
                     <ContentWrap>
                         <CustomCard onClick={handleClick}></CustomCard>
@@ -61,22 +60,7 @@ export default function () {
                 }
                 contentStyle={{overflowX: 'hidden' }}
             >
-                <VItem
-                    title='套用表格样式'
-                    style={{
-                        marginLeft: 8,
-                        marginRight: 8,
-                        paddingLeft: 4,
-                        paddingRight: 4,
-                        paddingBottom: 4,
-                    }}
-                    icon={
-                        <TableStyle
-                            iconStyle={{ width: 28, height: 28 }}
-                        ></TableStyle>
-                    }
-                ></VItem>
-            </Popper>
+            </IconPopper>
         </GroupItem>
     );
 }

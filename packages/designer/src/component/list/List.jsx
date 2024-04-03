@@ -64,6 +64,7 @@ const ListItem = styled.div`
 const List = ({
     values, // 数据源：数组类型
     objDatas = null, //数据源拓展：可传对象
+    datas = null,
     width = 'auto',
     height = 'auto',
     selectedValue,
@@ -131,6 +132,21 @@ const List = ({
                             </ListItem>
                         );
                     })}
+                {
+                    datas && datas.map(({value,text})=>{
+                        const isSelected = selectedValue === value;
+                        return (
+                            <ListItem
+                                key={value}
+                                data-selected={isSelected}
+                                data-style={value.includes('red') ? 'red' : ''}
+                                onClick={() => handleItemClick(value)}
+                            >
+                                {text}
+                            </ListItem>
+                        );
+                    })
+                }
             </ListWrap>
         </Wrap>
     );

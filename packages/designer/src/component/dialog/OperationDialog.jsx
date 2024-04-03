@@ -40,6 +40,7 @@ export default function (props) {
     const {
         onConfirm,
         onCancel,
+        hideOperations = false,
         cancelTitle = '取消',
         confirmTitle = '确定',
         children,
@@ -50,17 +51,19 @@ export default function (props) {
             <Wrap>
                 <Content>
                     {children}
-                    <ButtonWrap>
-                        <DialogButton onClick={onCancel}>
-                            {cancelTitle}
-                        </DialogButton>
-                        <DialogButton
-                            style={{ marginRight: 8 }}
-                            onClick={onConfirm}
-                        >
-                            {confirmTitle}
-                        </DialogButton>
-                    </ButtonWrap>
+                    {hideOperations ? null : (
+                        <ButtonWrap>
+                            <DialogButton onClick={onCancel}>
+                                {cancelTitle}
+                            </DialogButton>
+                            <DialogButton
+                                style={{ marginRight: 8 }}
+                                onClick={onConfirm}
+                            >
+                                {confirmTitle}
+                            </DialogButton>
+                        </ButtonWrap>
+                    )}
                 </Content>
             </Wrap>
         </Dialog>

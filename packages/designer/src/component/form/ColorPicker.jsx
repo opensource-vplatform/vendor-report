@@ -9,24 +9,20 @@ const FontColorSelector = styled.div`
     display: flex;
     border: 1px solid lightgray;
     cursor: pointer;
+    overflow: hidden;
+    box-sizing: border-box;
     &:hover {
-        border: 1px solid black;
+        border: solid 1px #5292f7;
     }
 `;
 const FontColorPreView = styled.div`
-    border: 4px solid #fff;
+    margin: 2px;
     width: 300px;
-    height: 16px;
-`;
-
-const ArrowDownIcon = styled.div`
-    width: 20px;
-    height: 23px;
-    border-left: 1px solid lightgray;
+    height: calc(100% - 4px);
 `;
 
 export default function (props) {
-    const { value, onChange,panelStyle={},style={} } = props;
+    const { value,disabled=false, onChange,panelStyle={},style={} } = props;
     return (
         <ColorEditor
             style={panelStyle}
@@ -36,18 +32,15 @@ export default function (props) {
             <FontColorSelector style={style}>
                 <FontColorPreView
                     style={{
+                        ...style,
+                        height: 'calc(100% - 4px)',
                         backgroundColor: value,
                     }}
                 ></FontColorPreView>
-                <ArrowDownIcon>
-                    <ArrowDown
-                        style={{
-                            width: 20,
-                            height: 23,
-                            margin: 0,
-                        }}
-                    ></ArrowDown>
-                </ArrowDownIcon>
+                <ArrowDown
+                    style={{ height: '100%', margin: 0 }}
+                    disabled={disabled}
+                ></ArrowDown>
             </FontColorSelector>
         </ColorEditor>
     );

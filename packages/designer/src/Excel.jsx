@@ -82,6 +82,10 @@ export default function () {
         let { foreColor } = styles;
         if (foreColor === undefined) foreColor = 'black';
         dispatch(setSelectedFontColor({ selectedFontColor: foreColor }));
+        fire({
+            event: EVENTS.EnterCell,
+            args: [args]
+        });
     };
     const handleActiveSheetChanged = useCallback((type, args) => {
         const sheet = args.newSheet;

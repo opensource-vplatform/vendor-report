@@ -404,3 +404,11 @@ export function sortSelection(spread, byCol, sorts) {
         }
     });
 }
+
+export function isFormula(text){
+    if(typeof text == 'string'){
+        text = text.trim();
+        return text.startsWith('=');
+    }
+    return false;
+}

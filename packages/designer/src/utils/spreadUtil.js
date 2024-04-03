@@ -131,27 +131,27 @@ export const applyToSelectedCell = function (sheet, func) {
     }
 };
 
-export const applyToSelectedRow = function(sheet,func){
+export const applyToSelectedRow = function (sheet, func) {
     const selections = sheet.getSelections();
-    for (let  index = 0; index < selections.length; index++){
+    for (let index = 0; index < selections.length; index++) {
         const selection = selections[index];
         const rowStart = -1 === selection.row ? 0 : selection.row;
-        for (let index1 = 0; index1 < selection.rowCount; index1++){
-            func(sheet, rowStart + index1)
+        for (let index1 = 0; index1 < selection.rowCount; index1++) {
+            func(sheet, rowStart + index1);
         }
     }
-}
+};
 
-export const applyToSelectedColumn = function(sheet,func){
+export const applyToSelectedColumn = function (sheet, func) {
     const selections = sheet.getSelections();
-    for (let index = 0; index < selections.length; index++){
+    for (let index = 0; index < selections.length; index++) {
         const selection = selections[index];
         const colStart = -1 === selection.col ? 0 : selection.col;
-        for (let index1 = 0; index1 < selection.colCount; index1++){
-            func(sheet, colStart + index1)
+        for (let index1 = 0; index1 < selection.colCount; index1++) {
+            func(sheet, colStart + index1);
         }
     }
-}
+};
 
 /**
  * 获取命令空间
@@ -198,3 +198,59 @@ export const getSelectionType = function (selections) {
     }
     return type;
 };
+
+export function isTableSheet(sheet) {
+    const GC = getNamespace();
+    if (GC.Spread.Sheets.TableSheet && GC.Spread.Sheets.TableSheet.TableSheet) {
+        return sheet instanceof GC.Spread.Sheets.TableSheet.TableSheet;
+    }
+    return false;
+}
+
+export function getWorkSheetForTableSheetFreeHeaderArea(
+    sheet,
+    notSyncSelections
+) {
+    let freeHeaderSheet = sheet._freeHeaderSheet;
+    const freeHeaderArea = sheet.applyFreeHeaderArea();
+    if (!freeHeaderSheet || sheet._freeHeaderSheetJson !== freeHeaderArea)
+        try {
+            const workbook = new on.Spread.Sheets.Workbook(
+                document.createElement('div'),
+                {
+                    sheetCount: 1,
+                }
+            );
+            freeHeaderSheet = workbook.getActiveSheet();
+            sheet._freeHeaderSheet = freeHeaderSheet;
+            sheet._freeHeaderSheetJson = freeHeaderArea;
+            freeHeaderSheet.suspendPaint();
+            freeHeaderSheet.suspendCalcService();
+            freeHeaderSheet.suspendDirty();
+            freeHeaderSheet.suspendEvent();
+            freeHeaderArea.keepUnknownFormulas = true;
+            freeHeaderSheet.fromJSON(freeHeaderArea);
+        } catch (e) {}
+    if (!notSyncSelections) {
+        const selections = sheet.getSelections(
+            on.Spread.Sheets.SheetArea.colHeader
+        );
+        if (selections.length > 0) {
+            const selection = selections[0];
+            if (freeHeaderSheet != null) {
+                freeHeaderSheet.setSelection(
+                    selection.row,
+                    selection.col,
+                    selection.rowCount,
+                    selection.colCount
+                );
+            }
+        }
+    }
+    return freeHeaderSheet;
+}
+
+
+export function setTableSheetFreeHeader(sheet,json){
+    sheet.applyFreeHeaderArea(json);
+}

@@ -1,3 +1,5 @@
+import { genUUID } from '../utils/commonUtil';
+
 export const EVENTS = {
     /**
      * 选择变更事件
@@ -17,6 +19,8 @@ export const EVENTS = {
     ActiveSheetChanged: "ActiveSheetChanged",
 
     EditorStatusChanged: "EditorStatusChanged",
+
+    EnterCell: "EnterCell",
 
     /**
      * 初始化后事件
@@ -56,14 +60,18 @@ const EVENT_HANDLER_MAP = {};
  */
 export const bind = function (params) {
     check(params);
-    checkId(params);
-    const { id,event, handler } = params;
+    const { id=genUUID(),event, handler } = params;
     const handlers = EVENT_HANDLER_MAP[event] || {};
     handlers[id] = handler
     EVENT_HANDLER_MAP[event] = handlers;
     if(SPREAD_INITED&&event === EVENTS.Inited){
         //解决热更新时，Inited事件不再触发引发的一系列问题
         handler(SPREAD);
+    }
+    return ()=>{
+        unbind({
+            id,event
+        });
     }
 };
 

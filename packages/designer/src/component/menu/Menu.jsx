@@ -25,11 +25,11 @@ export default function (props) {
         overflowX: 'visible',
         overflowY: 'visible',
     };
-    const handleNodeClick = (val)=>{
+    const handleNodeClick = (val,item)=>{
         if(cancelAble&&val===value){
             val = cancelValue;
         }
-        onNodeClick(val);
+        onNodeClick(val,item);
     }
     return (
         <Popper

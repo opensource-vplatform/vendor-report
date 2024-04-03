@@ -1,3 +1,14 @@
+const is = function(obj,type){
+    return typeof obj === type
+}
+
+export const isArray = function(obj){
+    return Array.isArray(obj);
+}
+
+export const isFunction = function(obj){
+    return is(obj,'function');
+}
 export const isNull = function(obj){
     return obj === null;
 }

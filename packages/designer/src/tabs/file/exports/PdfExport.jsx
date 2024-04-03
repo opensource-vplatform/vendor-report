@@ -23,9 +23,9 @@ import {
   DetailTitle,
   DetailWrap,
   DetialOptions,
-  ExcelIcon,
   IconTitle,
   ImportButtonWrap,
+  PdfIcon,
 } from '../Components';
 
 const Wrap = styled.div`
@@ -294,7 +294,7 @@ function Index(props) {
                     handleExport();
                 }}
             >
-                <ExcelIcon></ExcelIcon>
+                <PdfIcon></PdfIcon>
                 <IconTitle>导出PDF文件</IconTitle>
             </ImportButtonWrap>
         </DetailWrap>

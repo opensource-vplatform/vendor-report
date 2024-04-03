@@ -25,6 +25,9 @@ const Wrap = styled.div`
         background: #f3f3f3;
         cursor: not-allowed;
     }
+    &[data-disabled!='true']:hover {
+        border: solid 1px #5292f7;
+    }
 `;
 
 const Text = styled.div`
@@ -104,7 +107,10 @@ export default function (props) {
                         {data.text}
                     </Text>
                 )}
-                <ArrowDown disabled={disabled}></ArrowDown>
+                <ArrowDown
+                    style={{ height: '100%', margin: 0 }}
+                    disabled={disabled}
+                ></ArrowDown>
             </Wrap>
         </Menu>
     );
