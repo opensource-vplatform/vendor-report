@@ -13,13 +13,14 @@ import worksheetSettingSlice from './settingSlice/worksheetSettingSlice';
 import tableDesignSlice from './tableDesignSlice/tableDesignSlice';
 import viewSlice from './viewSlice/viewSlice';
 import wizardSlice from './wizardSlice';
+import conditionStyleSlice from './conditionStyleSlice';
 
 //不可序列化的值存储在redux中控制台会报错，需添加忽略动作和路径
 const serializableCheck = {
     // Ignore these action types
     //ignoredActions: ['appReducer/setSpread'],
     // Ignore these field paths in all actions
-    ignoredActionPaths: ['meta.arg', 'payload.spread','payload.styleName'],
+    ignoredActionPaths: ['meta.arg', 'payload.spread', 'payload.styleName'],
     // Ignore these paths in the state
     ignoredPaths: [
         'appSlice.spread',
@@ -49,6 +50,7 @@ export default configureStore({
         formulaEditorSlice,
         wizardSlice,
         layoutSlice,
+        conditionStyleSlice,
     },
     middleware: function (getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });
