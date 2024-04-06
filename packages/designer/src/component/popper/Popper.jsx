@@ -1,8 +1,4 @@
-import {
-  Fragment,
-  useRef,
-  useState,
-} from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import styled from 'styled-components';
@@ -46,12 +42,32 @@ export default function (props) {
         disabled = false,
     } = props;
     const ref = useRef(null);
+    const contentRef = useRef(null);
     const [data, setData] = useState({
         left: 0,
         top: 0,
         width: 0,
         contentVisible: false,
     });
+    useEffect(() => {
+        if (data.contentVisible && contentRef.current && ref.current) {
+            //内容展示时须判断是否有足够位置
+            const rect = contentRef.current.getBoundingClientRect();
+            if (rect.top + rect.height > document.body.clientHeight) {
+                //超出浏览器高度，尝试展示在上方
+                const hostRect = ref.current.getBoundingClientRect();
+                if (hostRect.top - rect.height >= 0) {
+                    //上方有位置，展示在上方
+                    contentRef.current.style.top = `${
+                        hostRect.top - rect.height
+                    }px`;
+                } else {
+                    //上方位置不够,直接顶着最上边展示
+                    contentRef.current.style.top = '0px';
+                }
+            }
+        }
+    }, [data.contentVisible]);
     return (
         <Fragment>
             {data.contentVisible
@@ -100,6 +116,7 @@ export default function (props) {
                 {data.contentVisible
                     ? createPortal(
                           <PopperContentWrap
+                              ref={contentRef}
                               className='popper-content-wrap'
                               style={{
                                   left: data.left,

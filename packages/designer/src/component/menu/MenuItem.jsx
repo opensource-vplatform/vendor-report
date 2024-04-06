@@ -1,7 +1,4 @@
-import {
-  Fragment,
-  useState,
-} from 'react';
+import { Fragment, useRef, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -53,14 +50,15 @@ const WithMenuItem = function (Component) {
             onClick,
             optionMaxSize,
             text,
-            type,
             item,
             datas,
-            style={},
+            type,
+            style = {},
             height,
             ...others
         } = props;
         let children = null;
+        const [data, setData] = useState({ show: false, left: 0, top: 0 });
         if (type == 'group') {
             let childrenComp = [];
             if (hasChildren(datas)) {
@@ -69,12 +67,14 @@ const WithMenuItem = function (Component) {
                 });
             }
             children = (
-                <Card title={text} contentStyle={{ flexDirection: 'row',...style }}>
+                <Card
+                    title={text}
+                    contentStyle={{ flexDirection: 'row', ...style }}
+                >
                     {childrenComp}
                 </Card>
             );
         } else {
-            const [data, setData] = useState({ show: false, left: 0, top: 0 });
             const handleMouseEnter = (evt) => {
                 if (disabled) return;
                 const target = evt.target;
@@ -105,14 +105,13 @@ const WithMenuItem = function (Component) {
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     onClick={() => {
-                        !disabled && onClick(value,item);
+                        !disabled && onClick(value, item);
                     }}
                 >
                     <Component
                         datas={datas}
                         disabled={disabled}
                         text={text}
-                        type={type}
                         {...others}
                     ></Component>
                     {!disabled && hasChildren(datas) && data.show ? (
@@ -140,24 +139,18 @@ const hasChildren = function (children) {
 };
 
 export const MenuItem = WithMenuItem(function (props) {
-    const { text, icon, disabled = false, type,datas } = props;
-    let children = null;
-    if (type == 'icon') {
-        children = <IconWrap title={text}>{icon}</IconWrap>;
-    } else {
-        children = (
-            <Fragment>
-                {icon ? <IconWrap>{icon}</IconWrap> : null}
-                {isReactNode(text) ? text : <Title>{text}</Title>}
-                {!disabled && hasChildren(datas) ? (
-                    <ArrowDownIcon
-                        style={{ transform: 'rotate(270deg)' }}
-                    ></ArrowDownIcon>
-                ) : null}
-            </Fragment>
-        );
-    }
-    return children;
+    const { text, icon, disabled = false, datas } = props;
+    return (
+        <Fragment>
+            {icon ? <IconWrap title={text}>{icon}</IconWrap> : null}
+            {isReactNode(text) ? text : <Title>{text}</Title>}
+            {!disabled && hasChildren(datas) ? (
+                <ArrowDownIcon
+                    style={{ transform: 'rotate(270deg)' }}
+                ></ArrowDownIcon>
+            ) : null}
+        </Fragment>
+    );
 });
 
 export const DividerMenuItem = function () {

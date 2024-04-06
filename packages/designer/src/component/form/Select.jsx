@@ -1,8 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -16,6 +12,7 @@ const Wrap = styled.div`
     border: 1px solid lightgray;
     display: flex;
     justify-content: space-between;
+    background-color: white;
     align-items: center;
     cursor: pointer;
     font-size: 12px;
@@ -25,7 +22,7 @@ const Wrap = styled.div`
         background: #f3f3f3;
         cursor: not-allowed;
     }
-    &[data-disabled!='true']:hover {
+    &[data-disabled='false']:hover {
         border: solid 1px #5292f7;
     }
 `;
@@ -34,23 +31,43 @@ const Text = styled.div`
     margin-left: 4px;
 `;
 
-const mapToText = function (value, datas) {
-    let text = '';
+const TextWrap = styled.div`
+    height: 100%;
+    width: calc(100% - 24px);
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    overflow: hidden;
+`;
+
+const getNode = function (value, datas) {
     if (datas && datas.length > 0) {
-        for (let i = 0, l = datas.length; i < l; i++) {
+        for (let i = 0; i < datas.length; i++) {
             const data = datas[i];
-            if (value == data.value) {
-                text = data.text;
-                break;
+            if (data.value === value) {
+                return data;
+            }
+            const node = getNode(value, data.children);
+            if (node !== null) {
+                return node;
             }
         }
+    }
+    return null;
+};
+
+const mapToText = function (value, node, datas) {
+    let text = '';
+    node = node ? node : getNode(value, datas);
+    if (node) {
+        return node.text;
     }
     return text;
 };
 
-const valueToData = function (value, datas) {
+const valueToData = function (value, node, datas) {
     return {
-        text: mapToText(value, datas),
+        text: mapToText(value, node, datas),
         value,
     };
 };
@@ -70,13 +87,13 @@ export default function (props) {
         cancelValue = undefined,
         value,
     } = props;
-    const [data, setData] = useState({ text: mapToText(value), value });
+    const [data, setData] = useState({ text: null, value });
     useEffect(() => {
-        setData(valueToData(value, datas));
+        setData(valueToData(value, null, datas));
     }, [value]);
-    const handleChange = useCallback((val) => {
+    const handleChange = useCallback((val, node) => {
         if (val !== value) {
-            setData(valueToData(val, datas));
+            setData(valueToData(val, node, datas));
             onChange && onChange(val);
         }
     });
@@ -94,7 +111,7 @@ export default function (props) {
         >
             <Wrap style={style} data-disabled={disabled}>
                 {isReactNode(data.text) ? (
-                    data.text
+                    <TextWrap>{data.text}</TextWrap>
                 ) : (
                     <Text
                         style={{

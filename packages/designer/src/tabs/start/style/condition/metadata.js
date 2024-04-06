@@ -114,10 +114,16 @@ export const getFormatTypes = function () {
     return [
         { value: 'formatOnValue', text: '►基于各自值设置所有单元格的格式' },
         { value: 'formatContain', text: '►只为包含以下内容的单元格设置格式' },
-        { value: 'formatRankedValue', text: '►仅对排名靠前或靠后的数值设置格式' },
+        {
+            value: 'formatRankedValue',
+            text: '►仅对排名靠前或靠后的数值设置格式',
+        },
         { value: 'formatAbove', text: '►仅对高于或低于平均值的数值设置格式' },
         { value: 'formatUnique', text: '►仅对唯一值或重复值设置格式' },
         { value: 'useFormula', text: '►使用公式确定要设置格式的单元格' },
-        { value: 'useRowColumnStates', text: '►使用状态确定要设置格式的行或者列' },
+        {
+            value: 'useRowColumnStates',
+            text: '►使用状态确定要设置格式的行或者列',
+        },
     ];
 };

@@ -8,6 +8,7 @@ const FontColorSelector = styled.div`
     height: 24px;
     display: flex;
     border: 1px solid lightgray;
+    background-color: white;
     cursor: pointer;
     overflow: hidden;
     box-sizing: border-box;
@@ -22,13 +23,15 @@ const FontColorPreView = styled.div`
 `;
 
 export default function (props) {
-    const { value,disabled=false, onChange,panelStyle={},style={} } = props;
+    const {
+        value,
+        disabled = false,
+        onChange,
+        panelStyle = {},
+        style = {},
+    } = props;
     return (
-        <ColorEditor
-            style={panelStyle}
-            onChange={onChange}
-            value={value}
-        >
+        <ColorEditor style={panelStyle} onChange={onChange} value={value}>
             <FontColorSelector style={style}>
                 <FontColorPreView
                     style={{

@@ -2,18 +2,20 @@ import styled from 'styled-components';
 
 import { DividerMenuItem } from './MenuItem';
 import { createMenuItem } from './Utils';
+import { useEffect, useRef } from 'react';
 
 const Wrap = styled.div`
     display: flex;
     flex-direction: column;
     border: solid 1px lightgray;
-    background-color:white;
+    background-color: white;
 `;
 
 const ScrollWrap = styled.div`
     display: flex;
     flex-direction: column;
-    width: max-content;
+    width: 100%;
+    min-width: max-content;
     overflow-x: hidden;
     overflow-y: auto;
 `;
@@ -21,19 +23,24 @@ const ScrollWrap = styled.div`
 //菜单项高度
 const MENU_ITEM_HEIGHT = 34;
 
-const createScrollableMenuItems = function (key,notFrozenItems, optionMaxSize,notFrozenDatas) {
+const createScrollableMenuItems = function (
+    key,
+    notFrozenItems,
+    optionMaxSize,
+    notFrozenDatas
+) {
     let maxHeight = 'unset';
-    if(notFrozenDatas.length>optionMaxSize){
+    if (notFrozenDatas.length > optionMaxSize) {
         maxHeight = 0;
         let index = 0;
-        while(index<optionMaxSize){
+        while (index < optionMaxSize) {
             const item = notFrozenDatas[index];
             let height = 0;
-            if(typeof item== 'string'){
+            if (typeof item == 'string') {
                 height = 4;
-            }else{
+            } else {
                 height = item.height;
-                height = height==undefined ? MENU_ITEM_HEIGHT:height;
+                height = height == undefined ? MENU_ITEM_HEIGHT : height;
             }
             maxHeight += height;
             index++;
@@ -47,40 +54,73 @@ const createScrollableMenuItems = function (key,notFrozenItems, optionMaxSize,no
 };
 
 const ItemsPanel = function (props) {
-    const { value,items, optionMaxSize, onNodeClick,style={} } = props;
+    const { value, items, optionMaxSize, onNodeClick, style = {} } = props;
     const itemComponents = [];
     let notFrozenItems = [];
     let notFrozenDatas = [];
     const keys = [];
-    items.forEach((item,index) => {
+    items.forEach((item, index) => {
         if (item == 'divider') {
             keys.push(item);
-            notFrozenItems.push(<DividerMenuItem key={index}></DividerMenuItem>);
+            notFrozenItems.push(
+                <DividerMenuItem key={index}></DividerMenuItem>
+            );
             notFrozenDatas.push(item);
         } else if (item.frozen) {
             //菜单项冻结
             if (notFrozenItems.length > 0) {
                 itemComponents.push(
-                    createScrollableMenuItems(keys.join("_$_"),notFrozenItems, optionMaxSize,notFrozenDatas)
+                    createScrollableMenuItems(
+                        keys.join('_$_'),
+                        notFrozenItems,
+                        optionMaxSize,
+                        notFrozenDatas
+                    )
                 );
                 notFrozenItems = [];
                 notFrozenDatas = [];
             }
-            itemComponents.push(createMenuItem(value,item, onNodeClick,optionMaxSize));
+            itemComponents.push(
+                createMenuItem(value, item, onNodeClick, optionMaxSize)
+            );
         } else {
             keys.push(item.value);
-            notFrozenItems.push(createMenuItem(value,item, onNodeClick,optionMaxSize));
+            notFrozenItems.push(
+                createMenuItem(value, item, onNodeClick, optionMaxSize)
+            );
             notFrozenDatas.push(item);
         }
     });
     if (notFrozenItems.length > 0) {
         itemComponents.push(
-            createScrollableMenuItems(keys.join("_$_"),notFrozenItems, optionMaxSize,notFrozenDatas)
+            createScrollableMenuItems(
+                keys.join('_$_'),
+                notFrozenItems,
+                optionMaxSize,
+                notFrozenDatas
+            )
         );
     }
     notFrozenItems = undefined;
     notFrozenDatas = undefined;
-    return <Wrap style={style} className='menuItemsWrap'>{itemComponents}</Wrap>;
-}
+    const ref = useRef(null);
+    useEffect(() => {
+        if (ref.current) {
+            const { top, height } = ref.current.getBoundingClientRect();
+            const clientHeight = window.document.body.clientHeight;
+            if (top + height > clientHeight) {
+                const delta = clientHeight - (top + height);
+                ref.current.style.top = `${
+                    parseInt(ref.current.style.top) + delta
+                }px`;
+            }
+        }
+    }, []);
+    return (
+        <Wrap ref={ref} style={style} className='menuItemsWrap'>
+            {itemComponents}
+        </Wrap>
+    );
+};
 
 export default ItemsPanel;

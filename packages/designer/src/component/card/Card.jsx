@@ -19,10 +19,10 @@ const CardContent = styled.div`
 `;
 
 export const Card = function (props) {
-    const { title, children,contentStyle={} } = props;
+    const { title, children, contentStyle = {} } = props;
     return (
         <CardWrap>
-            <CardTitle>{title}</CardTitle>
+            {title ? <CardTitle>{title}</CardTitle> : null}
             <CardContent style={contentStyle}>{children}</CardContent>
         </CardWrap>
     );

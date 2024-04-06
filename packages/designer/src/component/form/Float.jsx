@@ -100,6 +100,7 @@ export default function (props) {
             onFocus={onFocus}
             onBlur={onBlur}
             tabIndex={1}
+            data-disabled={disabled}
         >
             <NumberInput
                 value={data.innerVal}

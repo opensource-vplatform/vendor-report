@@ -26,6 +26,7 @@ const Input = styled.input`
 const Title = styled.span`
     margin-left: 12px;
     font-size: 12px;
+    min-width: max-content;
 `;
 
 export default function (props) {

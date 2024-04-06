@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useRef,
-} from 'react';
+import { useEffect, useRef } from 'react';
 
 import styled from 'styled-components';
 
@@ -12,8 +9,7 @@ export const Title = styled.span`
 
 export const Text = styled.span`
     font-size: 12px;
-    padding-left: 8px;
-    padding-right: 8px;
+    width: max-content;
 `;
 
 export const Wrap = styled.div`
@@ -33,11 +29,13 @@ export const VLayout = styled.div`
     flex-direction: column;
 `;
 
+export const Item = styled.div`
+    flex: 1;
+`;
+
 export const Border = styled.div`
     border: 1px solid #aaa;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-right: 8px;
+    padding: 8px;
 `;
 
 const Bar = styled.div`
@@ -149,4 +147,93 @@ export const ColorScale3Bar = function (props) {
         }
     }, [minColor, midColor, maxColor]);
     return <Bar ref={ref} style={style}></Bar>;
+};
+
+const PreviewWrap = styled.div`
+    border: 1px solid black;
+    box-sizing: border-box;
+    background-color: white;
+    height: 26px;
+    flex: 1;
+    padding: 1px;
+`;
+
+const PreviewDiv = styled.div`
+    height: calc(100% - 2px);
+    width: 70%;
+`;
+
+export const Preview = function (props) {
+    const {
+        borderType = 'noBorder',
+        fillType = 'solidFill',
+        fillColor,
+        borderColor,
+        direction = 'l2r',
+    } = props;
+    const ref = useRef(null);
+    const containRef = useRef(null);
+    useEffect(() => {
+        if (ref.current && containRef.current) {
+            if (fillType == 'gradientFill') {
+                (ref.current.style.backgroundImage =
+                    'linear-gradient(to right, ' + fillColor + ', white)'),
+                    (ref.current.style.backgroundImage =
+                        '-o-linear-gradient(to right, ' +
+                        fillColor +
+                        ', white)'),
+                    (ref.current.style.backgroundImage =
+                        '-moz-linear-gradient(to right, ' +
+                        fillColor +
+                        ', white)'),
+                    (ref.current.style.backgroundImage =
+                        '-webkit-linear-gradient(to right, ' +
+                        fillColor +
+                        ', white)'),
+                    (ref.current.style.backgroundImage =
+                        '-ms-linear-gradient(to right, ' +
+                        fillColor +
+                        ', white)'),
+                    (ref.current.style.backgroundImage =
+                        '-webkit-gradient(linear, left top, right top, color-stop(0, white),  color-stop(1, ' +
+                        fillColor +
+                        '))');
+            } else if (fillType == 'solidFill') {
+                ref.current.style.background = fillColor;
+            }
+            if (borderType == 'solidBorder') {
+                ref.current.style.border = '1px solid ' + borderColor || 0;
+            } else if (borderType == 'noBorder') {
+                ref.current.style.border = '1px solid white';
+            }
+            if (direction == 'l2r') {
+                containRef.current.setAttribute('align', 'left');
+            } else if (direction == 'r2l') {
+                containRef.current.setAttribute('align', 'right');
+            }
+        }
+    }, [borderType, fillType, fillColor, borderColor, direction]);
+    return (
+        <PreviewWrap ref={containRef}>
+            <PreviewDiv ref={ref}></PreviewDiv>
+        </PreviewWrap>
+    );
+};
+
+const FontPreviewWrap = styled.div`
+    width: 196px;
+    height: 36px;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    align-items: center;
+`;
+
+export const FontPreview = function (props) {
+    return (
+        <FontPreviewWrap>
+            <span>AaBbCcYyZz</span>
+        </FontPreviewWrap>
+    );
 };

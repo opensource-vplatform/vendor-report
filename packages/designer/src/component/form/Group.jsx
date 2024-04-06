@@ -11,14 +11,14 @@ const Title = styled.span`
     font-size: 12px;
     margin-left: 8px;
     transform: translateY(-50%);
-    background: #fff;
+    background: transparent;
     width: max-content;
     padding-left: 4px;
     padding-right: 4px;
 `;
 
 export const Group = function (props) {
-    const { style = {}, title = '', children, titleStyle={} } = props;
+    const { style = {}, title = '', children, titleStyle = {} } = props;
     return (
         <Wrap style={style}>
             <GroupTitle style={titleStyle}>{title}</GroupTitle>

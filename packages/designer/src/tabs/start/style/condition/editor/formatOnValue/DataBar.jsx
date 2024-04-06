@@ -1,29 +1,20 @@
-import {
-  Fragment,
-  useState,
-} from 'react';
+import { Fragment, useState } from 'react';
 
-import {
-  Button,
-  CheckBox,
-  ColorPicker,
-  Select,
-} from '@components/form/Index';
+import { Button, CheckBox, ColorPicker, Select } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 
+import { HLayout, Preview, Text } from '../../Components';
 import {
-  HLayout,
-  Text,
-} from '../../Components';
-import {
-  getMaxTypeOptions,
-  getMinTypeOptions,
-  Item,
-  itemStyle,
-  selectStyle,
-  titleStyle,
-  toDefaultValue,
+    getMaxTypeOptions,
+    getMinTypeOptions,
+    Item,
+    itemStyle,
+    selectStyle,
+    titleStyle,
+    toDefaultValue,
 } from './Utils';
+import { OperationDialog } from '@components/dialog/Index';
+import ValueAxisSetting from './ValueAxisSetting';
 
 const Auto_Option = { value: '5', text: '自动' };
 
@@ -59,6 +50,7 @@ export default function () {
             borderType: Border_Options[0].value,
             borderColor: 'rgb(0, 0, 0)',
             direction: Direction_Options[0].value,
+            showDialog: false,
         };
     });
     return (
@@ -200,7 +192,16 @@ export default function () {
             </HLayout>
             <HLayout style={{ ...itemStyle, marginLeft: 8 }}>
                 <Item>
-                    <Button style={{ height: 30 }}>负值和坐标轴...</Button>
+                    <Button
+                        style={{ height: 30 }}
+                        onClick={() => {
+                            setData((data) => {
+                                return { ...data, showDialog: true };
+                            });
+                        }}
+                    >
+                        负值和坐标轴...
+                    </Button>
                 </Item>
                 <Item>
                     <HLayout style={itemStyle}>
@@ -218,6 +219,41 @@ export default function () {
                     </HLayout>
                 </Item>
             </HLayout>
+            <HLayout style={{ ...itemStyle, marginLeft: 8 }}>
+                <Item></Item>
+                <Item>
+                    <HLayout style={itemStyle}>
+                        <Text style={titleStyle}>预览：</Text>
+                        <Preview
+                            fillType={data.fillType}
+                            fillColor={data.fillColor}
+                            borderType={data.borderType}
+                            borderColor={data.borderColor}
+                            direction={data.direction}
+                        ></Preview>
+                    </HLayout>
+                </Item>
+            </HLayout>
+            {data.showDialog ? (
+                <ValueAxisSetting
+                    onConfirm={() => {
+                        setData((data) => {
+                            return {
+                                ...data,
+                                showDialog: false,
+                            };
+                        });
+                    }}
+                    onCancel={() => {
+                        setData((data) => {
+                            return {
+                                ...data,
+                                showDialog: false,
+                            };
+                        });
+                    }}
+                ></ValueAxisSetting>
+            ) : null}
         </Fragment>
     );
 }

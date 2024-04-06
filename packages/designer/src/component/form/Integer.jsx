@@ -1,15 +1,12 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
 import {
-  DownIcon,
-  IconWrap,
-  NumberIconWrap,
-  NumberInput,
-  NumberWrap,
-  UpIcon,
+    DownIcon,
+    IconWrap,
+    NumberIconWrap,
+    NumberInput,
+    NumberWrap,
+    UpIcon,
 } from './Components';
 
 export default function (props) {
@@ -85,7 +82,7 @@ export default function (props) {
         });
     }, [value]);
     return (
-        <NumberWrap style={style}>
+        <NumberWrap style={style} data-disabled={disabled}>
             <NumberInput
                 value={data.innerVal}
                 onInput={handleInput}

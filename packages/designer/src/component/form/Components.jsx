@@ -8,6 +8,9 @@ export const NumberWrap = styled.div`
     border: 1px solid #d3d3d3;
     min-height: 24px;
     background: white;
+    &[data-disabled='false']:hover {
+        border: solid 1px #5292f7;
+    }
 `;
 
 export const NumberInput = styled.input`
@@ -51,7 +54,7 @@ export const IconWrap = styled.div`
         opacity: 0.6;
         background-color: transparent;
     }
-    &[data-disabled!='true']:hover {
+    &[data-disabled='false']:hover {
         cursor: pointer;
         background-color: #aaa;
     }
