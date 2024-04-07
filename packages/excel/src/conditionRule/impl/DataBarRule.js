@@ -20,13 +20,13 @@ class DataBarRule extends Rule {
     applySelections(selections) {
         const rule = new GC.Spread.Sheets.ConditionalFormatting.DataBarRule(
             this.getScaleValueType(this.minType),
-            minValue,
+            this.minValue,
             this.getScaleValueType(this.maxType),
-            maxValue,
-            style,
+            this.maxValue,
+            this.color,
             selections
         );
-        rule.gradient(gradient);
+        rule.gradient(this.gradient);
         this.sheet.conditionalFormats.addRule(rule);
     }
 
@@ -44,8 +44,15 @@ class DataBarRule extends Rule {
 }
 
 DataBarRule.fromJson = function (json) {
-    const { minType, minValue, maxType, maxValue, color } = json;
-    return new DataBarRule(minType, minValue, maxType, maxValue, color);
+    const { minType, minValue, maxType, maxValue, color, gradient } = json;
+    return new DataBarRule(
+        minType,
+        minValue,
+        maxType,
+        maxValue,
+        color,
+        gradient
+    );
 };
 
 export default DataBarRule;

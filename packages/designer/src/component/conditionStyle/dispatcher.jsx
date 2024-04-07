@@ -162,7 +162,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'blue',
+            color: 'blue',
             gradient: true,
         });
         applyRule(rule);
@@ -175,7 +175,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'green',
+            color: 'green',
             gradient: true,
         });
         applyRule(rule);
@@ -188,7 +188,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'red',
+            color: 'red',
             gradient: true,
         });
         applyRule(rule);
@@ -201,7 +201,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'orange',
+            color: 'orange',
             gradient: true,
         });
         applyRule(rule);
@@ -214,7 +214,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'lightblue',
+            color: 'lightblue',
             gradient: true,
         });
         applyRule(rule);
@@ -227,7 +227,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'purple',
+            color: 'purple',
             gradient: true,
         });
         applyRule(rule);
@@ -240,7 +240,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'blue',
+            color: 'blue',
             gradient: false,
         });
         applyRule(rule);
@@ -253,7 +253,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'green',
+            color: 'green',
             gradient: false,
         });
         applyRule(rule);
@@ -266,7 +266,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'red',
+            color: 'red',
             gradient: false,
         });
         applyRule(rule);
@@ -279,7 +279,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'orange',
+            color: 'orange',
             gradient: false,
         });
         applyRule(rule);
@@ -292,7 +292,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'lightblue',
+            color: 'lightblue',
             gradient: false,
         });
         applyRule(rule);
@@ -305,7 +305,7 @@ const dispatcher = {
             minValue: value,
             maxType: 'automax',
             maxValue: value,
-            style: 'purple',
+            color: 'purple',
             gradient: false,
         });
         applyRule(rule);

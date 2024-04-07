@@ -68,8 +68,30 @@ class ScaleRule extends Rule {
 }
 
 ScaleRule.fromJson = function (json) {
-    const { minType, minValue, maxType, maxValue, color } = json;
-    return new DataBarRule(minType, minValue, maxType, maxValue, color);
+    const {
+        ruleType,
+        minType,
+        minValue,
+        minColor,
+        midType,
+        midValue,
+        midColor,
+        maxType,
+        maxValue,
+        maxColor,
+    } = json;
+    return new ScaleRule(
+        ruleType,
+        minType,
+        minValue,
+        minColor,
+        midType,
+        midValue,
+        midColor,
+        maxType,
+        maxValue,
+        maxColor
+    1);
 };
 
 export default ScaleRule;
