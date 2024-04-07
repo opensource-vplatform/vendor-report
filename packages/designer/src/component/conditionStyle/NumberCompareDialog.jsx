@@ -1,24 +1,13 @@
 import { useSelector } from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
-import {
-  Integer,
-  Select,
-} from '@components/form/Index';
-import { addNumberFormat } from '@utils/formatterUtil';
+import { Integer, Select } from '@components/form/Index';
 
 import { setNumberCompareConfig } from '../../store/conditionStyleSlice';
-import {
-  HLayout,
-  Text,
-  Title,
-  Wrap,
-} from './Components';
+import { HLayout, Text, Title, Wrap } from './Components';
 import { dispatcher } from './dispatcher';
-import {
-  getStyle,
-  getStyleDatas,
-} from './metadata';
+import { getStyleDatas } from './metadata';
+import { ConditionRule } from '@toone/report-excel';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
@@ -27,15 +16,15 @@ export default function (props) {
     const { numberCompareConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
-    const handleConfirm = (...args) => {
-        addNumberFormat(
-            spread,
-            numberCompareConfig.ruleType,
-            getStyle(numberCompareConfig.style),
-            numberCompareConfig.operator,
-            numberCompareConfig.range
-        );
-        onConfirm && onConfirm(...args);
+    const handleConfirm = () => {
+        const rule = new ConditionRule({
+            _type: 'normalConditionRule',
+            ruleType: numberCompareConfig.ruleType,
+            style: numberCompareConfig.style,
+            type: numberCompareConfig.operator,
+            rank: numberCompareConfig.range,
+        });
+        onConfirm && onConfirm(rule);
     };
     return (
         <OperationDialog
@@ -55,7 +44,7 @@ export default function (props) {
                             dispatcher(
                                 setNumberCompareConfig({
                                     ...numberCompareConfig,
-                                    range:val,
+                                    range: val,
                                 })
                             )
                         }

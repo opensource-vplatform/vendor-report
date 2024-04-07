@@ -1,17 +1,33 @@
 import Rule from './Rule';
 
 class DataBarRule extends Rule {
-    constructor(minType, minValue, maxType, maxValue, color) {
+    constructor(minType, minValue, maxType, maxValue, color, gradient) {
+        super();
         this.minType = minType;
         this.minValue = minValue;
         this.maxType = maxType;
         this.maxValue = maxValue;
         this.color = color;
+        this.gradient = gradient;
     }
 
     apply(row, rowCount, col, colCount) {
         const GC = getNamespace();
-        const ranges = new GC.Spread.Sheets.Range(row, rowCount, col, colCount);
+        const range = new GC.Spread.Sheets.Range(row, rowCount, col, colCount);
+        this.applySelections([range]);
+    }
+
+    applySelections(selections) {
+        const rule = new GC.Spread.Sheets.ConditionalFormatting.DataBarRule(
+            this.getScaleValueType(this.minType),
+            minValue,
+            this.getScaleValueType(this.maxType),
+            maxValue,
+            style,
+            selections
+        );
+        rule.gradient(gradient);
+        this.sheet.conditionalFormats.addRule(rule);
     }
 
     toJson() {
@@ -22,6 +38,7 @@ class DataBarRule extends Rule {
             maxType: this.maxType,
             maxValue: this.maxValue,
             color: this.color,
+            gradient: this.gradient,
         };
     }
 }

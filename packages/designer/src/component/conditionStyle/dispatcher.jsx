@@ -1,26 +1,21 @@
 import {
-  addColorScaleAutoRule,
-  addDataBarFormat,
-  addIconSetAutoRule,
-} from '@utils/formatterUtil';
-
-import {
-  setDateCompareConfig,
-  setDateCompareVisible,
-  setDuplicateCompareConfig,
-  setDuplicateCompareVisible,
-  setEditorType,
-  setNumberApplyConfig,
-  setNumberApplyVisible,
-  setNumberCompareConfig,
-  setNumberCompareVisible,
-  setShowEditor,
-  setStyleType,
-  setTextBetweenConfig,
-  setTextBetweenVisible,
-  setTextCompareConfig,
-  setTextCompareVisible,
+    setDateCompareConfig,
+    setDateCompareVisible,
+    setDuplicateCompareConfig,
+    setDuplicateCompareVisible,
+    setEditorType,
+    setNumberApplyConfig,
+    setNumberApplyVisible,
+    setNumberCompareConfig,
+    setNumberCompareVisible,
+    setShowEditor,
+    setStyleType,
+    setTextBetweenConfig,
+    setTextBetweenVisible,
+    setTextCompareConfig,
+    setTextCompareVisible,
 } from '../../store/conditionStyleSlice';
+import { ConditionRule } from '@toone/report-excel';
 
 const dispatcher = {
     highlightCellsRulesGreaterThan: (spread, dispatcher) => {
@@ -30,7 +25,7 @@ const dispatcher = {
                 ruleType: 'cellValueRule',
                 operator: 'greaterThan',
                 desc: '为大于以下值的单元格设置格式',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setTextCompareVisible(true));
@@ -42,7 +37,7 @@ const dispatcher = {
                 ruleType: 'cellValueRule',
                 operator: 'lessThan',
                 desc: '为小于以下值的单元格设置格式',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setTextCompareVisible(true));
@@ -54,7 +49,7 @@ const dispatcher = {
                 ruleType: 'cellValueRule',
                 operator: 'between',
                 desc: '为介于以下值之间的单元格设置格式',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setTextBetweenVisible(true));
@@ -66,7 +61,7 @@ const dispatcher = {
                 ruleType: 'cellValueRule',
                 operator: 'equalsTo',
                 desc: '为等于以下值的单元格设置格式',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setTextCompareVisible(true));
@@ -78,7 +73,7 @@ const dispatcher = {
                 ruleType: 'specificTextRule',
                 operator: 'contains',
                 desc: '为包含以下文本的单元格设置格式',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setTextCompareVisible(true));
@@ -90,7 +85,7 @@ const dispatcher = {
                 ruleType: 'dateOccurringRule',
                 operator: 'contains',
                 desc: '为包含以下日期的单元格设置格式',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
                 date: 'yesterday',
             })
         );
@@ -101,7 +96,7 @@ const dispatcher = {
             setDuplicateCompareConfig({
                 title: '重复值',
                 desc: '为包含以下类型值的单元格设置格式',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
                 type: 'duplicateRule',
             })
         );
@@ -115,7 +110,7 @@ const dispatcher = {
                 operator: 'top',
                 desc: '为值最大的那些单元格设置格式',
                 range: 10,
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setNumberCompareVisible(true));
@@ -128,7 +123,7 @@ const dispatcher = {
                 operator: 'bottom',
                 desc: '为值最小的那些单元格设置格式',
                 range: 10,
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setNumberCompareVisible(true));
@@ -141,7 +136,7 @@ const dispatcher = {
                 operator: 'above',
                 desc: '为高于平均值的单元格设置格式',
                 secondary: '针对选定区域，设置为',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setNumberApplyVisible(true));
@@ -154,397 +149,501 @@ const dispatcher = {
                 operator: 'below',
                 desc: '为低于平均值的单元格设置格式',
                 secondary: '针对选定区域，设置为',
-                style:'lightRedFill_DarkRedText',
+                style: 'lightRedFill_DarkRedText',
             })
         );
         dispatcher(setNumberApplyVisible(true));
     },
-    gradientFillBlueDataBar: (spread, setData) => {
+    gradientFillBlueDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'blue',
-            true
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'blue',
+            gradient: true,
+        });
+        applyRule(rule);
     },
-    gradientFillGreenDataBar: (spread, setData) => {
+    gradientFillGreenDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'green',
-            true
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'green',
+            gradient: true,
+        });
+        applyRule(rule);
     },
-    gradientFillRedDataBar: (spread, setData) => {
+    gradientFillRedDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'red',
-            true
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'red',
+            gradient: true,
+        });
+        applyRule(rule);
     },
-    gradientFillOrangeDataBar: (spread, setData) => {
+    gradientFillOrangeDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'orange',
-            true
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'orange',
+            gradient: true,
+        });
+        applyRule(rule);
     },
-    gradientFillLightBlueDataBar: (spread, setData) => {
+    gradientFillLightBlueDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'lightblue',
-            true
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'lightblue',
+            gradient: true,
+        });
+        applyRule(rule);
     },
-    gradientFillPurpleDataBar: (spread, setData) => {
+    gradientFillPurpleDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'purple',
-            true
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'purple',
+            gradient: true,
+        });
+        applyRule(rule);
     },
-    solidFillBlueDataBar: (spread, setData) => {
+    solidFillBlueDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'blue',
-            false
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'blue',
+            gradient: false,
+        });
+        applyRule(rule);
     },
-    solidFillGreenDataBar: (spread, setData) => {
+    solidFillGreenDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'green',
-            false
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'green',
+            gradient: false,
+        });
+        applyRule(rule);
     },
-    solidFillRedDataBar: (spread, setData) => {
+    solidFillRedDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'red',
-            false
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'red',
+            gradient: false,
+        });
+        applyRule(rule);
     },
-    solidFillOrangeDataBar: (spread, setData) => {
+    solidFillOrangeDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'orange',
-            false
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'orange',
+            gradient: false,
+        });
+        applyRule(rule);
     },
-    solidFillLightBlueDataBar: (spread, setData) => {
+    solidFillLightBlueDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'lightblue',
-            false
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'lightblue',
+            gradient: false,
+        });
+        applyRule(rule);
     },
-    solidFillPurpleDataBar: (spread, setData) => {
+    solidFillPurpleDataBar: (spread, dispatcher, applyRule) => {
         const value = '(Automatic)';
-        addDataBarFormat(
-            spread,
-            'automin',
-            value,
-            'automax',
-            value,
-            'purple',
-            false
-        );
+        const rule = new ConditionRule({
+            _type: 'dataBarRule',
+            minType: 'automin',
+            minValue: value,
+            maxType: 'automax',
+            maxValue: value,
+            style: 'purple',
+            gradient: false,
+        });
+        applyRule(rule);
     },
-    colorScaleGyr: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'threeScaleRule',
-            'lowestValue',
-            'red',
-            'percentile',
-            50,
-            'yellow',
-            'highestValue',
-            'green'
-        );
+    colorScaleGyr: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'threeScaleRule',
+            minType: 'lowestValue',
+            minColor: 'red',
+            midType: 'percentile',
+            midValue: 50,
+            midColor: 'yellow',
+            maxType: 'highestValue',
+            maxColor: 'green',
+        });
+        applyRule(rule);
     },
-    colorScaleRyg: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'threeScaleRule',
-            'lowestValue',
-            'green',
-            'percentile',
-            50,
-            'yellow',
-            'highestValue',
-            'red'
-        );
+    colorScaleRyg: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'threeScaleRule',
+            minType: 'lowestValue',
+            minColor: 'green',
+            midType: 'percentile',
+            midValue: 50,
+            midColor: 'yellow',
+            maxType: 'highestValue',
+            maxColor: 'red',
+        });
+        applyRule(rule);
     },
-    colorScaleGwr: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'threeScaleRule',
-            'lowestValue',
-            'red',
-            'percentile',
-            50,
-            'white',
-            'highestValue',
-            'green'
-        );
+    colorScaleGwr: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'threeScaleRule',
+            minType: 'lowestValue',
+            minColor: 'red',
+            midType: 'percentile',
+            midValue: 50,
+            midColor: 'white',
+            maxType: 'highestValue',
+            maxColor: 'green',
+        });
+        applyRule(rule);
     },
-    colorScaleRwg: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'threeScaleRule',
-            'lowestValue',
-            'green',
-            'percentile',
-            50,
-            'white',
-            'highestValue',
-            'red'
-        );
+    colorScaleRwg: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'threeScaleRule',
+            minType: 'lowestValue',
+            minColor: 'green',
+            midType: 'percentile',
+            midValue: 50,
+            midColor: 'white',
+            maxType: 'highestValue',
+            maxColor: 'red',
+        });
+        applyRule(rule);
     },
-    colorScaleBwr: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'threeScaleRule',
-            'lowestValue',
-            'red',
-            'percentile',
-            50,
-            'white',
-            'highestValue',
-            'blue'
-        );
+    colorScaleBwr: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'threeScaleRule',
+            minType: 'lowestValue',
+            minColor: 'red',
+            midType: 'percentile',
+            midValue: 50,
+            midColor: 'white',
+            maxType: 'highestValue',
+            maxColor: 'blue',
+        });
+        applyRule(rule);
     },
-    colorScaleRwb: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'threeScaleRule',
-            'lowestValue',
-            'blue',
-            'percentile',
-            50,
-            'white',
-            'highestValue',
-            'red'
-        );
+    colorScaleRwb: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'threeScaleRule',
+            minType: 'lowestValue',
+            minColor: 'blue',
+            midType: 'percentile',
+            midValue: 50,
+            midColor: 'white',
+            maxType: 'highestValue',
+            maxColor: 'red',
+        });
+        applyRule(rule);
     },
-    colorScaleWr: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'twoScaleRule',
-            'lowestValue',
-            'red',
-            null,
-            null,
-            null,
-            'highestValue',
-            'white'
-        );
+    colorScaleWr: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minColor: 'red',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxColor: 'white',
+        });
+        applyRule(rule);
     },
-    colorScaleRw: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'twoScaleRule',
-            'lowestValue',
-            'white',
-            null,
-            null,
-            null,
-            'highestValue',
-            'red'
-        );
+    colorScaleRw: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minColor: 'white',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxColor: 'red',
+        });
+        applyRule(rule);
     },
-    colorScaleGw: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'twoScaleRule',
-            'lowestValue',
-            'white',
-            null,
-            null,
-            null,
-            'highestValue',
-            'green'
-        );
+    colorScaleGw: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minColor: 'white',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxColor: 'green',
+        });
+        applyRule(rule);
     },
-    colorScaleWg: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'twoScaleRule',
-            'lowestValue',
-            'green',
-            null,
-            null,
-            null,
-            'highestValue',
-            'white'
-        );
+    colorScaleWg: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minColor: 'green',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxColor: 'white',
+        });
+        applyRule(rule);
     },
-    colorScaleGy: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'twoScaleRule',
-            'lowestValue',
-            'yellow',
-            null,
-            null,
-            null,
-            'highestValue',
-            'green'
-        );
+    colorScaleGy: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minColor: 'yellow',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxColor: 'green',
+        });
+        applyRule(rule);
     },
-    colorScaleYg: (spread, setData) => {
-        addColorScaleAutoRule(
-            spread,
-            'twoScaleRule',
-            'lowestValue',
-            'green',
-            null,
-            null,
-            null,
-            'highestValue',
-            'yellow'
-        );
+    colorScaleYg: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minColor: 'green',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxColor: 'yellow',
+        });
+        applyRule(rule);
     },
-    iconSetThreeArrowsColored: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeArrowsColored');
+    iconSetThreeArrowsColored: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeArrowsColored',
+        });
+        applyRule(rule);
     },
-    iconSetThreeArrowsGray: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeArrowsGray');
+    iconSetThreeArrowsGray: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeArrowsGray',
+        });
+        applyRule(rule);
     },
-    iconSet3Triangles: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeTriangles');
+    iconSet3Triangles: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeTriangles',
+        });
+        applyRule(rule);
     },
-    iconSetFourArrowsGray: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fourArrowsGray');
+    iconSetFourArrowsGray: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fourArrowsGray',
+        });
+        applyRule(rule);
     },
-    iconSetFourArrowsColored: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fourArrowsColored');
+    iconSetFourArrowsColored: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fourArrowsColored',
+        });
+        applyRule(rule);
     },
-    iconSetFiveArrowsGray: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fiveArrowsGray');
+    iconSetFiveArrowsGray: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fiveArrowsGray',
+        });
+        applyRule(rule);
     },
-    iconSetFiveArrowsColored: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fiveArrowsColored');
+    iconSetFiveArrowsColored: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fiveArrowsColored',
+        });
+        applyRule(rule);
     },
-    iconSetThreeTrafficLightsUnRimmed: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeTrafficLightsUnrimmed');
+    iconSetThreeTrafficLightsUnRimmed: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeTrafficLightsUnrimmed',
+        });
+        applyRule(rule);
     },
-    iconSetThreeTrafficLightsRimmed: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeTrafficLightsRimmed');
+    iconSetThreeTrafficLightsRimmed: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeTrafficLightsRimmed',
+        });
+        applyRule(rule);
     },
-    iconSetThreeSigns: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeSigns');
+    iconSetThreeSigns: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeSigns',
+        });
+        applyRule(rule);
     },
-    iconSetFourTrafficLights: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fourTrafficLights');
+    iconSetFourTrafficLights: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fourTrafficLights',
+        });
+        applyRule(rule);
     },
-    iconSetFourRedToBlack: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fourRedToBlack');
+    iconSetFourRedToBlack: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fourRedToBlack',
+        });
+        applyRule(rule);
     },
-    iconSetThreeSymbolsCircled: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeSymbolsCircled');
+    iconSetThreeSymbolsCircled: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeSymbolsCircled',
+        });
+        applyRule(rule);
     },
-    iconSetThreeSymbolsUnCircled: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeSymbolsUncircled');
+    iconSetThreeSymbolsUnCircled: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeSymbolsUncircled',
+        });
+        applyRule(rule);
     },
-    iconSetThreeFlags: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeFlags');
+    iconSetThreeFlags: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeFlags',
+        });
+        applyRule(rule);
     },
-    iconSetThreeStars: (spread, setData) => {
-        addIconSetAutoRule(spread, 'threeStars');
+    iconSetThreeStars: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'threeStars',
+        });
+        applyRule(rule);
     },
-    iconSetFourRatings: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fourRatings');
+    iconSetFourRatings: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fourRatings',
+        });
+        applyRule(rule);
     },
-    iconSetFiveQuarters: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fiveQuarters');
+    iconSetFiveQuarters: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fiveQuarters',
+        });
+        applyRule(rule);
     },
-    iconSetFiveRatings: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fiveRatings');
+    iconSetFiveRatings: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fiveRatings',
+        });
+        applyRule(rule);
     },
-    iconSetFiveBoxes: (spread, setData) => {
-        addIconSetAutoRule(spread, 'fiveBoxes');
+    iconSetFiveBoxes: (spread, dispatcher, applyRule) => {
+        const rule = new ConditionRule({
+            _type: 'iconSetRule',
+            iconSetType: 'fiveBoxes',
+        });
+        applyRule(rule);
     },
     highlightCellsMoreRules: (spread, dispatcher) => {
-        dispatcher(setEditorType("formatContain"));
+        dispatcher(setEditorType('formatContain'));
         dispatcher(setShowEditor(true));
     },
     topBottomRulesMoreRules: (spread, dispatcher) => {
-        dispatcher(setEditorType("formatRankedValue"));
+        dispatcher(setEditorType('formatRankedValue'));
         dispatcher(setShowEditor(true));
     },
-    dataBarMoreRules:(spread, dispatcher) => {
-        dispatcher(setEditorType("formatOnValue"));
-        dispatcher(setStyleType("dataBar"));
+    dataBarMoreRules: (spread, dispatcher) => {
+        dispatcher(setEditorType('formatOnValue'));
+        dispatcher(setStyleType('dataBar'));
         dispatcher(setShowEditor(true));
     },
-    colorScalesListMoreRules:(spread, dispatcher) => {
-        dispatcher(setEditorType("formatOnValue"));
-        dispatcher(setStyleType("colorScale2"));
+    colorScalesListMoreRules: (spread, dispatcher) => {
+        dispatcher(setEditorType('formatOnValue'));
+        dispatcher(setStyleType('colorScale2'));
         dispatcher(setShowEditor(true));
     },
-    iconSetListMoreRules:(spread, dispatcher) => {
-        dispatcher(setEditorType("formatOnValue"));
-        dispatcher(setStyleType("iconSets"));
+    iconSetListMoreRules: (spread, dispatcher) => {
+        dispatcher(setEditorType('formatOnValue'));
+        dispatcher(setStyleType('iconSets'));
         dispatcher(setShowEditor(true));
     },
-    conditionFormatNewRule:(spread, dispatcher) => {
-        dispatcher(setEditorType("formatOnValue"));
-        dispatcher(setStyleType("colorScale2"));
+    conditionFormatNewRule: (spread, dispatcher) => {
+        dispatcher(setEditorType('formatOnValue'));
+        dispatcher(setStyleType('colorScale2'));
         dispatcher(setShowEditor(true));
     },
 };

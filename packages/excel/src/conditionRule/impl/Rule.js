@@ -1,4 +1,6 @@
 import { getNamespace } from '../../utils/spreadUtil';
+import { getStyle } from '../utils';
+import { isNullOrUndef } from '../../utils/objectUtils';
 
 class Rule {
     bind(sheet) {
@@ -7,7 +9,7 @@ class Rule {
 
     apply(row, rowCount, col, colCount) {}
 
-    applySelections(selections){}
+    applySelections(selections) {}
 
     getRuleType(ruleType) {
         const GC = getNamespace();
@@ -15,6 +17,9 @@ class Rule {
     }
 
     getScaleValueType(type) {
+        if (isNullOrUndef(type)) {
+            return undefined;
+        }
         const GC = getNamespace();
         return GC.Spread.Sheets.ConditionalFormatting.ScaleValueType[type];
     }
@@ -29,6 +34,18 @@ class Rule {
         return GC.Spread.Sheets.ConditionalFormatting.Top10ConditionType[type];
     }
 
+    getAverageType(type) {
+        const GC = getNamespace();
+        return GC.Spread.Sheets.ConditionalFormatting.AverageConditionType[
+            type
+        ];
+    }
+
+    getDateOccurringType(type) {
+        const GC = getNamespace();
+        return GC.Spread.Sheets.ConditionalFormatting.DateOccurringType[type];
+    }
+
     getDateOccurringType(type) {
         const GC = getNamespace();
         return GC.Spread.Sheets.ConditionalFormatting.DateOccurringType[type];
@@ -39,12 +56,33 @@ class Rule {
     }
 
     getOperator(type) {
+        if (isNullOrUndef(type)) {
+            return undefined;
+        }
         const GC = getNamespace();
         if (this.isTextComparison(type)) {
             return GC.Spread.Sheets.ConditionalFormatting
                 .TextComparisonOperators[type];
         }
         return GC.Spread.Sheets.ConditionalFormatting.ComparisonOperators[type];
+    }
+
+    getStyle(style) {
+        return getStyle(style);
+    }
+
+    getType(type) {
+        if (isNullOrUndef(type)) {
+            return undefined;
+        }
+        let res = this.getTop10Type(type);
+        if (isNullOrUndef(res)) {
+            res = this.getAverageType(type);
+        }
+        if (isNullOrUndef(res)) {
+            res = this.getDateOccurringType(type);
+        }
+        return res;
     }
 
     toJson() {

@@ -1,35 +1,23 @@
 import { useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
 import { Range as RangSelector } from '@components/range/Index';
-import { addConditionFormat } from '@utils/formatterUtil';
 
 import {
-  setTextBetweenConfig,
-  setTextBetweenVisible,
+    setTextBetweenConfig,
+    setTextBetweenVisible,
 } from '../../store/conditionStyleSlice';
 import { genUUID } from '../../utils/commonUtil';
-import {
-  HLayout,
-  Text,
-  Title,
-  Wrap,
-} from './Components';
-import {
-  getStyle,
-  getStyleDatas,
-} from './metadata';
+import { HLayout, Text, Title, Wrap } from './Components';
+import { getStyleDatas } from './metadata';
+import { ConditionRule } from '@toone/report-excel';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
     const options = getStyleDatas();
-    const { spread } = useSelector(({ appSlice }) => appSlice);
     const { textBetweenConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
@@ -37,16 +25,16 @@ export default function (props) {
     const [data] = useState({
         id: genUUID(),
     });
-    const handleConfirm = (...args) => {
-        addConditionFormat(
-            spread,
-            textBetweenConfig.ruleType,
-            textBetweenConfig.operator,
-            getStyle(textBetweenConfig.style),
-            textBetweenConfig.range,
-            textBetweenConfig.range1
-        );
-        onConfirm && onConfirm(...args);
+    const handleConfirm = () => {
+        const rule = new ConditionRule({
+            _type: 'normalConditionRule',
+            ruleType: textBetweenConfig.ruleType,
+            operator: textBetweenConfig.operator,
+            style: textBetweenConfig.style,
+            value1: textBetweenConfig.range,
+            value2: textBetweenConfig.range1,
+        });
+        onConfirm && onConfirm(rule);
     };
     return (
         <OperationDialog

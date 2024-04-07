@@ -1,41 +1,28 @@
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
-import { addDuplicateFormat } from '@utils/formatterUtil';
 
 import { setDuplicateCompareConfig } from '../../store/conditionStyleSlice';
-import {
-  HLayout,
-  Text,
-  Title,
-  Wrap,
-} from './Components';
-import {
-  getDuplicateOptions,
-  getStyle,
-  getStyleDatas,
-} from './metadata';
+import { HLayout, Text, Title, Wrap } from './Components';
+import { getDuplicateOptions, getStyleDatas } from './metadata';
+import { ConditionRule } from '@toone/report-excel';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
     const options = getStyleDatas();
     const duplicateOpitons = getDuplicateOptions();
-    const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatcher = useDispatch();
     const { duplicateCompareConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
     const handleConfirm = () => {
-        addDuplicateFormat(
-            spread,
-            duplicateCompareConfig.type,
-            getStyle(duplicateCompareConfig.style)
-        );
-        onConfirm && onConfirm();
+        const rule = new ConditionRule({
+            _type: 'normalConditionRule',
+            ruleType: duplicateCompareConfig.type,
+            style: duplicateCompareConfig.style,
+        });
+        onConfirm && onConfirm(rule);
     };
     return (
         <OperationDialog

@@ -1,8 +1,8 @@
 import { isNullOrUndef } from './objectUtil';
 import {
-  applyToSelectedCell,
-  getNamespace,
-  withBatchUpdate,
+    applyToSelectedCell,
+    getNamespace,
+    withBatchUpdate,
 } from './spreadUtil';
 
 /**
@@ -254,231 +254,23 @@ export const setFormatterStyle = function (spread, type) {
     });
 };
 
-const isTextComparison = function (type) {
-    return ['contains'].indexOf(type) != -1;
-};
-
-const getOperator = function (type) {
-    const GC = getNamespace();
-    if (isTextComparison(type)) {
-        return GC.Spread.Sheets.ConditionalFormatting.TextComparisonOperators[
-            type
-        ];
-    }
-    return GC.Spread.Sheets.ConditionalFormatting.ComparisonOperators[type];
-};
-
-const getRuleType = function (ruleType) {
-    const GC = getNamespace();
-    return GC.Spread.Sheets.ConditionalFormatting.RuleType[ruleType];
-};
-
-const addRule = function (
-    spread,
-    ruleType,
-    style,
-    operator,
-    value1,
-    value2,
-    text,
-    formula,
-    type,
-    rank
-) {
+export const clearSelectedRules = function (spread) {
     withBatchUpdate(spread, (sheet) => {
         const selections = sheet.getSelections();
-        const GC = getNamespace();
-        const rule =
-            new GC.Spread.Sheets.ConditionalFormatting.NormalConditionRule(
-                getRuleType(ruleType),
-                selections,
-                style,
-                isNullOrUndef(operator) ? undefined : getOperator(operator),
-                value1,
-                value2,
-                text,
-                formula,
-                type,
-                rank
+        for (let i = 0; i < selections.length; i++) {
+            const { row, col, rowCount, colCount } = selections[i];
+            sheet.conditionalFormats.removeRuleByRange(
+                row,
+                col,
+                rowCount,
+                colCount
             );
-        sheet.conditionalFormats.addRule(rule);
-    });
-};
-
-export const addConditionFormat = function (
-    spread,
-    ruleType,
-    operator,
-    style,
-    value1,
-    value2
-) {
-    let text = undefined;
-    if (isTextComparison(operator)) {
-        text = value1;
-        value1 = undefined;
-    }
-    addRule(spread, ruleType, style, operator, value1, value2, text);
-};
-
-const getDateOccurringType = function (type) {
-    const GC = getNamespace();
-    return GC.Spread.Sheets.ConditionalFormatting.DateOccurringType[type];
-};
-
-export const addDateFormat = function (spread, type, style) {
-    addRule(
-        spread,
-        'dateOccurringRule',
-        style,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        getDateOccurringType(type)
-    );
-};
-
-export const addDuplicateFormat = function (spread, ruleType, style) {
-    addRule(spread, ruleType, style);
-};
-
-const getTop10Type = function (type) {
-    const GC = getNamespace();
-    return GC.Spread.Sheets.ConditionalFormatting.Top10ConditionType[type];
-};
-
-export const addNumberFormat = function (
-    spread,
-    ruleType,
-    style,
-    operator,
-    value
-) {
-    addRule(
-        spread,
-        ruleType,
-        style,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        getTop10Type(operator),
-        value
-    );
-};
-
-const getAverageType = function (type) {
-    const GC = getNamespace();
-    return GC.Spread.Sheets.ConditionalFormatting.AverageConditionType[type];
-};
-
-export const addAverageNumberFormat = function (
-    spread,
-    ruleType,
-    style,
-    operator
-) {
-    addRule(
-        spread,
-        ruleType,
-        style,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        getAverageType(operator)
-    );
-};
-
-export const addDataBarFormat = function (
-    spread,
-    minType,
-    minValue,
-    maxType,
-    maxValue,
-    style,
-    gradient
-) {
-    withBatchUpdate(spread, (sheet) => {
-        const selections = sheet.getSelections();
-        const GC = getNamespace();
-        const rule = new GC.Spread.Sheets.ConditionalFormatting.DataBarRule(
-            GC.Spread.Sheets.ConditionalFormatting.ScaleValueType[minType],
-            minValue,
-            GC.Spread.Sheets.ConditionalFormatting.ScaleValueType[maxType],
-            maxValue,
-            style,
-            selections
-        );
-        rule.gradient(gradient);
-        sheet.conditionalFormats.addRule(rule);
-    });
-};
-
-export const addColorScaleAutoRule = function (
-    spread,
-    ruleType,
-    minType,
-    minColor,
-    midType,
-    midValue,
-    midColor,
-    maxType,
-    maxColor
-) {
-    withBatchUpdate(spread, (sheet) => {
-        const selections = sheet.getSelections();
-        const GC = getNamespace();
-        const rule = new GC.Spread.Sheets.ConditionalFormatting.ScaleRule(
-            GC.Spread.Sheets.ConditionalFormatting.RuleType[ruleType],
-            GC.Spread.Sheets.ConditionalFormatting.ScaleValueType[minType],
-            null,
-            minColor,
-            midType == null
-                ? null
-                : GC.Spread.Sheets.ConditionalFormatting.ScaleValueType[
-                      midType
-                  ],
-            midValue,
-            midColor,
-            GC.Spread.Sheets.ConditionalFormatting.ScaleValueType[maxType],
-            null,
-            maxColor,
-            selections
-        );
-        sheet.conditionalFormats.addRule(rule);
-    });
-};
-
-export const addIconSetAutoRule = function(spread,iconSetType){
-    withBatchUpdate(spread, (sheet) => {
-        const selections = sheet.getSelections();
-        const GC = getNamespace();
-        const rule = new GC.Spread.Sheets.ConditionalFormatting.IconSetRule(
-            GC.Spread.Sheets.ConditionalFormatting.IconSetType[iconSetType],
-            selections
-        );
-        sheet.conditionalFormats.addRule(rule);
-    });
-}
-
-
-export const clearSelectedRules = function(spread){
-    withBatchUpdate(spread, (sheet) => {
-        const selections = sheet.getSelections();
-        for (let i = 0; i < selections.length; i++){
-            const {row,col,rowCount,colCount} = selections[i];
-            sheet.conditionalFormats.removeRuleByRange(row, col, rowCount, colCount);
         }
     });
-}
+};
 
-export const clearSheetRules = function(spread){
+export const clearSheetRules = function (spread) {
     withBatchUpdate(spread, (sheet) => {
         sheet.conditionalFormats.clearRule();
     });
-}
+};

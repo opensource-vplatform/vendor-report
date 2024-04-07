@@ -1,47 +1,29 @@
-import { useState } from 'react';
-
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
-import { addDateFormat } from '@utils/formatterUtil';
 
 import { setDateCompareConfig } from '../../store/conditionStyleSlice';
-import {
-  HLayout,
-  Text,
-  Title,
-  Wrap,
-} from './Components';
-import {
-  getDateOptions,
-  getStyle,
-  getStyleDatas,
-} from './metadata';
+import { HLayout, Text, Title, Wrap } from './Components';
+import { getDateOptions, getStyleDatas } from './metadata';
+import { ConditionRule } from '@toone/report-excel';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
-    const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatcher = useDispatch();
     const { dateCompareConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
     const options = getStyleDatas();
     const dateOptions = getDateOptions();
-    const [data, setData] = useState({
-        date: dateOptions[0].value,
-        style: options[0].value,
-    });
     const handleConfirm = () => {
-        addDateFormat(
-            spread,
-            dateCompareConfig.date,
-            getStyle(dateCompareConfig.style)
-        );
-        onConfirm && onConfirm();
+        const rule = new ConditionRule({
+            _type: 'normalConditionRule',
+            ruleType: 'dateOccurringRule',
+            style: dateCompareConfig.style,
+            type: dateCompareConfig.date,
+        });
+        onConfirm && onConfirm(rule);
     };
     return (
         <OperationDialog

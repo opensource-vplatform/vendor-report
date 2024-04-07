@@ -1,38 +1,28 @@
 import { Fragment } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Menu from '@components/menu/Index';
 import EmptyIcon from '@icons/base/Empty';
 import ClearRulesIcon from '@icons/style/ClearRules';
 import ColorScalesListIcon from '@icons/style/ColorScalesList';
-import ConditionFormatManageRuleIcon
-  from '@icons/style/ConditionFormatManageRule';
+import ConditionFormatManageRuleIcon from '@icons/style/ConditionFormatManageRule';
 import ConditionFormatNewRuleIcon from '@icons/style/ConditionFormatNewRule';
 import DataBarIcon from '@icons/style/DataBar';
 import HighlightCellsRulesIcon from '@icons/style/HighlightCellsRules';
 import IconSetListIcon from '@icons/style/IconSetList';
 import TopBottomRulesIcon from '@icons/style/TopBottomRules';
 import {
-  setDateCompareVisible,
-  setDuplicateCompareVisible,
-  setNumberApplyVisible,
-  setNumberCompareVisible,
-  setShowEditor,
-  setTextBetweenVisible,
-  setTextCompareVisible,
+    setDateCompareVisible,
+    setDuplicateCompareVisible,
+    setNumberApplyVisible,
+    setNumberCompareVisible,
+    setShowEditor,
+    setTextBetweenVisible,
+    setTextCompareVisible,
 } from '@store/conditionStyleSlice';
-import {
-  clearSelectedRules,
-  clearSheetRules,
-} from '@utils/formatterUtil';
-import {
-  isArray,
-  isFunction,
-} from '@utils/objectUtil';
+import { clearSelectedRules, clearSheetRules } from '@utils/formatterUtil';
+import { isArray, isFunction } from '@utils/objectUtil';
 
 import { withBatchUpdate } from '../../utils/spreadUtil';
 import DateCompareDialog from './DateCompareDialog';
@@ -44,17 +34,17 @@ import NumberCompareDialog from './NumberCompareDialog';
 import TextBetweenDialog from './TextBetweenDialog';
 import TextCompareDialog from './TextCompareDialog';
 import {
-  getColorScalesMenu,
-  getDataBarMenu,
-  getHighlightCellsRulesMenu,
-  getIconSetMenu,
-  getTopBottomRulesMenu,
-  toConditionMenuType,
-  toNormalMenu,
+    getColorScalesMenu,
+    getDataBarMenu,
+    getHighlightCellsRulesMenu,
+    getIconSetMenu,
+    getTopBottomRulesMenu,
+    toConditionMenuType,
+    toNormalMenu,
 } from './Utils';
 
 const withHandler = function (menus) {
-    const handler = (menu)=>{
+    const handler = (menu) => {
         const value = menu.value;
         const handler = dispatcher[value];
         if (isFunction(handler)) {
@@ -64,10 +54,10 @@ const withHandler = function (menus) {
         if (isArray(children)) {
             withHandler(children);
         }
-    }
-    if(isArray(menus)){
+    };
+    if (isArray(menus)) {
         menus.forEach((menu) => handler(menu));
-    }else{
+    } else {
         handler(menus);
     }
     return menus;
@@ -129,11 +119,13 @@ const Condition_Menu_Datas = [
         }),
     ]),
     'divider',
-    withHandler(toNormalMenu(
-        'conditionFormatNewRule',
-        '新建规则...',
-        ConditionFormatNewRuleIcon
-    )),
+    withHandler(
+        toNormalMenu(
+            'conditionFormatNewRule',
+            '新建规则...',
+            ConditionFormatNewRuleIcon
+        )
+    ),
     toNormalMenu('clearRules', '清除规则', ClearRulesIcon, [
         toNormalMenu(
             'clearSeletedRules',
@@ -168,7 +160,7 @@ export default function (props) {
     );
     const handleNodeClick = (val, item) => {
         if (isFunction(item.handler)) {
-            item.handler(spread, dispatcher);
+            item.handler(spread, dispatcher, applyRule);
         }
     };
     const closeTextCompareDialog = () => {
@@ -189,47 +181,47 @@ export default function (props) {
     const closeNumberApplyDialog = () => {
         dispatcher(setNumberApplyVisible(false));
     };
-    const closeRuleEditor = ()=>{
+    const closeRuleEditor = () => {
         dispatcher(setShowEditor(false));
-    }
+    };
 
-    const applyRule = (rule)=>{
-        withBatchUpdate(spread,(sheet)=>{
+    const applyRule = (rule) => {
+        withBatchUpdate(spread, (sheet) => {
             const selections = sheet.getSelections();
             rule.bind(sheet);
             rule.applySelections(selections);
         });
-    }
+    };
 
-    const applyTextCompareSetting = (rule)=>{
+    const applyTextCompareSetting = (rule) => {
         applyRule(rule);
         closeTextCompareDialog();
-    }
+    };
 
-    const applyTextBetweenSetting = (rule)=>{
+    const applyTextBetweenSetting = (rule) => {
         applyRule(rule);
         closeTextBetweenDialog();
-    }
+    };
 
-    const applyDateCompareSetting = (rule)=>{
+    const applyDateCompareSetting = (rule) => {
         applyRule(rule);
         closeDateCompareDialog();
-    }
+    };
 
-    const applyDuplicateCompareSetting = (rule)=>{
+    const applyDuplicateCompareSetting = (rule) => {
         applyRule(rule);
         closeDuplicateCompareDialog();
-    }
+    };
 
-    const applyNumberCompareSetting = (rule)=>{
+    const applyNumberCompareSetting = (rule) => {
         applyRule(rule);
         closeNumberCompareDialog();
-    }
+    };
 
-    const applyNumberApplySetting = (rule)=>{
+    const applyNumberApplySetting = (rule) => {
         applyRule(rule);
         closeNumberApplyDialog();
-    }
+    };
     return (
         <Fragment>
             <Menu datas={Condition_Menu_Datas} onNodeClick={handleNodeClick}>
@@ -271,8 +263,12 @@ export default function (props) {
                     onConfirm={applyNumberApplySetting}
                 ></NumberApplyDialog>
             ) : null}
-            {conditionStyle.showEditor ? <RuleEditor onCancel={closeRuleEditor}
-                    onConfirm={closeRuleEditor}></RuleEditor> : null}
+            {conditionStyle.showEditor ? (
+                <RuleEditor
+                    onCancel={closeRuleEditor}
+                    onConfirm={closeRuleEditor}
+                ></RuleEditor>
+            ) : null}
         </Fragment>
     );
 }

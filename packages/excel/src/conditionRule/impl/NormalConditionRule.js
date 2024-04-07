@@ -12,6 +12,7 @@ class NormalConditionRule extends Rule {
         type,
         rank
     ) {
+        super();
         this.ruleType = ruleType;
         this.style = style;
         this.operator = operator;
@@ -29,9 +30,21 @@ class NormalConditionRule extends Rule {
         this.apply([range]);
     }
 
-    applySelections(selections){
+    applySelections(selections) {
         const rule =
-            new GC.Spread.Sheets.ConditionalFormatting.NormalConditionRule();
+            new GC.Spread.Sheets.ConditionalFormatting.NormalConditionRule(
+                this.getRuleType(this.ruleType),
+                selections,
+                this.getStyle(this.style),
+                this.getOperator(this.operator),
+                this.value1,
+                this.value2,
+                this.text,
+                this.formula,
+                this.getType(this.type),
+                this.rank
+            );
+        this.sheet.conditionalFormats.addRule(rule);
     }
 
     toJson() {
