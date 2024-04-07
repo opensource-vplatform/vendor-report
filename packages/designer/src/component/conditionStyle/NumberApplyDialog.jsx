@@ -1,11 +1,13 @@
-import { useState } from 'react';
-
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
 import { addAverageNumberFormat } from '@utils/formatterUtil';
 
+import { setNumberApplyConfig } from '../../store/conditionStyleSlice';
 import {
   HLayout,
   Text,
@@ -18,36 +20,36 @@ import {
 } from './metadata';
 
 export default function (props) {
-    const { title, ruleType, operator, desc, secondary, onCancel, onConfirm } =
-        props;
+    const { onCancel, onConfirm } = props;
     const options = getStyleDatas();
     const { spread } = useSelector(({ appSlice }) => appSlice);
-    const [data, setData] = useState({
-        style: options[0].value,
-    });
+    const dispatcher = useDispatch();
+    const { numberApplyConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
     const handleConfirm = (...args) => {
         addAverageNumberFormat(
             spread,
-            ruleType,
-            getStyle(data.style),
-            operator
+            numberApplyConfig.ruleType,
+            getStyle(numberApplyConfig.style),
+            numberApplyConfig.operator
         );
         onConfirm && onConfirm(...args);
     };
     return (
         <OperationDialog
-            title={title}
+            title={numberApplyConfig.title}
             width='380px'
             onCancel={onCancel}
             anchor={true}
             onConfirm={handleConfirm}
         >
             <Wrap>
-                <Title>{desc}:</Title>
+                <Title>{numberApplyConfig.desc}:</Title>
                 <HLayout style={{ marginTop: 8, alignItems: 'center' }}>
-                    <Text>{secondary}</Text>
+                    <Text>{numberApplyConfig.secondary}</Text>
                     <Select
-                        value={data.style}
+                        value={numberApplyConfig.style}
                         wrapStyle={{
                             flex: 1,
                             backgroundColor: 'white',
@@ -55,7 +57,14 @@ export default function (props) {
                         style={{ height: 30 }}
                         optionStyle={{ backgroundColor: 'white' }}
                         datas={options}
-                        onChange={(style) => setData({ ...data, style })}
+                        onChange={(style) =>
+                            dispatcher(
+                                setNumberApplyConfig({
+                                    ...numberApplyConfig,
+                                    style,
+                                })
+                            )
+                        }
                     ></Select>
                 </HLayout>
             </Wrap>

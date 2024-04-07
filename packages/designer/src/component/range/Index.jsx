@@ -1,3 +1,4 @@
 import Range from './Range';
+import SelectBox from './SelectBox';
 
-export { Range };
+export { Range, SelectBox };

@@ -4,14 +4,22 @@ import {
   useState,
 } from 'react';
 
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
+import { Dialog } from '@components/dialog/Index';
 import ToSettingIcon from '@icons/formula/ToSetting';
 
+import { setVisible } from '../../store/rangeSlice';
+
 const Wrap = styled.div`
-    width: 100%;
     margin-top: 10px;
+    margin-left: 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
 `;
 
 const InputWrap = styled.div`
@@ -47,8 +55,16 @@ const Div = styled.div`
 `;
 
 export default function (props) {
-    const { value, style, onIconClick,onChange, absoluteReference } = props;
     const { spread } = useSelector(({ appSlice }) => appSlice);
+    const {
+        visible,
+        hostId,
+        range,
+        absoluteReference,
+        onCloseHandlerId,
+        onChangeHandlerId,
+    } = useSelector(({ rangeSlice }) => rangeSlice);
+    const dispatcher = useDispatch();
     const hostSheet = spread.getActiveSheet();
     const ref = useRef(null);
     const [state] = useState({ formulaTextBox: null });
@@ -64,8 +80,9 @@ export default function (props) {
                     }
                 );
             formulaTextBox.workbook(spread);
-            formulaTextBox.startSelectMode(value ? `${value}` : '');
+            formulaTextBox.startSelectMode(range ? `${range}` : '');
             state.formulaTextBox = formulaTextBox;
+            ref.current.querySelector('[contenteditable="true"]').focus();
             return () => {
                 formulaTextBox.endSelectMode();
                 formulaTextBox.destroy();
@@ -75,15 +92,38 @@ export default function (props) {
     const handleIconClick = () => {
         spread.setActiveSheet(hostSheet.name());
         const text = state.formulaTextBox.text();
-        onChange && onChange(text);
-        onIconClick && onIconClick(text);
+        const handler = window[onChangeHandlerId];
+        handler && handler(text=='=' ? '':text);
+        dispatcher(setVisible(false));
     };
-    return (
-        <Wrap style={style}>
-            <InputWrap>
-                <Div ref={ref}></Div>
-                <ToSettingIcon onClick={handleIconClick}></ToSettingIcon>
-            </InputWrap>
-        </Wrap>
-    );
+    let wrapStyle = {},
+        title = '';
+    if (hostId) {
+        const el = document.getElementById(hostId);
+        if (el) {
+            const { top, left, width } = el.getBoundingClientRect();
+            wrapStyle = { top, left, width, transform: 'unset' };
+            const dataset = el.dataset;
+            title = dataset.title;
+        }
+    }
+    return visible ? (
+        <Dialog
+            open={true}
+            mask={false}
+            style={wrapStyle}
+            title={title}
+            onClose={() => {
+                const handler = window[onCloseHandlerId];
+                handler && handler();
+            }}
+        >
+            <Wrap>
+                <InputWrap>
+                    <Div ref={ref}></Div>
+                    <ToSettingIcon onClick={handleIconClick}></ToSettingIcon>
+                </InputWrap>
+            </Wrap>
+        </Dialog>
+    ) : null;
 }

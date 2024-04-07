@@ -1,11 +1,15 @@
 import { useState } from 'react';
 
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
 import { addDateFormat } from '@utils/formatterUtil';
 
+import { setDateCompareConfig } from '../../store/conditionStyleSlice';
 import {
   HLayout,
   Text,
@@ -19,8 +23,12 @@ import {
 } from './metadata';
 
 export default function (props) {
-    const { title, desc, onCancel, onConfirm } = props;
+    const { onCancel, onConfirm } = props;
     const { spread } = useSelector(({ appSlice }) => appSlice);
+    const dispatcher = useDispatch();
+    const { dateCompareConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
     const options = getStyleDatas();
     const dateOptions = getDateOptions();
     const [data, setData] = useState({
@@ -28,35 +36,53 @@ export default function (props) {
         style: options[0].value,
     });
     const handleConfirm = () => {
-        addDateFormat(spread, data.date, getStyle(data.style));
+        addDateFormat(
+            spread,
+            dateCompareConfig.date,
+            getStyle(dateCompareConfig.style)
+        );
         onConfirm && onConfirm();
     };
     return (
         <OperationDialog
-            title={title}
+            title={dateCompareConfig.title}
             width='480px'
             onCancel={onCancel}
             onConfirm={handleConfirm}
         >
             <Wrap>
-                <Title>{desc}:</Title>
+                <Title>{dateCompareConfig.desc}:</Title>
                 <HLayout style={{ marginTop: 8, alignItems: 'center' }}>
                     <Select
-                        value={data.date}
+                        value={dateCompareConfig.date}
                         wrapStyle={{ flex: 1, backgroundColor: 'white' }}
                         style={{ height: 30 }}
                         optionStyle={{ backgroundColor: 'white' }}
                         datas={dateOptions}
-                        onChange={(style) => setData({ ...data, style })}
+                        onChange={(date) =>
+                            dispatcher(
+                                setDateCompareConfig({
+                                    ...dateCompareConfig,
+                                    date,
+                                })
+                            )
+                        }
                     ></Select>
                     <Text>设置为</Text>
                     <Select
-                        value={data.style}
+                        value={dateCompareConfig.style}
                         wrapStyle={{ flex: 1, backgroundColor: 'white' }}
                         style={{ height: 30 }}
                         optionStyle={{ backgroundColor: 'white' }}
                         datas={options}
-                        onChange={(style) => setData({ ...data, style })}
+                        onChange={(style) =>
+                            dispatcher(
+                                setDateCompareConfig({
+                                    ...dateCompareConfig,
+                                    style,
+                                })
+                            )
+                        }
                     ></Select>
                 </HLayout>
             </Wrap>

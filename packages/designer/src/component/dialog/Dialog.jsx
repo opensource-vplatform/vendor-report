@@ -10,6 +10,8 @@ import styled from 'styled-components';
 
 import { getNext } from '@utils/zIndexUtil';
 
+import { genUUID } from '../../utils/commonUtil';
+
 const Mask = styled.div`
     z-index: 2000;
     background-color: #aaaaaa;
@@ -26,7 +28,7 @@ const Wrap = styled.div`
     top: 50%;
     left: 50%;
     min-width: 100px;
-    min-height: 100px;
+    min-height: 1px;
     transform: translateX(-50%) translateY(-50%);
     display: flex;
     flex-direction: column;
@@ -91,6 +93,7 @@ function Index(props) {
         height = 'auto',
         open = true,
         mask = true,
+        id = genUUID(),
         closable = true,
         anchor = false,
         style={},
@@ -127,6 +130,8 @@ function Index(props) {
             {mask ? <Mask style={{ zIndex: getNext() }}></Mask> : null}
             <Wrap
                 style={{ zIndex: getNext(), width, height,...style }}
+                id={id}
+                data-title={title}
                 ref={dialogEl}
             >
                 <TitleWrap

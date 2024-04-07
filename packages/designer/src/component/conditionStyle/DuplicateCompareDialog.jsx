@@ -1,11 +1,13 @@
-import { useState } from 'react';
-
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
 import { addDuplicateFormat } from '@utils/formatterUtil';
 
+import { setDuplicateCompareConfig } from '../../store/conditionStyleSlice';
 import {
   HLayout,
   Text,
@@ -19,44 +21,62 @@ import {
 } from './metadata';
 
 export default function (props) {
-    const { title, desc, onCancel, onConfirm } = props;
+    const { onCancel, onConfirm } = props;
     const options = getStyleDatas();
     const duplicateOpitons = getDuplicateOptions();
     const { spread } = useSelector(({ appSlice }) => appSlice);
-    const [data, setData] = useState({
-        type: duplicateOpitons[0].value,
-        style: options[0].value,
-    });
+    const dispatcher = useDispatch();
+    const { duplicateCompareConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
     const handleConfirm = () => {
-        addDuplicateFormat(spread, data.type, getStyle(data.style));
+        addDuplicateFormat(
+            spread,
+            duplicateCompareConfig.type,
+            getStyle(duplicateCompareConfig.style)
+        );
         onConfirm && onConfirm();
     };
     return (
         <OperationDialog
-            title={title}
+            title={duplicateCompareConfig.title}
             width='480px'
             onCancel={onCancel}
             onConfirm={handleConfirm}
         >
             <Wrap>
-                <Title>{desc}:</Title>
+                <Title>{duplicateCompareConfig.desc}:</Title>
                 <HLayout style={{ marginTop: 8, alignItems: 'center' }}>
                     <Select
-                        value={data.type}
+                        value={duplicateCompareConfig.type}
                         wrapStyle={{ flex: 1, backgroundColor: 'white' }}
                         style={{ height: 30 }}
                         optionStyle={{ backgroundColor: 'white' }}
                         datas={duplicateOpitons}
-                        onChange={(type) => setData({ ...data, type })}
+                        onChange={(type) =>
+                            dispatcher(
+                                setDuplicateCompareConfig({
+                                    ...duplicateCompareConfig,
+                                    type,
+                                })
+                            )
+                        }
                     ></Select>
                     <Text>设置为</Text>
                     <Select
-                        value={data.style}
+                        value={duplicateCompareConfig.style}
                         wrapStyle={{ flex: 1, backgroundColor: 'white' }}
                         style={{ height: 30 }}
                         optionStyle={{ backgroundColor: 'white' }}
                         datas={options}
-                        onChange={(style) => setData({ ...data, style })}
+                        onChange={(style) =>
+                            dispatcher(
+                                setDuplicateCompareConfig({
+                                    ...duplicateCompareConfig,
+                                    style,
+                                })
+                            )
+                        }
                     ></Select>
                 </HLayout>
             </Wrap>

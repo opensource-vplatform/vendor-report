@@ -8,6 +8,11 @@ export const appSlice = createSlice({
         waitMsg: null,
         errorMsg: null,
         navStyle: 'normal',
+        rangeSelect: {
+            //范围选择器配置
+            visible: false,
+            range: '',
+        },
     },
     reducers: {
         setSpread(state, action) {
@@ -26,8 +31,17 @@ export const appSlice = createSlice({
         setNavStyle(state, action) {
             state.navStyle = action.payload;
         },
+        setRangeSelect(state, action) {
+            state.rangeSelect = action.payload;
+        },
     },
 });
-export const { setSpread, setMode, setWaitMsg, setErrorMsg, setNavStyle } =
-    appSlice.actions;
+export const {
+    setRangeSelect,
+    setSpread,
+    setMode,
+    setWaitMsg,
+    setErrorMsg,
+    setNavStyle,
+} = appSlice.actions;
 export default appSlice.reducer;

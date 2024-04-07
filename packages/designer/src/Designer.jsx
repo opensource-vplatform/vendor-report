@@ -14,6 +14,7 @@ import CellStyleSetting from '@components/cellStyles/cellStyleSetting';
 import { DraggableDatasources } from '@components/defineDatasource/Index';
 import Error from '@components/error/Index';
 import Loading from '@components/loading/Index';
+import { SelectBox } from '@components/range/Index';
 import {
   Pane,
   Resizer,
@@ -94,7 +95,8 @@ function Designer(props) {
         ({ appSlice }) => appSlice
     );
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
-    const [data] = useState({});
+    const { visible } = useSelector(({rangeSlice})=>rangeSlice);
+    const [data] = useState({}); 
     data.spread = spread;
     data.active = active;
     data.hideCodes = hideCodes;
@@ -167,6 +169,7 @@ function Designer(props) {
                 ) : null}
                 <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
                     <Wrap>
+                        {visible ? <SelectBox></SelectBox>:null}
                         {isShowNav && <Nav></Nav>}
                         <SplitPane
                             style={{

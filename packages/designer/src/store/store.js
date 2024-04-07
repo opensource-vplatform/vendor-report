@@ -3,17 +3,18 @@ import { configureStore } from '@reduxjs/toolkit';
 import appSlice from './appSlice/appSlice';
 import borderSlice from './borderSlice/borderSlice';
 import fontCellSettingSlice from './cellSettingSlice/FontCellSettingSlice';
+import conditionStyleSlice from './conditionStyleSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
 import fontSlice from './fontSlice/fontSlice';
 import formulaEditorSlice from './formulaEditorSlice/formulaEditorSlice';
 import layoutSlice from './layoutSlice/layoutSlice';
 import navSlice from './navSlice/navSlice';
+import rangeSlice from './rangeSlice';
 import workbookSettingSlice from './settingSlice/workbookSettingSlice';
 import worksheetSettingSlice from './settingSlice/worksheetSettingSlice';
 import tableDesignSlice from './tableDesignSlice/tableDesignSlice';
 import viewSlice from './viewSlice/viewSlice';
 import wizardSlice from './wizardSlice';
-import conditionStyleSlice from './conditionStyleSlice';
 
 //不可序列化的值存储在redux中控制台会报错，需添加忽略动作和路径
 const serializableCheck = {
@@ -51,6 +52,7 @@ export default configureStore({
         wizardSlice,
         layoutSlice,
         conditionStyleSlice,
+        rangeSlice,
     },
     middleware: function (getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });

@@ -1,3 +1,4 @@
+import { ConditionRule } from './conditionRule/Index';
 import Report from './Report';
 import {
   genAutoMergeRangeInfos,
@@ -9,6 +10,7 @@ import Workbook from './Workbook';
 import Worksheet from './Worksheet';
 
 export {
+  ConditionRule,
   genAutoMergeRangeInfos,
   genSpans,
   Report,

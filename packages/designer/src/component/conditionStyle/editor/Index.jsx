@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { List } from '@components/list/Index';
 
+import { setEditorType } from '../../../store/conditionStyleSlice';
 import {
   Title,
   Wrap,
@@ -17,11 +21,13 @@ import UseFormula from './useFormula/Index';
 import UseRowColumnStates from './useRowColumnStates/Index';
 
 export default function (props) {
-    const { type, onConfirm, onCancel } = props;
+    const { onConfirm, onCancel } = props;
+    const { editorType } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
+    const dispatcher = useDispatch();
     const formatTypes = getFormatTypes();
-    const [data, setData] = useState(() => {
-        return { type: type ? type : formatTypes[0].value };
-    });
+    const type = editorType ? editorType : formatTypes[0].value;
     return (
         <OperationDialog
             onConfirm={onConfirm}
@@ -31,32 +37,28 @@ export default function (props) {
             <Wrap>
                 <Title>选择规则类型：</Title>
                 <List
-                    selectedValue={data.type}
+                    selectedValue={type}
                     datas={formatTypes}
                     style={{ backgroundColor: 'white' }}
-                    onChange={(val) =>
-                        setData((data) => {
-                            return { ...data, type: val };
-                        })
-                    }
+                    onChange={(val) => dispatcher(setEditorType(val))}
                 ></List>
-                {data.type == 'formatAbove' ? (
+                {editorType == 'formatAbove' ? (
                     <FormatAbove></FormatAbove>
                 ) : null}
-                {data.type == 'formatContain' ? (
+                {editorType == 'formatContain' ? (
                     <FormatContain></FormatContain>
                 ) : null}
-                {data.type == 'formatOnValue' ? (
+                {editorType == 'formatOnValue' ? (
                     <FormatOnValue></FormatOnValue>
                 ) : null}
-                {data.type == 'formatRankedValue' ? (
+                {editorType == 'formatRankedValue' ? (
                     <FormatRankedValue></FormatRankedValue>
                 ) : null}
-                {data.type == 'formatUnique' ? (
+                {editorType == 'formatUnique' ? (
                     <FormatUnique></FormatUnique>
                 ) : null}
-                {data.type == 'useFormula' ? <UseFormula></UseFormula> : null}
-                {data.type == 'useRowColumnStates' ? (
+                {editorType == 'useFormula' ? <UseFormula></UseFormula> : null}
+                {editorType == 'useRowColumnStates' ? (
                     <UseRowColumnStates></UseRowColumnStates>
                 ) : null}
             </Wrap>

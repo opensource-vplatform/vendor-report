@@ -3,7 +3,7 @@ import Menu from '@components/menu/Index';
 import Popper from '@components/popper/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
 
-const Icon = function (props) {
+export const Icon = function (props) {
     const { title, icon: Icon } = props;
     return (
         <VItem
