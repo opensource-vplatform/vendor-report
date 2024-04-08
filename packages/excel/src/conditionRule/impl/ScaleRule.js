@@ -1,5 +1,5 @@
-import Rule from './Rule';
 import { getNamespace } from '../../utils/spreadUtil';
+import Rule from './Rule';
 
 class ScaleRule extends Rule {
     constructor(
@@ -90,8 +90,7 @@ ScaleRule.fromJson = function (json) {
         midColor,
         maxType,
         maxValue,
-        maxColor
-    1);
+        maxColor);
 };
 
 export default ScaleRule;
