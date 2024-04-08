@@ -1,8 +1,12 @@
-import { useEffect, useRef } from 'react';
+import {
+  useEffect,
+  useRef,
+} from 'react';
 
 import styled from 'styled-components';
 
 import ToRangeIcon from '@icons/formula/ToRange';
+import { isNullOrUndef } from '@utils/objectUtil';
 
 const InputArea = styled.div`
     margin-top: 4px;
@@ -75,7 +79,7 @@ export default function (props) {
                     onFocus={onFocus}
                     onChange={handleChange}
                     disabled={disabled}
-                    value={value}
+                    value={isNullOrUndef(value) ? '':value}
                 ></Input>
                 <ToRangeIcon
                     style={{ margin: 0 }}

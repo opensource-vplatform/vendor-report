@@ -1,21 +1,23 @@
 import {
-    setDateCompareConfig,
-    setDateCompareVisible,
-    setDuplicateCompareConfig,
-    setDuplicateCompareVisible,
-    setEditorType,
-    setNumberApplyConfig,
-    setNumberApplyVisible,
-    setNumberCompareConfig,
-    setNumberCompareVisible,
-    setShowEditor,
-    setStyleType,
-    setTextBetweenConfig,
-    setTextBetweenVisible,
-    setTextCompareConfig,
-    setTextCompareVisible,
-} from '../../store/conditionStyleSlice';
+  setDateCompareConfig,
+  setDateCompareVisible,
+  setDuplicateCompareConfig,
+  setDuplicateCompareVisible,
+  setEditorType,
+  setNumberApplyConfig,
+  setNumberApplyVisible,
+  setNumberCompareConfig,
+  setNumberCompareVisible,
+  setRuleType,
+  setShowEditor,
+  setTextBetweenConfig,
+  setTextBetweenVisible,
+  setTextCompareConfig,
+  setTextCompareVisible,
+} from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
+
+import { setEditorConfig } from '../../store/conditionStyleSlice';
 
 const dispatcher = {
     highlightCellsRulesGreaterThan: (spread, dispatcher) => {
@@ -628,22 +630,35 @@ const dispatcher = {
     },
     dataBarMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
-        dispatcher(setStyleType('dataBar'));
+        dispatcher(setRuleType('dataBar'));
         dispatcher(setShowEditor(true));
     },
     colorScalesListMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
-        dispatcher(setStyleType('colorScale2'));
+        dispatcher(setRuleType('twoScaleRule'));
         dispatcher(setShowEditor(true));
     },
     iconSetListMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
-        dispatcher(setStyleType('iconSets'));
+        dispatcher(setRuleType('iconSets'));
         dispatcher(setShowEditor(true));
     },
     conditionFormatNewRule: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
-        dispatcher(setStyleType('colorScale2'));
+        dispatcher(setRuleType('twoScaleRule'));
+        dispatcher(setEditorConfig({
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minValue: null,
+            minColor:'rgb(255,0,0)',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxValue: null,
+            maxColor:'rgb(0,136,0)'
+        }));
         dispatcher(setShowEditor(true));
     },
 };

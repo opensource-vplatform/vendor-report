@@ -6,8 +6,9 @@ import {
 } from 'react-redux';
 
 import { Select } from '@components/form/Index';
-import { setStyleType } from '@store/conditionStyleSlice';
+import { setRuleType } from '@store/conditionStyleSlice';
 
+import { setEditorConfig } from '../../../../store/conditionStyleSlice';
 import {
   Border,
   HLayout,
@@ -24,14 +25,20 @@ import {
   itemStyle,
   selectStyle,
   titleStyle,
+  toDefaultEditorConfig,
 } from './Utils';
 
+/**
+ * 基于各自值设置所有单元格的格式
+ * @param {*} props
+ * @returns
+ */
 export default function (props) {
+    const {hostId} = props;
     const styleOptions = getStyleOptions();
-    const { styleType } = useSelector(
+    const { ruleType } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
-    const type = styleType ? styleType : styleOptions[0].value;
     const dispatcher = useDispatch();
     return (
         <Fragment>
@@ -42,16 +49,29 @@ export default function (props) {
                     <HLayout style={itemStyle}>
                         <Text style={titleStyle}>格式样式：</Text>
                         <Select
-                            value={type}
+                            value={ruleType}
                             datas={styleOptions}
                             style={{ ...selectStyle, width: 140 }}
-                            onChange={(val) => dispatcher(setStyleType(val))}
+                            onChange={(val) => {
+                                {
+                                    dispatcher(
+                                        setEditorConfig(
+                                            toDefaultEditorConfig(val)
+                                        )
+                                    );
+                                    dispatcher(setRuleType(val));
+                                }
+                            }}
                         ></Select>
                     </HLayout>
-                    {type == 'colorScale2' ? <ColorScale2></ColorScale2> : null}
-                    {type == 'colorScale3' ? <ColorScale3></ColorScale3> : null}
-                    {type == 'dataBar' ? <DataBar></DataBar> : null}
-                    {type == 'iconSets' ? <IconSets></IconSets> : null}
+                    {ruleType == 'twoScaleRule' ? (
+                        <ColorScale2 hostId={hostId}></ColorScale2>
+                    ) : null}
+                    {ruleType == 'threeScaleRule' ? (
+                        <ColorScale3 hostId={hostId}></ColorScale3>
+                    ) : null}
+                    {ruleType == 'dataBarRule' ? <DataBar hostId={hostId}></DataBar> : null}
+                    {ruleType == 'iconSetRule' ? <IconSets hostId={hostId}></IconSets> : null}
                 </VLayout>
             </Border>
         </Fragment>

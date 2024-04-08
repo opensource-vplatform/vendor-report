@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   useDispatch,
   useSelector,
@@ -5,6 +7,7 @@ import {
 
 import { OperationDialog } from '@components/dialog/Index';
 import { List } from '@components/list/Index';
+import { genUUID } from '@utils/commonUtil';
 
 import { setEditorType } from '../../../store/conditionStyleSlice';
 import {
@@ -27,39 +30,45 @@ export default function (props) {
     );
     const dispatcher = useDispatch();
     const formatTypes = getFormatTypes();
-    const type = editorType ? editorType : formatTypes[0].value;
+    const [data] = useState(()=>{
+        return {
+            id: genUUID()
+        }
+    })
     return (
         <OperationDialog
             onConfirm={onConfirm}
             onCancel={onCancel}
+            title="新增规则"
+            id={data.id}
             style={{ minWidth: 480 }}
         >
             <Wrap>
                 <Title>选择规则类型：</Title>
                 <List
-                    selectedValue={type}
+                    selectedValue={editorType}
                     datas={formatTypes}
                     style={{ backgroundColor: 'white' }}
                     onChange={(val) => dispatcher(setEditorType(val))}
                 ></List>
                 {editorType == 'formatAbove' ? (
-                    <FormatAbove></FormatAbove>
+                    <FormatAbove hostId={data.id}></FormatAbove>
                 ) : null}
                 {editorType == 'formatContain' ? (
-                    <FormatContain></FormatContain>
+                    <FormatContain hostId={data.id}></FormatContain>
                 ) : null}
                 {editorType == 'formatOnValue' ? (
-                    <FormatOnValue></FormatOnValue>
+                    <FormatOnValue hostId={data.id}></FormatOnValue>
                 ) : null}
                 {editorType == 'formatRankedValue' ? (
-                    <FormatRankedValue></FormatRankedValue>
+                    <FormatRankedValue hostId={data.id}></FormatRankedValue>
                 ) : null}
                 {editorType == 'formatUnique' ? (
-                    <FormatUnique></FormatUnique>
+                    <FormatUnique hostId={data.id}></FormatUnique>
                 ) : null}
-                {editorType == 'useFormula' ? <UseFormula></UseFormula> : null}
+                {editorType == 'useFormula' ? <UseFormula hostId={data.id}></UseFormula> : null}
                 {editorType == 'useRowColumnStates' ? (
-                    <UseRowColumnStates></UseRowColumnStates>
+                    <UseRowColumnStates hostId={data.id}></UseRowColumnStates>
                 ) : null}
             </Wrap>
         </OperationDialog>

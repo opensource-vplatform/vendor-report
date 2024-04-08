@@ -1,4 +1,7 @@
-import { useEffect, useRef } from 'react';
+import {
+  useEffect,
+  useRef,
+} from 'react';
 
 import styled from 'styled-components';
 
@@ -165,54 +168,48 @@ const PreviewDiv = styled.div`
 
 export const Preview = function (props) {
     const {
-        borderType = 'noBorder',
-        fillType = 'solidFill',
-        fillColor,
+        showBorder = false,
+        gradient = false,
+        color,
         borderColor,
-        direction = 'l2r',
+        direction = 'leftToRight',
     } = props;
     const ref = useRef(null);
     const containRef = useRef(null);
     useEffect(() => {
         if (ref.current && containRef.current) {
-            if (fillType == 'gradientFill') {
+            if (gradient) {
                 (ref.current.style.backgroundImage =
-                    'linear-gradient(to right, ' + fillColor + ', white)'),
+                    'linear-gradient(to right, ' + color + ', white)'),
                     (ref.current.style.backgroundImage =
-                        '-o-linear-gradient(to right, ' +
-                        fillColor +
-                        ', white)'),
+                        '-o-linear-gradient(to right, ' + color + ', white)'),
                     (ref.current.style.backgroundImage =
-                        '-moz-linear-gradient(to right, ' +
-                        fillColor +
-                        ', white)'),
+                        '-moz-linear-gradient(to right, ' + color + ', white)'),
                     (ref.current.style.backgroundImage =
                         '-webkit-linear-gradient(to right, ' +
-                        fillColor +
+                        color +
                         ', white)'),
                     (ref.current.style.backgroundImage =
-                        '-ms-linear-gradient(to right, ' +
-                        fillColor +
-                        ', white)'),
+                        '-ms-linear-gradient(to right, ' + color + ', white)'),
                     (ref.current.style.backgroundImage =
                         '-webkit-gradient(linear, left top, right top, color-stop(0, white),  color-stop(1, ' +
-                        fillColor +
+                        color +
                         '))');
-            } else if (fillType == 'solidFill') {
-                ref.current.style.background = fillColor;
+            } else {
+                ref.current.style.background = color;
             }
-            if (borderType == 'solidBorder') {
+            if (showBorder) {
                 ref.current.style.border = '1px solid ' + borderColor || 0;
-            } else if (borderType == 'noBorder') {
+            } else {
                 ref.current.style.border = '1px solid white';
             }
-            if (direction == 'l2r') {
+            if (direction == 'leftToRight') {
                 containRef.current.setAttribute('align', 'left');
-            } else if (direction == 'r2l') {
+            } else if (direction == 'rightToLeft') {
                 containRef.current.setAttribute('align', 'right');
             }
         }
-    }, [borderType, fillType, fillColor, borderColor, direction]);
+    }, [showBorder, gradient, color, borderColor, direction]);
     return (
         <PreviewWrap ref={containRef}>
             <PreviewDiv ref={ref}></PreviewDiv>

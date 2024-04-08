@@ -1,6 +1,6 @@
+import { isNullOrUndef } from '../../utils/objectUtils';
 import { getNamespace } from '../../utils/spreadUtil';
 import { getStyle } from '../utils';
-import { isNullOrUndef } from '../../utils/objectUtils';
 
 class Rule {
     bind(sheet) {
@@ -10,6 +10,16 @@ class Rule {
     apply(row, rowCount, col, colCount) {}
 
     applySelections(selections) {}
+
+    getBarDirection(direction){
+        const GC = getNamespace();
+        return GC.Spread.Sheets.ConditionalFormatting.BarDirection[direction];
+    }
+
+    getDataBarAxisPosition(position){
+        const GC = getNamespace();
+        return GC.Spread.Sheets.ConditionalFormatting.DataBarAxisPosition[position];
+    }
 
     getRuleType(ruleType) {
         const GC = getNamespace();

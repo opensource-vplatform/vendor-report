@@ -3,11 +3,26 @@ import { createSlice } from '@reduxjs/toolkit';
 export const conditionStyleSlice = createSlice({
     name: 'layoutSlice',
     initialState: {
-        ruleType: '',
+        //是否显示新增规则
         showEditor: false,
-        editorType: '',
-        styleType: '',
-        editorConfig: false,
+        //新增规则配置
+        editorConfig:{
+            _type: 'scaleRule',
+            ruleType: 'twoScaleRule',
+            minType: 'lowestValue',
+            minValue: null,
+            minColor:'rgb(255,0,0)',
+            midType: null,
+            midValue: null,
+            midColor: null,
+            maxType: 'highestValue',
+            maxValue: null,
+            maxColor:'rgb(0,136,0)'
+        },
+        //新增规则类型
+        editorType: 'formatOnValue',
+        //新增规则格式样式
+        ruleType: '',
         textCompareVisible: false,
         textCompareConfig: {
             title: '',
@@ -55,17 +70,14 @@ export const conditionStyleSlice = createSlice({
         duplicateCompareConfig: { title: '', desc: '' },
     },
     reducers: {
-        setRuleType(state, { payload }) {
-            state.ruleType = payload;
-        },
         setShowEditor(state, { payload }) {
             state.showEditor = payload;
         },
         setEditorType(state, { payload }) {
             state.editorType = payload;
         },
-        setStyleType(state, { payload }) {
-            state.styleType = payload;
+        setRuleType(state, { payload }) {
+            state.ruleType = payload;
         },
         setEditorConfig(state, { payload }) {
             state.editorConfig = payload;
@@ -109,7 +121,7 @@ export const conditionStyleSlice = createSlice({
     },
 });
 export const {
-    setStyleType,
+    setRuleType,
     setEditorType,
     setEditorConfig,
     setTextCompareConfig,
@@ -124,7 +136,6 @@ export const {
     setTextCompareVisible,
     setTextBetweenVisible,
     setTextBetweenConfig,
-    setRuleType,
     setShowEditor,
 } = conditionStyleSlice.actions;
 export default conditionStyleSlice.reducer;

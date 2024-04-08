@@ -1,22 +1,41 @@
-import { Fragment, useState } from 'react';
-
-import { Button, CheckBox, ColorPicker, Select } from '@components/form/Index';
-import { Range } from '@components/range/Index';
-
-import { HLayout, Preview, Text } from '../../Components';
 import {
-    getMaxTypeOptions,
-    getMinTypeOptions,
-    Item,
-    itemStyle,
-    selectStyle,
-    titleStyle,
-    toDefaultValue,
+  Fragment,
+  useState,
+} from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
+import {
+  Button,
+  CheckBox,
+  ColorPicker,
+  Select,
+} from '@components/form/Index';
+import { Range } from '@components/range/Index';
+import { setEditorConfig } from '@store/conditionStyleSlice';
+
+import { setShowEditor } from '../../../../store/conditionStyleSlice';
+import {
+  HLayout,
+  Preview,
+  Text,
+} from '../../Components';
+import {
+  getMaxTypeOptions,
+  getMinTypeOptions,
+  Item,
+  itemStyle,
+  selectStyle,
+  titleStyle,
+  toDefaultValue,
 } from './Utils';
-import { OperationDialog } from '@components/dialog/Index';
 import ValueAxisSetting from './ValueAxisSetting';
 
-const Auto_Option = { value: '5', text: '自动' };
+const Min_Auto_Option = { value: 'automin', text: '自动' };
+const Max_Auto_Option = { value: 'automax', text: '自动' };
 
 const Fill_Options = [
     { value: 'solidFill', text: '实心填充' },
@@ -29,40 +48,33 @@ const Border_Options = [
 ];
 
 const Direction_Options = [
-    { value: 'l2r', text: '从左到右' },
-    { value: 'r2l', text: '从右到左' },
+    { value: 'leftToRight', text: '从左到右' },
+    { value: 'rightToLeft', text: '从右到左' },
 ];
 
-export default function () {
-    const minTypeOptions = [...getMinTypeOptions(), Auto_Option];
-    const maxTypeOptions = [...getMaxTypeOptions(), Auto_Option];
-    const [data, setData] = useState(() => {
-        const minTypeVal = minTypeOptions[minTypeOptions.length - 1].value;
-        const maxTypeVal = maxTypeOptions[minTypeOptions.length - 1].value;
-        return {
-            minTypeVal,
-            maxTypeVal,
-            minVal: toDefaultValue(minTypeVal),
-            maxVal: toDefaultValue(maxTypeVal),
-            onlyDataBar: false,
-            fillType: Fill_Options[0].value,
-            fillColor: 'rgb(99, 142, 198)',
-            borderType: Border_Options[0].value,
-            borderColor: 'rgb(0, 0, 0)',
-            direction: Direction_Options[0].value,
-            showDialog: false,
-        };
-    });
+export default function (props) {
+    const {hostId} = props;
+    const minTypeOptions = [...getMinTypeOptions(), Min_Auto_Option];
+    const maxTypeOptions = [...getMaxTypeOptions(), Max_Auto_Option];
+    const { editorConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
+    const dispatcher = useDispatch();
+    const [dialogVisible,setDialogVisible] = useState(false);
+    useState();
     return (
         <Fragment>
             <HLayout>
                 <CheckBox
                     title='仅显示数据条'
-                    value={data.onlyDataBar}
+                    value={editorConfig.showBarOnly}
                     onChange={(val) =>
-                        setData((data) => {
-                            return { ...data, onlyDataBar: val };
-                        })
+                        dispatcher(
+                            setEditorConfig({
+                                ...editorConfig,
+                                showBarOnly: val,
+                            })
+                        )
                     }
                 ></CheckBox>
             </HLayout>
@@ -79,29 +91,33 @@ export default function () {
                 <Text style={titleStyle}>类型：</Text>
                 <Item>
                     <Select
-                        value={data.minTypeVal}
+                        value={editorConfig.minType}
                         style={selectStyle}
                         datas={minTypeOptions}
                         onChange={(val) =>
-                            setData({
-                                ...data,
-                                minVal: toDefaultValue(val),
-                                minTypeVal: val,
-                            })
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    minValue: toDefaultValue(val, 'min'),
+                                    minType: val,
+                                })
+                            )
                         }
                     ></Select>
                 </Item>
                 <Item>
                     <Select
-                        value={data.maxTypeVal}
+                        value={editorConfig.maxType}
                         style={selectStyle}
                         datas={maxTypeOptions}
                         onChange={(val) =>
-                            setData({
-                                ...data,
-                                maxVal: toDefaultValue(val),
-                                maxTypeVal: val,
-                            })
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    maxValue: toDefaultValue(val, 'max'),
+                                    maxType: val,
+                                })
+                            )
                         }
                     ></Select>
                 </Item>
@@ -110,18 +126,54 @@ export default function () {
                 <Text style={titleStyle}>值：</Text>
                 <Item>
                     <Range
-                        value={data.minVal}
+                        value={
+                            editorConfig.minType == 'automin'
+                                ? '(自动)'
+                                : editorConfig.minType == 'lowestValue'
+                                  ? '(最低值)'
+                                  : editorConfig.minValue
+                        }
                         disabled={
-                            data.minTypeVal == '1' || data.minTypeVal == '5'
+                            editorConfig.minType == 'lowestValue' ||
+                            editorConfig.minType == 'automin'
                         }
                         style={selectStyle}
+                        hostId={hostId}
+                        onStartSelect={()=>dispatcher(setShowEditor(false))}
+                        onEndSelect={()=>dispatcher(setShowEditor(true))}
+                        onChange={(val) =>
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    minValue: val,
+                                })
+                            )
+                        }
                     ></Range>
                 </Item>
                 <Item>
                     <Range
-                        value={data.maxVal}
+                        value={
+                            editorConfig.maxType == 'highestValue'
+                                ? '(最高值)'
+                                : editorConfig.maxType == 'automax'
+                                  ? '(自动)'
+                                  : editorConfig.maxValue
+                        }
                         disabled={
-                            data.maxTypeVal == '2' || data.minTypeVal == '5'
+                            editorConfig.maxType == 'highestValue' ||
+                            editorConfig.maxType == 'automax'
+                        }
+                        hostId={hostId}
+                        onStartSelect={()=>dispatcher(setShowEditor(false))}
+                        onEndSelect={()=>dispatcher(setShowEditor(true))}
+                        onChange={(val) =>
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    maxValue: val,
+                                })
+                            )
                         }
                         style={selectStyle}
                     ></Range>
@@ -147,45 +199,66 @@ export default function () {
             <HLayout style={{ ...itemStyle, marginLeft: 8 }}>
                 <Item>
                     <Select
-                        value={data.fillType}
+                        value={
+                            editorConfig.gradient ? 'gradientFill' : 'solidFill'
+                        }
                         style={selectStyle}
                         datas={Fill_Options}
                         onChange={(val) =>
-                            setData({
-                                ...data,
-                                fillType: val,
-                            })
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    gradient: val == 'gradientFill',
+                                })
+                            )
                         }
                     ></Select>
                 </Item>
                 <Item>
                     <ColorPicker
-                        value={data.fillColor}
+                        value={editorConfig.color}
                         style={selectStyle}
                         panelStyle={{ width: '188px', marginLeft: 5 }}
-                        onChange={(val) => setData({ ...data, fillColor: val })}
+                        onChange={(val) =>
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    color: val,
+                                })
+                            )
+                        }
                     ></ColorPicker>
                 </Item>
                 <Item>
                     <Select
-                        value={data.borderType}
+                        value={
+                            editorConfig.showBorder ? 'solidBorder' : 'noBorder'
+                        }
                         style={selectStyle}
                         datas={Border_Options}
                         onChange={(val) =>
-                            setData({
-                                ...data,
-                                borderType: val,
-                            })
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    showBorder: val == 'solidBorder',
+                                })
+                            )
                         }
                     ></Select>
                 </Item>
                 <Item>
                     <ColorPicker
-                        value={data.borderColor}
+                        value={editorConfig.borderColor}
                         style={selectStyle}
                         panelStyle={{ width: '188px', marginLeft: 5 }}
+                        disabled={!editorConfig.showBorder}
                         onChange={(val) =>
-                            setData({ ...data, borderColor: val })
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    borderColor: val,
+                                })
+                            )
                         }
                     ></ColorPicker>
                 </Item>
@@ -194,11 +267,7 @@ export default function () {
                 <Item>
                     <Button
                         style={{ height: 30 }}
-                        onClick={() => {
-                            setData((data) => {
-                                return { ...data, showDialog: true };
-                            });
-                        }}
+                        onClick={() => setDialogVisible(true)}
                     >
                         负值和坐标轴...
                     </Button>
@@ -207,13 +276,13 @@ export default function () {
                     <HLayout style={itemStyle}>
                         <Text style={titleStyle}>图形方向：</Text>
                         <Select
-                            value={data.direction}
+                            value={editorConfig.dataBarDirection}
                             wrapStyle={{ ...selectStyle, flex: 1 }}
                             datas={Direction_Options}
-                            onChange={(val) =>
-                                setData((data) => {
-                                    return { ...data, direction: val };
-                                })
+                            onChange={(val) => dispatcher(setEditorConfig({
+                                ...editorConfig,
+                                dataBarDirection:val
+                            }))
                             }
                         ></Select>
                     </HLayout>
@@ -225,33 +294,19 @@ export default function () {
                     <HLayout style={itemStyle}>
                         <Text style={titleStyle}>预览：</Text>
                         <Preview
-                            fillType={data.fillType}
-                            fillColor={data.fillColor}
-                            borderType={data.borderType}
-                            borderColor={data.borderColor}
-                            direction={data.direction}
+                            gradient={editorConfig.gradient}
+                            color={editorConfig.color}
+                            showBorder={editorConfig.showBorder}
+                            borderColor={editorConfig.borderColor}
+                            direction={editorConfig.dataBarDirection}
                         ></Preview>
                     </HLayout>
                 </Item>
             </HLayout>
-            {data.showDialog ? (
+            {dialogVisible ? (
                 <ValueAxisSetting
-                    onConfirm={() => {
-                        setData((data) => {
-                            return {
-                                ...data,
-                                showDialog: false,
-                            };
-                        });
-                    }}
-                    onCancel={() => {
-                        setData((data) => {
-                            return {
-                                ...data,
-                                showDialog: false,
-                            };
-                        });
-                    }}
+                    onConfirm={() => setDialogVisible(false)}
+                    onCancel={() => setDialogVisible(false)}
                 ></ValueAxisSetting>
             ) : null}
         </Fragment>

@@ -32,7 +32,7 @@ const Label = styled.span`
 const Context = createContext(null);
 
 export const Radio = function (props) {
-    const { label, value, desc = '', children } = props;
+    const { label, value, desc = '', children, style={} } = props;
     return (
         <Context.Consumer>
             {(ctx) => {
@@ -42,6 +42,7 @@ export const Radio = function (props) {
                         data-disabled={ctx.disabled}
                         title={desc}
                         data-direction={ctx.direction}
+                        style={style}
                         onClick={() =>
                             !ctx.disabled && !checked && ctx.onChange(value)
                         }
@@ -49,6 +50,7 @@ export const Radio = function (props) {
                         {checked ? (
                             <CheckedRadio
                                 style={{ color: '#0075ff' }}
+                                disabled={ctx.disabled}
                             ></CheckedRadio>
                         ) : (
                             <UnCheckRadio></UnCheckRadio>

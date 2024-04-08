@@ -12,8 +12,11 @@ const FontColorSelector = styled.div`
     cursor: pointer;
     overflow: hidden;
     box-sizing: border-box;
-    &:hover {
+    &[data-disabled='false']:hover {
         border: solid 1px #5292f7;
+    }
+    &[data-disabled='true'] {
+        cursor: not-allowed;
     }
 `;
 const FontColorPreView = styled.div`
@@ -31,8 +34,8 @@ export default function (props) {
         style = {},
     } = props;
     return (
-        <ColorEditor style={panelStyle} onChange={onChange} value={value}>
-            <FontColorSelector style={style}>
+        <ColorEditor style={panelStyle} onChange={onChange} value={value} disabled={disabled}>
+            <FontColorSelector style={style} data-disabled={disabled}>
                 <FontColorPreView
                     style={{
                         ...style,

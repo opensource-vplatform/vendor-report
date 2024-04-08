@@ -1,7 +1,24 @@
 import Rule from './Rule';
 
 class DataBarRule extends Rule {
-    constructor(minType, minValue, maxType, maxValue, color, gradient) {
+    constructor(
+        minType,
+        minValue,
+        maxType,
+        maxValue,
+        color,
+        gradient,
+        borderColor,
+        showBarOnly,
+        showBorder,
+        dataBarDirection,
+        useNegativeFillColor,
+        negativeFillColor,
+        useNegativeBorderColor,
+        negativeBorderColor,
+        axisColor,
+        axisPosition
+    ) {
         super();
         this.minType = minType;
         this.minValue = minValue;
@@ -9,6 +26,16 @@ class DataBarRule extends Rule {
         this.maxValue = maxValue;
         this.color = color;
         this.gradient = gradient;
+        this.borderColor = borderColor;
+        this.showBarOnly = showBarOnly;
+        this.showBorder = showBorder;
+        this.dataBarDirection = dataBarDirection;
+        this.useNegativeFillColor = useNegativeFillColor;
+        this.negativeFillColor = negativeFillColor;
+        this.useNegativeBorderColor = useNegativeBorderColor;
+        this.negativeBorderColor = negativeBorderColor;
+        this.axisColor = axisColor;
+        this.axisPosition = axisPosition;
     }
 
     apply(row, rowCount, col, colCount) {
@@ -27,6 +54,15 @@ class DataBarRule extends Rule {
             selections
         );
         rule.gradient(this.gradient);
+        rule.showBarOnly(this.showBarOnly);
+        rule.showBorder(this.showBorder);
+        rule.dataBarDirection(this.getBarDirection(this.dataBarDirection));
+        rule.useNegativeFillColor(this.useNegativeFillColor);
+        rule.negativeFillColor(this.negativeFillColor);
+        rule.useNegativeBorderColor(this.useNegativeBorderColor);
+        rule.negativeBorderColor(this.negativeBorderColor);
+        rule.axisColor(this.axisColor);
+        rule.axisPosition(this.getDataBarAxisPosition(this.axisPosition));
         this.sheet.conditionalFormats.addRule(rule);
     }
 
@@ -39,19 +75,56 @@ class DataBarRule extends Rule {
             maxValue: this.maxValue,
             color: this.color,
             gradient: this.gradient,
+            borderColor: this.borderColor,
+            showBarOnly: this.showBarOnly,
+            showBorder: this.showBorder,
+            dataBarDirection: this.dataBarDirection,
+            useNegativeFillColor: this.useNegativeFillColor,
+            negativeFillColor: this.negativeFillColor,
+            useNegativeBorderColor: this.useNegativeBorderColor,
+            negativeBorderColor: this.negativeBorderColor,
+            axisColor: this.axisColor,
+            axisPosition: this.axisPosition,
         };
     }
 }
 
 DataBarRule.fromJson = function (json) {
-    const { minType, minValue, maxType, maxValue, color, gradient } = json;
+    const {
+        minType,
+        minValue,
+        maxType,
+        maxValue,
+        color,
+        gradient,
+        borderColor,
+        showBarOnly,
+        showBorder,
+        dataBarDirection,
+        useNegativeFillColor,
+        negativeFillColor,
+        useNegativeBorderColor,
+        negativeBorderColor,
+        axisColor,
+        axisPosition,
+    } = json;
     return new DataBarRule(
         minType,
         minValue,
         maxType,
         maxValue,
         color,
-        gradient
+        gradient,
+        borderColor,
+        showBarOnly,
+        showBorder,
+        dataBarDirection,
+        useNegativeFillColor,
+        negativeFillColor,
+        useNegativeBorderColor,
+        negativeBorderColor,
+        axisColor,
+        axisPosition
     );
 };
 

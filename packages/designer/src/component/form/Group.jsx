@@ -5,6 +5,9 @@ const Wrap = styled.div`
     flex-direction: column;
     margin: '18px 4px 8px 4px';
     border: 1px solid #dadada;
+    &[data-disabled='true'] {
+        opacity: 0.6;
+    }
 `;
 
 const Title = styled.span`
@@ -18,9 +21,15 @@ const Title = styled.span`
 `;
 
 export const Group = function (props) {
-    const { style = {}, title = '', children, titleStyle = {} } = props;
+    const {
+        style = {},
+        title = '',
+        children,
+        titleStyle = {},
+        disabled = false,
+    } = props;
     return (
-        <Wrap style={style}>
+        <Wrap style={style} data-disabled={disabled}>
             <GroupTitle style={titleStyle}>{title}</GroupTitle>
             {children}
         </Wrap>

@@ -1,28 +1,39 @@
 import { Fragment } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import Menu from '@components/menu/Index';
 import EmptyIcon from '@icons/base/Empty';
 import ClearRulesIcon from '@icons/style/ClearRules';
 import ColorScalesListIcon from '@icons/style/ColorScalesList';
-import ConditionFormatManageRuleIcon from '@icons/style/ConditionFormatManageRule';
+import ConditionFormatManageRuleIcon
+  from '@icons/style/ConditionFormatManageRule';
 import ConditionFormatNewRuleIcon from '@icons/style/ConditionFormatNewRule';
 import DataBarIcon from '@icons/style/DataBar';
 import HighlightCellsRulesIcon from '@icons/style/HighlightCellsRules';
 import IconSetListIcon from '@icons/style/IconSetList';
 import TopBottomRulesIcon from '@icons/style/TopBottomRules';
 import {
-    setDateCompareVisible,
-    setDuplicateCompareVisible,
-    setNumberApplyVisible,
-    setNumberCompareVisible,
-    setShowEditor,
-    setTextBetweenVisible,
-    setTextCompareVisible,
+  setDateCompareVisible,
+  setDuplicateCompareVisible,
+  setNumberApplyVisible,
+  setNumberCompareVisible,
+  setShowEditor,
+  setTextBetweenVisible,
+  setTextCompareVisible,
 } from '@store/conditionStyleSlice';
-import { clearSelectedRules, clearSheetRules } from '@utils/formatterUtil';
-import { isArray, isFunction } from '@utils/objectUtil';
+import { ConditionRule } from '@toone/report-excel';
+import {
+  clearSelectedRules,
+  clearSheetRules,
+} from '@utils/formatterUtil';
+import {
+  isArray,
+  isFunction,
+} from '@utils/objectUtil';
 
 import { withBatchUpdate } from '../../utils/spreadUtil';
 import DateCompareDialog from './DateCompareDialog';
@@ -34,13 +45,13 @@ import NumberCompareDialog from './NumberCompareDialog';
 import TextBetweenDialog from './TextBetweenDialog';
 import TextCompareDialog from './TextCompareDialog';
 import {
-    getColorScalesMenu,
-    getDataBarMenu,
-    getHighlightCellsRulesMenu,
-    getIconSetMenu,
-    getTopBottomRulesMenu,
-    toConditionMenuType,
-    toNormalMenu,
+  getColorScalesMenu,
+  getDataBarMenu,
+  getHighlightCellsRulesMenu,
+  getIconSetMenu,
+  getTopBottomRulesMenu,
+  toConditionMenuType,
+  toNormalMenu,
 } from './Utils';
 
 const withHandler = function (menus) {
@@ -185,6 +196,16 @@ export default function (props) {
         dispatcher(setShowEditor(false));
     };
 
+    const applyNewRule = () => {
+        const config = {
+            ...conditionStyle.editorConfig,
+            ruleType: conditionStyle.ruleType,
+        };
+        const rule = new ConditionRule(config);
+        applyRule(rule);
+        closeRuleEditor();
+    };
+
     const applyRule = (rule) => {
         withBatchUpdate(spread, (sheet) => {
             const selections = sheet.getSelections();
@@ -266,7 +287,7 @@ export default function (props) {
             {conditionStyle.showEditor ? (
                 <RuleEditor
                     onCancel={closeRuleEditor}
-                    onConfirm={closeRuleEditor}
+                    onConfirm={applyNewRule}
                 ></RuleEditor>
             ) : null}
         </Fragment>

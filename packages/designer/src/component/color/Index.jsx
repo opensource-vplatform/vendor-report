@@ -96,7 +96,7 @@ const Divider = styled.div`
 `;
 
 export default function (props) {
-    const { children, onChange, nonable = true, value, style = {} } = props;
+    const { children, onChange, nonable = true, value, style = {},disabled=false } = props;
     const [visible, setVisible] = useState(false);
     const [dialogVisible, setDialogVisible] = useState(false);
     const customerColors = getCustomColors();
@@ -118,7 +118,7 @@ export default function (props) {
             <Wrap
                 key='wrap'
                 onClick={(evt) => {
-                    if (!evt.target.closest('.colorDialog')) {
+                    if (!evt.target.closest('.colorDialog')&&!disabled) {
                         setVisible(true);
                     }
                 }}

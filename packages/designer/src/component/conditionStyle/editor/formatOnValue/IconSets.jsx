@@ -1,19 +1,21 @@
-import { Fragment, useEffect, useState } from 'react';
-import { HLayout, Text, Title } from '../../Components';
-import { Item, titleStyle, itemStyle } from './Utils';
-import { Select, CheckBox } from '@components/form/Index';
-import { getIconSetMenu } from '../../Utils';
+import {
+  Fragment,
+  useState,
+} from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+import styled from 'styled-components';
+
+import {
+  CheckBox,
+  Select,
+} from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import Icon0 from '@icons/style/icons/detail/Icon0';
 import Icon1 from '@icons/style/icons/detail/Icon1';
-import Icon2 from '@icons/style/icons/detail/Icon2';
-import Icon3 from '@icons/style/icons/detail/Icon3';
-import Icon4 from '@icons/style/icons/detail/Icon4';
-import Icon5 from '@icons/style/icons/detail/Icon5';
-import Icon6 from '@icons/style/icons/detail/Icon6';
-import Icon7 from '@icons/style/icons/detail/Icon7';
-import Icon8 from '@icons/style/icons/detail/Icon8';
-import Icon9 from '@icons/style/icons/detail/Icon9';
 import Icon10 from '@icons/style/icons/detail/Icon10';
 import Icon11 from '@icons/style/icons/detail/Icon11';
 import Icon12 from '@icons/style/icons/detail/Icon12';
@@ -24,6 +26,7 @@ import Icon16 from '@icons/style/icons/detail/Icon16';
 import Icon17 from '@icons/style/icons/detail/Icon17';
 import Icon18 from '@icons/style/icons/detail/Icon18';
 import Icon19 from '@icons/style/icons/detail/Icon19';
+import Icon2 from '@icons/style/icons/detail/Icon2';
 import Icon20 from '@icons/style/icons/detail/Icon20';
 import Icon21 from '@icons/style/icons/detail/Icon21';
 import Icon22 from '@icons/style/icons/detail/Icon22';
@@ -34,6 +37,7 @@ import Icon26 from '@icons/style/icons/detail/Icon26';
 import Icon27 from '@icons/style/icons/detail/Icon27';
 import Icon28 from '@icons/style/icons/detail/Icon28';
 import Icon29 from '@icons/style/icons/detail/Icon29';
+import Icon3 from '@icons/style/icons/detail/Icon3';
 import Icon30 from '@icons/style/icons/detail/Icon30';
 import Icon31 from '@icons/style/icons/detail/Icon31';
 import Icon32 from '@icons/style/icons/detail/Icon32';
@@ -42,24 +46,42 @@ import Icon34 from '@icons/style/icons/detail/Icon34';
 import Icon35 from '@icons/style/icons/detail/Icon35';
 import Icon36 from '@icons/style/icons/detail/Icon36';
 import Icon37 from '@icons/style/icons/detail/Icon37';
+import Icon38 from '@icons/style/icons/detail/Icon38';
+import Icon39 from '@icons/style/icons/detail/Icon39';
+import Icon4 from '@icons/style/icons/detail/Icon4';
+import Icon40 from '@icons/style/icons/detail/Icon40';
+import Icon41 from '@icons/style/icons/detail/Icon41';
+import Icon42 from '@icons/style/icons/detail/Icon42';
 import Icon43 from '@icons/style/icons/detail/Icon43';
 import Icon44 from '@icons/style/icons/detail/Icon44';
 import Icon45 from '@icons/style/icons/detail/Icon45';
 import Icon46 from '@icons/style/icons/detail/Icon46';
 import Icon47 from '@icons/style/icons/detail/Icon47';
-import Icon38 from '@icons/style/icons/detail/Icon38';
-import Icon39 from '@icons/style/icons/detail/Icon39';
-import Icon40 from '@icons/style/icons/detail/Icon40';
-import Icon41 from '@icons/style/icons/detail/Icon41';
-import Icon42 from '@icons/style/icons/detail/Icon42';
 import Icon48 from '@icons/style/icons/detail/Icon48';
 import Icon49 from '@icons/style/icons/detail/Icon49';
+import Icon5 from '@icons/style/icons/detail/Icon5';
 import Icon50 from '@icons/style/icons/detail/Icon50';
 import Icon51 from '@icons/style/icons/detail/Icon51';
 import Icon52 from '@icons/style/icons/detail/Icon52';
-import { genUUID } from '@utils/commonUtil';
+import Icon6 from '@icons/style/icons/detail/Icon6';
+import Icon7 from '@icons/style/icons/detail/Icon7';
+import Icon8 from '@icons/style/icons/detail/Icon8';
+import Icon9 from '@icons/style/icons/detail/Icon9';
+import { setEditorConfig } from '@store/conditionStyleSlice';
 import { isFunction } from '@utils/objectUtil';
-import styled from 'styled-components';
+
+import { setShowEditor } from '../../../../store/conditionStyleSlice';
+import {
+  HLayout,
+  Text,
+} from '../../Components';
+import { getIconSetMenu } from '../../Utils';
+import {
+  getMidTypeOptions,
+  Item,
+  itemStyle,
+  titleStyle,
+} from './Utils';
 
 const iconStyleSelectStyle = {
     width: 140,
@@ -90,354 +112,541 @@ const Select_Icon_Options = [
             flexWrap: 'wrap',
         },
         children: [
-            { value: 'noIcon', title: '', text: <NoIcon>无图标</NoIcon> },
-            { value: '0', title: '', text: <Icon0></Icon0> },
-            { value: '1', title: '', text: <Icon1></Icon1> },
-            { value: '2', title: '', text: <Icon2></Icon2> },
-            { value: '3', title: '', text: <Icon3></Icon3> },
-            { value: '4', title: '', text: <Icon4></Icon4> },
-            { value: '5', title: '', text: <Icon5></Icon5> },
-            { value: '6', title: '', text: <Icon6></Icon6> },
-            { value: '7', title: '', text: <Icon7></Icon7> },
-            { value: '8', title: '', text: <Icon8></Icon8> },
-            { value: '9', title: '', text: <Icon9></Icon9> },
-            { value: '10', title: '', text: <Icon10></Icon10> },
-            { value: '11', title: '', text: <Icon11></Icon11> },
-            { value: '12', title: '', text: <Icon12></Icon12> },
-            { value: '13', title: '', text: <Icon13></Icon13> },
-            { value: '14', title: '', text: <Icon14></Icon14> },
-            { value: '15', title: '', text: <Icon15></Icon15> },
-            { value: '16', title: '', text: <Icon16></Icon16> },
-            { value: '17', title: '', text: <Icon17></Icon17> },
-            { value: '18', title: '', text: <Icon18></Icon18> },
-            { value: '19', title: '', text: <Icon19></Icon19> },
-            { value: '20', title: '', text: <Icon20></Icon20> },
-            { value: '21', title: '', text: <Icon21></Icon21> },
-            { value: '22', title: '', text: <Icon22></Icon22> },
-            { value: '23', title: '', text: <Icon23></Icon23> },
-            { value: '24', title: '', text: <Icon24></Icon24> },
-            { value: '25', title: '', text: <Icon25></Icon25> },
-            { value: '26', title: '', text: <Icon26></Icon26> },
-            { value: '27', title: '', text: <Icon27></Icon27> },
-            { value: '28', title: '', text: <Icon28></Icon28> },
-            { value: '29', title: '', text: <Icon29></Icon29> },
-            { value: '30', title: '', text: <Icon30></Icon30> },
-            { value: '31', title: '', text: <Icon31></Icon31> },
-            { value: '32', title: '', text: <Icon32></Icon32> },
-            { value: '33', title: '', text: <Icon33></Icon33> },
-            { value: '34', title: '', text: <Icon34></Icon34> },
-            { value: '35', title: '', text: <Icon35></Icon35> },
-            { value: '36', title: '', text: <Icon36></Icon36> },
-            { value: '37', title: '', text: <Icon37></Icon37> },
-            { value: '43', title: '', text: <Icon43></Icon43> },
-            { value: '44', title: '', text: <Icon44></Icon44> },
-            { value: '45', title: '', text: <Icon45></Icon45> },
-            { value: '46', title: '', text: <Icon46></Icon46> },
-            { value: '47', title: '', text: <Icon47></Icon47> },
-            { value: '38', title: '', text: <Icon38></Icon38> },
-            { value: '39', title: '', text: <Icon39></Icon39> },
-            { value: '40', title: '', text: <Icon40></Icon40> },
-            { value: '41', title: '', text: <Icon41></Icon41> },
-            { value: '42', title: '', text: <Icon42></Icon42> },
-            { value: '48', title: '', text: <Icon48></Icon48> },
-            { value: '49', title: '', text: <Icon49></Icon49> },
-            { value: '50', title: '', text: <Icon50></Icon50> },
-            { value: '51', title: '', text: <Icon51></Icon51> },
-            { value: '52', title: '', text: <Icon52></Icon52> },
+            { value: 'noIcons_0', title: '', text: <NoIcon>无图标</NoIcon> },
+            { value: 'threeArrowsColored_0', title: '', text: <Icon0></Icon0> },
+            { value: 'threeArrowsColored_1', title: '', text: <Icon1></Icon1> },
+            { value: 'threeArrowsColored_2', title: '', text: <Icon2></Icon2> },
+            { value: 'threeArrowsGray_0', title: '', text: <Icon3></Icon3> },
+            { value: 'threeArrowsGray_1', title: '', text: <Icon4></Icon4> },
+            { value: 'threeArrowsGray_2', title: '', text: <Icon5></Icon5> },
+            { value: 'threeTriangles_0', title: '', text: <Icon6></Icon6> },
+            { value: 'threeTriangles_1', title: '', text: <Icon7></Icon7> },
+            { value: 'threeTriangles_2', title: '', text: <Icon8></Icon8> },
+            { value: 'fourArrowsGray_1', title: '', text: <Icon9></Icon9> },
+            { value: 'fourArrowsGray_2', title: '', text: <Icon10></Icon10> },
+            {
+                value: 'fourArrowsColored_1',
+                title: '',
+                text: <Icon11></Icon11>,
+            },
+            {
+                value: 'fourArrowsColored_2',
+                title: '',
+                text: <Icon12></Icon12>,
+            },
+            {
+                value: 'threeTrafficLightsUnrimmed_0',
+                title: '',
+                text: <Icon13></Icon13>,
+            },
+            {
+                value: 'threeTrafficLightsUnrimmed_1',
+                title: '',
+                text: <Icon14></Icon14>,
+            },
+            {
+                value: 'threeTrafficLightsUnrimmed_2',
+                title: '',
+                text: <Icon15></Icon15>,
+            },
+            {
+                value: 'threeTrafficLightsRimmed_0',
+                title: '',
+                text: <Icon16></Icon16>,
+            },
+            {
+                value: 'threeTrafficLightsRimmed_1',
+                title: '',
+                text: <Icon17></Icon17>,
+            },
+            {
+                value: 'threeTrafficLightsRimmed_2',
+                title: '',
+                text: <Icon18></Icon18>,
+            },
+            { value: 'threeSigns_1', title: '', text: <Icon19></Icon19> },
+            {
+                value: 'threeSigns_2',
+                title: '',
+                text: <Icon20></Icon20>,
+            },
+            {
+                value: 'fourTrafficLights_3',
+                title: '',
+                text: <Icon21></Icon21>,
+            },
+            { value: 'fourRedToBlack_0', title: '', text: <Icon22></Icon22> },
+            { value: 'fourRedToBlack_1', title: '', text: <Icon23></Icon23> },
+            { value: 'fourRedToBlack_2', title: '', text: <Icon24></Icon24> },
+            {
+                value: 'fourRedToBlack_3',
+                title: '',
+                text: <Icon25></Icon25>,
+            },
+            {
+                value: 'threeSymbolsCircled_0',
+                title: '',
+                text: <Icon26></Icon26>,
+            },
+            {
+                value: 'threeSymbolsCircled_1',
+                title: '',
+                text: <Icon27></Icon27>,
+            },
+            {
+                value: 'threeSymbolsCircled_2',
+                title: '',
+                text: <Icon28></Icon28>,
+            },
+            {
+                value: 'threeSymbolsUncircled_0',
+                title: '',
+                text: <Icon29></Icon29>,
+            },
+            {
+                value: 'threeSymbolsUncircled_1',
+                title: '',
+                text: <Icon30></Icon30>,
+            },
+            {
+                value: 'threeSymbolsUncircled_2',
+                title: '',
+                text: <Icon31></Icon31>,
+            },
+            { value: 'threeFlags_0', title: '', text: <Icon32></Icon32> },
+            { value: 'threeFlags_1', title: '', text: <Icon33></Icon33> },
+            { value: 'threeFlags_2', title: '', text: <Icon34></Icon34> },
+            { value: 'threeStars_0', title: '', text: <Icon35></Icon35> },
+            { value: 'threeStars_1', title: '', text: <Icon36></Icon36> },
+            { value: 'threeStars_2', title: '', text: <Icon37></Icon37> },
+            { value: 'fiveQuarters_0', title: '', text: <Icon43></Icon43> },
+            { value: 'fiveQuarters_1', title: '', text: <Icon44></Icon44> },
+            { value: 'fiveQuarters_2', title: '', text: <Icon45></Icon45> },
+            { value: 'fiveQuarters_3', title: '', text: <Icon46></Icon46> },
+            { value: 'fiveQuarters_4', title: '', text: <Icon47></Icon47> },
+            { value: 'fiveRatings_0', title: '', text: <Icon38></Icon38> },
+            { value: 'fourRatings_0', title: '', text: <Icon39></Icon39> },
+            { value: 'fourRatings_1', title: '', text: <Icon40></Icon40> },
+            { value: 'fourRatings_2', title: '', text: <Icon41></Icon41> },
+            { value: 'fourRatings_3', title: '', text: <Icon42></Icon42> },
+            { value: 'fiveBoxes_0', title: '', text: <Icon48></Icon48> },
+            { value: 'fiveBoxes_1', title: '', text: <Icon49></Icon49> },
+            { value: 'fiveBoxes_2', title: '', text: <Icon50></Icon50> },
+            { value: 'fiveBoxes_3', title: '', text: <Icon51></Icon51> },
+            { value: 'fiveBoxes_4', title: '', text: <Icon52></Icon52> },
         ],
     },
 ];
 
 const Select_Compare_Options = [
-    { value: '>=', text: '>=' },
-    { value: '>', text: '>' },
+    { value: true, text: '>=' },
+    { value: false, text: '>' },
 ];
 
-const Select_Type_Opetions = [];
-
-const toSettingItem = function (icon, operatorDesc, operator, value, type) {
+const toDefaultIconCriteria = function (iconValue) {
     return {
-        id: genUUID(),
-        icon,
-        operatorDesc,
-        operator: operator == undefined ? null : operator,
-        value: value == undefined ? null : value,
-        type: type == undefined ? null : type,
+        isGreaterThanOrEqualTo: true,
+        iconValueType: 'percent',
+        iconValue,
     };
 };
 
-const dispatcher = {
-    iconSetThreeArrowsColored: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('0', '当值是', '>=', 67, ''),
-                    toSettingItem('1', '当<67与', '>=', 33, ''),
-                    toSettingItem('2', '当<33'),
-                ],
-            };
-        });
+const toDefaultIcon = function (iconSetType, iconIndex) {
+    return { iconSetType, iconIndex };
+};
+
+const dispatcherHandler = {
+    iconSetThreeArrowsColored: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeArrowsColored', 0),
+            toDefaultIcon('threeArrowsColored', 1),
+            toDefaultIcon('threeArrowsColored', 2),
+        ];
     },
-    iconSetThreeArrowsGray: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('3', '当值是', '>=', 67, ''),
-                    toSettingItem('4', '当<67与', '>=', 33, ''),
-                    toSettingItem('5', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeArrowsGray: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeArrowsGray', 0),
+            toDefaultIcon('threeArrowsGray', 1),
+            toDefaultIcon('threeArrowsGray', 2),
+        ];
     },
-    iconSet3Triangles: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('6', '当值是', '>=', 67, ''),
-                    toSettingItem('7', '当<67与', '>=', 33, ''),
-                    toSettingItem('8', '当<33'),
-                ],
-            };
-        });
+    iconSet3Triangles: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeTriangles', 0),
+            toDefaultIcon('threeTriangles', 1),
+            toDefaultIcon('threeTriangles', 2),
+        ];
     },
-    iconSetFourArrowsGray: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('3', '当值是', '>=', 75, ''),
-                    toSettingItem('9', '当<75与', '>=', 50, ''),
-                    toSettingItem('10', '当<50与', '>=', 25, ''),
-                    toSettingItem('5', '当<25'),
-                ],
-            };
-        });
+    iconSetFourArrowsGray: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(75),
+            toDefaultIconCriteria(50),
+            toDefaultIconCriteria(25),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeArrowsGray', 0),
+            toDefaultIcon('fourArrowsGray', 1),
+            toDefaultIcon('fourArrowsGray', 2),
+            toDefaultIcon('threeArrowsGray', 2),
+        ];
     },
-    iconSetFourArrowsColored: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('0', '当值是', '>=', 75, ''),
-                    toSettingItem('11', '当<75与', '>=', 50, ''),
-                    toSettingItem('12', '当<50与', '>=', 25, ''),
-                    toSettingItem('2', '当<25'),
-                ],
-            };
-        });
+    iconSetFourArrowsColored: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(75),
+            toDefaultIconCriteria(50),
+            toDefaultIconCriteria(25),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeArrowsColored', 0),
+            toDefaultIcon('fourArrowsColored', 1),
+            toDefaultIcon('fourArrowsColored', 2),
+            toDefaultIcon('threeArrowsColored', 2),
+        ];
     },
-    iconSetFiveArrowsGray: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('3', '当值是', '>=', 80, ''),
-                    toSettingItem('9', '当<80与', '>=', 60, ''),
-                    toSettingItem('4', '当<60与', '>=', 40, ''),
-                    toSettingItem('10', '当<40与', '>=', 20, ''),
-                    toSettingItem('5', '当<20'),
-                ],
-            };
-        });
+    iconSetFiveArrowsGray: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(80),
+            toDefaultIconCriteria(60),
+            toDefaultIconCriteria(40),
+            toDefaultIconCriteria(20),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeArrowsGray', 0),
+            toDefaultIcon('fourArrowsGray', 1),
+            toDefaultIcon('threeArrowsGray', 1),
+            toDefaultIcon('fourArrowsGray', 2),
+            toDefaultIcon('threeArrowsGray', 2),
+        ];
     },
-    iconSetFiveArrowsColored: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('0', '当值是', '>=', 80, ''),
-                    toSettingItem('11', '当<80与', '>=', 60, ''),
-                    toSettingItem('1', '当<60与', '>=', 40, ''),
-                    toSettingItem('12', '当<40与', '>=', 20, ''),
-                    toSettingItem('2', '当<20'),
-                ],
-            };
-        });
+    iconSetFiveArrowsColored: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(80),
+            toDefaultIconCriteria(60),
+            toDefaultIconCriteria(40),
+            toDefaultIconCriteria(20),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeArrowsColored', 0),
+            toDefaultIcon('fourArrowsColored', 1),
+            toDefaultIcon('threeArrowsColored', 1),
+            toDefaultIcon('fourArrowsColored', 2),
+            toDefaultIcon('threeArrowsColored', 2),
+        ];
     },
-    iconSetThreeTrafficLightsUnRimmed: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('13', '当值是', '>=', 67, ''),
-                    toSettingItem('14', '当<67与', '>=', 33, ''),
-                    toSettingItem('15', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeTrafficLightsUnRimmed: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeTrafficLightsUnrimmed', 0),
+            toDefaultIcon('threeTrafficLightsUnrimmed', 1),
+            toDefaultIcon('threeTrafficLightsUnrimmed', 2),
+        ];
     },
-    iconSetThreeTrafficLightsRimmed: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('16', '当值是', '>=', 67, ''),
-                    toSettingItem('17', '当<67与', '>=', 33, ''),
-                    toSettingItem('18', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeTrafficLightsRimmed: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeTrafficLightsRimmed', 0),
+            toDefaultIcon('threeTrafficLightsRimmed', 1),
+            toDefaultIcon('threeTrafficLightsRimmed', 2),
+        ];
     },
-    iconSetThreeSigns: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('13', '当值是', '>=', 67, ''),
-                    toSettingItem('19', '当<67与', '>=', 33, ''),
-                    toSettingItem('20', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeSigns: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeTrafficLightsUnrimmed', 0),
+            toDefaultIcon('threeSigns', 1),
+            toDefaultIcon('threeSigns', 2),
+        ];
     },
-    iconSetFourTrafficLights: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('13', '当值是', '>=', 75, ''),
-                    toSettingItem('14', '当<75与', '>=', 50, ''),
-                    toSettingItem('15', '当<50与', '>=', 25, ''),
-                    toSettingItem('21', '当<25'),
-                ],
-            };
-        });
+    iconSetFourTrafficLights: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(75),
+            toDefaultIconCriteria(50),
+            toDefaultIconCriteria(25),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeTrafficLightsUnrimmed', 0),
+            toDefaultIcon('threeTrafficLightsUnrimmed', 1),
+            toDefaultIcon('threeTrafficLightsUnrimmed', 2),
+            toDefaultIcon('fourTrafficLights', 3),
+        ];
     },
-    iconSetFourRedToBlack: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('22', '当值是', '>=', 75, ''),
-                    toSettingItem('23', '当<75与', '>=', 50, ''),
-                    toSettingItem('24', '当<50与', '>=', 25, ''),
-                    toSettingItem('25', '当<25'),
-                ],
-            };
-        });
+    iconSetFourRedToBlack: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(75),
+            toDefaultIconCriteria(50),
+            toDefaultIconCriteria(25),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('fourRedToBlack', 0),
+            toDefaultIcon('fourRedToBlack', 1),
+            toDefaultIcon('fourRedToBlack', 2),
+            toDefaultIcon('fourRedToBlack', 3),
+        ];
     },
-    iconSetThreeSymbolsCircled: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('26', '当值是', '>=', 67, ''),
-                    toSettingItem('27', '当<67与', '>=', 33, ''),
-                    toSettingItem('28', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeSymbolsCircled: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeSymbolsCircled', 0),
+            toDefaultIcon('threeSymbolsCircled', 1),
+            toDefaultIcon('threeSymbolsCircled', 2),
+        ];
     },
-    iconSetThreeSymbolsUnCircled: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('29', '当值是', '>=', 67, ''),
-                    toSettingItem('30', '当<67与', '>=', 33, ''),
-                    toSettingItem('31', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeSymbolsUnCircled: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeSymbolsUncircled', 0),
+            toDefaultIcon('threeSymbolsUncircled', 1),
+            toDefaultIcon('threeSymbolsUncircled', 2),
+        ];
     },
-    iconSetThreeFlags: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('32', '当值是', '>=', 67, ''),
-                    toSettingItem('33', '当<67与', '>=', 33, ''),
-                    toSettingItem('34', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeFlags: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeFlags', 0),
+            toDefaultIcon('threeFlags', 1),
+            toDefaultIcon('threeFlags', 2),
+        ];
     },
-    iconSetThreeStars: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('35', '当值是', '>=', 67, ''),
-                    toSettingItem('36', '当<67与', '>=', 33, ''),
-                    toSettingItem('37', '当<33'),
-                ],
-            };
-        });
+    iconSetThreeStars: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(67),
+            toDefaultIconCriteria(33),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('threeStars', 0),
+            toDefaultIcon('threeStars', 1),
+            toDefaultIcon('threeStars', 2),
+        ];
     },
-    iconSetFourRatings: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('39', '当值是', '>=', 75, ''),
-                    toSettingItem('40', '当<75与', '>=', 50, ''),
-                    toSettingItem('41', '当<50与', '>=', 25, ''),
-                    toSettingItem('42', '当<25'),
-                ],
-            };
-        });
+    iconSetFourRatings: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(75),
+            toDefaultIconCriteria(50),
+            toDefaultIconCriteria(25),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('fourRatings', 0),
+            toDefaultIcon('fourRatings', 1),
+            toDefaultIcon('fourRatings', 2),
+            toDefaultIcon('fourRatings', 3),
+        ];
     },
-    iconSetFiveQuarters: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('43', '当值是', '>=', 80, ''),
-                    toSettingItem('44', '当<80与', '>=', 60, ''),
-                    toSettingItem('45', '当<60与', '>=', 40, ''),
-                    toSettingItem('46', '当<40与', '>=', 20, ''),
-                    toSettingItem('47', '当<20'),
-                ],
-            };
-        });
+    iconSetFiveQuarters: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(80),
+            toDefaultIconCriteria(60),
+            toDefaultIconCriteria(40),
+            toDefaultIconCriteria(20),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('fiveQuarters', 0),
+            toDefaultIcon('fiveQuarters', 1),
+            toDefaultIcon('fiveQuarters', 2),
+            toDefaultIcon('fiveQuarters', 3),
+            toDefaultIcon('fiveQuarters', 4),
+        ];
     },
-    iconSetFiveRatings: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('38', '当值是', '>=', 80, ''),
-                    toSettingItem('39', '当<80与', '>=', 60, ''),
-                    toSettingItem('40', '当<60与', '>=', 40, ''),
-                    toSettingItem('41', '当<40与', '>=', 20, ''),
-                    toSettingItem('42', '当<20'),
-                ],
-            };
-        });
+    iconSetFiveRatings: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(80),
+            toDefaultIconCriteria(60),
+            toDefaultIconCriteria(40),
+            toDefaultIconCriteria(20),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('fiveRatings', 0),
+            toDefaultIcon('fourRatings', 0),
+            toDefaultIcon('fourRatings', 1),
+            toDefaultIcon('fourRatings', 2),
+            toDefaultIcon('fourRatings', 3),
+        ];
     },
-    iconSetFiveBoxes: (spread, setData) => {
-        setData((data) => {
-            return {
-                ...data,
-                settings: [
-                    toSettingItem('48', '当值是', '>=', 80, ''),
-                    toSettingItem('49', '当<80与', '>=', 60, ''),
-                    toSettingItem('50', '当<60与', '>=', 40, ''),
-                    toSettingItem('51', '当<40与', '>=', 20, ''),
-                    toSettingItem('52', '当<20'),
-                ],
-            };
-        });
+    iconSetFiveBoxes: (editorConfig) => {
+        editorConfig.iconCriteria = [
+            toDefaultIconCriteria(80),
+            toDefaultIconCriteria(60),
+            toDefaultIconCriteria(40),
+            toDefaultIconCriteria(20),
+        ];
+        editorConfig.icons = [
+            toDefaultIcon('fiveBoxes', 0),
+            toDefaultIcon('fiveBoxes', 1),
+            toDefaultIcon('fiveBoxes', 2),
+            toDefaultIcon('fiveBoxes', 3),
+            toDefaultIcon('fiveBoxes', 4),
+        ];
     },
 };
 
-export default function () {
+export default function (props) {
+    const { hostId } = props;
     const iconStyleOptions = getIconSetMenu();
+    const { editorConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
+    const dispatcher = useDispatch();
     const [data, setData] = useState({
         iconStyle: iconStyleOptions[0].children[0].value,
         onlyShowIcon: false,
         reverseIcon: false,
         settings: [],
     });
-    useEffect(() => {
-        const handler = dispatcher[data.iconStyle];
-        if (isFunction(handler)) {
-            handler(null, setData);
+    let IconSettings = [];
+    const iconSize = editorConfig.icons.length;
+    for (let i = 0; i < iconSize; i++) {
+        const iconIndex = editorConfig.reverseIconOrder ? iconSize - i - 1 : i;
+        const icon = editorConfig.icons[iconIndex];
+        const iconValue = icon.iconSetType + '_' + icon.iconIndex;
+        const criteria = editorConfig.iconCriteria[i];
+        let text = '当';
+        if (i == 0) {
+            text += '值是';
+        } else {
+            const preCriteria = editorConfig.iconCriteria[i - 1];
+            const operator = preCriteria.isGreaterThanOrEqualTo ? '<' : '<=';
+            let preVal = preCriteria.iconValue;
+            preVal = (preVal + '').startsWith('=') ? `[公式]` : preVal;
+            text += operator;
+            text += preVal;
+            if (i + 1 != iconSize) {
+                text += '与';
+            }
         }
-    }, [data.iconStyle]);
+        IconSettings.push(
+            <HLayout key={iconValue} style={{ gap: 4, alignItems: 'center' }}>
+                <Item>
+                    <Select
+                        value={iconValue}
+                        style={{ marginLeft: 8 }}
+                        datas={Select_Icon_Options}
+                        onChange={(val) => {
+                            const icons = [...editorConfig.icons];
+                            const [iconSetType, iconIndex] = val.split('_');
+                            icons[iconIndex] = { iconSetType, iconIndex };
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    icons,
+                                })
+                            );
+                        }}
+                    ></Select>
+                </Item>
+                <Item
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'end',
+                    }}
+                >
+                    <Text>{text}</Text>
+                </Item>
+                <Item>
+                    {criteria ? (
+                        <Select
+                            value={criteria.isGreaterThanOrEqualTo}
+                            datas={Select_Compare_Options}
+                            onChange={(val) => {
+                                const iconCriteria = [
+                                    ...editorConfig.iconCriteria,
+                                ];
+                                iconCriteria[i] = {
+                                    ...criteria,
+                                    isGreaterThanOrEqualTo: val,
+                                };
+                                dispatcher(
+                                    setEditorConfig({
+                                        ...editorConfig,
+                                        iconCriteria,
+                                    })
+                                );
+                            }}
+                        ></Select>
+                    ) : null}
+                </Item>
+                <Item>
+                    {criteria ? (
+                        <Range
+                            value={criteria.iconValue}
+                            style={{ width: '100%', height: 26 }}
+                            hostId={hostId}
+                            onStartSelect={() =>
+                                dispatcher(setShowEditor(false))
+                            }
+                            onEndSelect={() => dispatcher(setShowEditor(true))}
+                            onChange={(val) => {
+                                const iconCriteria = [
+                                    ...editorConfig.iconCriteria,
+                                ];
+                                iconCriteria[i] = {
+                                    ...criteria,
+                                    iconValue: val,
+                                };
+                                dispatcher(
+                                    setEditorConfig({
+                                        ...editorConfig,
+                                        iconCriteria,
+                                    })
+                                );
+                            }}
+                        ></Range>
+                    ) : null}
+                </Item>
+                <Item>
+                    {criteria ? (
+                        <Select
+                            value={criteria.iconValueType}
+                            datas={getMidTypeOptions()}
+                            onChange={(val) => {
+                                const iconCriteria = [
+                                    ...editorConfig.iconCriteria,
+                                ];
+                                iconCriteria[i] = {
+                                    ...criteria,
+                                    iconValueType: val,
+                                };
+                                dispatcher(
+                                    setEditorConfig({
+                                        ...editorConfig,
+                                        iconCriteria,
+                                    })
+                                );
+                            }}
+                        ></Select>
+                    ) : null}
+                </Item>
+            </HLayout>
+        );
+    }
     return (
         <Fragment>
             <HLayout style={hLayoutStyle}>
@@ -446,35 +655,47 @@ export default function () {
                         <Text style={titleStyle}>图标样式：</Text>
                         <Select
                             style={iconStyleSelectStyle}
-                            value={data.iconStyle}
+                            value={editorConfig.iconSetType}
                             datas={iconStyleOptions}
-                            onChange={(val) =>
-                                setData((data) => {
-                                    return { ...data, iconStyle: val };
-                                })
-                            }
+                            onChange={(val) => {
+                                const config = {
+                                    ...editorConfig,
+                                    iconSetType: val,
+                                };
+                                const handler = dispatcherHandler[val];
+                                if (isFunction(handler)) {
+                                    handler(config);
+                                }
+                                dispatcher(setEditorConfig(config));
+                            }}
                         ></Select>
                     </HLayout>
                 </Item>
                 <Item>
                     <CheckBox
                         title='仅显示图标'
-                        value={data.onlyShowIcon}
+                        value={editorConfig.showIconOnly}
                         onChange={(val) =>
-                            setData((data) => {
-                                return { ...data, onlyShowIcon: val };
-                            })
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    showIconOnly: val,
+                                })
+                            )
                         }
                     ></CheckBox>
                 </Item>
                 <Item>
                     <CheckBox
                         title='反转图标次序'
-                        value={data.reverseIcon}
+                        value={editorConfig.reverseIconOrder}
                         onChange={(val) =>
-                            setData((data) => {
-                                return { ...data, reverseIcon: val };
-                            })
+                            dispatcher(
+                                setEditorConfig({
+                                    ...editorConfig,
+                                    reverseIconOrder: val,
+                                })
+                            )
                         }
                     ></CheckBox>
                 </Item>
@@ -493,56 +714,7 @@ export default function () {
                     <Text>类型</Text>
                 </Item>
             </HLayout>
-            {data.settings.map(
-                ({ id, icon, operatorDesc, operator, value, type }) => {
-                    return (
-                        <HLayout
-                            key={id}
-                            style={{ gap: 4, alignItems: 'center' }}
-                        >
-                            <Item>
-                                <Select
-                                    value={icon}
-                                    style={{ marginLeft: 8 }}
-                                    datas={Select_Icon_Options}
-                                ></Select>
-                            </Item>
-                            <Item
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'end',
-                                }}
-                            >
-                                <Text>{operatorDesc}</Text>
-                            </Item>
-                            <Item>
-                                {operator !== null ? (
-                                    <Select
-                                        value={operator}
-                                        datas={Select_Compare_Options}
-                                    ></Select>
-                                ) : null}
-                            </Item>
-                            <Item>
-                                {value !== null ? (
-                                    <Range
-                                        value={value}
-                                        style={{ width: '100%', height: 26 }}
-                                    ></Range>
-                                ) : null}
-                            </Item>
-                            <Item>
-                                {type !== null ? (
-                                    <Select
-                                        value={type}
-                                        datas={Select_Type_Opetions}
-                                    ></Select>
-                                ) : null}
-                            </Item>
-                        </HLayout>
-                    );
-                }
-            )}
+            {IconSettings}
         </Fragment>
     );
 }

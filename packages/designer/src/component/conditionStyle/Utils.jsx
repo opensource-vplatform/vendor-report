@@ -528,9 +528,9 @@ export const getIconSetMenu = function () {
 
 export const getStyleOptions = function(){
     return [
-        { value: 'colorScale2', text: '双色刻度' },
-        { value: 'colorScale3', text: '三色刻度' },
-        { value: 'dataBar', text: '数据条' },
-        { value: 'iconSets', text: '图标集' },
+        { value: 'twoScaleRule', text: '双色刻度' },
+        { value: 'threeScaleRule', text: '三色刻度' },
+        { value: 'dataBarRule', text: '数据条' },
+        { value: 'iconSetRule', text: '图标集' },
     ];
 }
