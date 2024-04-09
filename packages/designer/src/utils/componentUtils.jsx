@@ -1,6 +1,9 @@
+import { useDispatch } from 'react-redux';
+
 import { VItem } from '@components/group/Index';
 import Menu from '@components/menu/Index';
 import Popper from '@components/popper/Index';
+import { Tab } from '@components/tabs/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
 
 export const Icon = function (props) {
@@ -55,6 +58,25 @@ export const WithIconPopper = function (title, icon, options = {}) {
             >
                 <Icon title={title} icon={icon}></Icon>
             </Popper>
+        );
+    };
+};
+
+
+export const WithTabItem = function (Component,clickHandler) {
+    return function (props) {
+        const dispatch = useDispatch();
+        const { code, title, tabProps = {} } = props;
+        return (
+            <Tab
+                code={code}
+                title={title}
+                onClick={() => {
+                    dispatch(clickHandler({ code }));
+                }}
+            >
+                <Component {...tabProps}></Component>
+            </Tab>
         );
     };
 };

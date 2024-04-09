@@ -9,7 +9,11 @@ import { OperationDialog } from '@components/dialog/Index';
 import { List } from '@components/list/Index';
 import { genUUID } from '@utils/commonUtil';
 
-import { setEditorType } from '../../../store/conditionStyleSlice';
+import {
+  setEditorConfig,
+  setEditorType,
+  setRuleType,
+} from '../../../store/conditionStyleSlice';
 import {
   Title,
   Wrap,
@@ -49,7 +53,16 @@ export default function (props) {
                     selectedValue={editorType}
                     datas={formatTypes}
                     style={{ backgroundColor: 'white' }}
-                    onChange={(val) => dispatcher(setEditorType(val))}
+                    onChange={(val) => {
+                        if(val=='formatContain'){
+                            dispatcher(setEditorConfig({
+                                _type: 'normalConditionRule',
+                                operator:'between',
+                            }));
+                            dispatcher(setRuleType('cellValueRule'));
+                        }
+                        dispatcher(setEditorType(val))
+                    }}
                 ></List>
                 {editorType == 'formatAbove' ? (
                     <FormatAbove hostId={data.id}></FormatAbove>

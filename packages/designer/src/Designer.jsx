@@ -11,6 +11,7 @@ import {
 import styled, { createGlobalStyle } from 'styled-components';
 
 import CellStyleSetting from '@components/cellStyles/cellStyleSetting';
+import { Setting as CellStylesSetting } from '@components/cellStyles/Index';
 import { DraggableDatasources } from '@components/defineDatasource/Index';
 import Error from '@components/error/Index';
 import Loading from '@components/loading/Index';
@@ -96,6 +97,7 @@ function Designer(props) {
     );
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     const { visible } = useSelector(({rangeSlice})=>rangeSlice);
+    const cellSettingSlice = useSelector(({cellSettingSlice})=>cellSettingSlice);
     const [data] = useState({}); 
     data.spread = spread;
     data.active = active;
@@ -170,6 +172,7 @@ function Designer(props) {
                 <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
                     <Wrap>
                         {visible ? <SelectBox></SelectBox>:null}
+                        {cellSettingSlice.visible ? <CellStylesSetting></CellStylesSetting>:null}
                         {isShowNav && <Nav></Nav>}
                         <SplitPane
                             style={{

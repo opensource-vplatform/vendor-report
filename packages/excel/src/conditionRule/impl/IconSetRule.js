@@ -1,10 +1,15 @@
-import Rule from './Rule';
+import { isNullOrUndef } from '../../utils/objectUtils';
 import { getNamespace } from '../../utils/spreadUtil';
+import Rule from './Rule';
 
 class IconSetRule extends Rule {
-    constructor(iconSetType) {
+    constructor(iconSetType,showIconOnly,reverseIconOrder,iconCriteria,icons) {
         super();
         this.iconSetType = iconSetType;
+        this.showIconOnly = showIconOnly;
+        this.reverseIconOrder = reverseIconOrder;
+        this.iconCriteria = iconCriteria;
+        this.icons = icons;
     }
 
     apply(row, rowCount, col, colCount) {
@@ -13,10 +18,32 @@ class IconSetRule extends Rule {
         this.applySelections([range]);
     }
     applySelections(selections) {
+        debugger;
+        const GC = getNamespace();
         const rule = new GC.Spread.Sheets.ConditionalFormatting.IconSetRule(
             this.getIconSetType(this.iconSetType),
             selections
         );
+        if(!isNullOrUndef(this.showIconOnly)){
+            rule.showIconOnly(this.showIconOnly);
+        }
+        if(!isNullOrUndef(this.reverseIconOrder)){
+            rule.reverseIconOrder(this.reverseIconOrder);
+        }
+        if(!isNullOrUndef(this.iconCriteria)){
+            const criterias = rule.iconCriteria();
+            const iconCriteria = [...this.iconCriteria].reverse();
+            iconCriteria.map(({isGreaterThanOrEqualTo,iconValueType,iconValue},index)=>{
+                criterias[index] = new GC.Spread.Sheets.ConditionalFormatting.IconCriterion(isGreaterThanOrEqualTo, this.getIconValueType(iconValueType), iconValue);
+            });
+
+        }
+        if(!isNullOrUndef(this.icons)){
+            const icons = this.icons.map(({iconSetType,iconIndex})=>{
+                return {iconSetType:this.getIconSetType(iconSetType),iconIndex}; 
+            });
+            rule.icons(icons);
+        }
         this.sheet.conditionalFormats.addRule(rule);
     }
 
@@ -24,12 +51,17 @@ class IconSetRule extends Rule {
         return {
             _type: 'iconSetRule',
             iconSetType: this.iconSetType,
+            showIconOnly : this. showIconOnly,
+            reverseIconOrder : this. reverseIconOrder,
+            iconCriteria : this. iconCriteria,
+            icons : this. icons,
         };
     }
 }
 
 IconSetRule.fromJson = function (json) {
-    return new IconSetRule(json.iconSetType);
+    const {iconSetType,showIconOnly,reverseIconOrder,iconCriteria,icons} = json;
+    return new IconSetRule(iconSetType,showIconOnly,reverseIconOrder,iconCriteria,icons);
 };
 
 export default IconSetRule;

@@ -11,6 +11,11 @@ class Rule {
 
     applySelections(selections) {}
 
+    getIconValueType(type){
+        const GC = getNamespace();
+        return GC.Spread.Sheets.ConditionalFormatting.IconValueType[type];
+    }
+
     getBarDirection(direction){
         const GC = getNamespace();
         return GC.Spread.Sheets.ConditionalFormatting.BarDirection[direction];

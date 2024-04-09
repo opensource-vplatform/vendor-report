@@ -91,16 +91,20 @@ function Index(props) {
         title,
         width = 'auto',
         height = 'auto',
-        open = true,
         mask = true,
         id = genUUID(),
         closable = true,
         anchor = false,
-        style={},
+        style = {},
         onClose,
     } = props;
     const dialogEl = createRef(null);
-    const [opened, setOpened] = useState(open);
+    const [data] = useState(() => {
+        return {
+            maskZIndex: getNext(),
+            dialogZIndex: getNext(),
+        };
+    });
     let mouseX,
         mouseY = 0;
     const mouseMoveHandler = (evt) => {
@@ -125,11 +129,11 @@ function Index(props) {
             }
         }
     }, []);
-    return opened ? (
+    return (
         <Fragment>
-            {mask ? <Mask style={{ zIndex: getNext() }}></Mask> : null}
+            {mask ? <Mask style={{ zIndex: data.maskZIndex }}></Mask> : null}
             <Wrap
-                style={{ zIndex: getNext(), width, height,...style }}
+                style={{ zIndex: data.dialogZIndex, width, height, ...style }}
                 id={id}
                 data-title={title}
                 ref={dialogEl}
@@ -161,9 +165,6 @@ function Index(props) {
                     <Title>{title}</Title>
                     <CloseButton
                         onClick={() => {
-                            if (closable) {
-                                setOpened(false);
-                            }
                             if (onClose) {
                                 onClose();
                             }
@@ -175,7 +176,7 @@ function Index(props) {
                 {props.children}
             </Wrap>
         </Fragment>
-    ) : null;
+    );
 }
 
 export default function (props) {

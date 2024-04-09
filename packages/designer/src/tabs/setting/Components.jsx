@@ -1,7 +1,6 @@
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { Tab } from '@components/tabs/Index';
+import { WithTabItem } from '@utils/componentUtils';
 
 export const Wrapper = styled.div`
     margin: 10px;
@@ -80,20 +79,4 @@ export const Operations = styled.div`
     }
 `;
 
-export const WithTabItem = function (Component,clickHandler) {
-    return function (props) {
-        const dispatch = useDispatch();
-        const { code, title, tabProps = {} } = props;
-        return (
-            <Tab
-                code={code}
-                title={title}
-                onClick={() => {
-                    dispatch(clickHandler({ code }));
-                }}
-            >
-                <Component {...tabProps}></Component>
-            </Tab>
-        );
-    };
-};
+export { WithTabItem };

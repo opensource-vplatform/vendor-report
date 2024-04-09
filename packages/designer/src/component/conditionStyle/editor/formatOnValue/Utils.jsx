@@ -100,7 +100,7 @@ export const toDefaultEditorConfig = function (ruleType) {
             return {
                 _type: 'iconSetRule',
                 showIconOnly: false,
-                iconSetType: 'iconSetThreeArrowsColored',
+                iconSetType: 'threeArrowsColored',
                 reverseIconOrder: false,
                 iconCriteria: [
                     {

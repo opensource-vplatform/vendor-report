@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import appSlice from './appSlice/appSlice';
 import borderSlice from './borderSlice/borderSlice';
+import cellSettingSlice from './cellSettingSlice';
 import fontCellSettingSlice from './cellSettingSlice/FontCellSettingSlice';
 import conditionStyleSlice from './conditionStyleSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
@@ -53,6 +54,7 @@ export default configureStore({
         layoutSlice,
         conditionStyleSlice,
         rangeSlice,
+        cellSettingSlice,
     },
     middleware: function (getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });

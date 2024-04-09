@@ -630,35 +630,98 @@ const dispatcher = {
     },
     dataBarMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
-        dispatcher(setRuleType('dataBar'));
+        dispatcher(setRuleType('dataBarRule'));
+        dispatcher(
+            setEditorConfig({
+                _type: 'dataBarRule',
+                minType: 'automin',
+                minValue: null,
+                maxType: 'automax',
+                maxValue: null,
+                color: 'rgb(99, 142, 198)',
+                borderColor: 'rgb(0,0,0)',
+                gradient: false,
+                showBarOnly: false,
+                showBorder: false,
+                dataBarDirection: 'leftToRight',
+                useNegativeFillColor: false,
+                negativeFillColor: 'rgb(255,0,0)',
+                useNegativeBorderColor: false,
+                negativeBorderColor: 'rgb(0,0,0)',
+                axisColor: 'rgb(0,0,0)',
+                axisPosition: 'automatic',
+            })
+        );
         dispatcher(setShowEditor(true));
     },
     colorScalesListMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
         dispatcher(setRuleType('twoScaleRule'));
+        dispatcher(
+            setEditorConfig({
+                _type: 'scaleRule',
+                ruleType: 'twoScaleRule',
+                minType: 'lowestValue',
+                minValue: null,
+                minColor: 'rgb(255,0,0)',
+                midType: null,
+                midValue: null,
+                midColor: null,
+                maxType: 'highestValue',
+                maxValue: null,
+                maxColor: 'rgb(0,136,0)',
+            })
+        );
         dispatcher(setShowEditor(true));
     },
     iconSetListMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
-        dispatcher(setRuleType('iconSets'));
+        dispatcher(setRuleType('iconSetRule'));
+        dispatcher(
+            setEditorConfig({
+                _type: 'iconSetRule',
+                showIconOnly: false,
+                iconSetType: 'threeArrowsColored',
+                reverseIconOrder: false,
+                iconCriteria: [
+                    {
+                        isGreaterThanOrEqualTo: true,
+                        iconValueType: 'percent',
+                        iconValue: 67,
+                    },
+                    {
+                        isGreaterThanOrEqualTo: true,
+                        iconValueType: 'percent',
+                        iconValue: 33,
+                    },
+                ],
+                icons: [
+                    { iconSetType: 'threeArrowsColored', iconIndex: 0 },
+                    { iconSetType: 'threeArrowsColored', iconIndex: 1 },
+                    { iconSetType: 'threeArrowsColored', iconIndex: 2 },
+                ],
+            })
+        );
         dispatcher(setShowEditor(true));
     },
     conditionFormatNewRule: (spread, dispatcher) => {
         dispatcher(setEditorType('formatOnValue'));
         dispatcher(setRuleType('twoScaleRule'));
-        dispatcher(setEditorConfig({
-            _type: 'scaleRule',
-            ruleType: 'twoScaleRule',
-            minType: 'lowestValue',
-            minValue: null,
-            minColor:'rgb(255,0,0)',
-            midType: null,
-            midValue: null,
-            midColor: null,
-            maxType: 'highestValue',
-            maxValue: null,
-            maxColor:'rgb(0,136,0)'
-        }));
+        dispatcher(
+            setEditorConfig({
+                _type: 'scaleRule',
+                ruleType: 'twoScaleRule',
+                minType: 'lowestValue',
+                minValue: null,
+                minColor: 'rgb(255,0,0)',
+                midType: null,
+                midValue: null,
+                midColor: null,
+                maxType: 'highestValue',
+                maxValue: null,
+                maxColor: 'rgb(0,136,0)',
+            })
+        );
         dispatcher(setShowEditor(true));
     },
 };

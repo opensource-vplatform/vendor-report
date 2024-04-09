@@ -508,6 +508,41 @@ const dispatcherHandler = {
     },
 };
 
+const Icon2TypeMap = {
+    iconSetThreeArrowsColored: 'threeArrowsColored',
+    iconSetThreeArrowsGray: 'threeArrowsGray',
+    iconSet3Triangles: 'threeTriangles',
+    iconSetFourArrowsGray: 'fourArrowsGray',
+    iconSetFourArrowsColored: 'fourArrowsColored',
+    iconSetFiveArrowsGray: 'fiveArrowsGray',
+    iconSetFiveArrowsColored: 'fiveArrowsColored',
+    iconSetThreeTrafficLightsUnRimmed: 'threeTrafficLightsUnrimmed',
+    iconSetThreeTrafficLightsRimmed: 'threeTrafficLightsRimmed',
+    iconSetThreeSigns: 'threeSigns',
+    iconSetFourTrafficLights: 'fourTrafficLights',
+    iconSetFourRedToBlack: 'fourRedToBlack',
+    iconSetThreeSymbolsCircled: 'threeSymbolsCircled',
+    iconSetThreeSymbolsUnCircled: 'threeSymbolsUncircled',
+    iconSetThreeFlags: 'threeFlags',
+    iconSetThreeStars: 'threeStars',
+    iconSetFourRatings: 'fourRatings',
+    iconSetFiveQuarters: 'fiveQuarters',
+    iconSetFiveRatings: 'fiveRatings',
+    iconSetFiveBoxes: 'fiveBoxes',
+};
+
+const toIconSetType = function (icon) {
+    return Icon2TypeMap[icon];
+};
+
+const fromIconSetType = function(type){
+    for(let [key,value] of Object.entries(Icon2TypeMap)){
+        if(value == type){
+            return key;
+        }
+    }
+}
+
 export default function (props) {
     const { hostId } = props;
     const iconStyleOptions = getIconSetMenu();
@@ -543,7 +578,7 @@ export default function (props) {
             }
         }
         IconSettings.push(
-            <HLayout key={iconValue} style={{ gap: 4, alignItems: 'center' }}>
+            <HLayout key={iconValue+'_'+i} style={{ gap: 4, alignItems: 'center' }}>
                 <Item>
                     <Select
                         value={iconValue}
@@ -551,8 +586,8 @@ export default function (props) {
                         datas={Select_Icon_Options}
                         onChange={(val) => {
                             const icons = [...editorConfig.icons];
-                            const [iconSetType, iconIndex] = val.split('_');
-                            icons[iconIndex] = { iconSetType, iconIndex };
+                            const [iconSetType, index] = val.split('_');
+                            icons[iconIndex] = { iconSetType, iconIndex:parseInt(index) };
                             dispatcher(
                                 setEditorConfig({
                                     ...editorConfig,
@@ -655,12 +690,12 @@ export default function (props) {
                         <Text style={titleStyle}>图标样式：</Text>
                         <Select
                             style={iconStyleSelectStyle}
-                            value={editorConfig.iconSetType}
+                            value={fromIconSetType(editorConfig.iconSetType)}
                             datas={iconStyleOptions}
                             onChange={(val) => {
                                 const config = {
                                     ...editorConfig,
-                                    iconSetType: val,
+                                    iconSetType: toIconSetType(val),
                                 };
                                 const handler = dispatcherHandler[val];
                                 if (isFunction(handler)) {

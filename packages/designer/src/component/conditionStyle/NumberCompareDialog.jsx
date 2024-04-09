@@ -1,18 +1,28 @@
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
-import { Integer, Select } from '@components/form/Index';
+import {
+  Integer,
+  Select,
+} from '@components/form/Index';
+import { ConditionRule } from '@toone/report-excel';
 
 import { setNumberCompareConfig } from '../../store/conditionStyleSlice';
-import { HLayout, Text, Title, Wrap } from './Components';
-import { dispatcher } from './dispatcher';
+import {
+  HLayout,
+  Text,
+  Title,
+  Wrap,
+} from './Components';
 import { getStyleDatas } from './metadata';
-import { ConditionRule } from '@toone/report-excel';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
     const options = getStyleDatas();
-    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const dispatcher = useDispatch();
     const { numberCompareConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );

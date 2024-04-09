@@ -6,6 +6,7 @@ export const fontCellSettingSlice = createSlice({
     name: 'fontCellSettingSlice',
     initialState: {
         spread: null,
+        visible: false,
         // selectedFontFamily: '微软雅黑',
         // selectedFontSize: 11,
         // selectedFontStyle: '常规',
@@ -13,6 +14,10 @@ export const fontCellSettingSlice = createSlice({
         selectedFontColor: 'black',
     },
     reducers: {
+        
+        setVisible(state, {payload}){
+            state.visible = payload;
+        },
         // setSelectedFontFamily(state, action) {
         //     state.selectedFontFamily = action.payload.selectedFontFamily;
         // },

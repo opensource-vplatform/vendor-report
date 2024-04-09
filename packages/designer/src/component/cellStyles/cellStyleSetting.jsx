@@ -249,7 +249,6 @@ function CellStyleSetting(props) {
             const activeSheet = spread?.getActiveSheet();
             const selections = activeSheet?.getSelections();
             const { colCount, rowCount } = selections[0];
-            console.log('object :>> ');
             if (colCount === 1 && rowCount === 1) {
                 setIsMoreCell(false);
             } else {
