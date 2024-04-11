@@ -32,6 +32,10 @@ class ConditionRule{
         }
     }
 
+    toJson(){
+        return this.json;
+    }
+
 }
 
 export default ConditionRule;

@@ -195,7 +195,6 @@ export const IconType = {
     DashDot: 9,
     Dashed: 3,
     Thin: 1,
-
     MediumDashDotDot: 12,
     SlantedDashDot: 10,
     MediumDashDot: 13,
@@ -213,7 +212,7 @@ export const FontStyle = {
 };
 
 export const UnderlineStyle = [
-    { value: '无', title: '无', text: '无' },
-    { value: '单下划线', title: '单下划线', text: '单下划线' },
-    { value: '双下划线', title: '双下划线', text: '双下划线' },
+    { value: 0, title: '无', text: '无' },
+    { value: 1, title: '单下划线', text: '单下划线' },
+    { value: 8, title: '双下划线', text: '双下划线' },
 ];

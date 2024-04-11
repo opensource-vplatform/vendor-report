@@ -1,20 +1,37 @@
 import { Fragment } from 'react';
+
 import {
-    Text,
-    Title,
-    Border,
-    VLayout,
-    HLayout,
-    Item,
-    FontPreview,
-} from '../../Components';
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import { itemStyle } from '../../Utils';
-import { Select, Button } from '@components/form/Index';
-import { Range } from '@components/range/Index';
 import { Divider } from '@components/divider/Index';
+import { Range } from '@components/range/Index';
+import {
+  setEditorConfig,
+  setShowEditor,
+} from '@store/conditionStyleSlice';
 
-export default function () {
+import {
+  Border,
+  HLayout,
+  Item,
+  Text,
+  Title,
+  VLayout,
+} from '../../Components';
+import { itemStyle } from '../../Utils';
+import {
+  CellPreview,
+  FormatButton,
+} from '../Components';
+
+export default function (props) {
+    const {hostId} = props;
+    const { editorConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
+    const dispatcher = useDispatch();
     return (
         <Fragment>
             <Title>编辑规则说明：</Title>
@@ -24,7 +41,15 @@ export default function () {
                     <HLayout style={itemStyle}>
                         <Item>
                             <Range
+                                hostId={hostId}
                                 style={{ width: '100%', height: 22 }}
+                                value={editorConfig.formula}
+                                onStartSelect={()=>dispatcher(setShowEditor(false))}
+                                onEndSelect={()=>dispatcher(setShowEditor(true))}
+                                onChange={(val)=>dispatcher(setEditorConfig({
+                                    ...editorConfig,
+                                    formula:val,
+                                }))}
                             ></Range>
                         </Item>
                     </HLayout>
@@ -33,8 +58,8 @@ export default function () {
                     </HLayout>
                     <HLayout style={{ ...itemStyle, marginBottom: 16 }}>
                         <Text>预览：</Text>
-                        <FontPreview></FontPreview>
-                        <Button style={{ height: 30 }}>格式...</Button>
+                        <CellPreview></CellPreview>
+                        <FormatButton></FormatButton>
                     </HLayout>
                 </VLayout>
             </Border>

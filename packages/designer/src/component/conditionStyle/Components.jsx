@@ -216,21 +216,3 @@ export const Preview = function (props) {
         </PreviewWrap>
     );
 };
-
-const FontPreviewWrap = styled.div`
-    width: 196px;
-    height: 36px;
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    background-color: white;
-    align-items: center;
-`;
-
-export const FontPreview = function (props) {
-    return (
-        <FontPreviewWrap>
-            <span>AaBbCcYyZz</span>
-        </FontPreviewWrap>
-    );
-};

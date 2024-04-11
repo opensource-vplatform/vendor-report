@@ -1,66 +1,91 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {
+  getAlignSetting,
+  getBorderSetting,
+  getFontSetting,
+  getNumberSetting,
+  numberSettingToFormat,
+} from '@utils/cellSettingUtil';
+import { deepClone } from '@utils/objectUtil';
 
 export const cellSettingSlice = createSlice({
     name: 'cellSettingSlice',
     initialState: {
+        hideCodes: [],
+        callbackId: null,
         visible: false,
-        active:'number',
-        numberSetting:{
-            category: 'general',
-            //小数位数
-            decimalPlacesValue:2,
-            //是否使用千分符
-            useThousandSeparator:false,
-            //货币符号
-            currencySymbol:'',
-            //格式
-            format:'number1',
-            //区域
-            locale:'zh_cn',
-        },
-        alignSetting:{
-            hAlign:3,//水平对齐：常规
-            vAlign:0,//垂直对齐：靠上
-            indentValue:0,//缩进
-            isWrapText:false,//自动换行
-            isShrinkToFit:false,//缩小字体填充
-            isMergeCells:false,//合并单元格
-            isShowEllipsis:false,//显示省略号
-            startDeg:0,//度
-        },
-        fontSetting:{
-            fontFamily:'Calibri',//字体
-            fontWeight:'',
-            fontStyle:'',
-            fontSize:11,
-            textDecoration:'',
-            isStrickoutLine:false,
-            fontColor:'',
-        }
+        active: 'number',
+        //是否多单元格选择
+        isSingleCell: false,
+        //是否绑定选中区域
+        bindRange: true,
+        setting: {},
+        numberSetting: getNumberSetting(),
+        alignSetting: getAlignSetting(),
+        fontSetting: getFontSetting(),
+        borderSetting: getBorderSetting(),
     },
     reducers: {
-        setActive(state, {payload}){
+        hideTab(state, { payload }) {
+            const hideCodes = state.hideCodes;
+            if (hideCodes.indexOf(payload) == -1) {
+                hideCodes.push(payload);
+                state.hideCodes = [...hideCodes];
+            }
+        },
+        setCallbackId(state, { payload }) {
+            state.callbackId = payload;
+        },
+        setActive(state, { payload }) {
             state.active = payload;
         },
-        setVisible(state, {payload}){
+        setVisible(state, { payload }) {
             state.visible = payload;
         },
-        setNumberSetting(state, {payload}){
-            state.numberSetting = payload;
+        setSetting(state, { payload }) {
+            state.setting = payload;
         },
-        setAlignSetting(state, {payload}){
+        setNumberSetting(state, { payload }) {
+            const formatter = numberSettingToFormat(payload);
+            state.numberSetting = {...payload,formatter};
+        },
+        setAlignSetting(state, { payload }) {
             state.alignSetting = payload;
         },
-        setFontSetting(state, {payload}){
+        setFontSetting(state, { payload }) {
             state.fontSetting = payload;
-        }
+        },
+        setBorderSetting(state, { payload }) {
+            state.borderSetting = payload;
+        },
+        setSingleCell(state, { payload }) {
+            state.isSingleCell = payload;
+        },
+        setBindRange(state, { payload }) {
+            state.bindRange = payload;
+        },
+        reset(state) {
+            state.hideCodes = [];
+            state.setting = {};
+            state.numberSetting = deepClone(getNumberSetting());
+            state.alignSetting = deepClone(getAlignSetting());
+            state.fontSetting = deepClone(getFontSetting());
+            state.borderSetting = deepClone(getBorderSetting());
+        },
     },
 });
 export const {
+    hideTab,
+    setCallbackId,
     setActive,
     setVisible,
     setNumberSetting,
     setAlignSetting,
     setFontSetting,
+    setSetting,
+    setBorderSetting,
+    setSingleCell,
+    setBindRange,
+    reset,
 } = cellSettingSlice.actions;
 export default cellSettingSlice.reducer;

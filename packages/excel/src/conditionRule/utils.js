@@ -1,3 +1,7 @@
+import {
+  isFunction,
+  isObject,
+} from '../utils/objectUtils';
 import { getNamespace } from '../utils/spreadUtil';
 
 const STYLES = {
@@ -57,6 +61,40 @@ const STYLES = {
     },
 };
 
-export const getStyle = function (key) {
-    return STYLES[key]();
+const toBorder = function(border){
+    const {color,style} = border;
+    const GC = getNamespace();
+    return new GC.Spread.Sheets.LineBorder(color,style);
+}
+
+const attrValue = function(attr,val){
+    switch(attr){
+        case 'borderLeft':
+        case 'borderRight':
+        case 'borderTop':
+        case 'borderBottom':
+        case 'diagonalDown':
+        case 'diagonalUp':
+            return toBorder(val);
+        default:
+            return val;
+    }
+}
+
+export const getStyle = function (style) {
+    if(typeof style == 'string'){
+        return STYLES[style]();
+    }else if(isObject(style)){
+        const instance = new GC.Spread.Sheets.Style();
+        for(let [key,val] of Object.entries(style)){
+            const handler = instance[key];
+            const attrVal = attrValue(key,val);
+            if(isFunction(handler)){
+                handler.call(instance,attrVal);
+            }else{
+                instance[key] = attrVal;
+            }
+        }
+        return instance;
+    }
 };

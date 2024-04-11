@@ -98,8 +98,8 @@ const ControlledItem = styled.div`
     width: 430px;
     height: 20px;
     margin: 10px 0 0 30px;
-    pointer-events: ${(props) => (props.isWrapText ? 'none' : 'unset')};
-    opacity: ${(props) => (props.isWrapText ? 0.6 : 1)};
+    pointer-events: ${(props) => (props.wordWrap ? 'none' : 'unset')};
+    opacity: ${(props) => (props.wordWrap ? 0.6 : 1)};
     span {
         font-size: 12px;
         margin-left: 3px;
@@ -171,9 +171,9 @@ const PointsBottom = styled.div`
  */
 export default function (props) {
     const {
-        isWrapText,
+        wordWrap,
         textHAlignValue,
-        startDeg,
+        textOrientation,
     } = props;
     const { alignSetting } = useSelector(
         ({ cellSettingSlice }) => cellSettingSlice
@@ -219,7 +219,7 @@ export default function (props) {
 
         if (degree >= maxDegree && degree <= minDegree) {
             degree = Math.round(degree);
-            changeHandler(degree,'startDeg');
+            changeHandler(degree,'textOrientation');
         }
     };
     const handlePointerClick = (e) => {
@@ -250,7 +250,7 @@ export default function (props) {
 
         if (degree >= maxDegree && degree <= minDegree) {
             degree = Math.round(degree);
-            changeHandler(degree,'startDeg');
+            changeHandler(degree,'textOrientation');
         }
     };
 
@@ -315,9 +315,9 @@ export default function (props) {
                             }}
                             max={255}
                             min={0}
-                            value={alignSetting.indentValue}
+                            value={alignSetting.textIndent}
                             onChange={(val) =>
-                                changeHandler(val, 'indentValue')
+                                changeHandler(val, 'textIndent')
                             }
                         ></Integer>
                     </TextItemDIV>
@@ -338,17 +338,17 @@ export default function (props) {
                     <ControlItem>
                         <CheckBox
                             title='自动换行'
-                            value={alignSetting.isWrapText}
-                            onChange={(val) => changeHandler(val, 'isWrapText')}
+                            value={alignSetting.wordWrap}
+                            onChange={(val) => changeHandler(val, 'wordWrap')}
                         ></CheckBox>
                     </ControlItem>
-                    <ControlledItem data-iswraptext={isWrapText}>
+                    <ControlledItem data-iswraptext={wordWrap}>
                         <CheckBox
                             title='缩小字体填充'
-                            value={alignSetting.isShrinkToFit}
-                            disabled={alignSetting.isWrapText}
+                            value={alignSetting.shrinkToFit}
+                            disabled={alignSetting.wordWrap}
                             onChange={(val) =>
-                                changeHandler(val, 'isShrinkToFit')
+                                changeHandler(val, 'shrinkToFit')
                             }
                         ></CheckBox>
                     </ControlledItem>
@@ -364,9 +364,9 @@ export default function (props) {
                     <ControlItem>
                         <CheckBox
                             title='显示省略号'
-                            value={alignSetting.isShowEllipsis}
+                            value={alignSetting.showEllipsis}
                             onChange={(val) =>
-                                changeHandler(val, 'isShowEllipsis')
+                                changeHandler(val, 'showEllipsis')
                             }
                         ></CheckBox>
                     </ControlItem>
@@ -400,7 +400,7 @@ export default function (props) {
                                         marginLeft: '45px',
                                         marginBottom: '3px',
                                         userSelect: 'none',
-                                        transform: `rotate(${-alignSetting.startDeg}deg)`,
+                                        transform: `rotate(${-alignSetting.textOrientation}deg)`,
                                         transformOrigin: 'left center',
                                     }}
                                 >
@@ -417,7 +417,7 @@ export default function (props) {
                                                 130 / 2
                                             }px)`,
                                             background:
-                                                alignSetting.startDeg === -deg
+                                                alignSetting.textOrientation === -deg
                                                     ? 'red'
                                                     : 'black',
                                         }}
@@ -434,8 +434,8 @@ export default function (props) {
                             }}
                             max={90}
                             min={-90}
-                            value={alignSetting.startDeg}
-                            onChange={(val) => changeHandler(val, 'startDeg')}
+                            value={alignSetting.textOrientation}
+                            onChange={(val) => changeHandler(val, 'textOrientation')}
                         ></Integer>
                         <span>度</span>
                     </PointsBottom>

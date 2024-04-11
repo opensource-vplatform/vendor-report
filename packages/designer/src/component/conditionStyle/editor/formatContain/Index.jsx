@@ -6,21 +6,17 @@ import {
 } from 'react-redux';
 
 import { Divider } from '@components/divider/Index';
-import {
-  Button,
-  Select,
-} from '@components/form/Index';
+import { Select } from '@components/form/Index';
 import { Range } from '@components/range/Index';
-import { setVisible } from '@store/cellSettingSlice';
-
 import {
   setEditorConfig,
   setRuleType,
   setShowEditor,
-} from '../../../../store/conditionStyleSlice';
+} from '@store/conditionStyleSlice';
+import { getNamespace } from '@utils/spreadUtil';
+
 import {
   Border,
-  FontPreview,
   HLayout,
   Item,
   Text,
@@ -28,6 +24,10 @@ import {
   VLayout,
 } from '../../Components';
 import { itemStyle } from '../../Utils';
+import {
+  CellPreview,
+  FormatButton,
+} from '../Components';
 
 const Type_Options = [
     { value: 'cellValueRule', text: '单元格值' },
@@ -51,22 +51,22 @@ const Operator_Options_Map = {
         { value: 'lessThanOrEqu', text: '小于或等于' },
     ],
     specificTextRule: [
-        { value: 'containing', text: '包含' },
-        { value: 'notContaining', text: '不包含' },
-        { value: 'beginningWith', text: '始于' },
-        { value: 'endingWith', text: '止于' },
+        { value: 'contains', text: '包含' },
+        { value: 'doesNotContain', text: '不包含' },
+        { value: 'beginsWith', text: '始于' },
+        { value: 'endsWith', text: '止于' },
     ],
     dateOccurringRule: [
         { value: 'yesterday', text: '昨天' },
         { value: 'today', text: '今天' },
         { value: 'tomorrow', text: '明天' },
-        { value: 'last7days', text: '最近7天' },
-        { value: 'lastweek', text: '上周' },
-        { value: 'thisweek', text: '本周' },
-        { value: 'nextweek', text: '下周' },
-        { value: 'lastmonth', text: '上个月' },
-        { value: 'thismonth', text: '本月' },
-        { value: 'nextmonth', text: '下个月' },
+        { value: 'last7Days', text: '最近7天' },
+        { value: 'lastWeek', text: '上周' },
+        { value: 'thisWeek', text: '本周' },
+        { value: 'nextWeek', text: '下周' },
+        { value: 'lastMonth', text: '上个月' },
+        { value: 'thisMonth', text: '本月' },
+        { value: 'nextMonth', text: '下个月' },
     ],
 };
 
@@ -74,13 +74,40 @@ const getOperatorOptions = function (type) {
     return Operator_Options_Map[type];
 };
 
+const enhanceRuleType = function (ruleType, editorConfig) {
+    if (ruleType == 'formulaRule') {
+        const formula = editorConfig.formula;
+        if (formula.startsWith('=ISBLANK(')) {
+            ruleType = 'blanks';
+        } else if (formula.startsWith('=NOT(ISBLANK(')) {
+            ruleType = 'noBlanks';
+        } else if (formula.startsWith('=ISERROR(')) {
+            ruleType = 'errors';
+        } else if (formula.startsWith('=NOT(ISERROR(')) {
+            ruleType = 'noErrors';
+        }
+    }
+    return ruleType;
+};
+
 export default function (props) {
     const { hostId } = props;
     const { editorConfig, ruleType } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     const operatorOptions = getOperatorOptions(ruleType);
     const dispatcher = useDispatch();
+    const { operator } = editorConfig;
+    const needOperator = !!operatorOptions;
+    const needVal = needOperator && ruleType != 'dateOccurringRule';
+    const isSingleVal =
+        needVal &&
+        (ruleType == 'specificTextRule' || ruleType == 'cellValueRule');
+    const isTwoVal =
+        needVal &&
+        ruleType == 'cellValueRule' &&
+        ['between', 'notBetween'].indexOf(operator) != -1;
     return (
         <Fragment>
             <Title>编辑规则说明：</Title>
@@ -91,36 +118,106 @@ export default function (props) {
                         <Item>
                             <Select
                                 datas={Type_Options}
-                                value={ruleType}
+                                value={enhanceRuleType(ruleType,editorConfig)}
                                 onChange={(val) => {
-                                    let operator = null;
+                                    const config = {
+                                        ...editorConfig,
+                                    };
                                     if (val == 'cellValueRule') {
-                                        operator = 'between';
+                                        config.operator = 'between';
                                     } else if (val == 'specificTextRule') {
-                                        operator = 'containing';
+                                        config.operator = 'contains';
+                                        config.value1 = undefined;
+                                        config.value2 = undefined;
                                     } else if (val == 'dateOccurringRule') {
-                                        operator = 'yesterday';
+                                        config.type = 'yesterday';
+                                        config.operator = undefined;
+                                        config.value1 = undefined;
+                                        config.value2 = undefined;
+                                    } else {
+                                        config.operator = undefined;
+                                        config.value1 = undefined;
+                                        config.value2 = undefined;
+                                        let formulaArg = '';
+                                        if (spread) {
+                                            const sheet =
+                                                spread.getActiveSheet();
+                                            if (sheet) {
+                                                const selections =
+                                                    sheet.getSelections();
+                                                const selection = selections[0];
+                                                const GC = getNamespace();
+                                                formulaArg +=
+                                                    GC.Spread.Sheets.CalcEngine.rangeToFormula(
+                                                        selection,
+                                                        0,
+                                                        0,
+                                                        GC.Spread.Sheets
+                                                            .CalcEngine
+                                                            .RangeReferenceRelative
+                                                            .allAbsolute
+                                                    );
+                                            } else {
+                                                formulaArg += '@';
+                                            }
+                                        }
+                                        let formula;
+                                        switch (val) {
+                                            case 'blanks':
+                                                formula =
+                                                    '=ISBLANK(' +
+                                                    formulaArg +
+                                                    ')';
+                                                break;
+                                            case 'noBlanks':
+                                                formula =
+                                                    '=NOT(ISBLANK(' +
+                                                    formulaArg +
+                                                    '))';
+                                                break;
+                                            case 'errors':
+                                                formula =
+                                                    '=ISERROR(' +
+                                                    formulaArg +
+                                                    ')';
+                                                break;
+                                            case 'noErrors':
+                                                formula =
+                                                    '=NOT(ISERROR(' +
+                                                    formulaArg +
+                                                    '))';
+                                        }
+                                        config.formula = formula;
+                                        val = 'formulaRule';
                                     }
-                                    dispatcher(
-                                        setEditorConfig({
-                                            ...editorConfig,
-                                            operator,
-                                        })
-                                    );
+                                    dispatcher(setEditorConfig(config));
                                     dispatcher(setRuleType(val));
                                 }}
                             ></Select>
                         </Item>
                         <Item>
-                            {operatorOptions ? (
+                            {needOperator ? (
                                 <Select
                                     datas={operatorOptions}
-                                    value={editorConfig.operator}
+                                    value={
+                                        ruleType == 'dateOccurringRule'
+                                            ? editorConfig.type
+                                            : editorConfig.operator
+                                    }
                                     onChange={(val) =>
                                         dispatcher(
                                             setEditorConfig({
                                                 ...editorConfig,
-                                                operator: val,
+                                                operator:
+                                                    ruleType ==
+                                                    'dateOccurringRule'
+                                                        ? undefined
+                                                        : val,
+                                                type:
+                                                    ruleType ==
+                                                    'dateOccurringRule'
+                                                        ? val
+                                                        : undefined,
                                             })
                                         )
                                     }
@@ -128,7 +225,7 @@ export default function (props) {
                             ) : null}
                         </Item>
                         <Item>
-                            {operatorOptions ? (
+                            {isSingleVal ? (
                                 <Range
                                     hostId={hostId}
                                     style={{ width: '100%', height: 26 }}
@@ -142,16 +239,25 @@ export default function (props) {
                                         dispatcher(
                                             setEditorConfig({
                                                 ...editorConfig,
-                                                value1: val,
+                                                value1:
+                                                    ruleType ==
+                                                    'specificTextRule'
+                                                        ? undefined
+                                                        : val,
+                                                text:
+                                                    ruleType ==
+                                                    'specificTextRule'
+                                                        ? val
+                                                        : undefined,
                                             })
                                         )
                                     }
                                 ></Range>
                             ) : null}
                         </Item>
-                        {operatorOptions ? <Text>与</Text> : null}
+                        {isTwoVal ? <Text>与</Text> : null}
                         <Item>
-                            {operatorOptions ? (
+                            {isTwoVal ? (
                                 <Range
                                     hostId={hostId}
                                     onStartSelect={() =>
@@ -178,13 +284,11 @@ export default function (props) {
                     </HLayout>
                     <HLayout style={{ ...itemStyle, marginBottom: 16 }}>
                         <Text>预览：</Text>
-                        <FontPreview></FontPreview>
-                        <Button
-                            style={{ height: 30 }}
-                            onClick={() => dispatcher(setVisible(true))}
-                        >
+                        <CellPreview>
+                        </CellPreview>
+                        <FormatButton>
                             格式...
-                        </Button>
+                        </FormatButton>
                     </HLayout>
                 </VLayout>
             </Border>

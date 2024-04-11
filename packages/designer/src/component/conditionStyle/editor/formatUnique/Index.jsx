@@ -1,20 +1,38 @@
 import { Fragment } from 'react';
-import {
-    Text,
-    Title,
-    Border,
-    VLayout,
-    HLayout,
-    Item,
-    FontPreview,
-} from '../../Components';
 
-import { itemStyle } from '../../Utils';
-import { Select, Button } from '@components/form/Index';
-import { Range } from '@components/range/Index';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
 import { Divider } from '@components/divider/Index';
+import { Select } from '@components/form/Index';
+import { setRuleType } from '@store/conditionStyleSlice';
+
+import {
+  Border,
+  HLayout,
+  Item,
+  Text,
+  Title,
+  VLayout,
+} from '../../Components';
+import { itemStyle } from '../../Utils';
+import {
+  CellPreview,
+  FormatButton,
+} from '../Components';
+
+const Select_Options = [
+    { value: 'duplicateRule', text: '重复' },
+    { value: 'uniqueRule', text: '唯一' },
+];
 
 export default function () {
+    const { editorConfig, ruleType } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
+    const dispatcher = useDispatch();
     return (
         <Fragment>
             <Title>编辑规则说明：</Title>
@@ -23,7 +41,11 @@ export default function () {
                     <Text>全部设置格式：</Text>
                     <HLayout style={itemStyle}>
                         <Item>
-                            <Select></Select>
+                            <Select
+                                datas={Select_Options}
+                                value={ruleType}
+                                onChange={(val) => dispatcher(setRuleType(val))}
+                            ></Select>
                         </Item>
                         <Item>
                             <Text>选定范围中的数值</Text>
@@ -34,8 +56,9 @@ export default function () {
                     </HLayout>
                     <HLayout style={{ ...itemStyle, marginBottom: 16 }}>
                         <Text>预览：</Text>
-                        <FontPreview></FontPreview>
-                        <Button style={{ height: 30 }}>格式...</Button>
+                        <CellPreview>
+                        </CellPreview>
+                        <FormatButton></FormatButton>
                     </HLayout>
                 </VLayout>
             </Border>

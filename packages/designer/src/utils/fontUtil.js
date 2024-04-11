@@ -144,11 +144,14 @@ export function parseFont(sheet) {
     );
     let wordWrap = !!style?.wordWrap,
         textDecoration = style?.textDecoration || 0,
-        textOrientation = style?.textOrientation,
+        textOrientation = style?.textOrientation||0,
         isVerticalText = !!style?.isVerticalText,
         hAlign = style?.hAlign || 0,
         vAlign = style?.vAlign || 0,
         backColor = style?.backColor,
+        showEllipsis = !!style?.showEllipsis,
+        shrinkToFit = !!style?.shrinkToFit,
+        textIndent = style?.textIndent||0,
         foreColor = style?.foreColor;
     const {
         fontFamily,
@@ -173,6 +176,9 @@ export function parseFont(sheet) {
         textOrientation,
         textDecoration,
         isVerticalText,
+        showEllipsis,
+        shrinkToFit,
+        textIndent,
     };
 }
 

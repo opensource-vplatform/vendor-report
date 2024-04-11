@@ -16,6 +16,11 @@ class Rule {
         return GC.Spread.Sheets.ConditionalFormatting.IconValueType[type];
     }
 
+    getRowColumnState(state){
+        const GC = getNamespace();
+        return GC.Spread.Sheets.RowColumnStates[state];
+    }
+
     getBarDirection(direction){
         const GC = getNamespace();
         return GC.Spread.Sheets.ConditionalFormatting.BarDirection[direction];
@@ -67,7 +72,7 @@ class Rule {
     }
 
     isTextComparison(type) {
-        return ['contains'].indexOf(type) != -1;
+        return ['contains','doesNotContain','beginsWith','endsWith'].indexOf(type) != -1;
     }
 
     getOperator(type) {

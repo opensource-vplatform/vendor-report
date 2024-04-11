@@ -30,6 +30,12 @@ const ListWrap = styled.div`
     overflow: auto;
     height: 100%;
     width: 100%;
+    &[data-disabled='true'] {
+        opacity: 0.6;
+        user-select: none;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
 `;
 
 const ListItem = styled.div`
@@ -69,15 +75,16 @@ const List = ({
     height = 'auto',
     selectedValue,
     onChange,
+    disabled=false,
     isHasInput = false,
     onDoubleClick = () => {},
     style = {},
 }) => {
     const [filterText, setFilterText] = useState(selectedValue);
     const listDom = createRef(null);
-    const handleItemClick = (value) => {
+    const handleItemClick = (value,text) => {
         onChange(value);
-        setFilterText(value);
+        setFilterText(text);
     };
     useEffect(() => {
         //将选中的元素滚动到可视范围内
@@ -101,17 +108,18 @@ const List = ({
             {isHasInput && (
                 <Input
                     onChange={(e) => setFilterText(e.target.value)}
+                    disabled={disabled}
                     value={filterText}
                 />
             )}
-            <ListWrap ref={listDom}>
+            <ListWrap ref={listDom} data-disabled={disabled}>
                 {values?.map((value, index) => {
                     const isSelected = selectedValue === value;
                     return (
                         <ListItem
                             key={value + index}
                             data-selected={isSelected}
-                            onClick={() => handleItemClick(value)}
+                            onClick={() => handleItemClick(value,value)}
                             onDoubleClick={onDoubleClick}
                         >
                             {value}
@@ -121,14 +129,15 @@ const List = ({
                 {objDatas &&
                     Object.keys(objDatas).map((key) => {
                         const isSelected = selectedValue === key;
+                        const text = objDatas[key];
                         return (
                             <ListItem
                                 key={key}
                                 data-selected={isSelected}
                                 data-style={key.includes('red') ? 'red' : ''}
-                                onClick={() => handleItemClick(key)}
+                                onClick={() => handleItemClick(key,text)}
                             >
-                                {objDatas[key]}
+                                {text}
                             </ListItem>
                         );
                     })}
@@ -139,8 +148,8 @@ const List = ({
                             <ListItem
                                 key={value}
                                 data-selected={isSelected}
-                                data-style={value.includes('red') ? 'red' : ''}
-                                onClick={() => handleItemClick(value)}
+                                data-style={String(value).includes('red') ? 'red' : ''}
+                                onClick={() => handleItemClick(value,text)}
                             >
                                 {text}
                             </ListItem>

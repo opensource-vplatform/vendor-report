@@ -58,8 +58,40 @@ export default function (props) {
                             dispatcher(setEditorConfig({
                                 _type: 'normalConditionRule',
                                 operator:'between',
+                                value1:'',
+                                value2:'',
                             }));
                             dispatcher(setRuleType('cellValueRule'));
+                        }else if(val == 'formatRankedValue'){
+                            dispatcher(setEditorConfig({
+                                _type: 'normalConditionRule',
+                                type: 'top',
+                                rank: 10,
+                            }));
+                            dispatcher(setRuleType('top10Rule'));
+                        }else if(val == 'formatAbove'){
+                            dispatcher(setEditorConfig({
+                                _type: 'normalConditionRule',
+                                type: 'above',
+                            }));
+                            dispatcher(setRuleType('averageRule'));
+                        }else if(val == 'formatUnique'){
+                            dispatcher(setEditorConfig({
+                                _type: 'normalConditionRule',
+                            }));
+                            dispatcher(setRuleType('duplicateRule'));
+                        }else if(val == 'useFormula'){
+                            dispatcher(setEditorConfig({
+                                _type: 'normalConditionRule',
+                                formula: ''
+                            }));
+                            dispatcher(setRuleType('formulaRule'));
+                        }else if(val == 'useRowColumnStates'){
+                            dispatcher(setEditorConfig({
+                                _type: 'stateRule',
+                                state: 'hover'
+                            }));
+                            dispatcher(setRuleType('rowStateRule'));
                         }
                         dispatcher(setEditorType(val))
                     }}

@@ -35,6 +35,7 @@ import {
   isFunction,
 } from '@utils/objectUtil';
 
+import { reset } from '../../store/cellSettingSlice';
 import { withBatchUpdate } from '../../utils/spreadUtil';
 import DateCompareDialog from './DateCompareDialog';
 import { dispatcher } from './dispatcher';
@@ -174,6 +175,11 @@ export default function (props) {
             item.handler(spread, dispatcher, applyRule);
         }
     };
+
+    const clearCellSetting = ()=>{
+        dispatcher(reset());
+    }
+
     const closeTextCompareDialog = () => {
         dispatcher(setTextCompareVisible(false));
     };
@@ -193,6 +199,7 @@ export default function (props) {
         dispatcher(setNumberApplyVisible(false));
     };
     const closeRuleEditor = () => {
+        clearCellSetting();
         dispatcher(setShowEditor(false));
     };
 
@@ -203,6 +210,7 @@ export default function (props) {
         };
         const rule = new ConditionRule(config);
         applyRule(rule);
+        clearCellSetting();
         closeRuleEditor();
     };
 

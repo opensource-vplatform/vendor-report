@@ -83,18 +83,19 @@ const LocaleDiv = styled.div`
 const getDefaultFormat = function(category,locale){
     switch(category){
         case 'currency':
+            return {format:'number1',useThousandSeparator:true};
         case 'numbers':
-            return 'number1';
+            return {format:'number1'};
         case 'date':
-            return locale=="zh_cn" ? "yyyy/M/d":"m/d/yyyy";
+            return {format:locale=="zh_cn" ? "yyyy/M/d":"m/d/yyyy"};
         case 'time':
-            return 'h:mm:ss tt';
+            return {format:'h:mm:ss tt'};
         case 'fractionType':
-            return '分母为一位数(1/4)';
+            return {format:'分母为一位数(1/4)'};
         case 'special':
-            return '00000';
+            return {format:'00000'};
         case 'custom':
-            return 'General';
+            return {format:'General'};
         default:
             return null;
     }
@@ -137,10 +138,10 @@ export default function () {
                     datas={Category_Options}
                     selectedValue={category}
                     onChange={(val) => {
-                        const format = getDefaultFormat(val,numberSetting.locale);
-                        const values = {category:val};
-                        if(format!==null){
-                            values.format = format;
+                        const def = getDefaultFormat(val,numberSetting.locale);
+                        let values = {category:val};
+                        if(def!==null){
+                            values = {...def,...values};
                         }
                         dispatcher(setNumberSetting({
                             ...numberSetting,

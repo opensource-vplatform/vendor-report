@@ -1,19 +1,47 @@
 import { Fragment } from 'react';
-import {
-    Text,
-    Title,
-    Border,
-    VLayout,
-    HLayout,
-    Item,
-    FontPreview,
-} from '../../Components';
 
-import { itemStyle } from '../../Utils';
-import { Select, Button } from '@components/form/Index';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
 import { Divider } from '@components/divider/Index';
+import {
+  Integer,
+  Select,
+} from '@components/form/Index';
+import { setEditorConfig } from '@store/conditionStyleSlice';
+
+import {
+  Border,
+  HLayout,
+  Item,
+  Text,
+  Title,
+  VLayout,
+} from '../../Components';
+import { itemStyle } from '../../Utils';
+import {
+  CellPreview,
+  FormatButton,
+} from '../Components';
+
+const Select_Options = [
+    {
+        value: 'top',
+        text: '前',
+    },
+    {
+        value: 'bottom',
+        text: '后',
+    },
+];
 
 export default function () {
+    const { editorConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
+    const dispatcher = useDispatch();
     return (
         <Fragment>
             <Title>编辑规则说明：</Title>
@@ -22,10 +50,32 @@ export default function () {
                     <Text>为以下排名内的值设置格式：</Text>
                     <HLayout style={itemStyle}>
                         <Item>
-                            <Select></Select>
+                            <Select
+                                datas={Select_Options}
+                                value={editorConfig.type}
+                                onChange={(val) =>
+                                    dispatcher(
+                                        setEditorConfig({
+                                            ...editorConfig,
+                                            type: val,
+                                        })
+                                    )
+                                }
+                            ></Select>
                         </Item>
                         <Item>
-                            <Select></Select>
+                            <Integer
+                                min={1}
+                                value={editorConfig.rank}
+                                onChange={(val) =>
+                                    dispatcher(
+                                        setEditorConfig({
+                                            ...editorConfig,
+                                            rank: val,
+                                        })
+                                    )
+                                }
+                            ></Integer>
                         </Item>
                     </HLayout>
                     <HLayout style={{ ...itemStyle, height: 30 }}>
@@ -33,8 +83,9 @@ export default function () {
                     </HLayout>
                     <HLayout style={{ ...itemStyle, marginBottom: 16 }}>
                         <Text>预览：</Text>
-                        <FontPreview></FontPreview>
-                        <Button style={{ height: 30 }}>格式...</Button>
+                        <CellPreview>
+                        </CellPreview>
+                        <FormatButton></FormatButton>
                     </HLayout>
                 </VLayout>
             </Border>

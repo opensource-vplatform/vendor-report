@@ -10,13 +10,20 @@ import {
   CheckBox,
   ColorPicker,
 } from '@components/form/Index';
+import { List } from '@components/list/Index';
+import { Preview } from '@components/preview/Index';
 import Select from '@components/Select/Index';
 import {
   getFontFamilies,
   getFontSizes,
 } from '@metadatas/font';
+import { setFontSetting } from '@store/cellSettingSlice';
 
-import List from '../../list/List';
+import {
+  isLineThrough,
+  withLineThrough,
+  withoutLineThrough,
+} from '../../../utils/textDecorationUtil';
 import {
   FontStyle,
   UnderlineStyle,
@@ -92,14 +99,23 @@ const FontColor = styled.div`
     }
 `;
 
-// 转成列表数据格式
-const fontFamiliesToListData = function (metadatas) {
-    const result = [];
-    metadatas.forEach((metadata) => {
-        result.push(metadata.value);
-    });
-    return result;
-};
+const Font_Family_Options = getFontFamilies().map(({value,text})=>{
+    return {value,text}
+});
+
+const Font_Style_Options = Object.entries(FontStyle).map(([key, val]) => {
+    return {
+        value: key,
+        text: val,
+    };
+});
+
+const Font_Size_Options = getFontSizes().map(({ value, text }) => {
+    return {
+        value,
+        text,
+    };
+});
 
 // 转换字形选择框对应的key
 function transformFontToselectedFontStyleKey(fontWeight, fontStyle) {
@@ -114,7 +130,7 @@ function transformFontToselectedFontStyleKey(fontWeight, fontStyle) {
         selectFontKey = 'italic';
     }
 
-    return FontStyle[selectFontKey];
+    return selectFontKey;
 }
 
 /*
@@ -122,41 +138,15 @@ function transformFontToselectedFontStyleKey(fontWeight, fontStyle) {
  */
 export default function (props) {
     const dispatcher = useDispatch();
-    const fontFamilies = getFontFamilies();
-    const fontSizes = getFontSizes();
-    const {
-        selectedFontFamily,
-        selectedFontSize,
-        selectedFontStyle = [],
-        setSelectedFontStyle,
-        selectedUnderlineStyle,
-    } = props;
-    const { fontSetting } = useSelector(
+    const { borderSetting,fontSetting,setting,numberSetting } = useSelector(
         ({ cellSettingSlice }) => cellSettingSlice
     );
-
-    const handleFontStyle = (value) => {
-        const keys = Object.keys(FontStyle);
-        const selectedOptionValue = keys.find((k) => FontStyle[k] === value);
-        selectedOptionValue &&
-            setSelectedFontStyle(selectedOptionValue.toString());
-    };
-
-    // 解析TextDecoration数值
-    function parseTextDecoration(textDecoration) {
-        if (textDecoration == 1 || textDecoration - 2 == 1) {
-            return '单下划线';
-        } else if (textDecoration == 8 || textDecoration - 2 == 8) {
-            return '双下划线';
-        } else {
-            return '无';
-        }
-    }
-
+    const { fontFamily, fontSize, fontWeight, fontStyle, textDecoration } =
+        fontSetting;
     const changeHandler = (val, attrName) => {
         dispatcher(
-            setNumberSetting({
-                ...numberSetting,
+            setFontSetting({
+                ...fontSetting,
                 [attrName]: val,
             })
         );
@@ -170,8 +160,9 @@ export default function (props) {
                         width='320px'
                         height='150px'
                         isHasInput={true}
-                        values={fontFamiliesToListData(fontFamilies)}
-                        selectedValue={fontSetting.fontFamily}
+                        datas={Font_Family_Options}
+                        selectedValue={fontFamily}
+                        disabled={setting?.font?.fontFamily === false}
                         onChange={(val) => changeHandler(val, 'fontFamily')}
                     />
                 </FontList>
@@ -181,12 +172,31 @@ export default function (props) {
                         width='160px'
                         height='150px'
                         isHasInput={true}
-                        values={Object.values(FontStyle)}
+                        datas={Font_Style_Options}
+                        disabled={setting?.font?.fontStyle === false}
                         selectedValue={transformFontToselectedFontStyleKey(
-                            fontSetting.fontWeight,
-                            fontSetting.fontStyle
+                            fontWeight,
+                            fontStyle
                         )}
-                        onChange={handleFontStyle}
+                        onChange={(val) => {
+                            let fontWeight = null,
+                                fontStyle = null;
+                            if (val == 'italic') {
+                                fontStyle = 'italic';
+                            } else if (val == 'bold') {
+                                fontWeight = 'bold';
+                            } else if (val == 'bolditalic') {
+                                fontStyle = 'italic';
+                                fontWeight = 'bold';
+                            }
+                            dispatcher(
+                                setFontSetting({
+                                    ...fontSetting,
+                                    fontWeight,
+                                    fontStyle,
+                                })
+                            );
+                        }}
                     />
                 </FontStyleSelect>
                 <FontSizeSelect>
@@ -195,9 +205,10 @@ export default function (props) {
                         width='160px'
                         height='150px'
                         isHasInput={true}
-                        values={fontFamiliesToListData(fontSizes)}
-                        selectedValue={fontSetting.fontSize}
-                        onChange={(val) => changeHandler(val, 'fontSizes')}
+                        datas={Font_Size_Options}
+                        selectedValue={fontSize}
+                        disabled={setting?.font?.fontSize === false}
+                        onChange={(val) => changeHandler(val, 'fontSize')}
                     />
                 </FontSizeSelect>
             </FontTop>
@@ -214,12 +225,18 @@ export default function (props) {
                             optionStyle={{
                                 width: '321px',
                             }}
-                            onChange={(val) =>
-                                changeHandler(val, 'textDecoration')
+                            disabled={setting?.font?.underlineStyle === false}
+                            onChange={(val) => {
+                                val = isLineThrough(textDecoration)
+                                    ? withLineThrough(val)
+                                    : val;
+                                changeHandler(val, 'textDecoration');
+                            }}
+                            value={
+                                isLineThrough(textDecoration)
+                                    ? withoutLineThrough(textDecoration)
+                                    : textDecoration
                             }
-                            value={parseTextDecoration(
-                                fontSetting.textDecoration
-                            )}
                         ></Select>
                     </div>
                     <EffectItem>
@@ -235,13 +252,27 @@ export default function (props) {
                                 alignItems: 'center',
                             }}
                         >
-                            <legend>特殊效果</legend>
+                            <legend style={{ marginLeft: 8 }}>特殊效果</legend>
                             <Strikethrough>
                                 <CheckBox
-                                    value={fontSetting.isStrickoutLine}
-                                    onChange={(val) =>
-                                        changeHandler(val, 'isStrickoutLine')
-                                    }
+                                    value={isLineThrough(
+                                        fontSetting.textDecoration
+                                    )}
+                                    title='删除线'
+                                    style={{ marginLeft: 8 }}
+                                    disabled={setting?.font?.lineThrough === false}
+                                    onChange={(val) => {
+                                        changeHandler(
+                                            val
+                                                ? withLineThrough(
+                                                      fontSetting.textDecoration
+                                                  )
+                                                : withoutLineThrough(
+                                                      fontSetting.textDecoration
+                                                  ),
+                                            'textDecoration'
+                                        );
+                                    }}
                                 ></CheckBox>
                             </Strikethrough>
                         </fieldset>
@@ -254,8 +285,9 @@ export default function (props) {
                         <ColorPicker
                             style={{ marginLeft: 5 }}
                             panelStyle={{ width: '188px', marginLeft: 5 }}
-                            onChange={(val)=>changeHandler(val,'fontColor')}
-                            value={fontSetting.fontColor}
+                            onChange={(val) => changeHandler(val, 'foreColor')}
+                            value={fontSetting.foreColor}
+                            disabled={setting?.font?.foreColor === false}
                         ></ColorPicker>
                     </FontColor>
                     <div>
@@ -273,37 +305,28 @@ export default function (props) {
                                 justifyContent: 'center',
                             }}
                         >
-                            <legend>预览</legend>
-                            <div
+                            <legend style={{ marginLeft: 8 }}>预览</legend>
+                            <Preview
                                 style={{
-                                    fontFamily: fontSetting.fontFamily,
-                                    fontWeight: fontSetting.fontStyle.includes(
-                                        'bold'
-                                    )
-                                        ? 'bold'
-                                        : 'normal',
-                                    fontSize: fontSetting.fontSize + 'pt',
-                                    color: fontSetting.fontColor,
-                                    fontStyle: fontSetting.fontStyle.includes(
-                                        'italic'
-                                    )
-                                        ? 'italic'
-                                        : 'normal',
-                                    textDecorationLine: `${
-                                        fontSetting.isStrickoutLine ? 'line-through' : ''
-                                    } ${
-                                        selectedUnderlineStyle === '单下划线'
-                                            ? 'underline'
-                                            : ''
-                                    }`,
-                                    borderBottom:
-                                        selectedUnderlineStyle === '双下划线'
-                                            ? `3px double ${selectedFontColor}`
-                                            : 'unset',
+                                    width: 260,
+                                    height: 60,
                                 }}
-                            >
-                                AaBbCcYyZz
-                            </div>
+                                format={numberSetting.formatSetting}
+                                borderLeft={borderSetting.borderLeft}
+                                borderRight={borderSetting.borderRight}
+                                borderTop={borderSetting.borderTop}
+                                borderBottom={borderSetting.borderBottom}
+                                innerHorizontal={borderSetting.innerHorizontal}
+                                innerVertical={borderSetting.innerVertical}
+                                diagonalDown={borderSetting.diagonalDown}
+                                diagonalUp={borderSetting.diagonalUp}
+                                fontFamily={fontSetting.fontFamily}
+                                textDecoration={fontSetting.textDecoration}
+                                fontWeight={fontSetting.fontWeight}
+                                fontStyle={fontSetting.fontStyle}
+                                fontSize={fontSetting.fontSize}
+                                foreColor={fontSetting.foreColor}
+                            ></Preview>
                         </fieldset>
                     </div>
                 </FontRight>
