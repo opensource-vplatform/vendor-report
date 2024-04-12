@@ -21,6 +21,7 @@ import {
   setDuplicateCompareVisible,
   setNumberApplyVisible,
   setNumberCompareVisible,
+  setRuleManagerVisible,
   setShowEditor,
   setTextBetweenVisible,
   setTextCompareVisible,
@@ -37,6 +38,7 @@ import {
 
 import { reset } from '../../store/cellSettingSlice';
 import { withBatchUpdate } from '../../utils/spreadUtil';
+import ConditionRuleManager from './ConditionRuleManager';
 import DateCompareDialog from './DateCompareDialog';
 import { dispatcher } from './dispatcher';
 import DuplicateCompareDialog from './DuplicateCompareDialog';
@@ -143,7 +145,7 @@ const Condition_Menu_Datas = [
             'clearSeletedRules',
             '清除所选单元格的规则',
             null,
-            (spread, setData) => {
+            (spread, dispatcher) => {
                 clearSelectedRules(spread);
             }
         ),
@@ -151,7 +153,7 @@ const Condition_Menu_Datas = [
             'clearAllRules',
             '清除整个工作表的规则',
             null,
-            (spread, setData) => {
+            (spread, dispatcher) => {
                 clearSheetRules(spread);
             }
         ),
@@ -159,7 +161,10 @@ const Condition_Menu_Datas = [
     toNormalMenu(
         'conditionFormatManageRule',
         '管理规则...',
-        ConditionFormatManageRuleIcon
+        ConditionFormatManageRuleIcon,
+        (spread, dispatcher)=>{
+            dispatcher(setRuleManagerVisible(true));
+        }
     ),
 ];
 
@@ -176,9 +181,9 @@ export default function (props) {
         }
     };
 
-    const clearCellSetting = ()=>{
+    const clearCellSetting = () => {
         dispatcher(reset());
-    }
+    };
 
     const closeTextCompareDialog = () => {
         dispatcher(setTextCompareVisible(false));
@@ -297,6 +302,9 @@ export default function (props) {
                     onCancel={closeRuleEditor}
                     onConfirm={applyNewRule}
                 ></RuleEditor>
+            ) : null}
+            {conditionStyle.ruleManagerVisible ? (
+                <ConditionRuleManager></ConditionRuleManager>
             ) : null}
         </Fragment>
     );

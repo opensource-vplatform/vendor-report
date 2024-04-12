@@ -9,6 +9,11 @@ export const isArray = function (obj) {
 export const isFunction = function (obj) {
     return is(obj, 'function');
 };
+
+export const isString = function(obj){
+    return is(obj,'string');
+}
+
 export const isNull = function (obj) {
     return obj === null;
 };

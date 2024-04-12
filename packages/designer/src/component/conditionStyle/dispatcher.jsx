@@ -3,6 +3,7 @@ import {
   setDateCompareVisible,
   setDuplicateCompareConfig,
   setDuplicateCompareVisible,
+  setEditorConfig,
   setEditorType,
   setNumberApplyConfig,
   setNumberApplyVisible,
@@ -16,8 +17,6 @@ import {
   setTextCompareVisible,
 } from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
-
-import { setEditorConfig } from '../../store/conditionStyleSlice';
 
 const dispatcher = {
     highlightCellsRulesGreaterThan: (spread, dispatcher) => {

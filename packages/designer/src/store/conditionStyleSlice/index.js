@@ -68,6 +68,7 @@ export const conditionStyleSlice = createSlice({
         },
         duplicateCompareVisible: false,
         duplicateCompareConfig: { title: '', desc: '' },
+        ruleManagerVisible:false,
     },
     reducers: {
         setShowEditor(state, { payload }) {
@@ -118,6 +119,9 @@ export const conditionStyleSlice = createSlice({
         setDuplicateCompareConfig(state, { payload }) {
             state.duplicateCompareConfig = payload;
         },
+        setRuleManagerVisible(state, { payload }){
+            state.ruleManagerVisible = payload;
+        }
     },
 });
 export const {
@@ -137,5 +141,6 @@ export const {
     setTextBetweenVisible,
     setTextBetweenConfig,
     setShowEditor,
+    setRuleManagerVisible,
 } = conditionStyleSlice.actions;
 export default conditionStyleSlice.reducer;

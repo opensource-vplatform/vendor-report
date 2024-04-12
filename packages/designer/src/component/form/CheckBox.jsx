@@ -35,6 +35,7 @@ export default function (props) {
         value,
         onChange,
         style = {},
+        iconStyle = {},
         disabled,
         desc = '',
         children,
@@ -60,6 +61,7 @@ export default function (props) {
                         ...defaultStyle,
                         color: dsb ? '#bdbdbd' : '#0075ff',
                     }}
+                    iconStyle={iconStyle}
                 >
                     {children}
                 </FillCheckIcon>
@@ -69,6 +71,7 @@ export default function (props) {
                         ...defaultStyle,
                         color: dsb ? '#bdbdbd' : '#6d6d6d',
                     }}
+                    iconStyle={iconStyle}
                 >
                     {children}
                 </FillUnCheckIcon>
