@@ -2,6 +2,7 @@ import {
   Fragment,
   useCallback,
   useContext,
+  useRef,
 } from 'react';
 
 import {
@@ -28,6 +29,10 @@ import {
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
+  toggleBooleanValue,
+  updateTemplateName,
+} from '@store/wizardSlice';
+import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
@@ -38,16 +43,19 @@ import {
 import { parseFont } from '@utils/fontUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
-import { BindingPathCellType } from './component/defineDatasource/utils/utils';
+import {
+  formatBindingPathCellType,
+} from './component/defineDatasource/utils/utils';
 import DesignerContext from './DesignerContext';
 import { isLineThrough } from './utils/fontUtil';
-
-const bindingPathCellType = new BindingPathCellType();
 
 export default function () {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
     const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
+    const { template } = useSelector(({ wizardSlice }) => wizardSlice);
+    const cacheDatas = useRef({ template }).current;
+    cacheDatas.template = template;
     const sheetName = 'Person Address';
     const handleValueChanged = useCallback((type, args) => {
         const { sheet, row, col, newValue } = args;
@@ -84,22 +92,32 @@ export default function () {
         dispatch(setSelectedFontColor({ selectedFontColor: foreColor }));
         fire({
             event: EVENTS.EnterCell,
-            args: [args]
-        });
-    };
-    const handleActiveSheetChanged = useCallback((type, args) => {
-        const sheet = args.newSheet;
-        const styles = parseFont(sheet);
-        const tablePaths = getActiveSheetTablesPath({ sheet });
-        dispatch(updateActiveSheetTablePath({ tablePaths }));
-        dispatch(setFontStyles({ styles }));
-        dispatch(resetView());
-        dispatch(hideTab({ code: 'table' }));
-        fire({
-            event: EVENTS.ActiveSheetChanged,
             args: [args],
         });
-    });
+    };
+    const handleActiveSheetChanged = useCallback(
+        (type, args) => {
+            const sheet = args.newSheet;
+            const styles = parseFont(sheet);
+            const tablePaths = getActiveSheetTablesPath({ sheet });
+            const sheetName = sheet.name();
+            dispatch(updateActiveSheetTablePath({ tablePaths }));
+            dispatch(setFontStyles({ styles }));
+            dispatch(resetView());
+            dispatch(hideTab({ code: 'table' }));
+            dispatch(
+                toggleBooleanValue({
+                    code: 'currentSheetIsTemplate',
+                    value: cacheDatas.template[sheetName] ? true : false,
+                })
+            );
+            fire({
+                event: EVENTS.ActiveSheetChanged,
+                args: [args],
+            });
+        },
+        [template]
+    );
     const handleWorkbookInitialized = useCallback((spread) => {
         const menuDatas = spread.contextMenu.menuData;
         for (let i = 0, l = menuDatas.length; i < l; i++) {
@@ -131,23 +149,7 @@ export default function () {
 
         //对已经绑定了数据源的单元格进行类型设置，设置后就可以看到当前单元格已经绑定了哪个数据源
         spread.sheets.forEach((sheet) => {
-            const dataTable = sheet.toJSON().data.dataTable;
-            if (!dataTable) {
-                return;
-            }
-            Object.entries(dataTable).forEach(([rowStr, colValue]) => {
-                const row = Number(rowStr);
-                Object.entries(colValue).forEach(
-                    ([colStr, { bindingPath }]) => {
-                        if (bindingPath) {
-                            const col = Number(colStr);
-                            sheet
-                                .getCell(row, col)
-                                .cellType(bindingPathCellType);
-                        }
-                    }
-                );
-            });
+            formatBindingPathCellType(sheet);
         });
         fire({
             event: EVENTS.Inited,
@@ -195,6 +197,7 @@ export default function () {
     const license = context?.conf?.license;
 
     const json = context?.conf?.json?.reportJson;
+
     return (
         <Fragment>
             <Workbook
@@ -207,12 +210,25 @@ export default function () {
                 onInited={handleWorkbookInitialized}
                 onEnterCell={handleEnterCell}
                 onActiveSheetChanged={handleActiveSheetChanged}
+                onActiveSheetChanging={function (a, b, c) {
+                    console.log(a, b);
+                    console.log(11111);
+                }}
                 onValueChanged={handleValueChanged}
                 onSelectionChanged={handleSelectionChanged}
                 onSelectionChanging={handleSelectionChanging}
                 onSheetChanged={handleSheetChanged}
                 onEditorStatusChanged={handleEditorStatusChanged}
                 onRendered={handleRendered}
+                onSheetNameChanged={function (aciton, datas) {
+                    const { newValue, oldValue } = datas;
+                    dispatch(
+                        updateTemplateName({
+                            oldName: oldValue,
+                            newName: newValue,
+                        })
+                    );
+                }}
             >
                 <Worksheet
                     name={sheetName}

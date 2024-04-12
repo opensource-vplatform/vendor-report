@@ -165,6 +165,7 @@ export default function Index(props) {
                                 id === activeId ? 'active' : ''
                             } ${draggableClass}`}
                             data-item-id={id}
+                            data-item-parent-id={parentId}
                             style={{ paddingLeft: indent + 'px' }}
                             draggable={isDraggable}
                             data-children-count={

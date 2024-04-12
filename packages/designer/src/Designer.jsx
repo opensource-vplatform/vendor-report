@@ -28,6 +28,7 @@ import {
   setActive,
   showTab,
 } from '@store/navSlice/navSlice';
+import { initWizardSlice } from '@store/wizardSlice';
 import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 
@@ -146,6 +147,12 @@ function Designer(props) {
                     datasourceSlice: conf?.json?.context?.datasourceSlice,
                 })
             );
+
+            dispatch(
+                initWizardSlice({
+                    wizardSlice: conf?.json?.context?.wizardSlice,
+                })
+            );
         },
         [conf?.dataSource?.dataSourceDefinition]
     );
@@ -184,11 +191,15 @@ function Designer(props) {
                             onResize={() => spread.refresh()}
                         >
                             <EditorBar></EditorBar>
-                            <Resizer size={10} minSize={26} direction='v'></Resizer>
+                            <Resizer
+                                size={10}
+                                minSize={26}
+                                direction='v'
+                            ></Resizer>
                             <SpreadWrap
                                 style={{
                                     overflow: 'hidden',
-                                    borderTop: '1px solid #ababab'
+                                    borderTop: '1px solid #ababab',
                                 }}
                             >
                                 <SplitPane

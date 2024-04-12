@@ -1,5 +1,7 @@
 const urlSearchParams = new URLSearchParams(window.location.search);
 let id = urlSearchParams.get('id');
+const enterpriseCode = urlSearchParams.get('enterpriseCode');
+const projectCode = urlSearchParams.get('projectCode');
 if (!id) {
     id =
         Math.random().toString(36).slice(2) +
@@ -49,18 +51,25 @@ const onSave = function (json, context) {
 //获取报表配置信息和数据源定义信息
 
 async function init() {
+    let config = '';
+    let dataSourceDefinition = [];
     try {
         //获取数据集
-        const defineResponse = await axios.get(queryAllDataNodesURI);
-        const { define: dataSourceDefinition = [] } =
-            defineResponse?.data?.data || {};
+        const defineResponse = await axios.get(
+            `${queryAllDataNodesURI}&enterpriseCode=${enterpriseCode}&projectCode=${projectCode}`
+        );
+
+        let define = (defineResponse?.data?.data || {}).define;
+
+        dataSourceDefinition = Array.isArray(define) ? define : [];
 
         //获取报表配置数据
         const configResponse = await axios.get(
             `${getReportConfigURI}&isLoadData=false&id=${id}`
         );
-        const { config = '' } = configResponse?.data?.data || {};
-
+        config = (configResponse?.data?.data || {}).config;
+    } catch (error) {
+    } finally {
         //实例化设计器
         var designer = new TOONE.Report.Designer({
             //配置详情参考README.md
@@ -91,7 +100,7 @@ async function init() {
         });
         //设计器挂载到指定dom元素
         designer.mount(document.getElementById('app'));
-    } catch (error) {}
+    }
 }
 
 init();

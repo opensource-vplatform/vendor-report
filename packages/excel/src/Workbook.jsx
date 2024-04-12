@@ -83,9 +83,408 @@ const tableMerge = function (params) {
     }
 };
 
-function parseJsonData(jsonData, datas) {
+function getRowRules({ rules, row }) {
+    let result = rules;
+    if (Number.isFinite(row) && row >= 0) {
+        result =
+            rules.filter(function ({ ranges }) {
+                return ranges.some(function ({ row: _row, rowCount }) {
+                    return _row <= row && row < _row + rowCount;
+                });
+            }) || [];
+    }
+    return result;
+}
+
+function getColRules({ rules, col, colHandler }) {
+    let result = rules;
+    if (Number.isFinite(col) && col >= 0) {
+        result = result.filter(function (item) {
+            const { ranges } = item;
+            const res = ranges.some(function ({ col: _col, colCount }) {
+                return _col <= col && col < _col + colCount;
+            });
+
+            if (res && typeof colHandler === 'function') {
+                colHandler(JSON.parse(JSON.stringify(item)));
+            }
+            return res;
+        });
+    }
+
+    return result;
+}
+
+function getCellRules(params) {
+    let result = getRowRules(params);
+    result = getColRules({ ...params, rules: result });
+    return result;
+}
+
+//处理每一页的头部区域
+function handleReportHeaderArea(params) {
+    let {
+        row,
+        rows,
+        spans,
+        pageRows,
+        pageSpans,
+        handler,
+        startRow = 0,
+        currentPageRowIndex = 0,
+        headerDataTableObj,
+        pageDataTable,
+        headerRules = {},
+        pageRules = [],
+    } = params;
+
+    for (let i = 0; i < row; i++) {
+        currentPageRowIndex = i + startRow;
+        if (headerDataTableObj[i]) {
+            pageDataTable[currentPageRowIndex] = JSON.parse(
+                JSON.stringify(headerDataTableObj[i])
+            );
+        }
+        spans.forEach(function (item) {
+            if (item.row === i) {
+                pageSpans.push({
+                    ...item,
+                    row: currentPageRowIndex,
+                });
+            }
+        });
+        if (headerRules[i]) {
+            headerRules[i].forEach(function (rule) {
+                pageRules.push({
+                    ...rule,
+                    ranges: [
+                        {
+                            ...rule.ranges[0],
+                            row: currentPageRowIndex,
+                        },
+                    ],
+                });
+            });
+        }
+
+        if (rows[i]) {
+            pageRows[i] = rows[i];
+        }
+        handler();
+    }
+
+    return {
+        currentPageRowIndex,
+    };
+}
+
+//处理每一页的表格区域
+function handleContentArea(params) {
+    let {
+        rows,
+        spans,
+        pageRows,
+        pageSpans,
+        handler,
+        currentPageRowIndex = 0,
+        page,
+        pageDataTable,
+        rules = [],
+        pageRules = [],
+    } = params;
+
+    let preRow = -1;
+    let tableEndRow = -1;
+    let height = 0;
+    Object.entries(page).forEach(function ([rowStr, value]) {
+        const row = Number(rowStr);
+        let addRowCount = 1;
+        if (preRow !== -1) {
+            addRowCount = row - preRow;
+        }
+        currentPageRowIndex += addRowCount;
+        tableEndRow = currentPageRowIndex;
+        spans.forEach(function (item) {
+            if (item.row === row) {
+                pageSpans.push({
+                    ...item,
+                    row: tableEndRow,
+                });
+            }
+        });
+
+        rules.forEach(function (rule) {
+            const range = rule.ranges?.[0];
+            if (range?.row === row) {
+                pageRules.push({
+                    ...rule,
+                    ranges: [
+                        {
+                            ...range,
+                            row: tableEndRow,
+                        },
+                    ],
+                });
+            }
+        });
+        if (rows[row]) {
+            pageRows[tableEndRow] = rows[row];
+            height += rows[row];
+        } else {
+            height += 20;
+        }
+        pageDataTable[tableEndRow] = value;
+        tableEndRow += addRowCount;
+        preRow = row;
+
+        handler({
+            addRowCount,
+            tableEndRow,
+        });
+    });
+    return {
+        currentPageRowIndex,
+        height,
+    };
+}
+
+//处理每一页的尾部区域
+function handleTailArea(params) {
+    let {
+        rows,
+        spans,
+        pageRows,
+        pageSpans,
+        handler,
+        currentPageRowIndex = 0,
+        pageDataTable,
+        maxTableEndRow,
+        oldSheetCount,
+        footerDataTableObj,
+        footerRules = {},
+        pageRules = [],
+    } = params;
+
+    for (let i = maxTableEndRow + 1; i < oldSheetCount; i++) {
+        let index = currentPageRowIndex++;
+        spans.forEach(function (item) {
+            if (item.row === i) {
+                pageSpans.push({
+                    ...item,
+                    row: index,
+                });
+            }
+        });
+        if (rows[i]) {
+            pageRows[index] = rows[i];
+        }
+        if (footerRules[i]) {
+            footerRules[i].forEach(function (rule) {
+                pageRules.push({
+                    ...rule,
+                    ranges: [
+                        {
+                            ...rule.ranges[0],
+                            row: index,
+                        },
+                    ],
+                });
+            });
+        }
+        pageDataTable[index] = JSON.parse(
+            JSON.stringify(footerDataTableObj[i])
+        );
+        handler();
+    }
+
+    return {
+        currentPageRowIndex,
+    };
+}
+
+function setSheetRows(sheet, rows) {
+    if (sheet.rows) {
+        Object.keys(sheet.rows).forEach(function (key) {
+            delete sheet.rows[key];
+        });
+        Object.entries(rows).forEach(function ([key, value]) {
+            sheet.rows[key] = value;
+        });
+    } else {
+        sheet.rows = rows;
+    }
+}
+
+function headerAndFooterInfo(params) {
+    const {
+        other_dataTable,
+        minTableStartRow,
+        maxTableEndRow,
+        rules,
+        rows,
+        oldSheetCount,
+    } = params;
+    //头部与尾部
+    const headerDataTableObj = {};
+    const footerDataTableObj = {};
+    const headerRules = {};
+    const footerRules = {};
+
+    other_dataTable.forEach(function (item) {
+        const { row, col, cellInfo } = item;
+        if (row >= minTableStartRow && row <= maxTableEndRow) {
+            return;
+        }
+        let dataTable = headerDataTableObj;
+        let newRules = headerRules;
+        if (row > maxTableEndRow) {
+            dataTable = footerDataTableObj;
+            newRules = footerRules;
+        }
+        dataTable[row] = dataTable[row] ? dataTable[row] : {};
+        dataTable[row][col] = JSON.parse(JSON.stringify(cellInfo));
+
+        const cellRules = getCellRules({
+            rules,
+            row,
+            col,
+        });
+        if (cellRules) {
+            newRules[row] = newRules[row] ? newRules[row] : [];
+            cellRules.forEach(function (rule) {
+                newRules[row].push({
+                    ...rule,
+                    ranges: [
+                        {
+                            row,
+                            col,
+                            rowCount: 1,
+                            colCount: 1,
+                        },
+                    ],
+                });
+            });
+        }
+    });
+
+    //头部总高度,行高默认是20
+    let headerHeight = 0;
+
+    for (let i = 0; i < minTableStartRow; i++) {
+        const rowH = rows?.[i];
+        if (rowH) {
+            headerHeight += rowH?.size;
+        } else {
+            headerHeight += 20;
+        }
+    }
+
+    //尾部总高度,行高默认是20
+    let footerHeight = 0;
+    for (let i = maxTableEndRow + 1; i < oldSheetCount; i++) {
+        const rowH = rows?.[i];
+        if (rowH) {
+            footerHeight += rowH?.size;
+        } else {
+            footerHeight += 20;
+        }
+    }
+
+    return {
+        headerDataTableObj,
+        footerDataTableObj,
+        headerRules,
+        footerRules,
+        headerHeight,
+        footerHeight,
+    };
+}
+
+function parseJsonData(jsonData, datas, _template = {}) {
     const sheetsInfo = {};
-    debugger;
+    const newSheets = {};
+    const groupsDatas = {};
+    let sheetCount = jsonData.sheetCount;
+    const template = { ..._template };
+    const changedGroupNames = []; //用于判断sheet名称是否重复
+    //如果有模板，则对数据进行分组，每个组一个sheet
+    Object.entries(_template).forEach(function ([sheetName, templateValue]) {
+        const groups = templateValue?.groups;
+        if (!groups) {
+            return;
+        }
+        if (templateValue?.isCurrentSheet) {
+            return;
+        }
+        const templateInfo = template[sheetName];
+        const currentSheetDatas = {};
+        //对数据进行分组，分组的名称就是sheet的名称
+        Object.entries(groups).some(function ([dsName, group]) {
+            currentSheetDatas[dsName] = {};
+            const toBeGroupedData = datas[dsName];
+            if (
+                Array.isArray(toBeGroupedData) &&
+                Array.isArray(group) &&
+                group.length
+            ) {
+                const groupFieldCode = group?.[0]?.code;
+                toBeGroupedData.forEach(function (item) {
+                    const groupName = item[groupFieldCode];
+                    if (!Array.isArray(currentSheetDatas[dsName][groupName])) {
+                        currentSheetDatas[dsName][groupName] = [];
+                    }
+                    currentSheetDatas[dsName][groupName].push(item);
+                });
+            }
+        });
+        const sheet = jsonData?.sheets?.[sheetName];
+        if (sheet) {
+            const cobySheet = JSON.stringify(sheet);
+            //根据分组名称创建sheet，Object.values(groupsDatas)[0]，只支持一个实体进行分组
+            const grouedData = Object.values(currentSheetDatas)[0];
+            const groupNames = Object.keys(grouedData);
+            groupNames.forEach(function (_newSheetName, index) {
+                let newSheetName = _newSheetName;
+                //处理同名的sheet
+                let suffix = 1;
+                while (jsonData.sheets[newSheetName]) {
+                    newSheetName = `${_newSheetName}${suffix++}`;
+                }
+                while (
+                    (groupNames.includes(newSheetName) &&
+                        newSheetName !== _newSheetName) ||
+                    changedGroupNames.includes(newSheetName)
+                ) {
+                    newSheetName = `${_newSheetName}${suffix++}`;
+                }
+                //更改修正后的名称
+                if (newSheetName !== _newSheetName) {
+                    const cache = currentSheetDatas[_newSheetName];
+                    delete currentSheetDatas[_newSheetName];
+                    currentSheetDatas[newSheetName] = cache;
+                }
+                changedGroupNames.push(newSheetName);
+
+                groupsDatas[newSheetName] = currentSheetDatas;
+
+                if (index <= 0) {
+                    sheet.name = newSheetName;
+                } else {
+                    const sheet = JSON.parse(cobySheet);
+                    sheet.name = newSheetName;
+                    sheet.isSelected = false;
+                    sheet.index = sheetCount++;
+                    sheet.order = sheet.index;
+                    jsonData.sheets[newSheetName] = sheet;
+                    jsonData.sheetCount += 1;
+                }
+                template[newSheetName] = templateInfo;
+            });
+        }
+        //只支持一个实体进行分组
+        return true;
+    });
+
     Object.values(jsonData.sheets).forEach(function (sheet) {
         const {
             name,
@@ -93,13 +492,25 @@ function parseJsonData(jsonData, datas) {
             data,
             tables = [],
             rows = {} /* 行高 */,
+            conditionalFormats = {},
         } = sheet;
+        const cobyRows = JSON.parse(JSON.stringify(rows));
+        const templateInfo = template[name];
+        const isTemplate = templateInfo ? true : false;
+
         const { dataTable } = data;
 
         const table_dataTable = []; //绑定了实体字段的单元格
         const other_dataTable = []; //其它单元格(当复制实体字段单元格的时候，行号大于实体字段单元格行号时，这些单元格需要相对的移动)
 
+        //oldSheetCount，minTableStartRow，maxTableEndRow用于计算模板的头部，尾部
+        const oldSheetCount = sheet.rowCount;
+        let minTableStartRow = -1;
+        let maxTableEndRow = -1;
+        const rules = conditionalFormats.rules || [];
+        const newRules = [];
         //将单元格信息收集到table_dataTable和other_dataTable，包含行号，列号，样式，跨行与跨列等信息
+        const markRowIsInTable = {};
         if (dataTable) {
             Object.entries(dataTable).forEach(function ([
                 rowStr,
@@ -121,6 +532,7 @@ function parseJsonData(jsonData, datas) {
                     };
 
                     const dataTableItem = {
+                        oldRow: row,
                         row,
                         col,
                         rowCount: span.rowCount,
@@ -136,13 +548,43 @@ function parseJsonData(jsonData, datas) {
                             tableCode,
                             field,
                         });
+
+                        if (minTableStartRow === -1 || minTableStartRow > row) {
+                            minTableStartRow = row;
+                        }
+                        if (maxTableEndRow === -1 || maxTableEndRow < row) {
+                            maxTableEndRow = row;
+                            if (span.rowCount >= 1) {
+                                maxTableEndRow += span.rowCount - 1;
+                            }
+                        }
+                        for (let i = row; i < row + span.rowCount; i++) {
+                            markRowIsInTable[i] = true;
+                        }
                     } else if (values && Object.keys(values).length) {
                         other_dataTable.push(dataTableItem);
                     }
                 });
             });
         }
-        let sheetRowCount = sheet.rowCount;
+        //头部与尾部相关信息
+        const {
+            headerDataTableObj,
+            footerDataTableObj,
+            headerRules,
+            footerRules,
+            headerHeight,
+            footerHeight,
+        } = headerAndFooterInfo({
+            other_dataTable,
+            minTableStartRow,
+            maxTableEndRow,
+            rules,
+            rows,
+            oldSheetCount,
+        });
+
+        let sheetRowCount = sheet.rowCount || 200;
         const tableInfos = [
             {
                 maxRowCount: 0,
@@ -209,15 +651,32 @@ function parseJsonData(jsonData, datas) {
         //记录上一次复制的表格开始行位置与结束行位置
         let lastStartRow = -1;
         let lastEndRow = -1;
+
+        const contentDataTable = {};
+        const virtualRows = []; //如果是虚拟行则不生成合并信息
         while (tableInfos.length) {
             const tableInfo = tableInfos.shift();
-            let { tableCode, startRow, endRow, data, oldStartRow } = tableInfo;
-            const ds = datas?.[tableCode];
+            let {
+                tableCode,
+                startRow,
+                endRow,
+                data,
+                oldStartRow,
+                maxRowCount,
+            } = tableInfo;
+            let ds = datas?.[tableCode];
+            const groupedDs = groupsDatas?.[name]?.[tableCode]?.[name];
+            if (Array.isArray(groupedDs)) {
+                ds = groupedDs;
+            }
             if (Array.isArray(ds)) {
+                //获取当前表格的条件样式
+                const currentRowRules = getRowRules({
+                    rules,
+                    row: oldStartRow,
+                });
+
                 ds.forEach(function (dsItem, i) {
-                    if (i > 0) {
-                        sheetRowCount++;
-                    }
                     //复制样式
                     const curRowDataTable = dataTable[oldStartRow];
                     if (!newDataTable[endRow]) {
@@ -226,15 +685,23 @@ function parseJsonData(jsonData, datas) {
                         );
                     }
 
-                    //复制spans
-                    spans.forEach(function (span) {
-                        if (span.row === oldStartRow) {
-                            newSpans.push({
-                                ...span,
-                                row: endRow,
-                            });
+                    let index = 1;
+                    for (
+                        let i = oldStartRow + 1;
+                        i < oldStartRow + maxRowCount;
+                        i++
+                    ) {
+                        const curRowDataTable = dataTable[i];
+                        if (!newDataTable[endRow + index]) {
+                            newDataTable[endRow + index] = JSON.parse(
+                                JSON.stringify(curRowDataTable)
+                            );
                         }
-                    });
+                        contentDataTable[endRow + index] =
+                            newDataTable[endRow + index];
+                        virtualRows.push(endRow + index);
+                        index++;
+                    }
 
                     //复制行高
                     if (rows?.[oldStartRow]) {
@@ -242,7 +709,7 @@ function parseJsonData(jsonData, datas) {
                             ...rows?.[oldStartRow],
                         };
                     }
-                    data.forEach(function ({ field, col }) {
+                    data.forEach(function ({ field, col, colCount, rowCount }) {
                         if (newDataTable[endRow]?.[col]?.bindingPath) {
                             delete newDataTable[endRow][col].bindingPath;
                         }
@@ -250,8 +717,41 @@ function parseJsonData(jsonData, datas) {
                             ? newDataTable[endRow][col]
                             : {};
                         newDataTable[endRow][col].value = dsItem[field];
+
+                        //新增spans
+                        if (colCount > 1 || rowCount > 1) {
+                            newSpans.push({
+                                col,
+                                row: endRow,
+                                rowCount,
+                                colCount,
+                            });
+                        }
+
+                        //复制条件格式
+                        getColRules({
+                            rules: currentRowRules,
+                            col,
+                            colHandler(item) {
+                                newRules.push({
+                                    ...item,
+                                    ranges: [
+                                        {
+                                            row: endRow,
+                                            rowCount,
+                                            col,
+                                            colCount,
+                                        },
+                                    ],
+                                });
+                            },
+                        });
                     });
-                    endRow++;
+                    contentDataTable[endRow] = newDataTable[endRow];
+                    endRow += maxRowCount;
+                    if (i > 0) {
+                        sheetRowCount += maxRowCount;
+                    }
                 });
             }
 
@@ -290,8 +790,11 @@ function parseJsonData(jsonData, datas) {
         }
 
         other_dataTable.forEach(function (item) {
-            const { row, col, rowCount, colCount, cellInfo, rows } = item;
-
+            const { row, col, rowCount, colCount, cellInfo, rows, oldRow } =
+                item;
+            if (markRowIsInTable[row]) {
+                return;
+            }
             newDataTable[row] = newDataTable[row] ? newDataTable[row] : {};
             newDataTable[row][col] = {
                 style: cellInfo.style,
@@ -315,29 +818,335 @@ function parseJsonData(jsonData, datas) {
             if (rows) {
                 newRows[row] = rows;
             }
+
+            getCellRules({
+                rules,
+                row: oldRow,
+                col,
+                colHandler(item) {
+                    newRules.push({
+                        ...item,
+                        ranges: [{ row, rowCount, col, colCount }],
+                    });
+                },
+            });
         });
-        if (sheet.rows) {
-            Object.keys(sheet.rows).forEach(function (key) {
-                delete sheet.rows[key];
-            });
-            Object.entries(newRows).forEach(function ([key, value]) {
-                sheet.rows[key] = value;
-            });
-        } else {
-            sheet.rows = newRows;
-        }
+        setSheetRows(sheet, newRows);
+
+        sheet.conditionalFormats = sheet.conditionalFormats
+            ? sheet.conditionalFormats
+            : {};
+        sheet.conditionalFormats.rules = newRules;
         sheet.spans = newSpans;
         sheet.data = sheet.data ? sheet.data : {};
         sheet.data.dataTable = newDataTable;
         sheet.rowCount = sheetRowCount;
-        sheetsInfo[name] = sheetsInfo[name] ? sheetsInfo[name] : {};
-        sheetsInfo[name]['tableEndRow'] = tableEndRow;
+
+        page({
+            sheet,
+            templateInfo,
+            minTableStartRow,
+            maxTableEndRow,
+            rows,
+            spans,
+            headerDataTableObj,
+            footerDataTableObj,
+            newRows,
+            newSpans,
+            cobyRows,
+            oldSheetCount,
+            sheetsInfo,
+            isTemplate,
+            sheetCount,
+            newSheets,
+            newRules,
+            headerRules,
+            footerRules,
+            contentDataTable,
+            headerHeight,
+            footerHeight,
+            virtualRows,
+        });
     });
+
+    Object.entries(newSheets).forEach(function ([name, info]) {
+        jsonData.sheets[name] = info;
+        jsonData.sheetCount += 1;
+    });
+
     return sheetsInfo;
 }
 
-function fillData(sheetJson, source, sheetsInfo = {}) {
+//分页
+function page(params) {
+    const {
+        sheet,
+        templateInfo,
+        minTableStartRow,
+        maxTableEndRow,
+        headerDataTableObj,
+        footerDataTableObj,
+        newRows,
+        newSpans,
+        cobyRows,
+        oldSheetCount,
+        sheetsInfo,
+        isTemplate,
+        sheetCount,
+        newSheets,
+        newRules,
+        headerRules,
+        footerRules,
+        contentDataTable,
+        headerHeight,
+        footerHeight,
+        spans,
+        rows,
+        virtualRows,
+    } = params;
+
+    if (!isTemplate) {
+        return;
+    }
+
+    const {
+        printInfo: {
+            paperSize: { height = 1100 },
+            margin = {
+                bottom: 75,
+                footer: 30,
+                header: 30,
+                left: 70,
+                right: 70,
+                top: 75,
+            },
+        },
+    } = sheet;
+
+    const {
+        bottom: marginBottom,
+        footer: marginFooter,
+        header: marginHeader,
+        top: marginTop,
+    } = margin;
+
+    const contentHeight =
+        height -
+        marginBottom -
+        marginFooter -
+        marginHeader -
+        marginTop -
+        headerHeight -
+        footerHeight;
+    let pageHeight = 0;
+
+    const pages = [];
+    const contentDataTableArr = Object.entries(contentDataTable);
+    let currentPageDataTable = {};
     debugger;
+    while (pageHeight < contentHeight && contentDataTableArr.length > 0) {
+        const [rowStr, rowDataTable] = contentDataTableArr.shift();
+        const row = Number(rowStr);
+        if (!virtualRows.includes(row)) {
+            let rowHeight = newRows?.[row]?.size || 20;
+            const span = newSpans.find(function (span) {
+                return Number(span.row) === row;
+            });
+            if (span && span.rowCount > 1) {
+                let index = 1;
+                while (index < span.rowCount) {
+                    rowHeight += newRows?.[row + index]?.size || 20;
+                    index++;
+                }
+            }
+            if (pageHeight + rowHeight < contentHeight) {
+                pageHeight += rowHeight;
+            } else {
+                pages.push(currentPageDataTable);
+                pageHeight = rowHeight;
+                currentPageDataTable = {};
+            }
+        }
+
+        currentPageDataTable[row] = rowDataTable;
+    }
+    if (
+        (pages.length && pages[pages.length - 1] !== currentPageDataTable) ||
+        !pages.length
+    ) {
+        pages.push(currentPageDataTable);
+    }
+
+    let sheetIndex = sheetCount + Object.keys(newSheets).length;
+    let pageDataTable = {};
+    let tableEndRow = -1;
+
+    const { isCurrentSheet } = templateInfo;
+    let currentPageRowIndex = 0;
+    let pageTotalRow = 0;
+    let prePageEndRow = 0;
+    let pageIndex = 0;
+
+    let pageSpans = [];
+    let pageRows = {};
+    let pageRules = [];
+    const cobySheet = JSON.stringify(sheet);
+    while (pages.length) {
+        const page = pages.shift();
+        if (!isCurrentSheet) {
+            currentPageRowIndex = 0;
+            pageTotalRow = 0;
+            pageIndex++;
+            pageSpans = [];
+            pageRows = {};
+            pageRules = [];
+            pageDataTable = {};
+        }
+        //头部区
+        let params = {
+            row: minTableStartRow,
+            rows,
+            spans,
+            pageRows,
+            pageSpans,
+            handler() {
+                pageTotalRow++;
+            },
+            headerDataTableObj,
+            pageDataTable,
+            pageRules,
+            headerRules,
+        };
+        if (isCurrentSheet) {
+            params.startRow = prePageEndRow;
+        }
+        let res = handleReportHeaderArea(params);
+        currentPageRowIndex = res.currentPageRowIndex;
+
+        //内容区
+        res = handleContentArea({
+            rows: newRows,
+            spans: newSpans,
+            pageRows,
+            pageSpans,
+            handler({ addRowCount, tableEndRow: _tableEndRow }) {
+                pageTotalRow += addRowCount;
+                tableEndRow = _tableEndRow;
+            },
+            currentPageRowIndex,
+            page,
+            pageDataTable,
+            pageRules,
+            rules: newRules,
+        });
+        currentPageRowIndex = res.currentPageRowIndex + 1;
+        let height = res.height;
+        //尾部区
+        if (maxTableEndRow > -1) {
+            res = handleTailArea({
+                rows: cobyRows,
+                spans,
+                pageRows,
+                pageSpans,
+                handler() {
+                    pageTotalRow++;
+                },
+                currentPageRowIndex,
+                pageDataTable,
+                footerDataTableObj,
+                maxTableEndRow,
+                oldSheetCount,
+                footerRules,
+                pageRules,
+            });
+            currentPageRowIndex = res.currentPageRowIndex;
+        }
+
+        if (!isCurrentSheet) {
+            let _sheet = sheet;
+
+            //从第二页起，复制模板创建sheet
+            if (pageIndex > 1) {
+                _sheet = JSON.parse(cobySheet);
+                _sheet.name += `_${pageIndex - 1}`;
+                _sheet.index = sheetIndex++;
+                _sheet.isSelected = false;
+                newSheets[_sheet.name] = _sheet;
+            }
+            resetSheet({
+                _sheet,
+                pageDataTable,
+                pageRules,
+                tableEndRow,
+                pageSpans,
+                pageRows,
+                sheetsInfo,
+                pageTotalRow,
+            });
+        }
+
+        if (isCurrentSheet) {
+            const diff = contentHeight - height;
+            if (diff > 0) {
+                const rowHeight = rows[tableEndRow]?.size || 20;
+                const rowCount = Math.ceil(diff / rowHeight);
+                currentPageRowIndex += rowCount;
+            }
+            prePageEndRow = currentPageRowIndex;
+        }
+    }
+
+    isCurrentSheet &&
+        resetSheet({
+            _sheet: sheet,
+            pageDataTable,
+            pageRules,
+            tableEndRow,
+            pageSpans,
+            pageRows,
+            sheetsInfo,
+            pageTotalRow: pageTotalRow + 1,
+        });
+}
+
+function resetSheet(params) {
+    const {
+        _sheet,
+        pageDataTable,
+        pageRules,
+        tableEndRow,
+        pageSpans,
+        pageRows,
+        sheetsInfo,
+        pageTotalRow,
+    } = params;
+
+    const sheetCount = pageTotalRow > 0 ? pageTotalRow : _sheet.rowCount;
+
+    const sheetName = _sheet.name;
+    _sheet.data.dataTable = Object.keys(pageDataTable).length
+        ? pageDataTable
+        : _sheet.data.dataTable;
+
+    _sheet.rowCount = sheetCount;
+
+    //条件格式规则
+    _sheet.conditionalFormats = _sheet.conditionalFormats
+        ? _sheet.conditionalFormats
+        : {};
+    _sheet.conditionalFormats.rules = pageRules;
+
+    //合并单元格
+    _sheet.spans = pageSpans;
+
+    //行高
+    setSheetRows(_sheet, pageRows);
+
+    sheetsInfo[sheetName] = sheetsInfo[sheetName] ? sheetsInfo[sheetName] : {};
+    sheetsInfo[sheetName]['tableEndRow'] = tableEndRow;
+}
+
+function fillData(sheetJson, source, sheetsInfo = {}) {
     const {
         rows = {}, //行高
         rowCount: sheetRowCount,
@@ -416,6 +1225,7 @@ function fillData(sheetJson, source, sheetsInfo = {}) {
         if (rowCount > 0) {
             const otherDataTable = []; //用于收集表格后面的单元格
             let endDataTalbe = null; //表格的最后一行单元格信息
+            const copyRows = JSON.parse(JSON.stringify(rows));
             Object.entries(dataTable).forEach(function ([rowStr, value]) {
                 const row = Number(rowStr);
                 if (row > tableEndRow) {
@@ -451,7 +1261,11 @@ function fillData(sheetJson, source, sheetsInfo = {}) {
             }
             //移动表格后面的单元格
             otherDataTable.forEach(function ({ row, value }) {
-                dataTable[row + rowCount] = value;
+                const newRow = row + rowCount;
+                dataTable[newRow] = value;
+                if (copyRows[row]) {
+                    sheetJson.rows[newRow] = copyRows[row];
+                }
             });
             //移动位于表格后面的单元格的合并信息
             if (sheetJson.spans) {
@@ -461,6 +1275,17 @@ function fillData(sheetJson, source, sheetsInfo = {}) {
                     }
                 });
             }
+
+            //移动条件格式
+            const rules = sheetJson?.conditionalFormats?.rules;
+            if (Array.isArray(rules)) {
+                rules.forEach(function ({ ranges }) {
+                    if (ranges?.[0]?.row > tableEndRow) {
+                        ranges[0].row = ranges[0].row + rowCount;
+                    }
+                });
+            }
+
             //sheet行数增加
             sheetJson.rowCount = sheetJson.rowCount + rowCount;
         }
@@ -578,6 +1403,9 @@ export default function (props) {
         onSelectionChanged,
         onSelectionChanging,
         onEditorStatusChanged,
+        onSheetNameChanged,
+        onSheetNameChanging,
+        onActiveSheetChanging,
         license,
         enablePrint = false,
         json: _json = null,
@@ -592,7 +1420,9 @@ export default function (props) {
         rowMergeColumns = {},
         colMergeColumns = {},
         isFillData = false,
+        template,
     } = props;
+
     if (license) {
         setLicense(license);
     }
@@ -621,21 +1451,49 @@ export default function (props) {
     });
 
     const el = useRef(null);
-
     const { json, sheetsInfo } = useMemo(
         function () {
             let sheetsInfo = null;
             let json = JSON.parse(JSON.stringify(_json));
             if (json) {
-                sheetsInfo = dataSource && parseJsonData(json, dataSource);
+                sheetsInfo =
+                    dataSource && parseJsonData(json, dataSource, template);
             }
             return {
                 sheetsInfo,
                 json,
             };
         },
-        [_json, dataSource]
+        [_json, dataSource, JSON.stringify(template)]
     );
+
+    /*  debugger;
+        if (json) {
+            Object.values(json.sheets).forEach(function (sheet) {
+                sheet.data.dataTable[2] = {
+                    1: {
+                        hyperlink: {
+                            url: 'sjs://Sheet2!A1',
+                            tooltip: '',
+                            target: 0,
+                            drawUnderline: true,
+                            command: '',
+                        },
+                    },
+                };
+                sheet.data.dataTable[3] = {
+                    1: {
+                        hyperlink: {
+                            url: 'sjs://Sheet3!A1',
+                            tooltip: '',
+                            target: 0,
+                            drawUnderline: true,
+                            command: '',
+                        },
+                    },
+                };
+            });
+        } */
 
     useEffect(() => {
         if (el.current && !data.showError) {
@@ -706,6 +1564,21 @@ export default function (props) {
                             onActiveSheetChanged
                         );
                         bindEvent(spread, 'ValueChanged', onValueChanged);
+                        bindEvent(
+                            spread,
+                            'ActiveSheetChanging',
+                            onActiveSheetChanging
+                        );
+                        bindEvent(
+                            spread,
+                            'SheetNameChanged',
+                            onSheetNameChanged
+                        );
+                        bindEvent(
+                            spread,
+                            'SheetNameChanging',
+                            onSheetNameChanging
+                        );
                         bindEvent(
                             spread,
                             'SelectionChanged',
@@ -789,6 +1662,8 @@ export default function (props) {
         columnMerge,
         rowMergeColumns,
         colMergeColumns,
+        onSheetNameChanged,
+        onSheetNameChanging,
     ]);
 
     return (

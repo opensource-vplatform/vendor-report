@@ -133,12 +133,13 @@ export default function () {
     const tableDesignSlice = useSelector(
         ({ tableDesignSlice }) => tableDesignSlice
     );
+    const wizardSlice = useSelector(({ wizardSlice }) => wizardSlice);
     const { finalDsList } = datasourceSlice;
     const handleSave = () => {
         if (spread) {
             const json = {
                 reportJson: spread.toJSON(),
-                context: { datasourceSlice, tableDesignSlice },
+                context: { datasourceSlice, tableDesignSlice, wizardSlice },
             };
             const define = parseUsedDatasource(spread, finalDsList);
             const result = fire({

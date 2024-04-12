@@ -16,6 +16,7 @@ import { toggleReportDesignWizard } from '@store/navSlice/navSlice';
 
 import ReportTypes from './nav/Index';
 import StatementDetail from './reportTemplate/Index';
+import Template from './Template';
 
 const Wrap = styled.div`
     background-color: #fff;
@@ -134,3 +135,5 @@ export default function Index(props) {
         </Dialog>
     );
 }
+
+export { Template };

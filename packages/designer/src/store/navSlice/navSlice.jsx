@@ -3,10 +3,11 @@ import { createSlice } from '@reduxjs/toolkit';
 export const navSlice = createSlice({
     name: 'navSlice',
     initialState: {
-        hideCodes: ['table','sparklines'],
+        hideCodes: ['table', 'sparklines'],
         tableName: null,
         active: null,
         reportDesignWizard: false,
+        showTemplate: false,
     },
     reducers: {
         /**
@@ -63,6 +64,14 @@ export const navSlice = createSlice({
         toggleReportDesignWizard(state, action) {
             state.reportDesignWizard = !state.reportDesignWizard;
         },
+        toggleBooleanValue(state, aciton) {
+            const { key, value } = aciton.payload || {};
+            if (typeof value === 'boolean') {
+                state[key] = value;
+                return;
+            }
+            state[key] = !state[key];
+        },
     },
 });
 export const {
@@ -72,5 +81,6 @@ export const {
     setActive,
     setTableName,
     toggleReportDesignWizard,
+    toggleBooleanValue,
 } = navSlice.actions;
 export default navSlice.reducer;

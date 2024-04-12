@@ -1,7 +1,8 @@
-const ip = '10.1.40.115';
-const port = '8889';
+/* const ip = '10.1.40.115';
+const port = '8889'; */
+const origin = window.location.origin;
 const path = `module-operation!executeOperation`;
-const baseURL = `http://${ip}:${port}/${path}?ajaxRequest=true`;
+const baseURL = `${origin}/${path}?ajaxRequest=true`;
 //获取数据集数据url
 const batchGetDatasURL = `${baseURL}&operation=GetVDataWebExcelDatas`;
 //获取数据集url

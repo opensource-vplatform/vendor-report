@@ -24,7 +24,73 @@ import {
 
 const GC = getNamespace();
 
+export function test(params) {
+    const {
+        columnsTemp,
+        sheet,
+        dispatch,
+        row,
+        col,
+        dataPath,
+        addingMode = 'drag',
+        groups = [],
+        sumColumns = [],
+        rowMergeColumns = [],
+        colMergeColumns = [],
+        dsName = '',
+    } = params;
+
+    const sheetJson = sheet.toJSON();
+    const dataTable = sheetJson.data.dataTable;
+    const rowDataTable = (dataTable[row] = dataTable[row]
+        ? dataTable[row]
+        : {});
+
+    debugger;
+    const spans = sheetJson.spans || [];
+    const currentRowSpans =
+        spans.filter(function ({ row: _row }) {
+            return _row === row;
+        }) || [];
+
+    const sheetInstanceId = getSheetInstanceId(sheet);
+    const tableName = `tableName_${genUUID()}`;
+
+    let index = 0;
+    columnsTemp.forEach(function ({ code, name }) {
+        const newCol = col + index;
+        rowDataTable[newCol] = rowDataTable[newCol] ? rowDataTable[newCol] : {};
+        rowDataTable[newCol].bindingPath = `${dataPath}.${code}`;
+        rowDataTable[newCol].value = `[${dsName}.${name}]`;
+        rowDataTable[newCol].tag = JSON.stringify({
+            instanceId: sheetInstanceId,
+            tableInfo: {
+                tableName,
+                dsName,
+                dsCode: dataPath,
+                fieldCode: code,
+            },
+        });
+
+        const currentColSpan = currentRowSpans.find(function ({ col }) {
+            return newCol === col;
+        }) || { colCount: 1 };
+
+        index += currentColSpan.colCount;
+    });
+
+    const diff = col + columnsTemp.length - sheetJson.columnCount;
+    if (diff > 0) {
+        sheetJson.columnCount += diff;
+    }
+    sheet.fromJSON(sheetJson);
+    formatBindingPathCellType(sheet);
+    debugger;
+}
+
 export function addTable(params) {
+    /*  test(params);
+    return; */
     const {
         columnsTemp,
         sheet,
@@ -224,6 +290,32 @@ export function checkHasBind(params) {
     }
 
     const stack = [...updated, ...deleted];
+
+    /*  const bindInfos = [];
+    const spreadJson = spread.toJSON();
+    Object.values(spreadJson.sheets).forEach(function (sheet) {
+        const dataTable = sheet.data.dataTable;
+        if (dataTable) {
+            Object.values(dataTable).forEach(function (rowDataTable) {
+                Object.values(rowDataTable).forEach(function ({
+                    bindingPath,
+                    value,
+                }) {
+                    if (bindingPath) {
+                        const res = bindInfos.some(function (item) {
+                            return item.bindingPath === bindingPath;
+                        });
+                        !res &&
+                            bindInfos.push({
+                                bindingPath,
+                                value,
+                            });
+                    }
+                });
+            });
+        }
+    }); */
+
     while (stack.length > 0) {
         const { newData, oldData } = stack.shift();
 
@@ -467,6 +559,25 @@ export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
         }
         super.paint(ctx, value, x, y, w, h, style, context);
     }
+}
+
+export function formatBindingPathCellType(sheet) {
+    const dataTable = sheet.toJSON().data.dataTable;
+    if (!dataTable) {
+        return;
+    }
+    sheet.suspendPaint();
+    const bindingPathCellType = new BindingPathCellType();
+    Object.entries(dataTable).forEach(([rowStr, colValue]) => {
+        const row = Number(rowStr);
+        Object.entries(colValue).forEach(([colStr, { bindingPath }]) => {
+            if (bindingPath) {
+                const col = Number(colStr);
+                sheet.getCell(row, col).cellType(bindingPathCellType);
+            }
+        });
+    });
+    sheet.resumePaint();
 }
 
 const decorationContainerClass = 'decorationContainer';

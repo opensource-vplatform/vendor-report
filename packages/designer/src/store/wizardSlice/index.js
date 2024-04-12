@@ -9,6 +9,9 @@ export const wizardSlice = createSlice({
         sumColumns: [],
         rowMerge: true,
         columnMerge: false,
+        template: {},
+        currentSheetIsTemplate: false,
+        isEdit: false,
     },
     reducers: {
         saveGroups(state, { payload }) {
@@ -70,6 +73,31 @@ export const wizardSlice = createSlice({
                 state[code] = !state[code];
             }
         },
+        addTemplate(state, { payload }) {
+            const { info, templateName } = payload;
+
+            state.template[templateName] = info;
+        },
+        updateTemplateName(state, { payload }) {
+            const { oldName, newName } = payload;
+            if (state.template[oldName] && newName) {
+                state.template[newName] = state.template[oldName];
+                delete state.template[oldName];
+            }
+
+            if (oldName && !newName && state.template[oldName]) {
+                delete state.template[oldName];
+            }
+        },
+        initWizardSlice(state, { payload }) {
+            let { wizardSlice } = payload;
+            //从配置项json还原仓库数据
+            if (wizardSlice && typeof wizardSlice === 'object') {
+                Object.entries(wizardSlice).forEach(([key, value]) => {
+                    state[key] = value;
+                });
+            }
+        },
     },
 });
 export const {
@@ -82,5 +110,8 @@ export const {
     clear,
     remove,
     toggleBooleanValue,
+    updateTemplateName,
+    addTemplate,
+    initWizardSlice,
 } = wizardSlice.actions;
 export default wizardSlice.reducer;

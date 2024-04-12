@@ -301,6 +301,7 @@ export default function () {
         colMergeColumns,
         isFillData = false,
     } = useSelector(({ datasourceSlice }) => datasourceSlice);
+    const { template } = useSelector(({ wizardSlice }) => wizardSlice);
 
     const { rowMerge, columnMerge } = useSelector(
         ({ tableDesignSlice }) => tableDesignSlice
@@ -377,6 +378,7 @@ export default function () {
                     rowMergeColumns={rowMergeColumns}
                     colMergeColumns={colMergeColumns}
                     isFillData={isFillData}
+                    template={template}
                     onInited={function (a) {
                         window.mapTest = a;
                     }}

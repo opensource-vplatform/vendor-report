@@ -33,12 +33,12 @@ import {
   DraggableDatasourcesHeander,
 } from './ui.jsx';
 import {
-  addTable,
   BindingPathCellType,
   getCellInfo,
   getPath,
   highlightBlock,
   removeHighlightOneBlock,
+  test,
 } from './utils/utils.js';
 
 //删除表格
@@ -114,6 +114,7 @@ function clearContents(params) {
                                     colIndex,
                                     ''
                                 );
+                                activeSheet.getCell(rowIndex, colIndex).tag('');
                             }
 
                             //清除角标
@@ -396,14 +397,27 @@ export default function Index() {
                     spread.suspendPaint();
                     const sheet = spread.getActiveSheet();
                     //获取拖动块的值
+                    const parentId = dragged.dataset.itemParentId;
                     const itemId = dragged.dataset.itemId;
-                    const current = findTreeNodeById(itemId, dsList);
+                    let current = null;
+                    let parent = null;
+                    if (parentId) {
+                        parent = findTreeNodeById(parentId, dsList);
+                        const children = Array.isArray(parent.children)
+                            ? parent.children
+                            : [];
+                        current = children.find(function (item) {
+                            return item.id === itemId;
+                        });
+                    } else {
+                        current = findTreeNodeById(itemId, dsList);
+                    }
 
                     const dataPath = getPath(current, dsList);
                     const GC = getNamespace();
                     const spreadNS = GC.Spread.Sheets;
                     if (current.type === 'table') {
-                        addTable({
+                        /*  addTable({
                             columnsTemp: current.children,
                             sheet,
                             spreadNS,
@@ -412,16 +426,31 @@ export default function Index() {
                             col,
                             dataPath,
                             filterButtonVisible,
+                        }); */
+
+                        test({
+                            columnsTemp: current.children,
+                            sheet,
+                            dispatch,
+                            row,
+                            col,
+                            dataPath,
+                            dsName: current.name,
                         });
                     } else {
                         const bindingPathCellType = new BindingPathCellType();
                         cell.bindingPath(dataPath).cellType(
                             bindingPathCellType
                         );
+                        cell.value(`[${current.name}]`);
                         if (dataPath.includes('.')) {
-                            cell.value(current.name);
+                            const parent = findTreeNodeById(
+                                current.parentId,
+                                dsList
+                            );
+                            cell.value(`[${parent?.name}.${current?.name}]`);
                         }
-
+                        debugger;
                         setCellTag(sheet, row, col, 'bindInfo', {
                             bindType: 'cell',
                             bindDsInstanceId: itemId,

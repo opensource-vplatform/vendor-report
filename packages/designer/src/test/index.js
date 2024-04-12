@@ -4,9 +4,10 @@ import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
-salesData.data.length = 10 || 21;
+salesData.data.length = 30 || 21;
 tourismData.data.length = 11 || 21;
 export default {
+    json,
     /* json: { reportJson: json }, */
     /*batchGetDatasURL,
     datasPath,  */
@@ -52,6 +53,9 @@ export default {
     dataSource: {
         dataSourceDefinition: [
             ...otherData.ds,
+
+            salesData.ds,
+            tourismData.ds,
             {
                 id: 'stu',
                 type: 'table',
@@ -80,8 +84,6 @@ export default {
                     },
                 ],
             },
-            salesData.ds,
-            tourismData.ds,
         ], //数据源定义
         datas: {
             ...otherData.data,
@@ -107,11 +109,12 @@ export default {
         tabStripVisible: true, //实现显示选项卡
     },
     event: {
-        onSave: function () {
+        onSave: function (a, b) {
+            window.localStorage.setItem('spreadJSON1', JSON.stringify(a));
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     resolve({ success: true });
-                }, 3000);
+                }, 0);
             });
         },
     },
