@@ -57,113 +57,177 @@ import Icon7 from '@icons/style/icons/detail/Icon7';
 import Icon8 from '@icons/style/icons/detail/Icon8';
 import Icon9 from '@icons/style/icons/detail/Icon9';
 
-import {
-  isFunction,
-  isString,
-} from './objectUtil';
+import { isFunction, isString } from './objectUtil';
 import { getNamespace } from './spreadUtil';
-
-const GC = getNamespace();
-const RuleType = GC.Spread.Sheets.ConditionalFormatting.RuleType;
-const ComparisonOperators =
-    GC.Spread.Sheets.ConditionalFormatting.ComparisonOperators;
-const TextComparisonOperators =
-    GC.Spread.Sheets.ConditionalFormatting.TextComparisonOperators;
-const DateOccurringType =
-    GC.Spread.Sheets.ConditionalFormatting.DateOccurringType;
-const Top10ConditionType =
-    GC.Spread.Sheets.ConditionalFormatting.Top10ConditionType;
-const RowColumnStates = GC.Spread.Sheets.RowColumnStates;
-const AverageConditionType =
-    GC.Spread.Sheets.ConditionalFormatting.AverageConditionType;
+import { genUUID } from './commonUtil';
+import {
+    setAddCallbackId,
+    setRuleManagerVisible,
+    setEditorType,
+    setRuleType,
+    setEditorConfig,
+    setShowEditor,
+} from '../store/conditionStyleSlice';
+import { ruleTypeToFormatType } from '@components/conditionStyle/metadata';
 
 const ComparisonOperatorToTitle = {
-    [ComparisonOperators.between]: function (value1, value2) {
+    between: function (value1, value2) {
         return `单元格值介于${value1}和${value2}之间`;
     },
-    [ComparisonOperators.notBetween]: function (value1, value2) {
+    notBetween: function (value1, value2) {
         return `单元格值不介于${value1}和${value2}之间`;
     },
-    [ComparisonOperators.equalsTo]: function (value) {
+    equalsTo: function (value) {
         return `单元格值 = ${value}`;
     },
-    [ComparisonOperators.notEqualsTo]: function (value) {
+    notEqualsTo: function (value) {
         return `单元格值 <> ${value}`;
     },
-    [ComparisonOperators.greaterThan]: function (value) {
+    greaterThan: function (value) {
         return `单元格值 > ${value}`;
     },
-    [ComparisonOperators.greaterThanOrEqualsTo]: function (value) {
+    greaterThanOrEqualsTo: function (value) {
         return `单元格值 >= ${value}`;
     },
-    [ComparisonOperators.lessThan]: function (value) {
+    lessThan: function (value) {
         return `'单元格值 < ${value}`;
     },
-    [ComparisonOperators.lessThanOrEqualsTo]: function (value) {
+    lessThanOrEqualsTo: function (value) {
         return `单元格值 <= ${value}`;
     },
 };
 
 const TextComparisonOperatorToTitle = {
-    [TextComparisonOperators.contains]: function (value) {
+    contains: function (value) {
         return `单元格值包含 "${value}"`;
     },
-    [TextComparisonOperators.doesNotContain]: function (value) {
+    doesNotContain: function (value) {
         return `单元格值不包含 "${value}"`;
     },
-    [TextComparisonOperators.beginsWith]: function (value) {
+    beginsWith: function (value) {
         return `单元格值开头是 "${value}"`;
     },
-    [TextComparisonOperators.endsWith]: function (value) {
+    endsWith: function (value) {
         return `单元格值结尾是 "${value}"`;
     },
 };
 
 const DateOccurringTypeToTitle = {
-    [DateOccurringType.last7Days]: '最近 7 天',
-    [DateOccurringType.lastMonth]: '上月',
-    [DateOccurringType.lastWeek]: '上周',
-    [DateOccurringType.nextMonth]: '下月',
-    [DateOccurringType.nextWeek]: '下周',
-    [DateOccurringType.thisMonth]: '本月',
-    [DateOccurringType.thisWeek]: '本周',
-    [DateOccurringType.today]: '今天',
-    [DateOccurringType.tomorrow]: '明天',
-    [DateOccurringType.yesterday]: '昨天',
+    last7Days: '最近 7 天',
+    lastMonth: '上月',
+    lastWeek: '上周',
+    nextMonth: '下月',
+    nextWeek: '下周',
+    thisMonth: '本月',
+    thisWeek: '本周',
+    today: '今天',
+    tomorrow: '明天',
+    yesterday: '昨天',
 };
 
 const Top10ConditionTypeToTitle = {
-    [Top10ConditionType.top]: function (value) {
+    top: function (value) {
         return `前 ${value}个`;
     },
-    [Top10ConditionType.bottom]: function (value) {
+    bottom: function (value) {
         return `后 ${value}个`;
     },
 };
 
 const AverageConditionTypeToTitle = {
-    [AverageConditionType.above]: '高于平均值',
-    [AverageConditionType.above1StdDev]: '标准偏差高于平均值1',
-    [AverageConditionType.above2StdDev]: '标准偏差高于平均值2',
-    [AverageConditionType.above3StdDev]: '标准偏差高于平均值3',
-    [AverageConditionType.below]: '低于平均值',
-    [AverageConditionType.below1StdDev]: '标准偏差低于平均值1',
-    [AverageConditionType.below2StdDev]: '标准偏差低于平均值2',
-    [AverageConditionType.below3StdDev]: '标准偏差低于平均值3',
-    [AverageConditionType.equalOrAbove]: '等于或高于平均值',
-    [AverageConditionType.equalOrBelow]: '等于或低于平均值',
+    above: '高于平均值',
+    above1StdDev: '标准偏差高于平均值1',
+    above2StdDev: '标准偏差高于平均值2',
+    above3StdDev: '标准偏差高于平均值3',
+    below: '低于平均值',
+    below1StdDev: '标准偏差低于平均值1',
+    below2StdDev: '标准偏差低于平均值2',
+    below3StdDev: '标准偏差低于平均值3',
+    equalOrAbove: '等于或高于平均值',
+    equalOrBelow: '等于或低于平均值',
 };
 
 const StateToTitle = {
-    [RowColumnStates.hover]: '鼠标悬停',
-    [RowColumnStates.active]: '活跃',
-    [RowColumnStates.selected]: '选择',
-    [RowColumnStates.edit]: '编辑',
-    [RowColumnStates.invalid]: '不合法',
-    [RowColumnStates.dirty]: '脏值',
-    [RowColumnStates.inserted]: '插入',
-    [RowColumnStates.edit]: '更新',
-    [RowColumnStates.invalidFormula]: '无效公式',
+    hover: '鼠标悬停',
+    active: '活跃',
+    selected: '选择',
+    invalid: '不合法',
+    dirty: '脏值',
+    inserted: '插入',
+    edit: '更新',
+    invalidFormula: '无效公式',
+};
+
+export const getDefaultScaleRuleEditConfig = function () {
+    return {
+        _type: 'scaleRule',
+        ruleType: 'twoScaleRule',
+        minType: 'lowestValue',
+        minValue: null,
+        minColor: 'rgb(255,0,0)',
+        midType: null,
+        midValue: null,
+        midColor: null,
+        maxType: 'highestValue',
+        maxValue: null,
+        maxColor: 'rgb(0,136,0)',
+    };
+};
+
+const CallbackMap = {};
+
+const addCallback = function (onConfirm, onCancel) {
+    const callbackId = genUUID();
+    CallbackMap[callbackId] = {
+        onConfirm,
+        onCancel,
+    };
+    return callbackId;
+};
+
+export const showAddConditionRule = function (
+    dispatch,
+    { onConfirm = () => {}, onCancel = () => {} }
+) {
+    const callbackId = addCallback(onConfirm, onCancel);
+    dispatch(setAddCallbackId(callbackId));
+    dispatch(setEditorType('formatOnValue'));
+    dispatch(setRuleType('twoScaleRule'));
+    dispatch(setEditorConfig(getDefaultScaleRuleEditConfig()));
+    dispatch(setShowEditor(true));
+    dispatch(setRuleManagerVisible(false));
+};
+
+export const showEditConditionRule = function (
+    dispatch,
+    { onConfirm = () => {}, onCancel = () => {}, json = {} }
+) {
+    const callbackId = addCallback(onConfirm, onCancel);
+    dispatch(setAddCallbackId(callbackId));
+    const { ruleType, ...options } = json;
+    dispatch(setRuleType(ruleType));
+    dispatch(setEditorType(ruleTypeToFormatType(ruleType)));
+    dispatch(setEditorConfig(options));
+    dispatch(setShowEditor(true));
+    dispatch(setRuleManagerVisible(false));
+};
+
+const handleAddCallback = function (callbackId, type, ...args) {
+    const callback = CallbackMap[callbackId];
+    if (callback) {
+        const handler = callback[type];
+        if (isFunction(handler)) {
+            handler(...args);
+        }
+    }
+};
+
+export const handleAddConfirm = function (callbackId, ...args) {
+    handleAddCallback(callbackId, 'onConfirm', ...args);
+};
+
+export const handleAddCancel = function (callbackId, ...args) {
+    handleAddCallback(callbackId, 'onCancel', ...args);
 };
 
 const toTitle = function (map, operator, ...args) {
@@ -185,74 +249,74 @@ const withoutFormulaPrefix = function (val) {
 };
 
 const RuleType2RuleTitle = {
-    [RuleType.cellValueRule]: function (rule) {
-        let value1 = rule.value1();
-        let value2 = rule.value2();
+    cellValueRule: function (rule) {
+        let value1 = rule.value1;
+        let value2 = rule.value2;
         value1 = withoutFormulaPrefix(value1);
         value2 = withoutFormulaPrefix(value2);
         return toTitle(
             ComparisonOperatorToTitle,
-            rule.operator(),
+            rule.operator,
             value1,
             value2
         );
     },
-    [RuleType.specificTextRule]: function (rule) {
+    specificTextRule: function (rule) {
         const text = rule.text() || '';
-        return toTitle(TextComparisonOperatorToTitle, rule.operator(), text);
+        return toTitle(TextComparisonOperatorToTitle, rule.operator, text);
     },
-    [RuleType.dateOccurringRule]: function (rule) {
-        return toTitle(DateOccurringTypeToTitle, rule.type());
+    dateOccurringRule: function (rule) {
+        return toTitle(DateOccurringTypeToTitle, rule.type);
     },
-    [RuleType.duplicateRule]: function (rule) {
+    duplicateRule: function (rule) {
         return '重复值';
     },
-    [RuleType.uniqueRule]: function (rule) {
+    uniqueRule: function (rule) {
         return '唯一值';
     },
-    [RuleType.top10Rule]: function (rule) {
+    top10Rule: function (rule) {
         const rank = rule.rank() || '';
-        return toTitle(Top10ConditionTypeToTitle, rule.type(), rank);
+        return toTitle(Top10ConditionTypeToTitle, rule.type, rank);
     },
-    [RuleType.averageRule]: function (rule) {
-        return toTitle(AverageConditionTypeToTitle, rule.type());
+    averageRule: function (rule) {
+        return toTitle(AverageConditionTypeToTitle, rule.type);
     },
-    [RuleType.dataBarRule]: function (rule) {
+    dataBarRule: function (rule) {
         return '数据条';
     },
-    [RuleType.twoScaleRule]: function (rule) {
+    twoScaleRule: function (rule) {
         return '渐变颜色刻度';
     },
-    [RuleType.threeScaleRule]: function (rule) {
+    threeScaleRule: function (rule) {
         return '渐变颜色刻度';
     },
-    [RuleType.iconSetRule]: function (rule) {
+    iconSetRule: function (rule) {
         return '图标集';
     },
-    [RuleType.formulaRule]: function (rule) {
-        const formula = rule.formula();
+    formulaRule: function (rule) {
+        const formula = rule.formula;
         return `公式: ${formula}`;
     },
-    [RuleType.rowStateRule]: function (rule) {
-        return `行状态: ${toTitle(StateToTitle, rule.state())}`;
+    rowStateRule: function (rule) {
+        return `行状态: ${toTitle(StateToTitle, rule.state)}`;
     },
-    [RuleType.columnStateRule]: function (rule) {
-        return `列状态: ${toTitle(StateToTitle, rule.state())}`;
+    columnStateRule: function (rule) {
+        return `列状态: ${toTitle(StateToTitle, rule.state)}`;
     },
 };
 
-export const getRuleTitle = function (rule) {
-    const ruleType = rule.ruleType();
+export const getRuleTitle = function (ruleJson) {
+    const ruleType = ruleJson.ruleType;
     const handler = RuleType2RuleTitle[ruleType];
     if (isFunction(handler)) {
-        return handler(rule);
+        return handler(ruleJson);
     }
     return '';
 };
 
 const Wrap = styled.div`
     width: 100%;
-    height: 100%;
+    height: 26px;
 `;
 
 const lineBorderToJson = function (line) {
@@ -264,8 +328,8 @@ const lineBorderToJson = function (line) {
 };
 
 const DefaultFormat = function (props) {
-    const { rule } = props;
-    const style = rule.style();
+    const { json } = props;
+    const style = json.style;
     const {
         borderLeft,
         borderRight,
@@ -281,12 +345,12 @@ const DefaultFormat = function (props) {
     } = style;
     return (
         <Preview
-            borderLeft={lineBorderToJson(borderLeft)}
-            borderRight={lineBorderToJson(borderRight)}
-            borderTop={lineBorderToJson(borderTop)}
-            borderBottom={lineBorderToJson(borderBottom)}
-            diagonalDown={lineBorderToJson(diagonalDown)}
-            diagonalUp={lineBorderToJson(diagonalUp)}
+            borderLeft={borderLeft}
+            borderRight={borderRight}
+            borderTop={borderTop}
+            borderBottom={borderBottom}
+            diagonalDown={diagonalDown}
+            diagonalUp={diagonalUp}
             textDecoration={textDecoration}
             fontWeight={fontWeight}
             fontStyle={fontStyle}
@@ -297,9 +361,9 @@ const DefaultFormat = function (props) {
 };
 
 const TwoScaleFormat = function (props) {
-    const { rule } = props;
-    const minColor = rule.minColor();
-    const maxColor = rule.maxColor();
+    const { json } = props;
+    const minColor = json.minColor;
+    const maxColor = json.maxColor;
     const style = {
         height: 26,
         backgroundImage: `linear-gradient(to right, ${minColor}, ${maxColor})`,
@@ -308,10 +372,10 @@ const TwoScaleFormat = function (props) {
 };
 
 const ThreeScaleFormat = function (props) {
-    const { rule } = props;
-    const minColor = rule.minColor();
-    const midColor = rule.midColor();
-    const maxColor = rule.maxColor();
+    const { json } = props;
+    const minColor = json.minColor;
+    const midColor = json.midColor;
+    const maxColor = json.maxColor;
     const style = {
         height: 26,
         backgroundImage: `linear-gradient(to right, ${minColor} , ${midColor} , ${maxColor})`,
@@ -320,11 +384,11 @@ const ThreeScaleFormat = function (props) {
 };
 
 const DataBarFormat = function (props) {
-    const { rule } = props;
-    const showBorder = rule.showBorder();
-    const borderColor = rule.borderColor();
-    const color = rule.color();
-    const gradient = rule.gradient();
+    const { json } = props;
+    const showBorder = json.showBorder;
+    const borderColor = json.borderColor;
+    const color = json.color;
+    const gradient = json.gradient;
     const style = {};
     if (showBorder) {
         style.border = '1px solid ' + borderColor;
@@ -527,17 +591,17 @@ export const getAllIcons = function () {
 };
 
 const IconSetFormat = function (props) {
-    const { rule } = props;
-    const icons = rule.icons();
-    const reverseIconOrder = rule.reverseIconOrder();
+    const { json } = props;
+    const icons = json.icons;
+    const reverseIconOrder = json.reverseIconOrder;
     let newIcons = [...icons];
     if (reverseIconOrder) {
         newIcons = newIcons.reverse();
     }
     const children = [];
     newIcons.forEach((icon, index) => {
-        const {iconIndex,iconSetType} = icon;
-        const iconSetName = IconSetTypeToName[iconSetType];
+        const { iconIndex, iconSetType } = icon;
+        const iconSetName = iconSetType;
         let value = iconSetName + '_' + iconIndex;
         value = NameToIconValue[value] ? NameToIconValue[value] : value;
         const def = ICONS.find((def) => def.value == value);
@@ -551,34 +615,34 @@ const IconSetFormat = function (props) {
 };
 
 export const RuleFormat = function (props) {
-    const { rule } = props;
-    const ruleType = rule.ruleType();
+    const { json } = props;
+    const ruleType = json.ruleType;
     const GC = getNamespace();
     const RuleType = GC.Spread.Sheets.ConditionalFormatting.RuleType;
     let children = null;
     if (
         [
-            RuleType.cellValueRule,
-            RuleType.specificTextRule,
-            RuleType.dateOccurringRule,
-            RuleType.duplicateRule,
-            RuleType.uniqueRule,
-            RuleType.top10Rule,
-            RuleType.averageRule,
-            RuleType.formulaRule,
-            RuleType.rowStateRule,
-            RuleType.columnStateRule,
+            'cellValueRule',
+            'specificTextRule',
+            'dateOccurringRule',
+            'duplicateRule',
+            'uniqueRule',
+            'top10Rule',
+            'averageRule',
+            'formulaRule',
+            'rowStateRule',
+            'columnStateRule',
         ].indexOf(ruleType) != -1
     ) {
-        children = <DefaultFormat rule={rule}></DefaultFormat>;
-    } else if (RuleType.dataBarRule == ruleType) {
-        children = <DataBarFormat rule={rule}></DataBarFormat>;
-    } else if (RuleType.twoScaleRule == ruleType) {
-        children = <TwoScaleFormat rule={rule}></TwoScaleFormat>;
-    } else if (RuleType.threeScaleRule == ruleType) {
-        children = <ThreeScaleFormat rule={rule}></ThreeScaleFormat>;
-    } else if (RuleType.iconSetRule == ruleType) {
-        children = <IconSetFormat rule={rule}></IconSetFormat>;
+        children = <DefaultFormat json={json}></DefaultFormat>;
+    } else if ('dataBarRule' == ruleType) {
+        children = <DataBarFormat json={json}></DataBarFormat>;
+    } else if ('twoScaleRule' == ruleType) {
+        children = <TwoScaleFormat json={json}></TwoScaleFormat>;
+    } else if ('threeScaleRule' == ruleType) {
+        children = <ThreeScaleFormat json={json}></ThreeScaleFormat>;
+    } else if ('iconSetRule' == ruleType) {
+        children = <IconSetFormat json={json}></IconSetFormat>;
     }
     return children;
 };

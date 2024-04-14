@@ -22,7 +22,12 @@ const serializableCheck = {
     // Ignore these action types
     //ignoredActions: ['appReducer/setSpread'],
     // Ignore these field paths in all actions
-    ignoredActionPaths: ['meta.arg', 'payload.spread', 'payload.styleName'],
+    ignoredActionPaths: [
+        'meta.arg',
+        'payload.spread',
+        'payload.styleName',
+        'payload.rules',
+    ],
     // Ignore these paths in the state
     ignoredPaths: [
         'appSlice.spread',
@@ -34,6 +39,7 @@ const serializableCheck = {
         'fontCellSettingSlice.spread',
         'workbookSettingSlice.spread',
         'worksheetSettingSlice.spread',
+        'conditionStyleSlice.ruleManagerConfig',
     ],
 };
 

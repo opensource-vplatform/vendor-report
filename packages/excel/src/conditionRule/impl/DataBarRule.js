@@ -17,7 +17,8 @@ class DataBarRule extends Rule {
         useNegativeBorderColor,
         negativeBorderColor,
         axisColor,
-        axisPosition
+        axisPosition,
+        stopIfTrue
     ) {
         super();
         this.minType = minType;
@@ -36,6 +37,7 @@ class DataBarRule extends Rule {
         this.negativeBorderColor = negativeBorderColor;
         this.axisColor = axisColor;
         this.axisPosition = axisPosition;
+        this.stopIfTrue = stopIfTrue;
     }
 
     apply(row, rowCount, col, colCount) {
@@ -63,6 +65,7 @@ class DataBarRule extends Rule {
         rule.negativeBorderColor(this.negativeBorderColor);
         rule.axisColor(this.axisColor);
         rule.axisPosition(this.getDataBarAxisPosition(this.axisPosition));
+        rule.stopIfTrue(this.stopIfTrue);
         this.sheet.conditionalFormats.addRule(rule);
     }
 
@@ -85,6 +88,7 @@ class DataBarRule extends Rule {
             negativeBorderColor: this.negativeBorderColor,
             axisColor: this.axisColor,
             axisPosition: this.axisPosition,
+            stopIfTrue: this.stopIfTrue,
         };
     }
 }
@@ -107,6 +111,7 @@ DataBarRule.fromJson = function (json) {
         negativeBorderColor,
         axisColor,
         axisPosition,
+        stopIfTrue,
     } = json;
     return new DataBarRule(
         minType,
@@ -124,7 +129,8 @@ DataBarRule.fromJson = function (json) {
         useNegativeBorderColor,
         negativeBorderColor,
         axisColor,
-        axisPosition
+        axisPosition,
+        stopIfTrue
     );
 };
 

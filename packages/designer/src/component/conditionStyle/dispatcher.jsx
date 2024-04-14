@@ -1,22 +1,24 @@
 import {
-  setDateCompareConfig,
-  setDateCompareVisible,
-  setDuplicateCompareConfig,
-  setDuplicateCompareVisible,
-  setEditorConfig,
-  setEditorType,
-  setNumberApplyConfig,
-  setNumberApplyVisible,
-  setNumberCompareConfig,
-  setNumberCompareVisible,
-  setRuleType,
-  setShowEditor,
-  setTextBetweenConfig,
-  setTextBetweenVisible,
-  setTextCompareConfig,
-  setTextCompareVisible,
+    setDateCompareConfig,
+    setDateCompareVisible,
+    setDuplicateCompareConfig,
+    setDuplicateCompareVisible,
+    setEditorConfig,
+    setEditorType,
+    setNumberApplyConfig,
+    setNumberApplyVisible,
+    setNumberCompareConfig,
+    setNumberCompareVisible,
+    setRuleType,
+    setShowEditor,
+    setTextBetweenConfig,
+    setTextBetweenVisible,
+    setTextCompareConfig,
+    setTextCompareVisible,
 } from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
+import { showAddConditionRule } from '@utils/conditionRuleUtil';
+import { withBatchUpdate } from '@utils/spreadUtil';
 
 const dispatcher = {
     highlightCellsRulesGreaterThan: (spread, dispatcher) => {
@@ -704,24 +706,19 @@ const dispatcher = {
         dispatcher(setShowEditor(true));
     },
     conditionFormatNewRule: (spread, dispatcher) => {
-        dispatcher(setEditorType('formatOnValue'));
-        dispatcher(setRuleType('twoScaleRule'));
-        dispatcher(
-            setEditorConfig({
-                _type: 'scaleRule',
-                ruleType: 'twoScaleRule',
-                minType: 'lowestValue',
-                minValue: null,
-                minColor: 'rgb(255,0,0)',
-                midType: null,
-                midValue: null,
-                midColor: null,
-                maxType: 'highestValue',
-                maxValue: null,
-                maxColor: 'rgb(0,136,0)',
-            })
-        );
-        dispatcher(setShowEditor(true));
+        const applyRule = (rule) => {
+            withBatchUpdate(spread, (sheet) => {
+                const selections = sheet.getSelections();
+                rule.bind(sheet);
+                rule.applySelections(selections);
+            });
+        };
+        showAddConditionRule(dispatcher, {
+            onConfirm: function (config) {
+                const rule = new ConditionRule(config);
+                applyRule(rule);
+            },
+        });
     },
 };
 

@@ -1,33 +1,20 @@
 import { Fragment } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Divider } from '@components/divider/Index';
 import { Select } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import {
-  setEditorConfig,
-  setRuleType,
-  setShowEditor,
+    setEditorConfig,
+    setRuleType,
+    setShowEditor,
 } from '@store/conditionStyleSlice';
 import { getNamespace } from '@utils/spreadUtil';
 
-import {
-  Border,
-  HLayout,
-  Item,
-  Text,
-  Title,
-  VLayout,
-} from '../../Components';
+import { Border, HLayout, Item, Text, Title, VLayout } from '../../Components';
 import { itemStyle } from '../../Utils';
-import {
-  CellPreview,
-  FormatButton,
-} from '../Components';
+import { CellPreview, FormatButton } from '../Components';
 
 const Type_Options = [
     { value: 'cellValueRule', text: '单元格值' },
@@ -118,7 +105,7 @@ export default function (props) {
                         <Item>
                             <Select
                                 datas={Type_Options}
-                                value={enhanceRuleType(ruleType,editorConfig)}
+                                value={enhanceRuleType(ruleType, editorConfig)}
                                 onChange={(val) => {
                                     const config = {
                                         ...editorConfig,
@@ -229,6 +216,7 @@ export default function (props) {
                                 <Range
                                     hostId={hostId}
                                     style={{ width: '100%', height: 26 }}
+                                    value={editorConfig.value1}
                                     onStartSelect={() =>
                                         dispatcher(setShowEditor(false))
                                     }
@@ -260,6 +248,7 @@ export default function (props) {
                             {isTwoVal ? (
                                 <Range
                                     hostId={hostId}
+                                    value={editorConfig.value2}
                                     onStartSelect={() =>
                                         dispatcher(setShowEditor(false))
                                     }
@@ -284,11 +273,8 @@ export default function (props) {
                     </HLayout>
                     <HLayout style={{ ...itemStyle, marginBottom: 16 }}>
                         <Text>预览：</Text>
-                        <CellPreview>
-                        </CellPreview>
-                        <FormatButton>
-                            格式...
-                        </FormatButton>
+                        <CellPreview></CellPreview>
+                        <FormatButton>格式...</FormatButton>
                     </HLayout>
                 </VLayout>
             </Border>

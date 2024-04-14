@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { getDefaultScaleRuleEditConfig } from '@utils/conditionRuleUtil';
 
 export const conditionStyleSlice = createSlice({
     name: 'layoutSlice',
@@ -6,19 +7,7 @@ export const conditionStyleSlice = createSlice({
         //是否显示新增规则
         showEditor: false,
         //新增规则配置
-        editorConfig:{
-            _type: 'scaleRule',
-            ruleType: 'twoScaleRule',
-            minType: 'lowestValue',
-            minValue: null,
-            minColor:'rgb(255,0,0)',
-            midType: null,
-            midValue: null,
-            midColor: null,
-            maxType: 'highestValue',
-            maxValue: null,
-            maxColor:'rgb(0,136,0)'
-        },
+        editorConfig: getDefaultScaleRuleEditConfig(),
         //新增规则类型
         editorType: 'formatOnValue',
         //新增规则格式样式
@@ -29,8 +18,8 @@ export const conditionStyleSlice = createSlice({
             desc: '',
             ruleType: '',
             operator: '',
-            range:'',
-            style:'lightRedFill_DarkRedText'
+            range: '',
+            style: 'lightRedFill_DarkRedText',
         },
         textBetweenVisible: false,
         textBetweenConfig: {
@@ -38,9 +27,9 @@ export const conditionStyleSlice = createSlice({
             desc: '',
             ruleType: '',
             operator: '',
-            range:'',
-            range1:'',
-            style:'lightRedFill_DarkRedText',
+            range: '',
+            range1: '',
+            style: 'lightRedFill_DarkRedText',
         },
         numberCompareVisible: false,
         numberCompareConfig: {
@@ -48,8 +37,8 @@ export const conditionStyleSlice = createSlice({
             desc: '',
             ruleType: '',
             operator: '',
-            range:'',
-            style:'lightRedFill_DarkRedText',
+            range: '',
+            style: 'lightRedFill_DarkRedText',
         },
         numberApplyVisible: false,
         numberApplyConfig: {
@@ -58,17 +47,24 @@ export const conditionStyleSlice = createSlice({
             operator: '',
             desc: '',
             secondary: '',
-            style:'lightRedFill_DarkRedText',
+            style: 'lightRedFill_DarkRedText',
         },
         dateCompareVisible: false,
         dateCompareConfig: {
             title: '',
             desc: '',
-            style:'lightRedFill_DarkRedText',
+            style: 'lightRedFill_DarkRedText',
         },
         duplicateCompareVisible: false,
         duplicateCompareConfig: { title: '', desc: '' },
-        ruleManagerVisible:false,
+        ruleManagerVisible: false,
+        //新增规则回调id
+        addCallbackId: null,
+        ruleManagerConfig: {
+            currentIndex: 0,
+            rules: [],
+            deleted: [],
+        },
     },
     reducers: {
         setShowEditor(state, { payload }) {
@@ -119,9 +115,15 @@ export const conditionStyleSlice = createSlice({
         setDuplicateCompareConfig(state, { payload }) {
             state.duplicateCompareConfig = payload;
         },
-        setRuleManagerVisible(state, { payload }){
+        setRuleManagerVisible(state, { payload }) {
             state.ruleManagerVisible = payload;
-        }
+        },
+        setAddCallbackId(state, { payload }) {
+            state.addCallbackId = payload;
+        },
+        setRuleManagerConfig(state, { payload }) {
+            state.ruleManagerConfig = payload;
+        },
     },
 });
 export const {
@@ -142,5 +144,7 @@ export const {
     setTextBetweenConfig,
     setShowEditor,
     setRuleManagerVisible,
+    setRuleManagerConfig,
+    setAddCallbackId,
 } = conditionStyleSlice.actions;
 export default conditionStyleSlice.reducer;

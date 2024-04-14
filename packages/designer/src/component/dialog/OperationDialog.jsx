@@ -44,6 +44,7 @@ export default function (props) {
         cancelTitle = '取消',
         confirmTitle = '确定',
         children,
+        tools = null,
         ...others
     } = props;
     return (
@@ -53,7 +54,13 @@ export default function (props) {
                     {children}
                     {hideOperations ? null : (
                         <ButtonWrap>
-                            <DialogButton onClick={onCancel}>
+                            {tools}
+                            <DialogButton
+                                onClick={onCancel}
+                                style={{
+                                    marginRight: tools ? 8 : 0,
+                                }}
+                            >
                                 {cancelTitle}
                             </DialogButton>
                             <DialogButton

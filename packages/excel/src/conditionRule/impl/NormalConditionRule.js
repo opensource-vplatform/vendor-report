@@ -10,7 +10,8 @@ class NormalConditionRule extends Rule {
         text,
         formula,
         type,
-        rank
+        rank,
+        stopIfTrue
     ) {
         super();
         this.ruleType = ruleType;
@@ -22,6 +23,7 @@ class NormalConditionRule extends Rule {
         this.formula = formula;
         this.type = type;
         this.rank = rank;
+        this.stopIfTrue = stopIfTrue;
     }
 
     apply(row, rowCount, col, colCount) {
@@ -44,6 +46,7 @@ class NormalConditionRule extends Rule {
                 this.getType(this.type),
                 this.rank
             );
+        rule.stopIfTrue(this.stopIfTrue);
         this.sheet.conditionalFormats.addRule(rule);
     }
 
@@ -59,6 +62,7 @@ class NormalConditionRule extends Rule {
             formula: this.formula,
             type: this.type,
             rank: this.rank,
+            stopIfTrue: this.stopIfTrue,
         };
     }
 }
@@ -74,6 +78,7 @@ NormalConditionRule.fromJson = function (json) {
         formula,
         type,
         rank,
+        stopIfTrue,
     } = json;
     return new NormalConditionRule(
         ruleType,
@@ -84,7 +89,8 @@ NormalConditionRule.fromJson = function (json) {
         text,
         formula,
         type,
-        rank
+        rank,
+        stopIfTrue
     );
 };
 

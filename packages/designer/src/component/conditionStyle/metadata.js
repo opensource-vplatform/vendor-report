@@ -127,3 +127,77 @@ export const getFormatTypes = function () {
         },
     ];
 };
+
+export const ruleTypeToName = function (ruleType) {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.ConditionalFormatting.RuleType[ruleType];
+};
+
+export const operatorToName = function (ruleType, operator) {
+    const GC = getNamespace();
+    const RuleType = GC.Spread.Sheets.ConditionalFormatting.RuleType;
+    let NS = GC.Spread.Sheets.ConditionalFormatting.ComparisonOperators;
+    if (ruleType == RuleType.specificTextRule) {
+        NS = GC.Spread.Sheets.ConditionalFormatting.TextComparisonOperators;
+    }
+    return NS[operator];
+};
+
+export const typeToName = function (ruleType, type) {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.ConditionalFormatting.AverageConditionType[type];
+};
+
+export const scaleValueToName = function (scaleValue) {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.ConditionalFormatting.ScaleValueType[scaleValue];
+};
+
+export const dataBarDirectionToName = function (direction) {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.ConditionalFormatting.BarDirection[direction];
+};
+
+export const iconSetTypeToName = function (iconSetType) {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.ConditionalFormatting.IconSetType[iconSetType];
+};
+
+export const iconValueTypeToName = function (iconValueType) {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.ConditionalFormatting.IconValueType[iconValueType];
+};
+
+export const rowColumnStateToName = function (state) {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.RowColumnStates[state];
+};
+
+export const ruleTypeToFormatType = function (ruleTypeName) {
+    if (
+        [
+            'twoScaleRule',
+            'threeScaleRule',
+            'dataBarRule',
+            'iconSetRule',
+        ].indexOf(ruleTypeName) != -1
+    ) {
+        return 'formatOnValue';
+    } else if (
+        ['cellValueRule', 'specificTextRule', 'dateOccurringRule'].indexOf(
+            ruleTypeName
+        ) != -1
+    ) {
+        return 'formatContain';
+    } else if ('top10Rule' == ruleTypeName) {
+        return 'formatRankedValue';
+    } else if ('averageRule' == ruleTypeName) {
+        return 'formatAbove';
+    } else if (['duplicateRule', 'uniqueRule'].indexOf(ruleTypeName) != -1) {
+        return 'formatUnique';
+    } else if ('formulaRule' == ruleTypeName) {
+        return 'useFormula';
+    } else if (['rowStateRule', 'columnStateRule'].indexOf(ruleTypeName)) {
+        return 'useRowColumnStates';
+    }
+};

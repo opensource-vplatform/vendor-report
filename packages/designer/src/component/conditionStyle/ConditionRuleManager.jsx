@@ -1,35 +1,35 @@
-import {
-  Fragment,
-  useEffect,
-  useState,
-} from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { OperationDialog } from '@components/dialog/Index';
-import {
-  Button,
-  CheckBox,
-} from '@components/form/Index';
+import { Button, CheckBox } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import {
-  setEditorConfig,
-  setEditorType,
-  setRuleManagerVisible,
-  setRuleType,
+    setEditorConfig,
+    setEditorType,
+    setRuleManagerVisible,
+    setRuleType,
 } from '@store/conditionStyleSlice';
 import { genUUID } from '@utils/commonUtil';
 import {
-  getRuleTitle,
-  RuleFormat,
+    getRuleTitle,
+    RuleFormat,
+    getDefaultScaleRuleEditConfig,
+    showAddConditionRule,
+    showEditConditionRule,
 } from '@utils/conditionRuleUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
-import { setShowEditor } from '../../store/conditionStyleSlice';
+import {
+    setRuleManagerConfig,
+    setShowEditor,
+} from '@store/conditionStyleSlice';
+import { jsonToRanges, toJson } from './RuleToJson';
+import { withBatchCalcUpdate } from '../../utils/spreadUtil';
+import { ConditionRule } from '@toone/report-excel';
+import { rangesToJson } from './RuleToJson';
 
 const Buttons = styled.div`
     display: flex;
@@ -193,96 +193,158 @@ const btnStyle = {
 export default function (props) {
     const { onCancel, onConfirm } = props;
     const { spread } = useSelector(({ appSlice }) => appSlice);
+    const { ruleManagerConfig } = useSelector(
+        ({ conditionStyleSlice }) => conditionStyleSlice
+    );
     const dispatch = useDispatch();
-    const [data, setData] = useState(() => {
-        return {
-            current: 0,
-            domId: genUUID(),
-            rules: [],
-        };
+    const [data] = useState(() => {
+        return { domId: genUUID(), id2Rule: {} };
     });
     const handleAdd = () => {
-        dispatch(setEditorType('formatOnValue'));
-        dispatch(setRuleType('twoScaleRule'));
-        dispatch(
-            setEditorConfig({
-                _type: 'scaleRule',
-                ruleType: 'twoScaleRule',
-                minType: 'lowestValue',
-                minValue: null,
-                minColor: 'rgb(255,0,0)',
-                midType: null,
-                midValue: null,
-                midColor: null,
-                maxType: 'highestValue',
-                maxValue: null,
-                maxColor: 'rgb(0,136,0)',
-            })
-        );
-        dispatch(setShowEditor(true));
-    };
-    const handleEdit = ()=>{
-
-    }
-    const handleDel = () => {
-        const rules = data.rules;
-        let current = data.current;
-        rules.splice(current, 1);
-        current = current > 0 ? current - 1 : current;
-        setData({
-            ...data,
-            current,
-            rules: [...rules],
+        showAddConditionRule(dispatch, {
+            onConfirm: (config) => {
+                const rules = ruleManagerConfig.rules;
+                const sheet = spread.getActiveSheet();
+                const selections = sheet.getSelections();
+                dispatch(
+                    setRuleManagerConfig({
+                        ...ruleManagerConfig,
+                        rules: [
+                            ...rules,
+                            {
+                                id: genUUID(),
+                                config: {
+                                    ...config,
+                                    ranges: rangesToJson(selections),
+                                },
+                            },
+                        ],
+                    })
+                );
+                dispatch(setRuleManagerVisible(true));
+            },
+            onCancel: () => {
+                dispatch(setRuleManagerVisible(true));
+            },
         });
     };
+    const handleEdit = () => {
+        const { rules, currentIndex } = ruleManagerConfig;
+        const { config } = rules[currentIndex];
+        showEditConditionRule(dispatch, {
+            onConfirm: (config) => {
+                const { rules, currentIndex } = ruleManagerConfig;
+                const ruleConfig = rules[currentIndex];
+                const newConfig = { ...ruleConfig, config };
+                const newRules = [...rules];
+                newRules[currentIndex] = newConfig;
+                dispatch(
+                    setRuleManagerConfig({
+                        ...ruleManagerConfig,
+                        rules: newRules,
+                    })
+                );
+                dispatch(setRuleManagerVisible(true));
+            },
+            onCancel: () => {
+                dispatch(setRuleManagerVisible(true));
+            },
+            json: config,
+        });
+    };
+    const handleDel = () => {
+        let { rules, currentIndex } = ruleManagerConfig;
+        let newRules = [...rules];
+        newRules.splice(currentIndex, 1);
+        currentIndex = currentIndex > 0 ? currentIndex - 1 : currentIndex;
+        dispatch(
+            setRuleManagerConfig({
+                ...ruleManagerConfig,
+                current: currentIndex,
+                rules: newRules,
+            })
+        );
+    };
     const handleMoveUp = () => {
-        const index = data.current;
-        const rules = data.rules;
-        if (index > 0 && rules.length > 0) {
-            const preIndex = index - 1;
+        const { currentIndex } = ruleManagerConfig;
+        const rules = [...ruleManagerConfig.rules];
+        if (currentIndex > 0 && rules.length > 0) {
+            const preIndex = currentIndex - 1;
             const pre = rules[preIndex];
-            rules[preIndex] = rules[index];
-            rules[index] = pre;
-            setData({
-                ...data,
-                current: preIndex,
-                rules: [...rules],
-            });
+            rules[preIndex] = rules[currentIndex];
+            rules[currentIndex] = pre;
+            dispatch(
+                setRuleManagerConfig({
+                    ...ruleManagerConfig,
+                    currentIndex: preIndex,
+                    rules,
+                })
+            );
         }
     };
     const handleMoveDown = () => {
-        const index = data.current;
-        const rules = data.rules;
+        const index = ruleManagerConfig.currentIndex;
+        const rules = [...ruleManagerConfig.rules];
         if (index < rules.length - 1 && rules.length > 0) {
             const nextIndex = index + 1;
             const pre = rules[nextIndex];
             rules[nextIndex] = rules[index];
             rules[index] = pre;
-            setData({
-                ...data,
-                current: nextIndex,
-                rules: [...rules],
-            });
+            dispatch(
+                setRuleManagerConfig({
+                    ...ruleManagerConfig,
+                    currentIndex: nextIndex,
+                    rules,
+                })
+            );
         }
     };
-    const handleCancel = ()=>{
-        dispatch(setRuleManagerVisible(false));
-    }
     useEffect(() => {
-        if (spread) {
+        if (spread && ruleManagerConfig.rules.length == 0) {
             const sheet = spread.getActiveSheet();
             if (!sheet) return;
             const conditionRules = sheet.conditionalFormats.getRules();
             const rules = [];
             conditionRules.forEach((rule) => {
-                rules.push({ title: getRuleTitle(rule), rule });
+                const id = genUUID();
+                rules.push({ id, config: toJson(rule) });
             });
-            setData({
-                ...data,
-                rules,
-            });
+            dispatch(
+                setRuleManagerConfig({
+                    ...ruleManagerConfig,
+                    rules,
+                })
+            );
         }
     }, []);
+    const handleConfirm = () => {
+        handleApply();
+        handleCancel();
+    };
+    const handleCancel = () => {
+        dispatch(
+            setRuleManagerConfig({
+                currentIndex: 0,
+                rules: [],
+            })
+        );
+        dispatch(setRuleManagerVisible(false));
+    };
+    const handleApply = () => {
+        const rules = ruleManagerConfig.rules;
+        if (rules) {
+            withBatchCalcUpdate(spread, (sheet) => {
+                sheet.conditionalFormats.clearRule();
+                rules.forEach(({ config }) => {
+                    const conditionRule = new ConditionRule(config);
+                    const ranges = config.ranges;
+                    const selections = jsonToRanges(ranges);
+                    conditionRule.bind(sheet);
+                    conditionRule.applySelections(selections);
+                });
+            });
+        }
+    };
     return (
         <Fragment>
             <OperationDialog
@@ -290,13 +352,9 @@ export default function (props) {
                 width='750px'
                 height='330px'
                 id={data.domId}
+                tools={<Button onClick={handleApply}>应用</Button>}
                 onCancel={handleCancel}
-                onConfirm={() =>
-                    onConfirm({
-                        sortType: data.sortType,
-                        conditions: data.conditions,
-                    })
-                }
+                onConfirm={handleConfirm}
             >
                 <Buttons>
                     <Button style={btnStyle} onClick={handleAdd}>
@@ -304,14 +362,14 @@ export default function (props) {
                     </Button>
                     <Button
                         style={btnStyle}
-                        disabled={data.rules.length == 0}
+                        disabled={ruleManagerConfig.rules.length == 0}
                         onClick={handleEdit}
                     >
                         编辑规则...
                     </Button>
                     <Button
                         style={btnStyle}
-                        disabled={data.rules.length == 0}
+                        disabled={ruleManagerConfig.rules.length == 0}
                         onClick={handleDel}
                     >
                         删除规则
@@ -319,7 +377,8 @@ export default function (props) {
                     <Button
                         style={btnStyle}
                         disabled={
-                            data.rules.length == 0 || data.current == 0
+                            ruleManagerConfig.rules.length == 0 ||
+                            ruleManagerConfig.currentIndex == 0
                         }
                         onClick={handleMoveUp}
                     >
@@ -328,8 +387,9 @@ export default function (props) {
                     <Button
                         style={btnStyle}
                         disabled={
-                            data.rules.length == 0 ||
-                            data.current == data.rules.length - 1
+                            ruleManagerConfig.rules.length == 0 ||
+                            ruleManagerConfig.currentIndex ==
+                                ruleManagerConfig.rules.length - 1
                         }
                         onClick={handleMoveDown}
                     >
@@ -337,10 +397,15 @@ export default function (props) {
                     </Button>
                 </Buttons>
                 <Grid
-                    datas={data.rules}
-                    current={data.current}
+                    datas={ruleManagerConfig.rules}
+                    current={ruleManagerConfig.currentIndex}
                     onSelection={(index) =>
-                        setData({ ...data, current: index })
+                        dispatch(
+                            setRuleManagerConfig({
+                                ...ruleManagerConfig,
+                                currentIndex: index,
+                            })
+                        )
                     }
                     columns={[
                         {
@@ -348,7 +413,8 @@ export default function (props) {
                             title: '规则(按所示顺序应用)',
                             width: '35%',
                             render: function (value, row, datas, column) {
-                                return <Label>{value}</Label>;
+                                const config = row.config;
+                                return <Label>{getRuleTitle(config)}</Label>;
                             },
                         },
                         {
@@ -356,7 +422,8 @@ export default function (props) {
                             title: '格式',
                             width: '25%',
                             render: (value, row, datas, column) => {
-                                return <RuleFormat rule={row.rule}></RuleFormat>
+                                const json = row.config;
+                                return <RuleFormat json={json}></RuleFormat>;
                             },
                         },
                         {
@@ -364,13 +431,22 @@ export default function (props) {
                             title: '应用于',
                             width: '30%',
                             render: (value, row, datas, column) => {
+                                const config = row.config;
+                                const ranges = config.ranges || [];
+                                const GC = getNamespace();
+                                const formula =
+                                    '=' +
+                                    GC.Spread.Sheets.CalcEngine.rangesToFormula(
+                                        ranges
+                                    );
                                 return (
                                     <Range
                                         hostId={data.domId}
                                         style={{
                                             width: '100%',
-                                            height: 26
+                                            height: 26,
                                         }}
+                                        value={formula}
                                         onStartSelect={() =>
                                             dispatch(
                                                 setRuleManagerVisible(false)
@@ -381,35 +457,85 @@ export default function (props) {
                                                 setRuleManagerVisible(true)
                                             )
                                         }
+                                        onChange={(val) => {
+                                            let ranges = null;
+                                            try {
+                                                const result =
+                                                    GC.Spread.Sheets.CalcEngine.formulaToRanges(
+                                                        spread.getActiveSheet(),
+                                                        val
+                                                    );
+                                                ranges = [];
+                                                result.forEach((item) => {
+                                                    ranges = ranges.concat(
+                                                        item.ranges
+                                                    );
+                                                });
+                                            } catch (e) {
+                                                ranges = [];
+                                            }
+
+                                            ranges = rangesToJson(ranges);
+                                            const newRules = [...datas];
+                                            const index = datas.indexOf(row);
+                                            newRules[index] = {
+                                                ...row,
+                                                config: {
+                                                    ...row.config,
+                                                    ranges,
+                                                },
+                                            };
+                                            dispatch(
+                                                setRuleManagerConfig({
+                                                    ...ruleManagerConfig,
+                                                    rules: newRules,
+                                                })
+                                            );
+                                        }}
                                     ></Range>
                                 );
                             },
                         },
                         {
-                            code: 'sortBy',
+                            code: 'stopIfTrue',
                             title: '如果为真则停止',
                             width: '110px',
                             render: (value, row, datas, column) => {
-                                let disabled = false;
-                                const rule = row.rule;
-                                const GC = getNamespace();
-                                const RuleType =
-                                    GC.Spread.Sheets.ConditionalFormatting
-                                        .RuleType;
-                                switch (rule.ruleType()) {
-                                    case RuleType.twoScaleRule:
-                                    case RuleType.threeScaleRule:
-                                    case RuleType.dataBarRule:
-                                    case RuleType.iconSetRule:
-                                        disabled = true;
-                                }
+                                const config = row.config;
+                                const disabled =
+                                    [
+                                        'twoScaleRule',
+                                        'threeScaleRule',
+                                        'dataBarRule',
+                                        'iconSetRule',
+                                    ].indexOf(config.ruleType) != -1;
                                 return (
                                     <Center>
                                         <CheckBox
                                             iconStyle={{
-                                                height: 22
+                                                height: 22,
                                             }}
+                                            value={config.stopIfTrue}
                                             disabled={disabled}
+                                            onChange={(val) => {
+                                                const newConfig = {
+                                                    ...config,
+                                                    stopIfTrue: val,
+                                                };
+                                                const index =
+                                                    datas.indexOf(row);
+                                                const rules = [...datas];
+                                                rules[index] = {
+                                                    ...row,
+                                                    config: newConfig,
+                                                };
+                                                dispatch(
+                                                    setRuleManagerConfig({
+                                                        ...ruleManagerConfig,
+                                                        rules,
+                                                    })
+                                                );
+                                            }}
                                         ></CheckBox>
                                     </Center>
                                 );
@@ -418,31 +544,6 @@ export default function (props) {
                     ]}
                 ></Grid>
             </OperationDialog>
-            {data.showWran ? (
-                <OperationDialog
-                    title='消息提示'
-                    width='248px'
-                    height='150px'
-                    onCancel={() => {
-                        setData({
-                            ...data,
-                            showWran: false,
-                            sortTypeTemp: null,
-                        });
-                    }}
-                    onConfirm={() => {
-                        setData({
-                            ...data,
-                            showWran: false,
-                            sortType: data.sortTypeTemp,
-                            sortTypeTemp: null,
-                            conditions: [],
-                        });
-                    }}
-                >
-                    <Warn>更改选项将清除排序条件，确定清除吗？</Warn>
-                </OperationDialog>
-            ) : null}
         </Fragment>
     );
 }

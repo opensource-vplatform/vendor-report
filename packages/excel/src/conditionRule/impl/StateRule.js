@@ -2,11 +2,12 @@ import { getNamespace } from '../../utils/spreadUtil';
 import Rule from './Rule';
 
 class StateRule extends Rule {
-    constructor(ruleType, state, style) {
+    constructor(ruleType, state, style, stopIfTrue) {
         super();
         this.ruleType = ruleType;
         this.state = state;
         this.style = style;
+        this.stopIfTrue = stopIfTrue;
     }
 
     apply(row, rowCount, col, colCount) {
@@ -22,6 +23,7 @@ class StateRule extends Rule {
             this.getStyle(this.style),
             selections
         );
+        rule.stopIfTrue(this.stopIfTrue);
         this.sheet.conditionalFormats.addRule(rule);
     }
 
@@ -31,13 +33,14 @@ class StateRule extends Rule {
             ruleType: this.ruleType,
             state: this.state,
             style: this.style,
+            stopIfTrue: this.stopIfTrue,
         };
     }
 }
 
 StateRule.fromJson = function (json) {
-    const { ruleType, state, style } = json;
-    return new StateRule(ruleType, state, style);
+    const { ruleType, state, style, stopIfTrue } = json;
+    return new StateRule(ruleType, state, style, stopIfTrue);
 };
 
 export default StateRule;

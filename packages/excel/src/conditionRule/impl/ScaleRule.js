@@ -12,7 +12,8 @@ class ScaleRule extends Rule {
         midColor,
         maxType,
         maxValue,
-        maxColor
+        maxColor,
+        stopIfTrue
     ) {
         super();
         this.ruleType = ruleType;
@@ -25,6 +26,7 @@ class ScaleRule extends Rule {
         this.maxType = maxType;
         this.maxValue = maxValue;
         this.maxColor = maxColor;
+        this.stopIfTrue = stopIfTrue;
     }
 
     apply(row, rowCount, col, colCount) {
@@ -47,6 +49,7 @@ class ScaleRule extends Rule {
             this.maxColor,
             selections
         );
+        rule.stopIfTrue(this.stopIfTrue);
         this.sheet.conditionalFormats.addRule(rule);
     }
 
@@ -63,6 +66,7 @@ class ScaleRule extends Rule {
             maxType: this.maxType,
             maxValue: this.maxValue,
             maxColor: this.maxColor,
+            stopIfTrue: this.stopIfTrue,
         };
     }
 }
@@ -79,6 +83,7 @@ ScaleRule.fromJson = function (json) {
         maxType,
         maxValue,
         maxColor,
+        stopIfTrue,
     } = json;
     return new ScaleRule(
         ruleType,
@@ -90,7 +95,9 @@ ScaleRule.fromJson = function (json) {
         midColor,
         maxType,
         maxValue,
-        maxColor);
+        maxColor,
+        stopIfTrue
+    );
 };
 
 export default ScaleRule;
