@@ -1,16 +1,14 @@
 import {
-  hideTab,
-  setBindRange,
-  setCallbackId,
-  setSetting,
-  setVisible,
+    hideTab,
+    setBindRange,
+    setCallbackId,
+    setSetting,
+    setVisible,
+    setActive,
 } from '@store/cellSettingSlice';
 
 import { genUUID } from './commonUtil';
-import {
-  diff,
-  isNullOrUndef,
-} from './objectUtil';
+import { diff, isNullOrUndef } from './objectUtil';
 import { getNamespace } from './spreadUtil';
 
 const HANDLER_CONTIANER = {};
@@ -22,6 +20,7 @@ export const show = function (dispatch, options) {
         hideCodes = [],
         setting = {},
         bindRange = true,
+        active = 'number',
     } = options;
     const callbackId = genUUID();
     HANDLER_CONTIANER[callbackId] = {
@@ -31,6 +30,7 @@ export const show = function (dispatch, options) {
     hideCodes.forEach((code) => {
         dispatch(hideTab(code));
     });
+    dispatch(setActive(active));
     dispatch(setCallbackId(callbackId));
     dispatch(setBindRange(bindRange));
     dispatch(setSetting(setting));

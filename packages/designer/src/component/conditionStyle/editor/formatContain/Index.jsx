@@ -30,12 +30,12 @@ const Operator_Options_Map = {
     cellValueRule: [
         { value: 'between', text: '介于' },
         { value: 'notBetween', text: '未介于' },
-        { value: 'equalTo', text: '等于' },
-        { value: 'notEqualTo', text: '不等于' },
+        { value: 'equalsTo', text: '等于' },
+        { value: 'notEqualsTo', text: '不等于' },
         { value: 'greaterThan', text: '大于' },
         { value: 'lessThan', text: '小于' },
-        { value: 'greaterThanOrEqu', text: '大于或等于' },
-        { value: 'lessThanOrEqu', text: '小于或等于' },
+        { value: 'greaterThanOrEqualsTo', text: '大于或等于' },
+        { value: 'lessThanOrEqualsTo', text: '小于或等于' },
     ],
     specificTextRule: [
         { value: 'contains', text: '包含' },

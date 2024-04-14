@@ -1,16 +1,10 @@
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { Button } from '@components/form/Index';
 import { Preview } from '@components/preview/Index';
 import { setEditorConfig } from '@store/conditionStyleSlice';
-import {
-  cellSettingSliceToConditionStyle,
-  show,
-} from '@utils/cellSettingUtil';
+import { cellSettingSliceToConditionStyle, show } from '@utils/cellSettingUtil';
 
 const Wrap = styled.div`
     width: 196px;
@@ -61,7 +55,8 @@ export const FormatButton = function () {
                         dispatcher(setEditorConfig(config));
                     },
                     hideCodes: ['align'],
-                    bindRange:false,
+                    bindRange: false,
+                    active: 'font',
                     setting: {
                         font: {
                             fontFamily: false,
