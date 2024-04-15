@@ -138,7 +138,7 @@ function transformFontToselectedFontStyleKey(fontWeight, fontStyle) {
  */
 export default function (props) {
     const dispatcher = useDispatch();
-    const { borderSetting,fontSetting,setting,numberSetting } = useSelector(
+    const { borderSetting,fontSetting,setting,numberSetting,fillSetting } = useSelector(
         ({ cellSettingSlice }) => cellSettingSlice
     );
     const { fontFamily, fontSize, fontWeight, fontStyle, textDecoration } =
@@ -326,6 +326,7 @@ export default function (props) {
                                 fontStyle={fontSetting.fontStyle}
                                 fontSize={fontSetting.fontSize}
                                 foreColor={fontSetting.foreColor}
+                                backColor={fillSetting}
                             ></Preview>
                         </fieldset>
                     </div>

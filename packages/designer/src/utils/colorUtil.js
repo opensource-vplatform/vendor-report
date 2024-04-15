@@ -16,14 +16,19 @@ export function hexToRgb(hex) {
     };
 }
 
-export function rgbStrToHex(rgbStr) {
+export function parseRgb(rgbStr){
     rgbStr = rgbStr.replace('rgb', '').replace('(', '').replace(')', '');
     const arr = rgbStr.split(',');
-    return rgbToHex({
+    return {
         r: parseInt(arr[0]),
         g: parseInt(arr[1]),
         b: parseInt(arr[2]),
-    });
+    }
+}
+
+export function rgbStrToHex(rgbStr) {
+    const rbg = parseRgb(rgbStr);
+    return rgbToHex(rbg);
 }
 
 export function rgbToHex(rgb) {

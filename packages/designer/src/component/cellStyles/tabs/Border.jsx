@@ -19,8 +19,8 @@ import DiagonalDownLine from '@icons/border/DiagonalDownLine';
 import DiagonalUpLine from '@icons/border/DiagonalUpLine';
 import LineHorizontalInner from '@icons/border/LineHorizontalInner';
 import LineVerticalInner from '@icons/border/LineVerticalInner';
+import { setBorderSetting } from '@store/cellSettingSlice';
 
-import { setBorderSetting } from '../../../store/cellSettingSlice';
 import BorderStyle from '../components/BorderStyle';
 
 const BorderTabPanel = styled.div`
@@ -108,7 +108,7 @@ const BorderPreviewWrap = styled.div`
  */
 export default function (props) {
     const dispatch = useDispatch();
-    const { borderSetting,fontSetting, isSingleCell,numberSetting } = useSelector(
+    const { borderSetting,fontSetting, isSingleCell,numberSetting,fillSetting } = useSelector(
         ({ cellSettingSlice }) => cellSettingSlice
     );
     const { lineBorder } = borderSetting;
@@ -372,6 +372,7 @@ export default function (props) {
                                     fontStyle={fontSetting.fontStyle}
                                     fontSize={fontSetting.fontSize}
                                     foreColor={fontSetting.foreColor}
+                                    backColor={fillSetting}
                                     text="文本"
                                 ></Preview>
                             </BorderPreviewWrap>

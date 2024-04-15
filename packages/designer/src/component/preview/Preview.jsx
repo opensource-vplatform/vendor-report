@@ -6,11 +6,14 @@ import React, {
 import styled from 'styled-components';
 
 import { format as formatData } from '@utils/cellSettingUtil';
+import { isString } from '@utils/objectUtil';
 import {
   isDoubleUnderline,
   isLineThrough,
   isUnderline,
 } from '@utils/textDecorationUtil';
+
+import { isObject } from '../../../../excel/src/utils/objectUtils';
 
 const Wrap = styled.div`
     width: 180px;
@@ -26,8 +29,8 @@ const Outline = styled.div`
     align-items: center;
     justify-content: center;
     position: relative;
-    width:100%;
-    height:100%;
+    width: 100%;
+    height: 100%;
 `;
 
 const TextPreviewWrap = styled.div`
@@ -38,6 +41,8 @@ const TextPreviewWrap = styled.div`
     justify-content: center;
     align-items: center;
     font-size: 12px;
+    width: 100%;
+    height: 100%;
 `;
 
 const MultiCellWrap = styled.div`
@@ -64,6 +69,7 @@ function TextPreview(props) {
         fontWeight,
         fontStyle,
         fontSize,
+        backColor,
         foreColor,
         format,
         text = 'AaBbCcYyZz',
@@ -72,6 +78,11 @@ function TextPreview(props) {
         <TextPreviewWrap
             style={{
                 fontFamily,
+                backgroundColor: isString(backColor)
+                    ? backColor
+                    : isObject(backColor)
+                      ? backColor.backgroundColor
+                      : 'unset',
                 fontWeight: fontWeight == 'bold' ? 'bold' : 'normal',
                 fontSize: fontSize + 'pt',
                 color: foreColor,
@@ -84,7 +95,7 @@ function TextPreview(props) {
                     : 'unset',
             }}
         >
-            {formatData(format,text)}
+            {formatData(format, text)}
         </TextPreviewWrap>
     );
 }
@@ -187,7 +198,8 @@ export default function (props) {
     const canvasRef = useRef(null);
     const {
         style,
-        isSingleCell=true,
+        isSingleCell = true,
+        backColor,
         borderLeft,
         borderRight,
         borderTop,
@@ -374,7 +386,12 @@ export default function (props) {
         <Outline style={style}>
             <canvas
                 ref={canvasRef}
-                style={{ position: 'absolute', height: '100%', width: '100%' }}
+                style={{
+                    position: 'absolute',
+                    height: '100%',
+                    width: '100%',
+                    zIndex: 1,
+                }}
             />
             {isSingleCell ? (
                 <TextPreview
@@ -383,6 +400,7 @@ export default function (props) {
                     fontWeight={fontWeight}
                     fontStyle={fontStyle}
                     fontSize={fontSize}
+                    backColor={backColor}
                     foreColor={foreColor}
                     format={format}
                     text={text}
@@ -396,6 +414,7 @@ export default function (props) {
                             fontWeight={fontWeight}
                             fontStyle={fontStyle}
                             fontSize={fontSize}
+                            backColor={backColor}
                             foreColor={foreColor}
                             format={format}
                             text={text}
@@ -408,6 +427,7 @@ export default function (props) {
                             fontWeight={fontWeight}
                             fontStyle={fontStyle}
                             fontSize={fontSize}
+                            backColor={backColor}
                             foreColor={foreColor}
                             format={format}
                             text={text}
@@ -420,6 +440,7 @@ export default function (props) {
                             fontWeight={fontWeight}
                             fontStyle={fontStyle}
                             fontSize={fontSize}
+                            backColor={backColor}
                             foreColor={foreColor}
                             format={format}
                             text={text}
@@ -432,6 +453,7 @@ export default function (props) {
                             fontWeight={fontWeight}
                             fontStyle={fontStyle}
                             fontSize={fontSize}
+                            backColor={backColor}
                             foreColor={foreColor}
                             format={format}
                             text={text}

@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 
 import styled from 'styled-components';
 
+import { ruleTypeToFormatType } from '@components/conditionStyle/metadata';
 import { Preview } from '@components/preview/Index';
 import Icon0 from '@icons/style/icons/detail/Icon0';
 import Icon1 from '@icons/style/icons/detail/Icon1';
@@ -57,18 +58,20 @@ import Icon7 from '@icons/style/icons/detail/Icon7';
 import Icon8 from '@icons/style/icons/detail/Icon8';
 import Icon9 from '@icons/style/icons/detail/Icon9';
 
-import { isFunction, isString } from './objectUtil';
-import { getNamespace } from './spreadUtil';
+import {
+  setAddCallbackId,
+  setEditorConfig,
+  setEditorType,
+  setRuleManagerVisible,
+  setRuleType,
+  setShowEditor,
+} from '../store/conditionStyleSlice';
 import { genUUID } from './commonUtil';
 import {
-    setAddCallbackId,
-    setRuleManagerVisible,
-    setEditorType,
-    setRuleType,
-    setEditorConfig,
-    setShowEditor,
-} from '../store/conditionStyleSlice';
-import { ruleTypeToFormatType } from '@components/conditionStyle/metadata';
+  isFunction,
+  isString,
+} from './objectUtil';
+import { getNamespace } from './spreadUtil';
 
 const ComparisonOperatorToTitle = {
     between: function (value1, value2) {
@@ -338,6 +341,7 @@ const DefaultFormat = function (props) {
         diagonalDown,
         diagonalUp,
         formatter,
+        backColor,
         foreColor,
         fontStyle,
         fontWeight,
@@ -355,6 +359,7 @@ const DefaultFormat = function (props) {
             fontWeight={fontWeight}
             fontStyle={fontStyle}
             foreColor={foreColor}
+            backColor={backColor}
             format={formatter}
         ></Preview>
     );
@@ -560,30 +565,6 @@ const NameToIconValue = {
     fourTrafficLights_1: 'threeTrafficLightsUnrimmed_1',
     fourTrafficLights_2: 'threeTrafficLightsUnrimmed_2',
     threeSigns_0: 'threeTrafficLightsUnrimmed_0',
-};
-
-const IconSetTypeToName = {
-    0: 'threeArrowsColored',
-    1: 'threeArrowsGray',
-    2: 'threeTriangles',
-    3: 'threeStars',
-    4: 'threeFlags',
-    5: 'threeTrafficLightsUnrimmed',
-    6: 'threeTrafficLightsRimmed',
-    7: 'threeSigns',
-    8: 'threeSymbolsCircled',
-    9: 'threeSymbolsUncircled',
-    10: 'fourArrowsColored',
-    11: 'fourArrowsGray',
-    12: 'fourRedToBlack',
-    13: 'fourRatings',
-    14: 'fourTrafficLights',
-    15: 'fiveArrowsColored',
-    16: 'fiveArrowsGray',
-    17: 'fiveRatings',
-    18: 'fiveQuarters',
-    19: 'fiveBoxes',
-    20: 'noIcons',
 };
 
 export const getAllIcons = function () {

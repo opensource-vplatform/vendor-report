@@ -1,14 +1,23 @@
 import {
-    hideTab,
-    setBindRange,
-    setCallbackId,
-    setSetting,
-    setVisible,
-    setActive,
+  hideTab,
+  setActive,
+  setAlignSetting,
+  setBindRange,
+  setBorderSetting,
+  setCallbackId,
+  setFillSetting,
+  setFontSetting,
+  setSetting,
+  setSingleCell,
+  setVisible,
 } from '@store/cellSettingSlice';
 
 import { genUUID } from './commonUtil';
-import { diff, isNullOrUndef } from './objectUtil';
+import {
+  diff,
+  isNullOrUndef,
+  isObject,
+} from './objectUtil';
 import { getNamespace } from './spreadUtil';
 
 const HANDLER_CONTIANER = {};
@@ -20,6 +29,7 @@ export const show = function (dispatch, options) {
         hideCodes = [],
         setting = {},
         bindRange = true,
+        cellSetting = {},
         active = 'number',
     } = options;
     const callbackId = genUUID();
@@ -33,7 +43,22 @@ export const show = function (dispatch, options) {
     dispatch(setActive(active));
     dispatch(setCallbackId(callbackId));
     dispatch(setBindRange(bindRange));
+    if(!bindRange){
+        dispatch(setSingleCell(true));
+    }
     dispatch(setSetting(setting));
+    if(isObject(cellSetting.alignSetting)){
+        dispatch(setAlignSetting(cellSetting.alignSetting));
+    }
+    if(isObject(cellSetting.fontSetting)){
+        dispatch(setFontSetting(cellSetting.fontSetting));
+    }
+    if(isObject(cellSetting.borderSetting)){
+        dispatch(setBorderSetting(cellSetting.borderSetting));
+    }
+    if(!isNullOrUndef(cellSetting.fillSetting)){
+        dispatch(setFillSetting(cellSetting.fillSetting));
+    }
     dispatch(setVisible(true));
 };
 
@@ -181,6 +206,19 @@ export const getBorderSetting = function () {
     return Border_Setting;
 };
 
+const Fill_Setting = {
+    //背景色
+    backgroundColor: null,
+    //图案颜色
+    patternColor: null,
+    //图案样式
+    type: null
+}
+
+export const getFillSetting = function(){
+    return Fill_Setting;
+}
+
 const getDisabledKeys = function (setting) {
     const result = [];
     if (setting) {
@@ -199,6 +237,7 @@ export const getSetting = function (cellSettingSlice) {
         alignSetting,
         fontSetting,
         borderSetting,
+        fillSetting,
         hideCodes,
         setting,
     } = cellSettingSlice;
@@ -226,7 +265,7 @@ export const getSetting = function (cellSettingSlice) {
         }
     }
     if (hideCodes.indexOf('border') == -1) {
-        const except = getDisabledKeys(setting?.font);
+        const except = getDisabledKeys(setting?.border);
         const diffRes = diff(Border_Setting, borderSetting, [
             'lineBorder',
             ...except,
@@ -234,6 +273,14 @@ export const getSetting = function (cellSettingSlice) {
         if (diffRes !== null) {
             result = result ? result : {};
             result.borderSetting = diffRes;
+        }
+    }
+    if(hideCodes.indexOf('fill') == -1){
+        const except = getDisabledKeys(setting?.fill)
+        const diffRes = diff(Fill_Setting, fillSetting, except);
+        if (diffRes !== null) {
+            result = result ? result : {};
+            result.fillSetting = diffRes;
         }
     }
     return result;
@@ -249,7 +296,7 @@ export const format = function (format, value) {
 };
 
 export const cellSettingSliceToConditionStyle = function (cellSettingSlice) {
-    const { fontSetting, alignSetting, borderSetting, numberSetting } =
+    const { fontSetting, alignSetting, borderSetting, numberSetting, fillSetting } =
         cellSettingSlice;
     let style = null;
     if (fontSetting) {
@@ -267,5 +314,28 @@ export const cellSettingSliceToConditionStyle = function (cellSettingSlice) {
         style = style ? style : {};
         style = { ...borderSetting, ...style };
     }
+    if(fillSetting&&fillSetting.backgroundColor){
+        style = style ? style : {};
+        style.backColor = fillSetting.backgroundColor;//{...fillSetting}
+    }
     return style;
 };
+
+const fill = function(style,defaultSetting){
+    const result = {};
+    for(let [key,val] of Object.entries(defaultSetting)){
+        const newVal = style[key];
+        result[key] = isNullOrUndef(newVal) ? val:newVal;
+    }
+    return result;
+}
+
+export const jsonStyleToCellSetting = function(style={}){
+    const cellSetting = {};
+    cellSetting.alignSetting = fill(style,Align_Setting);
+    cellSetting.fontSetting = fill(style,Font_Setting);
+    cellSetting.borderSetting = fill(style,Border_Setting);
+    const backColor = style.backColor;
+    cellSetting.fillSetting = backColor;
+    return cellSetting;
+}

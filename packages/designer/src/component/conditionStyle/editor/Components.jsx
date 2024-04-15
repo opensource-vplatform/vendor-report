@@ -1,10 +1,17 @@
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import { Button } from '@components/form/Index';
 import { Preview } from '@components/preview/Index';
 import { setEditorConfig } from '@store/conditionStyleSlice';
-import { cellSettingSliceToConditionStyle, show } from '@utils/cellSettingUtil';
+import {
+  cellSettingSliceToConditionStyle,
+  jsonStyleToCellSetting,
+  show,
+} from '@utils/cellSettingUtil';
 
 const Wrap = styled.div`
     width: 196px;
@@ -31,6 +38,7 @@ export const CellPreview = function () {
                 fontStyle={editorConfig.style?.fontStyle}
                 foreColor={editorConfig.style?.foreColor}
                 format={editorConfig.formatSetting}
+                backColor={editorConfig.style?.backColor}
             ></Preview>
         </Wrap>
     );
@@ -57,6 +65,7 @@ export const FormatButton = function () {
                     hideCodes: ['align'],
                     bindRange: false,
                     active: 'font',
+                    cellSetting: jsonStyleToCellSetting(editorConfig?.style),
                     setting: {
                         font: {
                             fontFamily: false,

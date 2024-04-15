@@ -11,9 +11,11 @@ import Integer from '@components/integer/Index';
 import {
   colorFromHLS,
   hexToRgb,
+  parseRgb,
   rgb2hls,
   rgbToHex,
 } from '@utils/colorUtil';
+import { isNullOrUndef } from '@utils/objectUtil';
 
 const PalletWrap = styled.div`
     width: 100%;
@@ -99,11 +101,16 @@ const Display = styled.div`
     broder: solid 1px lightgray;
 `;
 
+const getRgb = function(color){
+    color = isNullOrUndef(color) ? '#ffffff': color.trim();
+    return color.startsWith('#') ? hexToRgb(color):parseRgb(color);
+}
+
 export default function (props) {
     const { value = '#ffffff', onClose, onChange } = props;
     const palletPointer = useRef(null);
     const [data, setData] = useState(() => {
-        const rgb = hexToRgb(value == null ? '#ffffff' : value);
+        const rgb = getRgb(value);
         return {
             isDragingHueSat: false,
             isDragingLum: false,
@@ -114,7 +121,7 @@ export default function (props) {
     });
     useEffect(() => {
         setData((data) => {
-            const rgb = hexToRgb(value == null ? '#ffffff' : value);
+            const rgb = getRgb(value);
             return {
                 isDragingHueSat: false,
                 isDragingLum: false,

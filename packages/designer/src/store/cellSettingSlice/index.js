@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   getAlignSetting,
   getBorderSetting,
+  getFillSetting,
   getFontSetting,
   getNumberSetting,
   numberSettingToFormat,
@@ -24,6 +25,7 @@ export const cellSettingSlice = createSlice({
         alignSetting: getAlignSetting(),
         fontSetting: getFontSetting(),
         borderSetting: getBorderSetting(),
+        fillSetting: getFillSetting(),
     },
     reducers: {
         hideTab(state, { payload }) {
@@ -47,7 +49,7 @@ export const cellSettingSlice = createSlice({
         },
         setNumberSetting(state, { payload }) {
             const formatter = numberSettingToFormat(payload);
-            state.numberSetting = {...payload,formatter};
+            state.numberSetting = { ...payload, formatter };
         },
         setAlignSetting(state, { payload }) {
             state.alignSetting = payload;
@@ -57,6 +59,9 @@ export const cellSettingSlice = createSlice({
         },
         setBorderSetting(state, { payload }) {
             state.borderSetting = payload;
+        },
+        setFillSetting(state, { payload }) {
+            state.fillSetting = payload;
         },
         setSingleCell(state, { payload }) {
             state.isSingleCell = payload;
@@ -71,6 +76,7 @@ export const cellSettingSlice = createSlice({
             state.alignSetting = deepClone(getAlignSetting());
             state.fontSetting = deepClone(getFontSetting());
             state.borderSetting = deepClone(getBorderSetting());
+            state.fillSetting = deepClone(getFillSetting());
         },
     },
 });
@@ -84,6 +90,7 @@ export const {
     setFontSetting,
     setSetting,
     setBorderSetting,
+    setFillSetting,
     setSingleCell,
     setBindRange,
     reset,

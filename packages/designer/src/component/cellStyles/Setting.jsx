@@ -26,6 +26,7 @@ import { parseFont } from '@utils/fontUtil';
 
 import Align from './tabs/Align';
 import Border from './tabs/Border';
+import Fill from './tabs/Fill';
 import Font from './tabs/Font';
 import Number from './tabs/Number';
 
@@ -46,6 +47,7 @@ const NumberTab = WithTabItem(Number, setActive);
 const AlignTab = WithTabItem(Align, setActive);
 const FontTab = WithTabItem(Font, setActive);
 const BorderTab = WithTabItem(Border, setActive);
+const FillTab = WithTabItem(Fill,setActive);
 
 export default function () {
     const cellSettingSlice = useSelector(
@@ -158,6 +160,7 @@ export default function () {
                     <AlignTab code='align' title='对齐'></AlignTab>
                     <FontTab code='font' title='字体'></FontTab>
                     <BorderTab code='border' title='边框'></BorderTab>
+                    <FillTab code='fill' title='填充'></FillTab>
                 </Tabs>
             </TabPanel>
         </OperationDialog>
