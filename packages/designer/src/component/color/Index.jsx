@@ -46,6 +46,7 @@ export default function (props) {
                             onOther={() => setDialogVisible(true)}
                         ></PopperColorPanel>
                     }
+                    style={style}
                 >
                     {children}
                 </Popper>
