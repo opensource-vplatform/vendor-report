@@ -185,6 +185,7 @@ function Designer(props) {
                             style={{
                                 width: '100%',
                                 display: 'flex',
+                                height:'100%',
                                 flexDirection: 'column',
                                 overflow: 'hidden',
                             }}

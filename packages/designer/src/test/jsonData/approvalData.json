@@ -1,0 +1,33 @@
+{
+    "ds": [
+        {
+            "id": "id",
+            "type": "text",
+            "typeName": "记录id",
+            "desc": "记录id",
+            "code": "id",
+            "name": "记录id"
+        },
+        {
+            "id": "username",
+            "type": "text",
+            "typeName": "文本",
+            "desc": "审批人",
+            "code": "username",
+            "name": "审批人"
+        },
+        {
+            "id": "msg",
+            "type": "text",
+            "typeName": "文本",
+            "desc": "审批意见",
+            "code": "msg",
+            "name": "审批意见"
+        }
+    ],
+    "data": {
+        "id": "1",
+        "username": "张三",
+        "message": "审批通过"
+    }
+}

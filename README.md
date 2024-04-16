@@ -62,11 +62,11 @@ https://pnpm.io/zh/
 
 #### Demos
 
-https://developer.mescius.com/spreadjs/demos
+https://demo.grapecity.com.cn/spreadjs/practice/welcome
 
 #### API
 
-https://developer.mescius.com/spreadjs/api/modules/GC.Data
+https://demo.grapecity.com.cn/spreadjs/help/api/modules/GC.Data
 
 ### React
 

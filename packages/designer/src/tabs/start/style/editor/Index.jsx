@@ -1,28 +1,12 @@
 import { Fragment } from 'react';
 
-import ButtonListCellTypeIcon from '@icons/style/ButtonListCellType';
-import CalculatorCellTypeIcon from '@icons/style/CalculatorCellType';
-import CheckboxCellTypeIcon from '@icons/style/CheckboxCellType';
-import CheckboxListCellTypeIcon from '@icons/style/CheckboxListCellType';
-import ClearCellTypeIcon from '@icons/style/ClearCellType';
-import ColorPickerCellTypeIcon from '@icons/style/ColorPickerCellType';
-import ComboBoxCellTypeIcon from '@icons/style/ComboBoxCellType';
-import DateTimePickerCellTypeIcon from '@icons/style/DateTimePickerCellType';
-import HyperlinkCellTypeIcon from '@icons/style/HyperlinkCellType';
-import ListCellTypeIcon from '@icons/style/ListCellType';
-import MonthPickerCellTypeIcon from '@icons/style/MonthPickerCellType';
-import MultiColumnPickerIcon from '@icons/style/MultiColumnPicker';
-import RadioListCellTypeIcon from '@icons/style/RadioListCellType';
-import RangeTemplateCellTypeIcon from '@icons/style/RangeTemplateCellType';
-import RibbonButtonButtonCellTypeIcon
-  from '@icons/style/RibbonButtonButtonCellType';
-import SliderCellTypeIcon from '@icons/style/SliderCellType';
-import TimePickerCellTypeIcon from '@icons/style/TimePickerCellType';
-import WorkflowListIcon from '@icons/style/WorkflowList';
-import { WithIconMenu } from '@utils/componentUtils';
+import { useSelector } from 'react-redux';
 
-import CellDropdownsIcon from '../../../../icons/style/CellDropdowns';
-import CellEditorsIcon from '../../../../icons/style/cellEditors';
+import ImageIcon from '@icons/shape/Image';
+import CellEditorsIcon from '@icons/style/cellEditors';
+import ClearCellTypeIcon from '@icons/style/ClearCellType';
+import { WithIconMenu } from '@utils/componentUtils';
+import { isFunction } from '@utils/objectUtil';
 
 const iconStyles = {
     style: { margin: 4 },
@@ -37,7 +21,7 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
         height: 50,
         icon: <CellEditorsIcon {...iconStyles}></CellEditorsIcon>,
         children: [
-            {
+            /*{
                 value: 'ribbonButtonButtonCellType',
                 title: '按钮',
                 text: '按钮',
@@ -87,6 +71,15 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
                 title: '按钮列表',
                 text: '按钮列表',
                 icon: <ButtonListCellTypeIcon></ButtonListCellTypeIcon>,
+            },*/
+            {
+                value: 'imageCellType',
+                title: '图片',
+                text: '图片',
+                icon: <ImageIcon></ImageIcon>,
+                handler: function(spread){
+                    
+                }
             },
             'divider',
             {
@@ -97,7 +90,7 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
             },
         ],
     },
-    {
+    /*{
         value: 'cellDropdown',
         title: '单元格下拉框',
         text: '单元格下拉框',
@@ -166,11 +159,17 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
                 icon: <ClearCellTypeIcon></ClearCellTypeIcon>,
             },
         ],
-    },
+    },*/
 ],{optionMaxSize:12});
 
 export default function () {
-    const handleNodeClick = (val) => {};
+    const {spread } = useSelector(({appSlice})=>appSlice);
+    const handleNodeClick = (val,node) => {
+        const handler = node.handler;
+        if(isFunction(handler)){
+            handler(spread);
+        }
+    };
     return (
         <Fragment>
             <EditorIconMenu onNodeClick={handleNodeClick}></EditorIconMenu>

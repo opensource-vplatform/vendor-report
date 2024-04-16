@@ -1,13 +1,14 @@
 import { getNamespace } from '@utils/spreadUtil';
+
 import {
-    ruleTypeToName,
-    operatorToName,
-    typeToName,
-    scaleValueToName,
-    dataBarDirectionToName,
-    iconSetTypeToName,
-    iconValueTypeToName,
-    rowColumnStateToName,
+  dataBarDirectionToName,
+  iconSetTypeToName,
+  iconValueTypeToName,
+  operatorToName,
+  rowColumnStateToName,
+  ruleTypeToName,
+  scaleValueToName,
+  typeToName,
 } from './metadata';
 
 const styleToJson = function (style) {
@@ -132,7 +133,6 @@ const scaleRuleToJson = function (rule) {
     const ruleType = rule.ruleType();
     return {
         _type: 'scaleRule',
-        ruleType: ruleTypeToName(ruleType),
         ruleType: ruleTypeToName(rule.ruleType()),
         minType: scaleValueToName(rule.minType()),
         minValue: rule.minValue(),
