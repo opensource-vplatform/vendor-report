@@ -168,7 +168,7 @@ function handleReportHeaderArea(params) {
         }
 
         if (rows[i]) {
-            pageRows[i] = rows[i];
+            pageRows[currentPageRowIndex] = rows[i];
         }
         handler();
     }
@@ -337,7 +337,7 @@ function headerAndFooterInfo(params) {
         }
         let dataTable = headerDataTableObj;
         let newRules = headerRules;
-        if (row > maxTableEndRow) {
+        if (row > maxTableEndRow && maxTableEndRow !== -1) {
             dataTable = footerDataTableObj;
             newRules = footerRules;
         }
@@ -566,6 +566,10 @@ function parseJsonData(jsonData, datas, _template = {}) {
                     }
                 });
             });
+        }
+        if (maxTableEndRow === -1) {
+            minTableStartRow = oldSheetCount;
+            maxTableEndRow = oldSheetCount;
         }
         //头部与尾部相关信息
         const {
@@ -1020,9 +1024,9 @@ function page(params) {
         if (isCurrentSheet) {
             params.startRow = prePageEndRow;
         }
+        debugger;
         let res = handleReportHeaderArea(params);
         currentPageRowIndex = res.currentPageRowIndex;
-
         //内容区
         res = handleContentArea({
             rows: newRows,

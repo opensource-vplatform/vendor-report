@@ -1,10 +1,10 @@
 const path = require('path');
 const fs = require('fs');
 
-//const distDir = path.resolve(__dirname, '../dist');
-const distDir = path.resolve(
+const distDir = path.resolve(__dirname, '../dist');
+/* const distDir = path.resolve(
     `D:\\vdata\\vdata.biz.designer\\resources\\page\\saasvdata`
-);
+); */
 
 function deleteDirectory(directory) {
     if (fs.existsSync(directory)) {
