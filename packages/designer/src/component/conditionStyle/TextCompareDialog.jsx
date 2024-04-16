@@ -9,7 +9,6 @@ import {
 } from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
-import { Select } from '@components/form/Index';
 import { Range as RangSelector } from '@components/range/Index';
 import { ConditionRule } from '@toone/report-excel';
 
@@ -20,16 +19,14 @@ import {
 import { genUUID } from '../../utils/commonUtil';
 import {
   HLayout,
+  StyleSelect,
   Text,
   Title,
   Wrap,
 } from './Components';
-import { getStyleDatas } from './metadata';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
-    const options = getStyleDatas();
-    const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatcher = useDispatch();
     const { textCompareConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
@@ -42,7 +39,7 @@ export default function (props) {
             _type: 'normalConditionRule',
             ruleType: textCompareConfig.ruleType,
             operator: textCompareConfig.operator,
-            style:textCompareConfig.style,
+            style: textCompareConfig.style,
             value1: textCompareConfig.range,
         });
         onConfirm && onConfirm(rule);
@@ -83,24 +80,10 @@ export default function (props) {
                     ></RangSelector>
                     <Fragment>
                         <Text>设置为</Text>
-                        <Select
-                            value={textCompareConfig.style}
-                            wrapStyle={{
-                                flex: 1,
-                                backgroundColor: 'white',
-                            }}
-                            style={{ height: 30 }}
-                            optionStyle={{ backgroundColor: 'white' }}
-                            datas={options}
-                            onChange={(style) =>
-                                dispatcher(
-                                    setTextCompareConfig({
-                                        ...textCompareConfig,
-                                        style,
-                                    })
-                                )
-                            }
-                        ></Select>
+                        <StyleSelect
+                            config={textCompareConfig}
+                            setHandler={setTextCompareConfig}
+                        ></StyleSelect>
                     </Fragment>
                 </HLayout>
             </Wrap>

@@ -1,17 +1,19 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
-import { Select } from '@components/form/Index';
+import { ConditionRule } from '@toone/report-excel';
 
 import { setNumberApplyConfig } from '../../store/conditionStyleSlice';
-import { HLayout, Text, Title, Wrap } from './Components';
-import { getStyleDatas } from './metadata';
-import { ConditionRule } from '@toone/report-excel';
+import {
+  HLayout,
+  StyleSelect,
+  Text,
+  Title,
+  Wrap,
+} from './Components';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
-    const options = getStyleDatas();
-    const dispatcher = useDispatch();
     const { numberApplyConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
@@ -36,24 +38,10 @@ export default function (props) {
                 <Title>{numberApplyConfig.desc}:</Title>
                 <HLayout style={{ marginTop: 8, alignItems: 'center' }}>
                     <Text>{numberApplyConfig.secondary}</Text>
-                    <Select
-                        value={numberApplyConfig.style}
-                        wrapStyle={{
-                            flex: 1,
-                            backgroundColor: 'white',
-                        }}
-                        style={{ height: 30 }}
-                        optionStyle={{ backgroundColor: 'white' }}
-                        datas={options}
-                        onChange={(style) =>
-                            dispatcher(
-                                setNumberApplyConfig({
-                                    ...numberApplyConfig,
-                                    style,
-                                })
-                            )
-                        }
-                    ></Select>
+                    <StyleSelect
+                        config={numberApplyConfig}
+                        setHandler={setNumberApplyConfig}
+                    ></StyleSelect>
                 </HLayout>
             </Wrap>
         </OperationDialog>

@@ -3,7 +3,18 @@ import {
   useRef,
 } from 'react';
 
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
+
+import { Select } from '@components/form/Index';
+import {
+  cellSettingSliceToConditionStyle,
+  jsonStyleToCellSetting,
+  show,
+} from '@utils/cellSettingUtil';
+import { isObject } from '@utils/objectUtil';
+
+import { getStyleDatas } from './metadata';
 
 export const Title = styled.span`
     font-weight: bold;
@@ -214,5 +225,48 @@ export const Preview = function (props) {
         <PreviewWrap ref={containRef}>
             <PreviewDiv ref={ref}></PreviewDiv>
         </PreviewWrap>
+    );
+};
+
+export const StyleSelect = function (props) {
+    const { config, setHandler } = props;
+    const options = getStyleDatas();
+    const dispatcher = useDispatch();
+    return (
+        <Select
+            value={isObject(config?.style) ? 'customFormat' : config?.style}
+            wrapStyle={{ flex: 1, backgroundColor: 'white' }}
+            style={{ height: 30 }}
+            optionStyle={{ backgroundColor: 'white' }}
+            datas={options}
+            onChange={(style) => {
+                if (style == 'customFormat') {
+                    show(dispatcher, {
+                        onConfirm: (setting) => {
+                            const style =
+                                cellSettingSliceToConditionStyle(setting);
+                            dispatcher(setHandler({ ...config, style }));
+                        },
+                        hideCodes: ['align'],
+                        bindRange: false,
+                        active: 'font',
+                        cellSetting: jsonStyleToCellSetting(config?.style),
+                        setting: {
+                            font: {
+                                fontFamily: false,
+                                fontSize: false,
+                            },
+                        },
+                    });
+                } else {
+                    dispatcher(
+                        setHandler({
+                            ...config,
+                            style,
+                        })
+                    );
+                }
+            }}
+        ></Select>
     );
 };

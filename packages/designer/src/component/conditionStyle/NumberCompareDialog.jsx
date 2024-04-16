@@ -4,24 +4,20 @@ import {
 } from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
-import {
-  Integer,
-  Select,
-} from '@components/form/Index';
+import { Integer } from '@components/form/Index';
 import { ConditionRule } from '@toone/report-excel';
 
 import { setNumberCompareConfig } from '../../store/conditionStyleSlice';
 import {
   HLayout,
+  StyleSelect,
   Text,
   Title,
   Wrap,
 } from './Components';
-import { getStyleDatas } from './metadata';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
-    const options = getStyleDatas();
     const dispatcher = useDispatch();
     const { numberCompareConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
@@ -61,24 +57,10 @@ export default function (props) {
                         style={{ flex: 1 }}
                     ></Integer>
                     <Text>设置为</Text>
-                    <Select
-                        value={numberCompareConfig.style}
-                        wrapStyle={{
-                            flex: 1,
-                            backgroundColor: 'white',
-                        }}
-                        style={{ height: 30 }}
-                        optionStyle={{ backgroundColor: 'white' }}
-                        datas={options}
-                        onChange={(style) =>
-                            dispatcher(
-                                setNumberCompareConfig({
-                                    ...numberCompareConfig,
-                                    style,
-                                })
-                            )
-                        }
-                    ></Select>
+                    <StyleSelect
+                        config={numberCompareConfig}
+                        setHandler={setNumberCompareConfig}
+                    ></StyleSelect>
                 </HLayout>
             </Wrap>
         </OperationDialog>

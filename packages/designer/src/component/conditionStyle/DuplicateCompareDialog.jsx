@@ -1,16 +1,24 @@
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
+import { ConditionRule } from '@toone/report-excel';
 
 import { setDuplicateCompareConfig } from '../../store/conditionStyleSlice';
-import { HLayout, Text, Title, Wrap } from './Components';
-import { getDuplicateOptions, getStyleDatas } from './metadata';
-import { ConditionRule } from '@toone/report-excel';
+import {
+  HLayout,
+  StyleSelect,
+  Text,
+  Title,
+  Wrap,
+} from './Components';
+import { getDuplicateOptions } from './metadata';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
-    const options = getStyleDatas();
     const duplicateOpitons = getDuplicateOptions();
     const dispatcher = useDispatch();
     const { duplicateCompareConfig } = useSelector(
@@ -50,21 +58,10 @@ export default function (props) {
                         }
                     ></Select>
                     <Text>设置为</Text>
-                    <Select
-                        value={duplicateCompareConfig.style}
-                        wrapStyle={{ flex: 1, backgroundColor: 'white' }}
-                        style={{ height: 30 }}
-                        optionStyle={{ backgroundColor: 'white' }}
-                        datas={options}
-                        onChange={(style) =>
-                            dispatcher(
-                                setDuplicateCompareConfig({
-                                    ...duplicateCompareConfig,
-                                    style,
-                                })
-                            )
-                        }
-                    ></Select>
+                    <StyleSelect
+                        config={duplicateCompareConfig}
+                        setHandler={setDuplicateCompareConfig}
+                    ></StyleSelect>
                 </HLayout>
             </Wrap>
         </OperationDialog>

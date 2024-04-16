@@ -265,7 +265,7 @@ const RuleType2RuleTitle = {
         );
     },
     specificTextRule: function (rule) {
-        const text = rule.text() || '';
+        const text = rule.text || '';
         return toTitle(TextComparisonOperatorToTitle, rule.operator, text);
     },
     dateOccurringRule: function (rule) {

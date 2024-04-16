@@ -1,12 +1,21 @@
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { OperationDialog } from '@components/dialog/Index';
 import { Select } from '@components/form/Index';
-
-import { setDateCompareConfig } from '../../store/conditionStyleSlice';
-import { HLayout, Text, Title, Wrap } from './Components';
-import { getDateOptions, getStyleDatas } from './metadata';
+import { setDateCompareConfig } from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
+
+import {
+  HLayout,
+  StyleSelect,
+  Text,
+  Title,
+  Wrap,
+} from './Components';
+import { getDateOptions } from './metadata';
 
 export default function (props) {
     const { onCancel, onConfirm } = props;
@@ -14,7 +23,6 @@ export default function (props) {
     const { dateCompareConfig } = useSelector(
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
-    const options = getStyleDatas();
     const dateOptions = getDateOptions();
     const handleConfirm = () => {
         const rule = new ConditionRule({
@@ -51,21 +59,10 @@ export default function (props) {
                         }
                     ></Select>
                     <Text>设置为</Text>
-                    <Select
-                        value={dateCompareConfig.style}
-                        wrapStyle={{ flex: 1, backgroundColor: 'white' }}
-                        style={{ height: 30 }}
-                        optionStyle={{ backgroundColor: 'white' }}
-                        datas={options}
-                        onChange={(style) =>
-                            dispatcher(
-                                setDateCompareConfig({
-                                    ...dateCompareConfig,
-                                    style,
-                                })
-                            )
-                        }
-                    ></Select>
+                    <StyleSelect
+                        config={dateCompareConfig}
+                        setHandler={setDateCompareConfig}
+                    ></StyleSelect>
                 </HLayout>
             </Wrap>
         </OperationDialog>
