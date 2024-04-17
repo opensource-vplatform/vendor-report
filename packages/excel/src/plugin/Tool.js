@@ -5,7 +5,7 @@ class Tool{
     }
 
     setDataCountHandler(handler){
-
+        this.dataCountHandler = handler;
     }
 
     getFieldIndex(tableCode,fieldCode){
@@ -13,7 +13,7 @@ class Tool{
     }
 
     getDataCount(tableCode){
-
+        this.dataCountHandler(tableCode);
     }
 
 }
