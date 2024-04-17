@@ -52,8 +52,81 @@ export function getSheetInstanceId(sheetInstance) {
     return setSheetTag(sheetInstance)['instanceId'];
 }
 
+function getCellTagPlugins(sheet, row, col) {
+    return getCellTag(sheet, row, col, 'plugins');
+}
+
+export function hasCellTagPlugin(sheet, row, col, pluginType) {
+    const plugins = getCellTagPlugins(sheet, row, col);
+    if (plugins) {
+        const pl = plugins.find((pl) => pl.type == pluginType);
+        return !!pl;
+    }
+    return false;
+}
+
+/**
+ * 清除单元格插件
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @param {*} plugin
+ * {
+ *  type:string,//插件类型
+ *  ...
+ * }
+ */
+export function clearCellTagPlugin(sheet, row, col, plugin) {
+    const plugins = getCellTagPlugins(sheet, row, col);
+    if (plugins) {
+        const pl = plugins.find((pl) => pl.type == plugin.type);
+        if (pl) {
+            const index = plugins.indexOf(pl);
+            plugins.splice(index, 1);
+            setCellTag(sheet, row, col, 'plugins', plugins);
+        }
+    }
+}
+
+/**
+ * 设置单元格插件,如果已存在该类型插件，则更新，否则新增
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @param {*} plugin
+ * {
+ *  type:string,//插件类型
+ *  config:{
+ *     //插件配置信息
+ *  }
+ * }
+ */
+export function setCellTagPlugin(sheet, row, col, plugin) {
+    const plugins = getCellTagPlugins(sheet, row, col) || [];
+    const pl = plugins.find((pl) => plugin.type == pl.type);
+    if (pl) {
+        Object.assign(pl, plugin);
+    } else {
+        plugins.push(plugin);
+    }
+    setCellTag(sheet, row, col, 'plugins', plugins);
+}
+
+/**
+ * 获取单元格插件
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @param {*} pluginType
+ * @returns
+ */
+export function getCellTagPlugin(sheet, row, col, pluginType) {
+    const plugins = getCellTagPlugins(sheet, row, col);
+    return plugins ? plugins.find((pl) => pl.type == pluginType) : null;
+}
+
 //设置表单单元格的标签值
-export function setCellTag(sheetInstance, row, col, key, vlaue) {
+export function setCellTag(sheetInstance, row, col, key, value) {
     if (!sheetInstance) {
         return;
     }
@@ -66,7 +139,7 @@ export function setCellTag(sheetInstance, row, col, key, vlaue) {
     }
 
     if (key) {
-        _tagJson[key] = vlaue;
+        _tagJson[key] = value;
     }
 
     sheetInstance.setTag(row, col, JSON.stringify(_tagJson));
@@ -405,8 +478,8 @@ export function sortSelection(spread, byCol, sorts) {
     });
 }
 
-export function isFormula(text){
-    if(typeof text == 'string'){
+export function isFormula(text) {
+    if (typeof text == 'string') {
         text = text.trim();
         return text.startsWith('=');
     }

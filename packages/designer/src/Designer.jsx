@@ -32,6 +32,7 @@ import { initWizardSlice } from '@store/wizardSlice';
 import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 
+import SparkLine from './component/sparkline/SparkLine';
 import DesignerContext from './DesignerContext';
 import EditorBar from './EditorBar';
 import Excel from './Excel';
@@ -99,6 +100,7 @@ function Designer(props) {
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
     const { visible } = useSelector(({rangeSlice})=>rangeSlice);
     const cellSettingSlice = useSelector(({cellSettingSlice})=>cellSettingSlice);
+    const sparklineSlice = useSelector(({sparklineSlice})=>sparklineSlice);
     const [data] = useState({}); 
     data.spread = spread;
     data.active = active;
@@ -180,6 +182,7 @@ function Designer(props) {
                     <Wrap>
                         {visible ? <SelectBox></SelectBox>:null}
                         {cellSettingSlice.visible ? <CellStylesSetting></CellStylesSetting>:null}
+                        {sparklineSlice.visible ? <SparkLine></SparkLine>:null}
                         {isShowNav && <Nav></Nav>}
                         <SplitPane
                             style={{

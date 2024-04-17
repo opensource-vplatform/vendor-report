@@ -12,15 +12,17 @@ import {
   setVisible,
 } from '@store/cellSettingSlice';
 
-import { genUUID } from './commonUtil';
+import {
+  addCallback,
+  handleCancel,
+  handleConfirm,
+} from './callbackUtil';
 import {
   diff,
   isNullOrUndef,
   isObject,
 } from './objectUtil';
 import { getNamespace } from './spreadUtil';
-
-const HANDLER_CONTIANER = {};
 
 export const show = function (dispatch, options) {
     const {
@@ -32,11 +34,7 @@ export const show = function (dispatch, options) {
         cellSetting = {},
         active = 'number',
     } = options;
-    const callbackId = genUUID();
-    HANDLER_CONTIANER[callbackId] = {
-        onConfirm,
-        onCancel,
-    };
+    const callbackId = addCallback(onConfirm,onCancel);
     hideCodes.forEach((code) => {
         dispatch(hideTab(code));
     });
@@ -62,24 +60,12 @@ export const show = function (dispatch, options) {
     dispatch(setVisible(true));
 };
 
-const handleCallback = function (callbackId, type, ...args) {
-    const callback = HANDLER_CONTIANER[callbackId];
-    if (callback) {
-        const handler = callback[type];
-        if (handler) {
-            handler(...args);
-        }
-        HANDLER_CONTIANER[type] = null;
-        delete HANDLER_CONTIANER[type];
-    }
-};
-
 export const onConfirm = function (callbackId, ...args) {
-    handleCallback(callbackId, 'onConfirm', ...args);
+    handleConfirm(callbackId,...args);
 };
 
 export const onCancel = function (callbackId, ...args) {
-    handleCallback(callbackId, 'onCancel', ...args);
+    handleCancel(callbackId,...args);
 };
 
 const Number_Setting = {

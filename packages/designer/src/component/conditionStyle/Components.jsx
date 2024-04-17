@@ -236,7 +236,7 @@ export const StyleSelect = function (props) {
         <Select
             value={isObject(config?.style) ? 'customFormat' : config?.style}
             wrapStyle={{ flex: 1, backgroundColor: 'white' }}
-            style={{ height: 30 }}
+            style={{ height: 26 }}
             optionStyle={{ backgroundColor: 'white' }}
             datas={options}
             onChange={(style) => {

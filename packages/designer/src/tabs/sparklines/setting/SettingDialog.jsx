@@ -68,6 +68,11 @@ export const ButtonWrap = styled.div`
     flex-direction: row-reverse;
 `;
 
+const Warn = styled.div`
+    font-size: 12px;
+    color: red;
+`;
+
 const SettingButton = function (props) {
     const { style = {}, children, ...others } = props;
     const btnStyle = { width: 80, height: 32 };

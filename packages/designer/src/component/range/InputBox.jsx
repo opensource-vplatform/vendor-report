@@ -9,8 +9,6 @@ import ToRangeIcon from '@icons/formula/ToRange';
 import { isNullOrUndef } from '@utils/objectUtil';
 
 const InputArea = styled.div`
-    margin-top: 4px;
-    margin-bottom: 4px;
     width: 260px;
     height: 26px;
 `;

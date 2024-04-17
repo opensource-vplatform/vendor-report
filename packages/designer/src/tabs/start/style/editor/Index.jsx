@@ -1,12 +1,23 @@
 import { Fragment } from 'react';
 
-import { useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import ImageIcon from '@icons/shape/Image';
 import CellEditorsIcon from '@icons/style/cellEditors';
 import ClearCellTypeIcon from '@icons/style/ClearCellType';
 import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
+import {
+  show,
+  toFormula,
+} from '@utils/sparklineUtil';
+import {
+  getCellTagPlugin,
+  setCellTagPlugin,
+} from '@utils/worksheetUtil';
 
 const iconStyles = {
     style: { margin: 4 },
@@ -77,8 +88,29 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
                 title: '图片',
                 text: '图片',
                 icon: <ImageIcon></ImageIcon>,
-                handler: function(spread){
-                    
+                handler: function(spread,dispatch){
+                    const sheet = spread.getActiveSheet();
+                    const row = sheet.getActiveRowIndex();
+                    const col = sheet.getActiveColumnIndex();
+                    const plugin = getCellTagPlugin(sheet,row,col,"cellImage");
+                    const config = plugin?.config;
+                    show(dispatch,{
+                        onConfirm:function(config){
+                            let {url,...others} = config;
+                            setCellTagPlugin(sheet,row,col,{
+                                type: "cellImage",
+                                config:others,
+                            });
+                            url = `"./image.png"`;
+                            const datas = {url,...others};
+                            const formula = toFormula(datas);
+                            sheet.setFormula(row,col,formula);
+                        },
+                        config,
+                        setting:{
+                            url: false,
+                        }
+                    });
                 }
             },
             'divider',
@@ -164,10 +196,11 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
 
 export default function () {
     const {spread } = useSelector(({appSlice})=>appSlice);
+    const dispatch = useDispatch();
     const handleNodeClick = (val,node) => {
         const handler = node.handler;
         if(isFunction(handler)){
-            handler(spread);
+            handler(spread,dispatch);
         }
     };
     return (

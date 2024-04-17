@@ -66,7 +66,11 @@ import {
   setRuleType,
   setShowEditor,
 } from '../store/conditionStyleSlice';
-import { genUUID } from './commonUtil';
+import {
+  addCallback,
+  handleCancel,
+  handleConfirm,
+} from './callbackUtil';
 import {
   isFunction,
   isString,
@@ -179,15 +183,6 @@ export const getDefaultScaleRuleEditConfig = function () {
 
 const CallbackMap = {};
 
-const addCallback = function (onConfirm, onCancel) {
-    const callbackId = genUUID();
-    CallbackMap[callbackId] = {
-        onConfirm,
-        onCancel,
-    };
-    return callbackId;
-};
-
 export const showAddConditionRule = function (
     dispatch,
     { onConfirm = () => {}, onCancel = () => {} }
@@ -215,22 +210,12 @@ export const showEditConditionRule = function (
     dispatch(setRuleManagerVisible(false));
 };
 
-const handleAddCallback = function (callbackId, type, ...args) {
-    const callback = CallbackMap[callbackId];
-    if (callback) {
-        const handler = callback[type];
-        if (isFunction(handler)) {
-            handler(...args);
-        }
-    }
-};
-
 export const handleAddConfirm = function (callbackId, ...args) {
-    handleAddCallback(callbackId, 'onConfirm', ...args);
+    handleConfirm(callbackId, ...args);
 };
 
 export const handleAddCancel = function (callbackId, ...args) {
-    handleAddCallback(callbackId, 'onCancel', ...args);
+    handleCancel(callbackId, ...args);
 };
 
 const toTitle = function (map, operator, ...args) {

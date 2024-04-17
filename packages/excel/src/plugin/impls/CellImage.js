@@ -1,0 +1,4 @@
+
+class CellImagePlugin extend Plugin{
+
+}
