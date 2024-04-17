@@ -30,6 +30,9 @@ const InputWrap = styled.div`
         cursor: not-allowed;
         background-color: #f3f3f3;
     }
+    &[data-error='true'] {
+        border: solid 1px red !important;
+    }
 `;
 
 const Input = styled.input`
@@ -52,6 +55,7 @@ export default function (props) {
         disabled,
         onIconClick,
         onChange,
+        error,
         onFocus,
         style = {},
     } = props;
@@ -71,7 +75,7 @@ export default function (props) {
     };
     return (
         <InputArea style={style}>
-            <InputWrap onClick={handleWrapClick} data-disabled={disabled}>
+            <InputWrap onClick={handleWrapClick} data-disabled={disabled} data-error={error}>
                 <Input
                     ref={ref}
                     onFocus={onFocus}

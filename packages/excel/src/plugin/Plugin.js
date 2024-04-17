@@ -4,11 +4,14 @@ class Plugin{
         this.plugin = plugin;
     }
 
-    execute(value,row,col,options){
-        return {
-            type: "text"|"formula",
-		    value: ""
-        }
+    getConfig(){
+        return this.plugin ? this.plugin.config:null;
+    }
+
+    execute(value,tool){
+        return value;
     }
 
 }
+
+export default Plugin;

@@ -38,7 +38,7 @@ import EditorBar from './EditorBar';
 import Excel from './Excel';
 import Nav from './Nav';
 import Preview from './Preview';
-import { isFormulaSparklineSelected } from './utils/formulaUtil';
+import { hasCellTagPlugin } from './utils/worksheetUtil';
 
 const GlobalStyle = createGlobalStyle`
     ::-webkit-scrollbar {
@@ -119,9 +119,9 @@ function Designer(props) {
                 //不在表格区域，且存在表设计页签，需要隐藏表设计页签
                 dispatch(hideTab({ code: 'table' }));
             }
-            const sparklinesSel = isFormulaSparklineSelected(
-                data.spread,
-                sheet
+            const sparklinesSel = hasCellTagPlugin(
+                sheet,
+                "cellImage"
             );
             if (sparklinesSel) {
                 if (data.hideCodes.indexOf('sparklines') != -1) {

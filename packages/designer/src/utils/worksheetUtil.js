@@ -56,7 +56,9 @@ function getCellTagPlugins(sheet, row, col) {
     return getCellTag(sheet, row, col, 'plugins');
 }
 
-export function hasCellTagPlugin(sheet, row, col, pluginType) {
+export function hasCellTagPlugin(sheet, pluginType) {
+    const row = sheet.getActiveRowIndex();
+    const col = sheet.getActiveColumnIndex();
     const plugins = getCellTagPlugins(sheet, row, col);
     if (plugins) {
         const pl = plugins.find((pl) => pl.type == pluginType);

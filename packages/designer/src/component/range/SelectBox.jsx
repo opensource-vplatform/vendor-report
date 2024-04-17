@@ -61,6 +61,7 @@ export default function (props) {
         hostId,
         range,
         absoluteReference,
+        rangeSelectMode,
         onCloseHandlerId,
         onChangeHandlerId,
     } = useSelector(({ rangeSlice }) => rangeSlice);
@@ -76,13 +77,13 @@ export default function (props) {
                     {
                         absoluteReference,
                         needSheetName: false,
-                        rangeSelectMode: true,
+                        rangeSelectMode,
                     }
                 );
             formulaTextBox.workbook(spread);
-            formulaTextBox.startSelectMode(range ? `${range}` : '');
+            rangeSelectMode&&formulaTextBox.startSelectMode(range ? `${range}` : '');
             state.formulaTextBox = formulaTextBox;
-            ref.current.querySelector('[contenteditable="true"]').focus();
+            ref.current.querySelector('[contenteditable="true"]')?.focus();
             return () => {
                 formulaTextBox.endSelectMode();
                 formulaTextBox.destroy();

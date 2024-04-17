@@ -11,7 +11,15 @@ import {
   handleConfirm as onConfirm,
 } from './callbackUtil';
 import { isNullOrUndef } from './objectUtil';
-import { getNamespace } from './spreadUtil';
+import {
+  applyToSelectedCell,
+  getNamespace,
+  withBatchCalcUpdate,
+} from './spreadUtil';
+import {
+  getCellTagPlugin,
+  setCellTagPlugin,
+} from './worksheetUtil';
 
 const toFormulaArg = function (val) {
     if (isNullOrUndef(val)) {
@@ -129,6 +137,36 @@ export const getDefaultConfig = function(){
         result[key] = val;
     }
     return result;
+}
+
+export const showEditorDialog = function(spread,dispatch,ctx){
+    const sheet = spread.getActiveSheet();
+    const row = sheet.getActiveRowIndex();
+    const col = sheet.getActiveColumnIndex();
+    const plugin = getCellTagPlugin(sheet,row,col,"cellImage");
+    const config = plugin?.config;
+    show(dispatch,{
+        onConfirm:function(config){
+            let {url,...others} = config;
+            url = `"./image.png"`;
+            const datas = {url,...others};
+            const formula = toFormula(datas);
+            withBatchCalcUpdate(spread,(sheet)=>{
+                applyToSelectedCell(sheet,(sheet,row,col)=>{
+                    setCellTagPlugin(sheet,row,col,{
+                        type: "cellImage",
+                        config:others,
+                    });
+                    sheet.setFormula(row,col,formula);
+                });
+            });
+            ctx.handleSelectionChange();
+        },
+        config,
+        setting:{
+            url: false,
+        }
+    });
 }
 
 export const show = function(dispatch,options){

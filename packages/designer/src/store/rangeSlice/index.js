@@ -6,6 +6,7 @@ export const navSlice = createSlice({
         visible: false,
         hostId: null,
         absoluteReference: false,
+        rangeSelectMode:true,
         onCloseHandlerId: '',
         onChangeHandlerId: '',
         range: '',
@@ -29,6 +30,9 @@ export const navSlice = createSlice({
         setAbsoluteReference(state, { payload }) {
             state.absoluteReference = payload;
         },
+        setRangeSelectMode(state, { payload }){
+            state.rangeSelectMode = payload;
+        }
     },
 });
 export const {
@@ -38,5 +42,6 @@ export const {
     setAbsoluteReference,
     setOnCloseHandlerId,
     setOnChangeHandlerId,
+    setRangeSelectMode,
 } = navSlice.actions;
 export default navSlice.reducer;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext } from 'react';
 
 import {
   useDispatch,
@@ -11,55 +11,14 @@ import {
   VItem,
 } from '@components/group/Index';
 import SpreadGeneralIcon from '@icons/setting/spreadGeneral';
-import { isNullOrUndef } from '@utils/objectUtil';
+import { showEditorDialog } from '@utils/sparklineUtil';
 
-import SettingDialog from './SettingDialog';
-
-const toFormulaArg = function (val) {
-    if (isNullOrUndef(val)) {
-        return '';
-    }
-    return val;
-};
-
-const dataArgs = [
-    ['url',''],
-    ['mode', 1],
-    ['height', 0],
-    ['width', 0],
-    ['clipX', 0],
-    ['clipY', 0],
-    ['clipHeight', 0],
-    ['clipWidth', 0],
-    ['vAlign', 1],
-    ['hAlign', 1],
-];
-
-const toFormula = function (data) {
-    const formula = ['IMAGE('];
-    dataArgs.forEach((argDef) => {
-        let argName,
-            argDeft = undefined;
-        if (Array.isArray(argDef)) {
-            argName = argDef[0];
-            argDeft = argDef[1];
-        } else {
-            argName = argDef;
-        }
-        let val = data[argName];
-        val = val === argDeft ? undefined : val;
-        formula.push(toFormulaArg(val));
-        formula.push(',');
-    });
-    formula.pop();
-    formula.push(')');
-    return formula.join('');
-};
+import context from '../../../DesignerContext';
 
 export default function () {
     const dispatch = useDispatch();
     const { spread } = useSelector(({ appSlice }) => appSlice);
-    const [data, setData] = useState({ showSettingDialog: false });
+    const ctx = useContext(context);
     return (
         <GroupItem title='参数'>
             <HLayout>
@@ -82,33 +41,10 @@ export default function () {
                         ></SpreadGeneralIcon>
                     }
                     onClick={() => {
-                        setData({
-                            ...data,
-                            showSettingDialog: true,
-                        });
+                        showEditorDialog(spread,dispatch,ctx);
                     }}
                 ></VItem>
             </HLayout>
-            {data.showSettingDialog ? (
-                <SettingDialog
-                    onCancel={() => {
-                        setData({
-                            ...data,
-                            showSettingDialog: false,
-                        });
-                    }}
-                    onConfirm={(formula) => {
-                        const sheet = spread.getActiveSheet();
-                        const row = sheet.getActiveRowIndex();
-                        const col = sheet.getActiveColumnIndex();
-                        sheet.setFormula(row, col, formula);
-                        setData({
-                            ...data,
-                            showSettingDialog: false,
-                        });
-                    }}
-                ></SettingDialog>
-            ) : null}
         </GroupItem>
     );
 }

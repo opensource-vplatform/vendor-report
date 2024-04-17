@@ -12,9 +12,11 @@ import {
   setOnChangeHandlerId,
   setOnCloseHandlerId,
   setRange,
+  setRangeSelectMode,
   setVisible,
-} from '../../store/rangeSlice';
-import { genUUID } from '../../utils/commonUtil';
+} from '@store/rangeSlice';
+import { genUUID } from '@utils/commonUtil';
+
 import InputBox from './InputBox';
 
 export default function (props) {
@@ -26,7 +28,9 @@ export default function (props) {
         style = {},
         disabled = false,
         autoFocus = false,
+        error=false,
         absoluteReference = false,
+        rangeSelectMode = true,
         onStartSelect,
         onEndSelect,
     } = props;
@@ -40,6 +44,7 @@ export default function (props) {
         dispatcher(setHostId(hostId));
         dispatcher(setRange(data));
         dispatcher(setAbsoluteReference(absoluteReference));
+        dispatcher(setRangeSelectMode(rangeSelectMode));
         const closeId = 'close_'+genUUID();
         window[closeId] = ()=>{
             delete window[closeId];
@@ -67,6 +72,7 @@ export default function (props) {
                 autoFocus={autoFocus}
                 style={style}
                 value={data}
+                error={error}
                 disabled={disabled}
                 onChange={handleChange}
                 onIconClick={handleStartSelect}

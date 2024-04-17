@@ -1,38 +1,84 @@
-import { Fragment } from 'react';
+import {
+  Fragment,
+  useContext,
+  useState,
+} from 'react';
 
 import {
   useDispatch,
   useSelector,
 } from 'react-redux';
 
-import ImageIcon from '@icons/shape/Image';
+import CalculationIcon from '@icons/formula/Calculation';
 import CellEditorsIcon from '@icons/style/cellEditors';
 import ClearCellTypeIcon from '@icons/style/ClearCellType';
 import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
+
+import context from '../../../../DesignerContext';
+import ImageIcon from '../../../../icons/shape/Image';
+import { showEditorDialog } from '../../../../utils/sparklineUtil';
 import {
-  show,
-  toFormula,
-} from '@utils/sparklineUtil';
+  applyToSelectedCell,
+  withBatchCalcUpdate,
+} from '../../../../utils/spreadUtil';
 import {
   getCellTagPlugin,
   setCellTagPlugin,
-} from '@utils/worksheetUtil';
+} from '../../../../utils/worksheetUtil';
+import SubTotalDialog from './SubTotalDialog';
 
 const iconStyles = {
     style: { margin: 4 },
     iconStyle: { width: 26, height: 26 },
 };
 
-const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
-    {
+const EditorIconMenu = WithIconMenu(
+    '单元格类型',
+    CellEditorsIcon,
+    [
+        {
+            value: 'imageCellType',
+            title: '图片',
+            text: '图片',
+            icon: <ImageIcon></ImageIcon>,
+            handler: showEditorDialog,
+        },
+        {
+            value: 'cellSubTotal',
+            title: '汇总',
+            text: '汇总',
+            icon: <CalculationIcon></CalculationIcon>,
+            handler: (spread, disptach, context, setData) => {
+                const sheet = spread.getActiveSheet();
+                const row = sheet.getActiveRowIndex();
+                const col = sheet.getActiveColumnIndex();
+                const plugin = getCellTagPlugin(sheet,row,col,"cellSubTotal");
+                const config = plugin ? plugin.config:{};
+                setData((data)=>{
+                    return {
+                        ...data,
+                        visible:true,
+                        config,
+                    }
+                });
+            },
+        },
+        'divider',
+        {
+            value: 'clearCellType',
+            title: '清除单元格类型',
+            text: '清除单元格类型',
+            icon: <ClearCellTypeIcon></ClearCellTypeIcon>,
+        },
+        /*{
         value: 'cellType',
         title: '单元格类型',
         text: '单元格类型',
         height: 50,
         icon: <CellEditorsIcon {...iconStyles}></CellEditorsIcon>,
         children: [
-            /*{
+           {
                 value: 'ribbonButtonButtonCellType',
                 title: '按钮',
                 text: '按钮',
@@ -82,36 +128,20 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
                 title: '按钮列表',
                 text: '按钮列表',
                 icon: <ButtonListCellTypeIcon></ButtonListCellTypeIcon>,
-            },*/
+            },
             {
                 value: 'imageCellType',
                 title: '图片',
                 text: '图片',
                 icon: <ImageIcon></ImageIcon>,
-                handler: function(spread,dispatch){
-                    const sheet = spread.getActiveSheet();
-                    const row = sheet.getActiveRowIndex();
-                    const col = sheet.getActiveColumnIndex();
-                    const plugin = getCellTagPlugin(sheet,row,col,"cellImage");
-                    const config = plugin?.config;
-                    show(dispatch,{
-                        onConfirm:function(config){
-                            let {url,...others} = config;
-                            setCellTagPlugin(sheet,row,col,{
-                                type: "cellImage",
-                                config:others,
-                            });
-                            url = `"./image.png"`;
-                            const datas = {url,...others};
-                            const formula = toFormula(datas);
-                            sheet.setFormula(row,col,formula);
-                        },
-                        config,
-                        setting:{
-                            url: false,
-                        }
-                    });
-                }
+                handler: showEditorDialog,
+            },
+            {
+                value: 'cellSubTotal',
+                title: '汇总',
+                text: '汇总',
+                icon: <CalculationIcon></CalculationIcon>,
+                handler: showEditorDialog,
             },
             'divider',
             {
@@ -192,20 +222,57 @@ const EditorIconMenu = WithIconMenu('单元格编辑器', CellEditorsIcon, [
             },
         ],
     },*/
-],{optionMaxSize:12});
+    ],
+    { optionMaxSize: 12 }
+);
 
 export default function () {
-    const {spread } = useSelector(({appSlice})=>appSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatch = useDispatch();
-    const handleNodeClick = (val,node) => {
+    const ctx = useContext(context);
+    const [data, setData] = useState(() => {
+        return {
+            visible: false,
+            config: {},
+        };
+    });
+    const handleNodeClick = (val, node) => {
         const handler = node.handler;
-        if(isFunction(handler)){
-            handler(spread,dispatch);
+        if (isFunction(handler)) {
+            handler(spread, dispatch, ctx, setData);
         }
+    };
+    const handleConfirm = (config, text) => {
+        withBatchCalcUpdate(spread, (sheet) => {
+            applyToSelectedCell(sheet, (sheet, row, col) => {
+                setCellTagPlugin(sheet, row, col, {
+                    type: 'cellSubTotal',
+                    config,
+                });
+                sheet.setText(row, col, text);
+            });
+        });
+        handleCancel();
+    };
+    const handleCancel = () => {
+        setData((data)=>{
+            return {
+                ...data,
+                visible:false
+            }
+        });
     };
     return (
         <Fragment>
             <EditorIconMenu onNodeClick={handleNodeClick}></EditorIconMenu>
+            {data.visible ? (
+                <SubTotalDialog
+                    functionNum={data.config.functionNum}
+                    range={data.config.range}
+                    onConfirm={handleConfirm}
+                    onCancel={handleCancel}
+                ></SubTotalDialog>
+            ) : null}
         </Fragment>
     );
 }
