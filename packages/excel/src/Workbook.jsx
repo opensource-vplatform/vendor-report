@@ -533,8 +533,8 @@ function parseJsonData1(jsonData, datas, _template = {}) {
 }
 
 function parseJsonData(jsonData, datas, _template = {}) {
-    parseJsonData1(jsonData, datas, _template);
-    return;
+    /*  parseJsonData1(jsonData, datas, _template);
+    return; */
     const sheetsInfo = {};
     const newSheets = {};
     const groupsDatas = {};
@@ -954,8 +954,7 @@ function parseJsonData(jsonData, datas, _template = {}) {
             }
             newDataTable[row] = newDataTable[row] ? newDataTable[row] : {};
             newDataTable[row][col] = {
-                style: cellInfo.style,
-                bindingPath: cellInfo.bindingPath,
+                ...cellInfo,
             };
 
             if (cellInfo.value) {
