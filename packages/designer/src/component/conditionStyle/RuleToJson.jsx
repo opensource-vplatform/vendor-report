@@ -165,6 +165,7 @@ export const toJson = function (rule) {
     const RuleType = GC.Spread.Sheets.ConditionalFormatting.RuleType;
     switch (ruleType) {
         case RuleType.averageRule:
+        case RuleType.specificTextRule:
         case RuleType.cellValueRule:
             return normalConditionRuleToJson(rule);
         case RuleType.dataBarRule:
