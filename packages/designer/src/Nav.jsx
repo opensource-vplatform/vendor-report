@@ -230,13 +230,13 @@ export default function () {
     useEffect(() => {
         if (spread) {
             spread.refresh();
+            const handler = getListenSaveHandler(handleSave);
+            listenSave(handler);
+            return ()=>{
+                unListenSave(handler);
+            }
         }
-        const handler = getListenSaveHandler(handleSave);
-        listenSave(handler);
-        return ()=>{
-            unListenSave(handler);
-        }
-    }, [navStyle]);
+    }, [navStyle,spread]);
     return (
         <Tabs
             value={active}

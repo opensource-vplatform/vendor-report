@@ -76,6 +76,7 @@ const addMergeMenu = function (menuDatas) {
             text: '合并',
             name: Merge_Menu_Name,
             subMenu: [],
+            iconClass:'toone-row-merge',
             workArea: 'viewport',
         };
         menuDatas.push(menu);
@@ -92,7 +93,7 @@ const addRowMergeMenu = function (menuDatas) {
             text: '行合并',
             name: Merge_Row_Menu_Name,
             command: Merge_Row_Command,
-            iconClass: '',
+            iconClass:'toone-row-merge',
         });
     }
 };
@@ -114,7 +115,7 @@ const addColumnMergeMenu = function (menuDatas) {
             text: '列合并',
             name: Merge_Column_Menu_Name,
             command: Merge_Column_Command,
-            iconClass: '',
+            iconClass:'toone-row-merge',
         });
     }
 };

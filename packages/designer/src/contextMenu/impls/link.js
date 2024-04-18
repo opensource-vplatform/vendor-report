@@ -8,6 +8,7 @@ export const registerContextMenu = function (menuDatas, spread) {
         command: 'toggleHyperlink',
         name: 'gc.spread.toggleHyperlink',
         text: '超链接',
+        iconClass: 'toone-link',
         workArea: 'viewport',
     });
 }
