@@ -144,12 +144,11 @@ export default function () {
                     <Datasources
                         notAllowEdit={false}
                         isEditData={false}
-                        disabledTypes={['table']}
                         searchKey={searchKey.dsSearchKey}
-                        onDoubleClick={function (data) {
+                        onDoubleClick={function (data,parent) {
                             dispatch(
                                 insert({
-                                    formula: `TOONE.GET("${data?.code}")`,
+                                    formula: parent ? `=TOONE.GET("${parent.code}","${data?.code}")`:`=TOONE.GET("${data?.code}")`,
                                 })
                             );
                         }}

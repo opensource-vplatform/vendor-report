@@ -59,6 +59,7 @@ export default function Index(props) {
         width,
         draggable = false,
         parentType,
+        parentNode = null,
         activeSheetTablePath = {},
         notAllowEdit = true,
         onDoubleClick,
@@ -117,7 +118,7 @@ export default function Index(props) {
 
     const listDoubleClickHandler = function (data) {
         if (typeof onDoubleClick === 'function') {
-            onDoubleClick(data);
+            onDoubleClick(data,parentNode);
         }
     };
 
@@ -175,8 +176,7 @@ export default function Index(props) {
                             }
                             onDoubleClick={function () {
                                 if (
-                                    draggableClass === 'notDraggable' ||
-                                    parentType === 'table'
+                                    draggableClass === 'notDraggable'
                                 ) {
                                     return;
                                 }
@@ -219,6 +219,7 @@ export default function Index(props) {
                                 datas={children}
                                 indent={2 * indent}
                                 parentId={id}
+                                parentNode={dataItem}
                                 parentType='table'
                                 parentDisabled={disabled}
                             ></Index>
