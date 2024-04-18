@@ -123,6 +123,23 @@ function parseUsedDatasource(spread, finalDsList) {
     return define;
 }
 
+const getListenSaveHandler = function(handler){
+    return (evt)=>{
+        if((evt.key == 's'|| evt.key == 'S')&&evt.ctrlKey){
+            evt.preventDefault();
+            handler();
+        }
+    }
+}
+
+const listenSave = function(handler){
+    window.addEventListener("keydown",handler);
+}
+
+const unListenSave = function(handler){
+    window.removeEventListener("keydown",handler);
+}
+
 export default function () {
     const dispatch = useDispatch();
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
@@ -213,6 +230,11 @@ export default function () {
     useEffect(() => {
         if (spread) {
             spread.refresh();
+        }
+        const handler = getListenSaveHandler(handleSave);
+        listenSave(handler);
+        return ()=>{
+            unListenSave(handler);
         }
     }, [navStyle]);
     return (

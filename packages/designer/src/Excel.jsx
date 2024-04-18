@@ -46,6 +46,7 @@ import { getCellTag } from '@utils/worksheetUtil';
 import {
   formatBindingPathCellType,
 } from './component/defineDatasource/utils/utils';
+import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
 import { isLineThrough } from './utils/fontUtil';
 
@@ -119,34 +120,7 @@ export default function () {
         [template]
     );
     const handleWorkbookInitialized = useCallback((spread) => {
-        const menuDatas = spread.contextMenu.menuData;
-        for (let i = 0, l = menuDatas.length; i < l; i++) {
-            const menu = menuDatas[i];
-            if (
-                menu.name == 'gc.spread.tableDelete' &&
-                menu.workArea == 'table'
-            ) {
-                menu.subMenu.push({
-                    command: 'tableDeleteAllForContextMenu',
-                    iconClass: 'gc-spread-deleteComment',
-                    name: 'gc.spread.tableDeleteAll',
-                    text: '整表',
-                });
-                menuDatas.push({
-                    command: 'tableMoveForContextMenu',
-                    name: 'gc.spread.tableMove',
-                    text: '移动',
-                    workArea: 'table',
-                });
-                break;
-            }
-        }
-        menuDatas.push({
-            command: 'toggleHyperlink',
-            name: 'gc.spread.toggleHyperlink',
-            text: '超链接',
-            workArea: 'viewport',
-        });
+        enhanceContextMenu(spread);
         const sheet = spread.getActiveSheet();
         const tablePaths = getActiveSheetTablesPath({ sheet });
         dispatch(updateActiveSheetTablePath({ tablePaths }));
