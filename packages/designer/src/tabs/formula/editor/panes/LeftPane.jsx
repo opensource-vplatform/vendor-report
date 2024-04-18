@@ -6,8 +6,8 @@ import {
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { Datasources } from '@components/defineDatasource/Index';
 import { Search } from '@components/form/Index';
+import { DatasourceSelect } from '@components/select/Index';
 import {
   Tab,
   Tabs,
@@ -126,7 +126,14 @@ export default function () {
                         flexDirection: 'column',
                     }}
                 >
-                    <Search
+                    <DatasourceSelect onChange={(val)=>{
+                        dispatch(
+                            insert({
+                                formula: val,
+                            })
+                        );
+                    }}></DatasourceSelect>
+                    {/*<Search
                         onClear={function () {
                             setSearchKey({
                                 ...searchKey,
@@ -152,7 +159,7 @@ export default function () {
                                 })
                             );
                         }}
-                    ></Datasources>
+                    ></Datasources>*/}
                 </Tab>
                 <Tab code='func' title='函数' style={{ height: '100%' }}>
                     <Search

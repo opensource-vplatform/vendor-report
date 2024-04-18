@@ -145,7 +145,14 @@ export const operatorToName = function (ruleType, operator) {
 
 export const typeToName = function (ruleType, type) {
     const GC = getNamespace();
-    return GC.Spread.Sheets.ConditionalFormatting.AverageConditionType[type];
+    const RuleType = GC.Spread.Sheets.ConditionalFormatting.RuleType;
+    let NS = GC.Spread.Sheets.ConditionalFormatting.AverageConditionType;
+    if(ruleType == RuleType.dateOccurringRule){
+        NS = GC.Spread.Sheets.ConditionalFormatting.DateOccurringType
+    }else if(ruleType == RuleType.top10Rule){
+        NS = GC.Spread.Sheets.ConditionalFormatting.Top10ConditionType
+    }
+    return NS[type];
 };
 
 export const scaleValueToName = function (scaleValue) {

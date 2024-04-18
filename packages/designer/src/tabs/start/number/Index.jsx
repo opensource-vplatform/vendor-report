@@ -8,12 +8,12 @@ import {
   useSelector,
 } from 'react-redux';
 
+import { Select } from '@components/form/Index';
 import {
   GroupItem,
   ItemList,
 } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
-import Select from '@components/select/Index';
 import FormatMoreIcon from '@icons/base/Empty';
 import AccountingFormatIcon from '@icons/number/AccountingFormat';
 import CommaIcon from '@icons/number/Comma';

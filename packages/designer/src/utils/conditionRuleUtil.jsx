@@ -263,7 +263,7 @@ const RuleType2RuleTitle = {
         return '唯一值';
     },
     top10Rule: function (rule) {
-        const rank = rule.rank() || '';
+        const rank = rule.rank || '';
         return toTitle(Top10ConditionTypeToTitle, rule.type, rank);
     },
     averageRule: function (rule) {

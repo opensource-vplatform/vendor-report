@@ -166,6 +166,11 @@ export const toJson = function (rule) {
     switch (ruleType) {
         case RuleType.averageRule:
         case RuleType.specificTextRule:
+        case RuleType.dateOccurringRule:
+        case RuleType.duplicateRule:
+        case RuleType.uniqueRule:
+        case RuleType.formulaRule:
+        case RuleType.top10Rule:
         case RuleType.cellValueRule:
             return normalConditionRuleToJson(rule);
         case RuleType.dataBarRule:

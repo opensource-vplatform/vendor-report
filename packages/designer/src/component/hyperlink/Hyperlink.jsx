@@ -10,8 +10,8 @@ import Button from '@components/button/Index';
 import ColorEditor from '@components/color/Index';
 import { Dialog } from '@components/dialog/Index';
 import CheckBox from '@components/form/CheckBox';
+import { Select } from '@components/form/Index';
 import TextInput from '@components/form/TextInput';
-import Select from '@components/select/Index';
 import {
   Tab,
   Tabs,

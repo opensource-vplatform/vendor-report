@@ -9,10 +9,10 @@ import {
   useSelector,
 } from 'react-redux';
 
+import { Select } from '@components/form/Index';
 import Textarea from '@components/form/Textarea';
 import TextInput from '@components/form/TextInput';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
-import Select from '@components/select/Index';
 import {
   pushDsList,
   setIsShowDatasource,

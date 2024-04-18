@@ -6,9 +6,11 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { CheckBox } from '@components/form/Index';
+import {
+  CheckBox,
+  Select,
+} from '@components/form/Index';
 import Integer from '@components/integer/Index';
-import Select from '@components/Select/Index';
 import {
   setAllowAutoCreateHyperlink,
   setAllowAutoExtendFilterRange,

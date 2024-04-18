@@ -9,10 +9,10 @@ import styled from 'styled-components';
 import {
   CheckBox,
   ColorPicker,
+  Select,
 } from '@components/form/Index';
 import { List } from '@components/list/Index';
 import { Preview } from '@components/preview/Index';
-import Select from '@components/Select/Index';
 import {
   getFontFamilies,
   getFontSizes,

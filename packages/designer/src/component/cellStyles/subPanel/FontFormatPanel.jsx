@@ -6,8 +6,10 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { ColorPicker } from '@components/form/Index';
-import Select from '@components/Select/Index';
+import {
+  ColorPicker,
+  Select,
+} from '@components/form/Index';
 import {
   getFontFamilies,
   getFontSizes,

@@ -7,13 +7,13 @@ import {
 import styled from 'styled-components';
 
 import ColorEditor from '@components/color/Index';
+import { Select } from '@components/form/Index';
 import {
   GroupItem,
   ItemList,
 } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Menu.jsx';
-import Select from '@components/select/Index';
 import ArrowDown from '@icons/arrow/ArrowDown';
 import BorderBottom from '@icons/border/BorderBottom';
 import BackColor from '@icons/font/BackColor';

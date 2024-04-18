@@ -154,6 +154,7 @@ export default function (props) {
                         style={{
                             width: isH ? size : 'unset',
                             height: !isH ? size : 'unset',
+                            overflow: 'hidden',
                             ...style,
                         }}
                         data-type={direction}

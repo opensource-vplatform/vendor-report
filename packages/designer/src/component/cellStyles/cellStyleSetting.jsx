@@ -9,7 +9,7 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Select from '@components/Select/Index';
+import { Select } from '@components/form/Index';
 import {
   setIsOpenCellSetting,
   setTabValueCellSetting,

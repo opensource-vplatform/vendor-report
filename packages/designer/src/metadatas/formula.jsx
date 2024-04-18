@@ -47,7 +47,7 @@ const CATALOGS = [
 ];
 
 const CATALOG_FORMULA_MAP = {
-    useful:['SUMIF','IF','SUM','COUNT','ROUNDDOWN','AVERAGE','HYPERLINK','MAX','SIN','PMT','ROUND'],
+    useful:['TOONE.GET','SUMIF','IF','SUM','COUNT','ROUNDDOWN','AVERAGE','HYPERLINK','MAX','SIN','PMT','ROUND'],
     text: [
         'ASC',
         'BAHTTEXT',
@@ -8056,6 +8056,17 @@ const FORMULA_METADATAS = {
             },
         ],
     },
+    "TOONE.GET":{
+        desc: '获取字段或实体字段值，如果实体有多条记录，则获取第一条记录中的字段值。',
+        args: [
+            {
+                name: 'array',
+            },
+            {
+                name: 'col_num1',
+            }
+        ],
+    }
 };
 
 export const getFormulasByCatalog = function (catalog) {

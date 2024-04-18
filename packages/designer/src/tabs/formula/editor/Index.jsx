@@ -63,7 +63,7 @@ export default function (props) {
                 >
                     <LeftPane></LeftPane>
                 </Pane>
-                <Resizer width={8}></Resizer>
+                <Resizer size={8}></Resizer>
                 <Pane style={{ width: '100%', flex: 1 }}>
                     <RightPane onClose={onClose}></RightPane>
                 </Pane>

@@ -9,8 +9,8 @@ import styled from 'styled-components';
 import {
   CheckBox,
   Integer,
+  Select,
 } from '@components/form/Index';
-import Select from '@components/Select/Index';
 import { setAlignSetting } from '@store/cellSettingSlice';
 
 import {

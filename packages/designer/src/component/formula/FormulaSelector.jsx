@@ -6,9 +6,9 @@ import {
 import styled from 'styled-components';
 
 import { OperationDialog } from '@components/dialog/Index';
+import { Select } from '@components/form/Index';
 import { Highlight } from '@components/highlight/Index';
 import List from '@components/list/List';
-import Select from '@components/select/Index';
 import {
   getCatalogs,
   getFormulaMetadata,

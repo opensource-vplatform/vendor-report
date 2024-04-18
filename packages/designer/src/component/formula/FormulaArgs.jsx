@@ -110,10 +110,16 @@ export default function (props) {
         });
     };
     const handleInput = (evt)=>{
-        const target = evt.target;
+        let value = null;
+        if(typeof evt == 'string'){
+            value = evt;
+        }else{
+            const target = evt.target;
+            value = target.value;
+        }
         const current = data.current;
         const arg = data.args[current];
-        const newArg = {...arg,exp:target.value};
+        const newArg = {...arg,exp:value};
         data.args[current] = newArg;
         setData({
             ...data,

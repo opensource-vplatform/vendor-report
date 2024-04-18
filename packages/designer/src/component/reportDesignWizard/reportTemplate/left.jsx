@@ -21,8 +21,10 @@ import {
 } from 'react-sortable-hoc';
 import styled from 'styled-components';
 
-import { CheckBox } from '@components/form/Index';
-import Select from '@components/select/Index';
+import {
+  CheckBox,
+  Select,
+} from '@components/form/Index';
 import {
   remove,
   save,
