@@ -4,7 +4,7 @@ import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
-salesData.data.length = 30 || 21;
+salesData.data.length = 2 || 21;
 tourismData.data.length = 11 || 21;
 export default {
     json,

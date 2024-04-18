@@ -141,6 +141,12 @@ export default function () {
                 break;
             }
         }
+        menuDatas.push({
+            command: 'toggleHyperlink',
+            name: 'gc.spread.toggleHyperlink',
+            text: '超链接',
+            workArea: 'viewport',
+        });
         const sheet = spread.getActiveSheet();
         const tablePaths = getActiveSheetTablesPath({ sheet });
         dispatch(updateActiveSheetTablePath({ tablePaths }));

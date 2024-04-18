@@ -400,7 +400,141 @@ function headerAndFooterInfo(params) {
     };
 }
 
+function parseJsonData1(jsonData, datas, _template = {}) {
+    const sheetsInfo = {};
+    const newSheets = {};
+    const groupsDatas = {};
+
+    let { sheetCount, sheets } = jsonData;
+    const template = { ..._template };
+    const changedGroupNames = []; //用于判断sheet名称是否重复
+    //如果有模板，则对数据进行分组，每个组一个sheet
+    Object.entries(_template).forEach(function ([sheetName, templateValue]) {
+        const groups = templateValue?.groups;
+        if (!groups) {
+            return;
+        }
+        const templateInfo = template[sheetName];
+        const currentSheetDatas = {};
+        //对数据进行分组，分组的名称就是sheet的名称
+        Object.entries(groups).some(function ([dsName, group]) {
+            currentSheetDatas[dsName] = {};
+            const toBeGroupedData = datas[dsName];
+            if (
+                Array.isArray(toBeGroupedData) &&
+                Array.isArray(group) &&
+                group.length
+            ) {
+                const groupFieldCode = group?.[0]?.code;
+                toBeGroupedData.forEach(function (item) {
+                    const groupName = item[groupFieldCode];
+                    if (!Array.isArray(currentSheetDatas[dsName][groupName])) {
+                        currentSheetDatas[dsName][groupName] = [];
+                    }
+                    currentSheetDatas[dsName][groupName].push(item);
+                });
+            }
+        });
+        const sheet = jsonData?.sheets?.[sheetName];
+        if (sheet) {
+            const cobySheet = JSON.stringify(sheet);
+            //根据分组名称创建sheet，Object.values(groupsDatas)[0]，只支持一个实体进行分组
+            const grouedData = Object.values(currentSheetDatas)[0];
+            const groupNames = Object.keys(grouedData);
+            groupNames.forEach(function (_newSheetName, index) {
+                let newSheetName = _newSheetName;
+                //处理同名的sheet
+                let suffix = 1;
+                while (jsonData.sheets[newSheetName]) {
+                    newSheetName = `${_newSheetName}${suffix++}`;
+                }
+                while (
+                    (groupNames.includes(newSheetName) &&
+                        newSheetName !== _newSheetName) ||
+                    changedGroupNames.includes(newSheetName)
+                ) {
+                    newSheetName = `${_newSheetName}${suffix++}`;
+                }
+                //更改修正后的名称
+                if (newSheetName !== _newSheetName) {
+                    const cache = currentSheetDatas[_newSheetName];
+                    delete currentSheetDatas[_newSheetName];
+                    currentSheetDatas[newSheetName] = cache;
+                }
+                changedGroupNames.push(newSheetName);
+
+                groupsDatas[newSheetName] = currentSheetDatas;
+
+                if (index <= 0) {
+                    sheet.name = newSheetName;
+                } else {
+                    const sheet = JSON.parse(cobySheet);
+                    sheet.name = newSheetName;
+                    sheet.isSelected = false;
+                    sheet.index = sheetCount++;
+                    sheet.order = sheet.index;
+                    jsonData.sheets[newSheetName] = sheet;
+                    jsonData.sheetCount += 1;
+                }
+                template[newSheetName] = templateInfo;
+            });
+        }
+        //只支持一个实体进行分组
+        return true;
+    });
+
+    Object.values(sheets).forEach(function (sheet) {
+        const {
+            name,
+            spans = [],
+            data,
+            tables = [],
+            rows = {} /* 行高 */,
+            conditionalFormats = {},
+            visible = 1,
+        } = sheet;
+        //当前sheet不可见，直接跳过解析
+        if (visible === 0) {
+            return;
+        }
+        const cobyRows = JSON.parse(JSON.stringify(rows));
+        const templateInfo = template[name];
+        const isTemplate = templateInfo ? true : false;
+
+        const { dataTable } = data;
+
+        const other_dataTable = [];
+        const content_dataTable = [];
+
+        if (dataTable) {
+            Object.entries(dataTable).forEach(function ([
+                rowStr,
+                colDataTable,
+            ]) {
+                const row = Number(rowStr);
+                const hasBindTableField = Object.values(colDataTable).some(
+                    function ({ bindingPath }) {
+                        return bindingPath?.includes?.('.');
+                    }
+                );
+                let curDataTable = other_dataTable;
+                if (hasBindTableField) {
+                    curDataTable = content_dataTable;
+                }
+
+                curDataTable.push({
+                    row,
+                    dataTable: colDataTable,
+                });
+            });
+        }
+        debugger;
+    });
+}
+
 function parseJsonData(jsonData, datas, _template = {}) {
+    parseJsonData1(jsonData, datas, _template);
+    return;
     const sheetsInfo = {};
     const newSheets = {};
     const groupsDatas = {};
@@ -411,9 +545,6 @@ function parseJsonData(jsonData, datas, _template = {}) {
     Object.entries(_template).forEach(function ([sheetName, templateValue]) {
         const groups = templateValue?.groups;
         if (!groups) {
-            return;
-        }
-        if (templateValue?.isCurrentSheet) {
             return;
         }
         const templateInfo = template[sheetName];
@@ -493,7 +624,12 @@ function parseJsonData(jsonData, datas, _template = {}) {
             tables = [],
             rows = {} /* 行高 */,
             conditionalFormats = {},
+            visible = 1,
         } = sheet;
+        //当前sheet不可见，直接跳过解析
+        if (visible === 0) {
+            return;
+        }
         const cobyRows = JSON.parse(JSON.stringify(rows));
         const templateInfo = template[name];
         const isTemplate = templateInfo ? true : false;
@@ -598,7 +734,7 @@ function parseJsonData(jsonData, datas, _template = {}) {
                 endRow: -1,
                 startCol: -1,
                 endCol: -1,
-                data: [],
+                tableColumns: [],
             },
         ];
 
@@ -606,7 +742,7 @@ function parseJsonData(jsonData, datas, _template = {}) {
         table_dataTable.forEach(function (item) {
             const { tableCode, row, col, rowCount, colCount } = item;
             const tableInfo = tableInfos[tableInfos.length - 1];
-            if (tableInfo.data.length <= 0) {
+            if (tableInfo.tableColumns.length <= 0) {
                 tableInfo.startRow = row;
                 tableInfo.oldStartRow = row;
                 tableInfo.endRow = row;
@@ -614,14 +750,14 @@ function parseJsonData(jsonData, datas, _template = {}) {
                 tableInfo.tableCode = tableCode;
                 tableInfo.startCol = col;
                 tableInfo.endCol = col + colCount;
-                tableInfo.data.push(item);
+                tableInfo.tableColumns.push(item);
             } else {
                 const {
                     row: _row,
                     col: _col,
                     colCount: _colCount,
                     tableCode: _tableCode,
-                } = tableInfo.data[tableInfo.data.length - 1];
+                } = tableInfo.tableColumns[tableInfo.tableColumns.length - 1];
 
                 if (
                     _tableCode === tableCode &&
@@ -632,7 +768,7 @@ function parseJsonData(jsonData, datas, _template = {}) {
                         tableInfo.maxRowCount = rowCount;
                     }
                     tableInfo.endCol = col + colCount;
-                    tableInfo.data.push(item);
+                    tableInfo.tableColumns.push(item);
                 } else {
                     tableInfos.push({
                         maxRowCount: rowCount,
@@ -642,7 +778,7 @@ function parseJsonData(jsonData, datas, _template = {}) {
                         endRow: row,
                         startCol: col,
                         endCol: col + colCount,
-                        data: [item],
+                        tableColumns: [item],
                     });
                 }
             }
@@ -664,7 +800,7 @@ function parseJsonData(jsonData, datas, _template = {}) {
                 tableCode,
                 startRow,
                 endRow,
-                data,
+                tableColumns,
                 oldStartRow,
                 maxRowCount,
             } = tableInfo;
@@ -697,9 +833,9 @@ function parseJsonData(jsonData, datas, _template = {}) {
                     ) {
                         const curRowDataTable = dataTable[i];
                         if (!newDataTable[endRow + index]) {
-                            newDataTable[endRow + index] = JSON.parse(
-                                JSON.stringify(curRowDataTable)
-                            );
+                            newDataTable[endRow + index] = curRowDataTable
+                                ? JSON.parse(JSON.stringify(curRowDataTable))
+                                : {};
                         }
                         contentDataTable[endRow + index] =
                             newDataTable[endRow + index];
@@ -713,7 +849,32 @@ function parseJsonData(jsonData, datas, _template = {}) {
                             ...rows?.[oldStartRow],
                         };
                     }
-                    data.forEach(function ({ field, col, colCount, rowCount }) {
+
+                    //复制spans
+                    spans.forEach(function (span) {
+                        if (span.row === oldStartRow) {
+                            newSpans.push({ ...span, row: endRow });
+                        }
+                    });
+
+                    //复制条件格式
+                    currentRowRules.forEach(function (rule) {
+                        const { col, rowCount, colCount } =
+                            rule?.ranges?.[0] || {};
+                        newRules.push({
+                            ...rule,
+                            ranges: [
+                                {
+                                    row: endRow,
+                                    rowCount,
+                                    col,
+                                    colCount,
+                                },
+                            ],
+                        });
+                    });
+
+                    tableColumns.forEach(function ({ field, col }) {
                         if (newDataTable[endRow]?.[col]?.bindingPath) {
                             delete newDataTable[endRow][col].bindingPath;
                         }
@@ -722,34 +883,26 @@ function parseJsonData(jsonData, datas, _template = {}) {
                             : {};
                         newDataTable[endRow][col].value = dsItem[field];
 
-                        //新增spans
-                        if (colCount > 1 || rowCount > 1) {
-                            newSpans.push({
-                                col,
-                                row: endRow,
-                                rowCount,
-                                colCount,
-                            });
+                        //复制超链接信息
+                        let tag = newDataTable[endRow][col].tag;
+                        if (tag) {
+                            let hyperlinkInfo = JSON.parse(tag).hyperlinkInfo;
+                            if (
+                                hyperlinkInfo &&
+                                hyperlinkInfo.type === 'document' &&
+                                hyperlinkInfo.isAutoDoc
+                            ) {
+                                newDataTable[endRow][col].hyperlink.url =
+                                    `sjs://${dsItem[field]}!A1`;
+                                if (
+                                    newDataTable[endRow][col].hyperlink.tooltip
+                                ) {
+                                    newDataTable[endRow][
+                                        col
+                                    ].hyperlink.tooltip = dsItem[field];
+                                }
+                            }
                         }
-
-                        //复制条件格式
-                        getColRules({
-                            rules: currentRowRules,
-                            col,
-                            colHandler(item) {
-                                newRules.push({
-                                    ...item,
-                                    ranges: [
-                                        {
-                                            row: endRow,
-                                            rowCount,
-                                            col,
-                                            colCount,
-                                        },
-                                    ],
-                                });
-                            },
-                        });
                     });
                     contentDataTable[endRow] = newDataTable[endRow];
                     endRow += maxRowCount;
@@ -877,7 +1030,6 @@ function parseJsonData(jsonData, datas, _template = {}) {
         jsonData.sheets[name] = info;
         jsonData.sheetCount += 1;
     });
-
     return sheetsInfo;
 }
 
@@ -947,7 +1099,8 @@ function page(params) {
     const pages = [];
     const contentDataTableArr = Object.entries(contentDataTable);
     let currentPageDataTable = {};
-    debugger;
+    let pageSpans = [];
+
     while (pageHeight < contentHeight && contentDataTableArr.length > 0) {
         const [rowStr, rowDataTable] = contentDataTableArr.shift();
         const row = Number(rowStr);
@@ -963,12 +1116,21 @@ function page(params) {
                     index++;
                 }
             }
+
+            if (span && (span.rowCount > 1 || span.colCount > 1)) {
+                pageSpans.push(span);
+            }
+
             if (pageHeight + rowHeight < contentHeight) {
                 pageHeight += rowHeight;
             } else {
-                pages.push(currentPageDataTable);
+                pages.push({
+                    dataTable: currentPageDataTable,
+                    spans: pageSpans,
+                });
                 pageHeight = rowHeight;
                 currentPageDataTable = {};
+                pageSpans = [];
             }
         }
 
@@ -978,7 +1140,10 @@ function page(params) {
         (pages.length && pages[pages.length - 1] !== currentPageDataTable) ||
         !pages.length
     ) {
-        pages.push(currentPageDataTable);
+        pages.push({
+            dataTable: currentPageDataTable,
+            spans: pageSpans,
+        });
     }
 
     let sheetIndex = sheetCount + Object.keys(newSheets).length;
@@ -991,12 +1156,12 @@ function page(params) {
     let prePageEndRow = 0;
     let pageIndex = 0;
 
-    let pageSpans = [];
+    pageSpans = [];
     let pageRows = {};
     let pageRules = [];
     const cobySheet = JSON.stringify(sheet);
     while (pages.length) {
-        const page = pages.shift();
+        const { dataTable: page /* spans: newSpans */ } = pages.shift();
         if (!isCurrentSheet) {
             currentPageRowIndex = 0;
             pageTotalRow = 0;
@@ -1024,7 +1189,7 @@ function page(params) {
         if (isCurrentSheet) {
             params.startRow = prePageEndRow;
         }
-        debugger;
+
         let res = handleReportHeaderArea(params);
         currentPageRowIndex = res.currentPageRowIndex;
         //内容区

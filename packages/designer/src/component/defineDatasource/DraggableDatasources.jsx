@@ -9,9 +9,11 @@ import {
   useSelector,
 } from 'react-redux';
 
+import Hyperlink from '@components/hyperlink';
 import DatasourceIcon from '@icons/data/datasource';
 import {
   setIsShowDatasource,
+  toggleBooleanValue,
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
@@ -247,6 +249,30 @@ function tableMove(params) {
     );
 }
 
+function toggleHyperlink(params) {
+    const { commandManager, dispatch } = params;
+    const command = {
+        canUndo: false,
+        execute(spread, infos) {
+            dispatch(
+                toggleBooleanValue({
+                    code: 'showHyperlink',
+                    value: true,
+                })
+            );
+        },
+    };
+    commandManager.register(
+        'toggleHyperlink',
+        command,
+        null,
+        false,
+        false,
+        false,
+        false
+    );
+}
+
 function subContextMenuActions(params) {
     const { spread } = params;
     params.commandManager = spread.commandManager();
@@ -259,12 +285,17 @@ function subContextMenuActions(params) {
 
     //移动表格
     tableMove(params);
+
+    //
+    toggleHyperlink(params);
 }
 
 //可拖拽树形数据源列表
 export default function Index() {
     const { spread } = useSelector(({ fontSlice }) => fontSlice);
-    const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
+    const { dsList, showHyperlink } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
 
     const context = useContext(DesignerContext);
     //是否允许查看数据源
@@ -468,6 +499,7 @@ export default function Index() {
     }, []);
     return (
         <>
+            {showHyperlink && <Hyperlink></Hyperlink>}
             <DialogDatasourcesEdit></DialogDatasourcesEdit>
             <DraggableDatasourcesBox>
                 <DraggableDatasourcesHeander>
