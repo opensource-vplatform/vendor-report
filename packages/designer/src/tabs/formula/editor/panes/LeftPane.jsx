@@ -148,7 +148,7 @@ export default function () {
                         onDoubleClick={function (data,parent) {
                             dispatch(
                                 insert({
-                                    formula: parent ? `=TOONE.GET("${parent.code}","${data?.code}")`:`=TOONE.GET("${data?.code}")`,
+                                    formula: parent ? `TOONE.GET("${parent.code}","${data?.code}")`:`TOONE.GET("${data?.code}")`,
                                 })
                             );
                         }}
