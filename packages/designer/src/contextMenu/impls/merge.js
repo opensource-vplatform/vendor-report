@@ -2,20 +2,34 @@ import {
   bind,
   EVENTS,
 } from '../../event/EventManager';
+import {
+  time,
+  timeEnd,
+} from '../../utils/profileUtil';
 
 const Merge_Menu_Name = 'com.toone.merge';
 
 const Merge_Row_Menu_Name = 'com.toone.mergeRow';
 
+const Un_Merge_Row_Menu_Name = 'com.toone.unMergeRow';
+
 const Merge_Column_Menu_Name = 'com.toone.mergeColumn';
+
+const Un_Merge_Column_Menu_Name = 'com.toone.unMergeColumn';
 
 const Merge_Row_Command = 'com.toone.contextMenu.mergeRow';
 
+const Un_Merge_Row_Command = 'com.toone.ontextMenu.unMergeRow';
+
 const Merge_Column_Command = 'com.toone.contextMenu.mergeColumn';
 
+const Un_Merge_Column_Command = 'com.toone.contextMenu.unMergeColumn';
+
 const getMergeInfo = function (spread) {
-    let allowColMerge = false,
-        allowRowMerge = false;
+    let colMergeList = [],
+        rowMergeList = [],
+        colMergedList = [],
+        rowMergedList = [];
     const sheet = spread.getActiveSheet();
     if (sheet) {
         const selections = sheet.getSelections();
@@ -32,21 +46,26 @@ const getMergeInfo = function (spread) {
                             colIndex
                         );
                         if (bindingPath) {
-                            allowColMerge = true;
+                            colMergeList.push({
+                                row:rowIndex,
+                                col:colIndex,
+                            });
                             bindingColCount++;
                         } else {
+                            if (bindingColCount > 1) {
+                                rowMergeList.push({
+                                    
+                                });
+                                break;
+                            }
                             bindingColCount = 0;
-                        }
-                        if (bindingColCount > 1) {
-                            allowRowMerge = true;
-                            break;
                         }
                     }
                 }
             }
         }
     }
-    return { allowColMerge, allowRowMerge };
+    return { colMergeList, rowMergeList, colMergedList, rowMergedList };
 };
 
 const getMenu = function (menus, name) {
@@ -76,7 +95,7 @@ const addMergeMenu = function (menuDatas) {
             text: '合并',
             name: Merge_Menu_Name,
             subMenu: [],
-            iconClass:'toone-row-merge',
+            iconClass: 'toone-row-merge',
             workArea: 'viewport',
         };
         menuDatas.push(menu);
@@ -84,48 +103,99 @@ const addMergeMenu = function (menuDatas) {
     return menu;
 };
 
-const addRowMergeMenu = function (menuDatas) {
+/**
+ * 添加合并子菜单
+ * @param {*} menuDatas
+ * @param {*} options
+ */
+const addMergeSubMenu = function (menuDatas, options) {
     const mergeMenu = addMergeMenu(menuDatas);
     const subMenu = mergeMenu.subMenu;
-    const menu = getMenu(subMenu, Merge_Row_Menu_Name);
+    const { name } = options;
+    const menu = getMenu(subMenu, name);
     if (!menu) {
-        subMenu.push({
-            text: '行合并',
-            name: Merge_Row_Menu_Name,
-            command: Merge_Row_Command,
-            iconClass:'toone-row-merge',
-        });
+        subMenu.push(options);
     }
 };
 
-const removeRowMergeMenu = function (menuDatas) {
-    const menu = getMergeMenu(menuDatas);
-    if (menu) {
-        const subMenu = menu.subMenu;
-        removeMenu(subMenu, Merge_Row_Menu_Name);
-    }
+const addRowMergeMenu = function (menuDatas) {
+    addMergeSubMenu(menuDatas, {
+        text: '行合并',
+        name: Merge_Row_Menu_Name,
+        command: Merge_Row_Command,
+        iconClass: 'toone-row-merge',
+    });
+};
+
+const addRowUnMergeMenu = function (menuDatas) {
+    addMergeSubMenu(menuDatas, {
+        text: '取消行合并',
+        name: Un_Merge_Row_Menu_Name,
+        command: Un_Merge_Row_Command,
+        iconClass: 'toone-cell-unMerge',
+    });
 };
 
 const addColumnMergeMenu = function (menuDatas) {
     const mergeMenu = addMergeMenu(menuDatas);
     const subMenu = mergeMenu.subMenu;
-    const menu = getMenu(subMenu, Merge_Row_Menu_Name);
-    if (!menu) {
-        subMenu.push({
-            text: '列合并',
-            name: Merge_Column_Menu_Name,
-            command: Merge_Column_Command,
-            iconClass:'toone-row-merge',
-        });
-    }
+    subMenu.push({
+        text: '列合并',
+        name: Merge_Column_Menu_Name,
+        command: Merge_Column_Command,
+        iconClass: 'toone-row-merge',
+    });
 };
 
-const removeColumnMergeMenu = function (menuDatas) {
-    const menu = getMergeMenu(menuDatas);
-    if (menu) {
-        const subMenu = menu.subMenu;
-        removeMenu(subMenu, Merge_Column_Menu_Name);
-    }
+const addColumnUnMergeMenu = function (menuDatas) {
+    const mergeMenu = addMergeMenu(menuDatas);
+    const subMenu = mergeMenu.subMenu;
+    subMenu.push({
+        text: '取消列合并',
+        name: Un_Merge_Column_Menu_Name,
+        command: Un_Merge_Column_Command,
+        iconClass: 'toone-cell-unMerge',
+    });
+};
+
+const registerRowMergeCommand = function (commandManager) {
+    commandManager.register(Merge_Row_Command, {
+        canUndo: true,
+        execute: function (context, options, isUndo) {
+            debugger;
+            alert('行合并实现');
+        },
+    });
+};
+
+const registerUnRowMergeCommand = function (commandManager) {
+    commandManager.register(Un_Merge_Row_Command, {
+        canUndo: true,
+        execute: function (context, options, isUndo) {
+            debugger;
+            alert('取消行合并实现');
+        },
+    });
+};
+
+const registerColumnMergeCommand = function (commandManager) {
+    commandManager.register(Merge_Column_Command, {
+        canUndo: true,
+        execute: function (context, options, isUndo) {
+            debugger;
+            alert('列合并实现');
+        },
+    });
+};
+
+const registerUnColumnMergeCommand = function (commandManager) {
+    commandManager.register(Un_Merge_Column_Command, {
+        canUndo: true,
+        execute: function (context, options, isUndo) {
+            debugger;
+            alert('取消列合并实现');
+        },
+    });
 };
 
 /**
@@ -137,43 +207,25 @@ const removeColumnMergeMenu = function (menuDatas) {
  */
 export const registerContextMenu = function (menuDatas, spread) {
     const handler = () => {
-        const { allowColMerge, allowRowMerge } = getMergeInfo(spread);
-        if (allowColMerge || allowRowMerge) {
-            if (allowColMerge) {
-                addColumnMergeMenu(menuDatas);
-            } else {
-                removeColumnMergeMenu(menuDatas);
-            }
-            if (allowRowMerge) {
-                addRowMergeMenu(menuDatas);
-            } else {
-                removeRowMergeMenu(menuDatas);
-            }
-        } else {
-            removeMergeMenu(menuDatas);
-        }
+        const profile = '设置行列合并右键菜单';
+        time(profile);
+        const {
+            colMergeList,
+            rowMergeList,
+            colMergedList,
+            rowMergedList,
+        } = getMergeInfo(spread);
+        //先清除合并菜单
+        removeMergeMenu(menuDatas);
+        colMergeList.length>0&&addColumnMergeMenu(menuDatas);
+        rowMergeList.length>0&&addRowMergeMenu(menuDatas);
+        colMergedList.length>0&&addColumnUnMergeMenu(menuDatas);
+        rowMergedList.length>0&&addRowUnMergeMenu(menuDatas);
+        timeEnd(profile);
     };
     bind({
         event: EVENTS.SelectionChanged,
         handler,
-    });
-};
-
-const registerRowMergeCommand = function(commandManager){
-    commandManager.register(Merge_Row_Command,{
-        canUndo: true,
-        execute: function (context, options, isUndo) {
-            alert("行合并实现");
-        },
-    });
-}
-
-const registerColumnMergeCommand = function (commandManager) {
-    commandManager.register(Merge_Column_Command,{
-        canUndo: true,
-        execute: function (context, options, isUndo) {
-            alert("列合并实现");
-        },
     });
 };
 
@@ -184,5 +236,7 @@ const registerColumnMergeCommand = function (commandManager) {
 export const registerCommand = function (spread) {
     const commandManager = spread.commandManager();
     registerRowMergeCommand(commandManager);
+    registerUnRowMergeCommand(commandManager);
     registerColumnMergeCommand(commandManager);
+    registerUnColumnMergeCommand(commandManager);
 };
