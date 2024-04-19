@@ -38,6 +38,54 @@ const EditorIconMenu = WithIconMenu(
     CellEditorsIcon,
     [
         {
+            value: 'pageCellType',
+            title: '当前页',
+            text: '当前页',
+            icon: <ImageIcon></ImageIcon>,
+            handler(spread, dispatch, ctx) {
+                const sheet = spread.getActiveSheet();
+                const row = sheet.getActiveRowIndex();
+                const col = sheet.getActiveColumnIndex();
+                const plugin = getCellTagPlugin(
+                    sheet,
+                    row,
+                    col,
+                    'pageCellType'
+                );
+                if (!plugin) {
+                    setCellTagPlugin(sheet, row, col, {
+                        type: 'pageCellType',
+                        config: {},
+                    });
+                    sheet.setText(row, col, `[当前页]`);
+                }
+            },
+        },
+        {
+            value: 'totalPagesCellType',
+            title: '总页数',
+            text: '总页数',
+            icon: <ImageIcon></ImageIcon>,
+            handler(spread, dispatch, ctx) {
+                const sheet = spread.getActiveSheet();
+                const row = sheet.getActiveRowIndex();
+                const col = sheet.getActiveColumnIndex();
+                const plugin = getCellTagPlugin(
+                    sheet,
+                    row,
+                    col,
+                    'totalPagesCellType'
+                );
+                if (!plugin) {
+                    setCellTagPlugin(sheet, row, col, {
+                        type: 'totalPagesCellType',
+                        config: {},
+                    });
+                    sheet.setText(row, col, `[总页数]`);
+                }
+            },
+        },
+        {
             value: 'imageCellType',
             title: '图片',
             text: '图片',
@@ -53,14 +101,19 @@ const EditorIconMenu = WithIconMenu(
                 const sheet = spread.getActiveSheet();
                 const row = sheet.getActiveRowIndex();
                 const col = sheet.getActiveColumnIndex();
-                const plugin = getCellTagPlugin(sheet,row,col,"cellSubTotal");
-                const config = plugin ? plugin.config:{};
-                setData((data)=>{
+                const plugin = getCellTagPlugin(
+                    sheet,
+                    row,
+                    col,
+                    'cellSubTotal'
+                );
+                const config = plugin ? plugin.config : {};
+                setData((data) => {
                     return {
                         ...data,
-                        visible:true,
+                        visible: true,
                         config,
-                    }
+                    };
                 });
             },
         },
@@ -255,11 +308,11 @@ export default function () {
         handleCancel();
     };
     const handleCancel = () => {
-        setData((data)=>{
+        setData((data) => {
             return {
                 ...data,
-                visible:false
-            }
+                visible: false,
+            };
         });
     };
     return (

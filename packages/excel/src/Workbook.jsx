@@ -10,6 +10,10 @@ import resourceManager from 'resource-manager-js';
 import { register } from './custom/index';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
+import {
+  execute,
+  PluginTool,
+} from './plugin';
 import { withDivStyled } from './utils/componentUtil';
 import { setBaseUrl } from './utils/environmentUtil';
 import {
@@ -136,6 +140,7 @@ function handleReportHeaderArea(params) {
         pageDataTable,
         headerRules = {},
         pageRules = [],
+        pluginTool,
     } = params;
 
     for (let i = 0; i < row; i++) {
@@ -144,6 +149,20 @@ function handleReportHeaderArea(params) {
             pageDataTable[currentPageRowIndex] = JSON.parse(
                 JSON.stringify(headerDataTableObj[i])
             );
+            Object.entries(pageDataTable[currentPageRowIndex]).forEach(
+                function ([colStr, { tag }]) {
+                    if (tag) {
+                        const plugins = JSON.parse(tag).plugins;
+                        if (Array.isArray(plugins)) {
+                            const col = Number(colStr);
+                            const res = execute('', plugins, pluginTool);
+                            pageDataTable[currentPageRowIndex][col].value =
+                                res.value;
+                        }
+                    }
+                }
+            );
+            debugger;
         }
         spans.forEach(function (item) {
             if (item.row === i) {
@@ -783,6 +802,19 @@ function parseJsonData(jsonData, datas, _template = {}) {
                 }
             }
         });
+        const tableDataCounts = {};
+        const tableFieldIndexs = {};
+        const totalPagesHandler = genTotalPagesHandler(1);
+        const pluginTool = new PluginTool();
+        const pageHander = genPageIndexHandler(1);
+        pluginTool.setPageHandler(pageHander);
+        pluginTool.setTotalPagesHandler(totalPagesHandler);
+        pluginTool.setFieldIndexHandler(function (tableCode, fieldCode) {
+            return tableFieldIndexs?.[tableCode]?.[fieldCode];
+        });
+        pluginTool.setDataCountHandler(function (tableCode) {
+            return tableDataCounts[tableCode];
+        });
 
         const newDataTable = {};
         const newSpans = [];
@@ -803,13 +835,22 @@ function parseJsonData(jsonData, datas, _template = {}) {
                 tableColumns,
                 oldStartRow,
                 maxRowCount,
+                startCol,
             } = tableInfo;
+            tableFieldIndexs[tableCode] = {};
+            tableColumns.forEach(function ({ field }, index) {
+                tableFieldIndexs[tableCode][field] = {
+                    row: startRow,
+                    col: startCol + index,
+                };
+            });
             let ds = datas?.[tableCode];
             const groupedDs = groupsDatas?.[name]?.[tableCode]?.[name];
             if (Array.isArray(groupedDs)) {
                 ds = groupedDs;
             }
             if (Array.isArray(ds)) {
+                tableDataCounts[tableCode] = ds.length;
                 //获取当前表格的条件样式
                 const currentRowRules = getRowRules({
                     rules,
@@ -823,6 +864,28 @@ function parseJsonData(jsonData, datas, _template = {}) {
                         newDataTable[endRow] = JSON.parse(
                             JSON.stringify(curRowDataTable)
                         );
+
+                        Object.entries(newDataTable[endRow]).forEach(function ([
+                            col,
+                            { tag },
+                        ]) {
+                            if (tag) {
+                                const plugins = JSON.parse(tag).plugins;
+                                if (Array.isArray(plugins)) {
+                                    const res = execute(
+                                        '',
+                                        plugins,
+                                        pluginTool
+                                    );
+                                    if (res.type === 'text') {
+                                        newDataTable[endRow][col].value =
+                                            res.value;
+                                    } else {
+                                        console.log(res, '你好');
+                                    }
+                                }
+                            }
+                        });
                     }
 
                     let index = 1;
@@ -923,21 +986,24 @@ function parseJsonData(jsonData, datas, _template = {}) {
             lastStartRow = startRow;
             lastEndRow = endRow;
 
+            const tableStartRow =
+                startRow + (maxRowCount > 1 ? maxRowCount : 0);
+
             other_dataTable.forEach(function (item) {
-                if (item.row > startRow && item.row <= endRow) {
+                if (item.row > tableStartRow && item.row <= endRow) {
                     item.row += removeRowCount;
                 }
             });
 
             tableInfos.forEach(function (item) {
-                if (item.startRow > startRow && item.startRow <= endRow) {
+                if (item.startRow > tableStartRow && item.startRow <= endRow) {
                     item.startRow += removeRowCount;
                     item.endRow = item.startRow;
                 }
             });
 
             tables.forEach(function (table) {
-                if (table.row > startRow && table.row <= endRow) {
+                if (table.row > tableStartRow && table.row <= endRow) {
                     table.row += removeRowCount;
                 }
             });
@@ -959,6 +1025,19 @@ function parseJsonData(jsonData, datas, _template = {}) {
 
             if (cellInfo.value) {
                 newDataTable[row][col].value = cellInfo.value;
+            }
+            let tag = cellInfo.tag;
+            if (tag) {
+                const plugins = JSON.parse(tag).plugins;
+                if (Array.isArray(plugins)) {
+                    const res = execute('', plugins, pluginTool);
+                    if (res.type === 'text') {
+                        newDataTable[row][col].value = res.value;
+                    } else if (res.type === 'formula') {
+                        newDataTable[row][col].formula = res.value;
+                        console.log(res.value);
+                    }
+                }
             }
 
             if (rowCount > 1 || colCount > 1) {
@@ -1030,6 +1109,18 @@ function parseJsonData(jsonData, datas, _template = {}) {
         jsonData.sheetCount += 1;
     });
     return sheetsInfo;
+}
+
+function genPageIndexHandler(index) {
+    return function () {
+        return index;
+    };
+}
+
+function genTotalPagesHandler(totalPages) {
+    return function () {
+        return totalPages;
+    };
 }
 
 //分页
@@ -1159,7 +1250,14 @@ function page(params) {
     let pageRows = {};
     let pageRules = [];
     const cobySheet = JSON.stringify(sheet);
+    let currentPageIndex = 0;
+    const totalPagesHandler = genTotalPagesHandler(pages.length);
     while (pages.length) {
+        currentPageIndex++;
+        const pluginTool = new PluginTool();
+        const pageHander = genPageIndexHandler(currentPageIndex);
+        pluginTool.setPageHandler(pageHander);
+        pluginTool.setTotalPagesHandler(totalPagesHandler);
         const { dataTable: page /* spans: newSpans */ } = pages.shift();
         if (!isCurrentSheet) {
             currentPageRowIndex = 0;
@@ -1184,6 +1282,7 @@ function page(params) {
             pageDataTable,
             pageRules,
             headerRules,
+            pluginTool,
         };
         if (isCurrentSheet) {
             params.startRow = prePageEndRow;

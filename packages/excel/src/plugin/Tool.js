@@ -1,19 +1,33 @@
-class Tool{
-
-    setFieldIndexHandler(handler){
+export default class Tool {
+    setFieldIndexHandler(handler) {
         this.fieldIndexHandler = handler;
     }
 
-    setDataCountHandler(handler){
+    setDataCountHandler(handler) {
         this.dataCountHandler = handler;
     }
 
-    getFieldIndex(tableCode,fieldCode){
-        this.fieldIndexHandler(tableCode,fieldCode);
+    setPageHandler(handler) {
+        this.pageHandler = handler;
     }
 
-    getDataCount(tableCode){
-        this.dataCountHandler(tableCode);
+    setTotalPagesHandler(handler) {
+        this.totalPagesHandler = handler;
     }
 
+    getFieldIndex(tableCode, fieldCode) {
+        return this.fieldIndexHandler(tableCode, fieldCode);
+    }
+
+    getDataCount(tableCode) {
+        return this.dataCountHandler(tableCode);
+    }
+
+    getPage() {
+        return this.pageHandler();
+    }
+
+    getTotalPages() {
+        return this.totalPagesHandler();
+    }
 }
