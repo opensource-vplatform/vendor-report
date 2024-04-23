@@ -16,6 +16,6 @@ const Component = styled.div`
 `;
 
 export default function (props) {
-    const { type = 'vertical' } = props;
-    return <Component data-type={type}></Component>;
+    const { type = 'vertical', style = {} } = props;
+    return <Component data-type={type} style={{ ...style }}></Component>;
 }

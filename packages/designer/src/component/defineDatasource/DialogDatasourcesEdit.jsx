@@ -21,6 +21,7 @@ export default function Index(props) {
             open={true}
             width='100%'
             height='100%'
+            style={{ border: 'none' }}
             onClose={function () {
                 dispatch(setIsShowDatasource());
             }}

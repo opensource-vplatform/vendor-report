@@ -59,15 +59,16 @@ export const DatasourceOptBoxRight = styled.div`
 export const DatasourceOptBoxLeft = styled.div`
     display: flex;
     flex-direction: column;
-    flex: 1;
     border-right: 1px solid #ddd;
     overflow-y: hidden;
+    width: 400px;
 
     .header {
         display: flex;
         justify-content: right;
-        padding-right: 16px;
-        padding-top: 16px;
+        padding-right: 6px;
+        height: 30px;
+        align-items: center;
     }
 `;
 
@@ -79,7 +80,7 @@ export const DatasourceBox = styled.div`
     padding: 0 24px;
     box-sizing: border-box;
     background-color: #fff;
-    overflow-y: hidden;
+    overflow: hidden;
     font-size: 14px;
 `;
 export const DatasourceOptBox = styled.div`

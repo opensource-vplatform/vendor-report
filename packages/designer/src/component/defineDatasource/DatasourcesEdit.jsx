@@ -226,7 +226,10 @@ export default function Index(props) {
                 ''
             )}
             <h2>数据源</h2>
-            <LineSepatator type='horizontal'></LineSepatator>
+            <LineSepatator
+                type='horizontal'
+                style={{ margin: 0 }}
+            ></LineSepatator>
             <DatasourceOptBox>
                 <DatasourceOptBoxLeft>
                     {isAllowToEdit && (
