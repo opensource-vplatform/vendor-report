@@ -22,12 +22,11 @@ export const withBatchCalcUpdate = function (spread, updateHandler) {
 };
 
 const PLUGIN_SRCS = {
-    print: ['/vendor/plugins/print.min.js'],
+    print: ['print.min.js'],
 };
 
 export const getPluginSrc = function (type) {
-    const baseUrl = getBaseUrl();
-    return PLUGIN_SRCS[type].map((src) => baseUrl + src);
+    return PLUGIN_SRCS[type].map((src) => toExcelPluginUrl(src));
 };
 
 /**
@@ -42,3 +41,17 @@ export const applyToRange = function (cellRange, sheet, func) {
         }
     }
 };
+
+export function getExcelVersion(){
+    const GC = getNamespace();
+    return GC.Spread.Sheets.productInfo.productVersion;
+}
+
+export const getExcelBaseUrl = function(){
+    const version = getExcelVersion();
+    return `${getBaseUrl()}/vendor/excel/${version}`;
+}
+
+export const toExcelPluginUrl = function(filename){
+    return `${getExcelBaseUrl()}/plugins/${filename}`;
+}

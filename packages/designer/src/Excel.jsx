@@ -10,6 +10,7 @@ import {
   useSelector,
 } from 'react-redux';
 
+import { registerCommand } from '@commands/index';
 import {
   EVENTS,
   fire,
@@ -120,7 +121,6 @@ export default function () {
         [template]
     );
     const handleWorkbookInitialized = useCallback((spread) => {
-        enhanceContextMenu(spread);
         const sheet = spread.getActiveSheet();
         const tablePaths = getActiveSheetTablesPath({ sheet });
         dispatch(updateActiveSheetTablePath({ tablePaths }));
@@ -135,6 +135,8 @@ export default function () {
             event: EVENTS.Inited,
             args: [spread],
         });
+        registerCommand(spread);
+        enhanceContextMenu(spread);
     });
     const handleSelectionChanged = useCallback((type, data) => {
         fire({

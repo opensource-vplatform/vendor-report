@@ -12,13 +12,13 @@ import InsertSheetCol from '@icons/cell/InsertSheetCol';
 import InsertSheetRow from '@icons/cell/InsertSheetRow';
 import {
   insertColumns,
-  insertDownCells,
-  insertRightCells,
   insertRows,
-  insertSheet,
 } from '@utils/cellUtil';
 import { WithIconMenu } from '@utils/componentUtils';
+import { isFunction } from '@utils/objectUtil';
 
+import { Commands } from '../../../../command';
+import { exeCommand } from '../../../../utils/spreadUtil';
 import Dialog from './Dialog';
 
 const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [
@@ -27,6 +27,11 @@ const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [
         title: '插入单元格',
         text: '插入单元格',
         icon: <InsertRowIcon></InsertRowIcon>,
+        handler: function (spread, setData) {
+            setData((data) => {
+                return { ...data, showDialog: true };
+            });
+        },
     },
     'divider',
     {
@@ -34,12 +39,18 @@ const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [
         title: '插入工作表行',
         text: '插入工作表行',
         icon: <InsertSheetRow></InsertSheetRow>,
+        handler: function(spread,setData){
+            insertRows(spread);
+        }
     },
     {
         value: 'insertSheetCol',
         title: '插入工作表列',
         text: '插入工作表列',
         icon: <InsertSheetCol></InsertSheetCol>,
+        handler: function(spread){
+            insertColumns(spread);
+        }
     },
     'divider',
     {
@@ -47,44 +58,43 @@ const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [
         title: '插入工作表',
         text: '插入工作表',
         icon: <InsertSheet></InsertSheet>,
+        handler: function(spread){
+            exeCommand(spread,Commands.Insert.Sheet,{});
+        }
     },
 ]);
 
 export default function () {
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const [data, setData] = useState({ showDialog: false });
-    const handleInsertChange = (value) => {
-        if (value == 'insertCell') {
-            setData({
-                ...data,
-                showDialog: true,
-            });
-        } else if (value == 'insertSheetRow') {
-            insertRows(spread);
-        } else if (value == 'insertSheetCol') {
-            insertColumns(spread);
-        } else if (value == 'insertSheet') {
-            insertSheet(spread);
-        }
-    };
     const handleInsertCell = (val) => {
-        if (val == 'right') {
-            insertRightCells(spread);
-        } else if (val == 'down') {
-            insertDownCells(spread);
-        } else if (val == 'row') {
-            insertRows(spread);
-        } else if (val == 'col') {
-            insertColumns(spread);
+        switch(val){
+            case 'right':
+            case 'down':
+                exeCommand(spread,Commands.Insert.Cell,{position:val});
+                break;
+            case 'row':
+                insertRows(spread);
+                break;
+            case 'col':
+                insertColumns(spread);
+                break;
         }
+
         setData({ ...data, showDialog: false });
     };
+    const handleNodeClick = (value,node)=>{
+        const handler = node.handler;
+        if(isFunction(handler)){
+            handler(spread,setData);
+        }
+    }
     return (
         <Fragment>
             {data.showDialog ? (
                 <Dialog onClose={handleInsertCell}></Dialog>
             ) : null}
-            <InsertMenuIcon onNodeClick={handleInsertChange}></InsertMenuIcon>
+            <InsertMenuIcon onNodeClick={handleNodeClick}></InsertMenuIcon>
         </Fragment>
     );
 }

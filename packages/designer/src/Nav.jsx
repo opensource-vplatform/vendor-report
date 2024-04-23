@@ -41,6 +41,11 @@ import ViewTab from '@tabs/view/Index';
 import DesignerContext from './DesignerContext';
 import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
 import VerticalAlignTop from './icons/arrow/VerticalAlignTop';
+import {
+  listenRedo,
+  listenSave,
+  listenUndo,
+} from './Listener';
 import { setNavStyle } from './store/appSlice/appSlice';
 import Formula from './tabs/formula/Index';
 
@@ -121,23 +126,6 @@ function parseUsedDatasource(spread, finalDsList) {
         return dsCodes.includes(code);
     });
     return define;
-}
-
-const getListenSaveHandler = function(handler){
-    return (evt)=>{
-        if((evt.key == 's'|| evt.key == 'S')&&evt.ctrlKey){
-            evt.preventDefault();
-            handler();
-        }
-    }
-}
-
-const listenSave = function(handler){
-    window.addEventListener("keydown",handler);
-}
-
-const unListenSave = function(handler){
-    window.removeEventListener("keydown",handler);
 }
 
 export default function () {
@@ -230,13 +218,22 @@ export default function () {
     useEffect(() => {
         if (spread) {
             spread.refresh();
-            const handler = getListenSaveHandler(handleSave);
-            listenSave(handler);
-            return ()=>{
-                unListenSave(handler);
-            }
+            const unListenSave = listenSave(handleSave);
+            const unListenUndo = listenUndo(() => {
+                const undoManager = spread.undoManager();
+                undoManager.undo();
+            });
+            const unListenRedo = listenRedo(() => {
+                const undoManager = spread.undoManager();
+                undoManager.redo();
+            });
+            return () => {
+                unListenSave();
+                unListenUndo();
+                unListenRedo();
+            };
         }
-    }, [navStyle,spread]);
+    }, [navStyle, spread]);
     return (
         <Tabs
             value={active}

@@ -1,35 +1,42 @@
-import { Fragment, useEffect, useState } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import { OperationDialog } from '@components/dialog/Index';
-import { Button, CheckBox } from '@components/form/Index';
+import {
+  Button,
+  CheckBox,
+} from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import {
-    setEditorConfig,
-    setEditorType,
-    setRuleManagerVisible,
-    setRuleType,
+  setRuleManagerConfig,
+  setRuleManagerVisible,
 } from '@store/conditionStyleSlice';
+import { ConditionRule } from '@toone/report-excel';
 import { genUUID } from '@utils/commonUtil';
 import {
-    getRuleTitle,
-    RuleFormat,
-    getDefaultScaleRuleEditConfig,
-    showAddConditionRule,
-    showEditConditionRule,
+  getRuleTitle,
+  RuleFormat,
+  showAddConditionRule,
+  showEditConditionRule,
 } from '@utils/conditionRuleUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
+import { Commands } from '../../command';
+import { exeCommand } from '../../utils/spreadUtil';
 import {
-    setRuleManagerConfig,
-    setShowEditor,
-} from '@store/conditionStyleSlice';
-import { jsonToRanges, toJson } from './RuleToJson';
-import { withBatchCalcUpdate } from '../../utils/spreadUtil';
-import { ConditionRule } from '@toone/report-excel';
-import { rangesToJson } from './RuleToJson';
+  jsonToRanges,
+  rangesToJson,
+  toJson,
+} from './RuleToJson';
 
 const Buttons = styled.div`
     display: flex;
@@ -332,18 +339,19 @@ export default function (props) {
     };
     const handleApply = () => {
         const rules = ruleManagerConfig.rules;
-        if (rules) {
-            withBatchCalcUpdate(spread, (sheet) => {
-                sheet.conditionalFormats.clearRule();
-                rules.forEach(({ config }) => {
-                    const conditionRule = new ConditionRule(config);
-                    const ranges = config.ranges;
-                    const selections = jsonToRanges(ranges);
-                    conditionRule.bind(sheet);
-                    conditionRule.applySelections(selections);
+        const configs = [];
+        if (rules && rules.length > 0) {
+            rules.forEach(({ config }) => {
+                const rule = new ConditionRule(config);
+                const ranges = config.ranges;
+                const selections = jsonToRanges(ranges);
+                configs.push({
+                    rule,
+                    selections,
                 });
             });
         }
+        exeCommand(spread, Commands.ConditionStyle.Reset, { configs });
     };
     return (
         <Fragment>

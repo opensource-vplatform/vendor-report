@@ -12,13 +12,13 @@ import DeleteSheetCol from '@icons/cell/DeleteSheetCol';
 import DeleteSheetRow from '@icons/cell/DeleteSheetRow';
 import {
   deleteColumns,
-  deleteLeftCells,
   deleteRows,
-  deleteSheet,
-  deleteUpCells,
 } from '@utils/cellUtil';
 import { WithIconMenu } from '@utils/componentUtils';
+import { isFunction } from '@utils/objectUtil';
 
+import { Commands } from '../../../../command/index';
+import { exeCommand } from '../../../../utils/spreadUtil';
 import Dialog from './Dialog';
 
 const DeleteIconMenu = WithIconMenu('删除', DeleteIcon, [
@@ -27,6 +27,11 @@ const DeleteIconMenu = WithIconMenu('删除', DeleteIcon, [
         title: '删除单元格',
         text: '删除单元格',
         icon: <DeleteCell></DeleteCell>,
+        handler: function (spread, setData) {
+            setData((data) => {
+                return { ...data, showDialog: true };
+            });
+        },
     },
     'divider',
     {
@@ -34,12 +39,18 @@ const DeleteIconMenu = WithIconMenu('删除', DeleteIcon, [
         title: '删除工作表行',
         text: '删除工作表行',
         icon: <DeleteSheetRow></DeleteSheetRow>,
+        handler: function (spread) {
+            deleteRows(spread);
+        },
     },
     {
         value: 'deleteSheetCol',
         title: '删除工作表列',
         text: '删除工作表列',
         icon: <DeleteSheetCol></DeleteSheetCol>,
+        handler: function (spread) {
+            deleteColumns(spread);
+        },
     },
     'divider',
     {
@@ -47,44 +58,42 @@ const DeleteIconMenu = WithIconMenu('删除', DeleteIcon, [
         title: '删除工作表',
         text: '删除工作表',
         icon: <DeleteSheet></DeleteSheet>,
+        handler: function (spread) {
+            exeCommand(spread, Commands.Delete.Sheet, {});
+        },
     },
 ]);
 
 export default function () {
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const [data, setData] = useState({ showDialog: false });
-    const handleDeleteChange = (value) => {
-        if (value == 'deleteCell') {
-            setData({
-                ...data,
-                showDialog: true,
-            });
-        } else if (value == 'deleteSheetRow') {
-            deleteRows(spread);
-        } else if (value == 'deleteSheetCol') {
-            deleteColumns(spread);
-        } else if (value == 'deleteSheet') {
-            deleteSheet(spread);
-        }
-    };
     const handleDeleteCell = (val) => {
-        if (val == 'left') {
-            deleteLeftCells(spread);
-        } else if (val == 'up') {
-            deleteUpCells(spread);
-        } else if (val == 'row') {
-            deleteRows(spread);
-        } else if (val == 'col') {
-            deleteColumns(spread);
+        switch (val) {
+            case 'left':
+            case 'up':
+                exeCommand(spread, Commands.Delete.Cell, { position: val });
+                break;
+            case 'row':
+                deleteRows(spread);
+                break;
+            case 'col':
+                deleteColumns(spread);
+                break;
         }
         setData({ ...data, showDialog: false });
+    };
+    const handleNodeClick = (value, node) => {
+        const handler = node.handler;
+        if (isFunction(handler)) {
+            handler(spread, setData);
+        }
     };
     return (
         <Fragment>
             {data.showDialog ? (
                 <Dialog onClose={handleDeleteCell}></Dialog>
             ) : null}
-            <DeleteIconMenu onNodeClick={handleDeleteChange}></DeleteIconMenu>
+            <DeleteIconMenu onNodeClick={handleNodeClick}></DeleteIconMenu>
         </Fragment>
     );
 }

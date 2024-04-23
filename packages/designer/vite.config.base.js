@@ -44,13 +44,16 @@ export default {
             {
                 find: '@tabs',
                 replacement: resolve(__dirname, 'src/tabs'),
-            },{
+            },
+            {
                 find: '@event',
                 replacement: resolve(__dirname, 'src/event'),
             },
+            {
+                find: '@commands',
+                replacement: resolve(__dirname, 'src/command'),
+            },
         ],
     },
-    plugins: [
-        react()
-    ],
+    plugins: [react()],
 };

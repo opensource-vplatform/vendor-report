@@ -17,14 +17,86 @@ export const withBatchUpdate = function (spread, updateHandler) {
     }
 };
 
-export const withBatchCalcUpdate = function (spread, updateHandler) {
+const withTransaction = function (
+    handler,
+    cmd,
+    context,
+    options,
+    isUndo
+) {
+    const GC = getNamespace();
+    const Commands = GC.Spread.Sheets.Commands;
+    if (isUndo) {
+        const config = { cmd, ...options };
+        Commands.undoTransaction(context, config);
+        return true;
+    } else {
+        Commands.startTransaction(context, options);
+        try {
+            handler(options);
+        } catch (e) {}
+        Commands.endTransaction(context, options);
+        return true;
+    }
+};
+
+export const withBatchSettingInTransaction = function (
+    spread,
+    handler,
+    ...args
+) {
+    return withTransaction(
+        (options) => {
+            withBatchCalcUpdate(spread, handler, options);
+        },
+        ...args
+    );
+};
+
+export const exeCommandImpl = function(handler,context, options, isUndo){
+    const GC = getNamespace();
+    var Commands = GC.Spread.Sheets.Commands;
+    //options.cmd = cmdName;
+    if (isUndo) {
+        Commands.undoTransaction(context, options);
+        return true;
+    } else {
+        Commands.startTransaction(context, options);
+        const sheet = options.sheet;
+        const config = options.options
+        sheet.suspendPaint();
+        sheet.suspendCalcService();
+        handler(sheet,config);
+        sheet.resumeCalcService();
+        sheet.resumePaint();
+        Commands.endTransaction(context, options);
+        return true;
+    }
+}
+
+/**
+ * 执行命令
+ * @param {*} spread
+ * @param {*} cmd
+ * @param {*} options
+ */
+export const exeCommand = function (spread, cmd, options) {
+    const commandManager = spread.commandManager();
+    const sheet = spread.getActiveSheet();
+    const sheetName = sheet.name();
+    commandManager.execute({ cmd, sheetName, sheet, options });
+};
+
+export const withBatchCalcUpdate = function (spread, updateHandler, ...args) {
     if (spread) {
         spread.suspendPaint();
         spread.suspendCalcService();
         const sheet = spread.getActiveSheet();
         if (sheet) {
             try {
-                updateHandler(sheet);
+                args && args.length > 0
+                    ? updateHandler(...args)
+                    : updateHandler(sheet);
             } finally {
                 spread.resumeCalcService(false);
                 spread.resumePaint();
@@ -250,7 +322,11 @@ export function getWorkSheetForTableSheetFreeHeaderArea(
     return freeHeaderSheet;
 }
 
-
-export function setTableSheetFreeHeader(sheet,json){
+export function setTableSheetFreeHeader(sheet, json) {
     sheet.applyFreeHeaderArea(json);
+}
+
+export function getExcelVersion() {
+    const GC = getNamespace();
+    return GC.Spread.Sheets.productInfo.productVersion;
 }

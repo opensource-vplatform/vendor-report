@@ -8,6 +8,10 @@ const FONT_FAMILIES = [
         value: '黑体',
         title: '黑体',
         text: '黑体',
+    },{
+        value: '宋体',
+        title: '宋体',
+        text: '宋体',
     },
     {
         value: '新宋体',

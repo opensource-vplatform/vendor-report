@@ -8,7 +8,7 @@ import resourceManager from 'resource-manager-js';
 import styled from 'styled-components';
 
 import { Select } from '@components/form/Index';
-import { getBaseUrl } from '@utils/environmentUtil';
+import { toExcelPluginUrl } from '@utils/environmentUtil';
 import { download } from '@utils/fileUtil';
 import {
   showErrorMessage,
@@ -94,11 +94,10 @@ function Index(props) {
             return;
         } else {
             showLoadingMessage(dispatch, '导出中...');
-            const baseUrl = getBaseUrl();
             resourceManager
                 .loadScript([
-                    baseUrl+'/vendor/plugins/print.min.js',
-                    baseUrl+'/vendor/plugins/pdf.min.js',
+                    toExcelPluginUrl('print.min.js'),
+                    toExcelPluginUrl('pdf.min.js'),
                 ])
                 .then(() => {
                     spread.savePDF(

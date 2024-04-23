@@ -5,6 +5,7 @@ import {
   setVisible,
 } from '@store/sparklineSlice';
 
+import { Commands } from '../command';
 import {
   addCallback,
   handleCancel as onCancel,
@@ -13,8 +14,8 @@ import {
 import { isNullOrUndef } from './objectUtil';
 import {
   applyToSelectedCell,
+  exeCommand,
   getNamespace,
-  withBatchCalcUpdate,
 } from './spreadUtil';
 import {
   getCellTagPlugin,
@@ -131,63 +132,65 @@ export const isAlignDisabled = function (config) {
     return mode === 1 || mode === 2;
 };
 
-export const getDefaultConfig = function(){
+export const getDefaultConfig = function () {
     const result = {};
-    for(let [key,val] of argList){
+    for (let [key, val] of argList) {
         result[key] = val;
     }
     return result;
-}
+};
 
-export const showEditorDialog = function(spread,dispatch,ctx){
+export const applyImageSetting = function (sheet,config) {
+    let { url, ...others } = config;
+    url = `"./image.png"`;
+    const datas = { url, ...others };
+    const formula = toFormula(datas);
+    applyToSelectedCell(sheet, (sheet, row, col) => {
+        setCellTagPlugin(sheet, row, col, {
+            type: 'cellImage',
+            config: others,
+        });
+        sheet.setFormula(row, col, formula);
+    });
+    //ctx.handleSelectionChange();
+};
+
+export const showEditorDialog = function (spread, dispatch, ctx) {
     const sheet = spread.getActiveSheet();
     const row = sheet.getActiveRowIndex();
     const col = sheet.getActiveColumnIndex();
-    const plugin = getCellTagPlugin(sheet,row,col,"cellImage");
+    const plugin = getCellTagPlugin(sheet, row, col, 'cellImage');
     const config = plugin?.config;
-    show(dispatch,{
-        onConfirm:function(config){
-            let {url,...others} = config;
-            url = `"./image.png"`;
-            const datas = {url,...others};
-            const formula = toFormula(datas);
-            withBatchCalcUpdate(spread,(sheet)=>{
-                applyToSelectedCell(sheet,(sheet,row,col)=>{
-                    setCellTagPlugin(sheet,row,col,{
-                        type: "cellImage",
-                        config:others,
-                    });
-                    sheet.setFormula(row,col,formula);
-                });
-            });
-            ctx.handleSelectionChange();
+    show(dispatch, {
+        onConfirm: function (config) {
+            exeCommand(spread, Commands.CellType.Image, config);
         },
         config,
-        setting:{
+        setting: {
             url: false,
-        }
+        },
     });
-}
+};
 
-export const show = function(dispatch,options){
-    const {onConfirm,onCancel,config,setting} = options;
-    const callbackId = addCallback(onConfirm,onCancel);
-    if(config){
+export const show = function (dispatch, options) {
+    const { onConfirm, onCancel, config, setting } = options;
+    const callbackId = addCallback(onConfirm, onCancel);
+    if (config) {
         const defConfig = getDefaultConfig();
-        Object.assign(defConfig,config);
+        Object.assign(defConfig, config);
         dispatch(setConfig(defConfig));
     }
-    if(setting){
+    if (setting) {
         dispatch(setSetting(setting));
     }
     dispatch(setCallbackId(callbackId));
     dispatch(setVisible(true));
-}
+};
 
-export const handleConfirm = function(callbackId,config){
-    onConfirm(callbackId,config);
-}
+export const handleConfirm = function (callbackId, config) {
+    onConfirm(callbackId, config);
+};
 
-export const handleCancel = function(callbackId){
+export const handleCancel = function (callbackId) {
     onCancel(callbackId);
-}
+};

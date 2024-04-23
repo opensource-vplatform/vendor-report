@@ -1,33 +1,40 @@
 import { Fragment } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import Menu from '@components/menu/Index';
 import EmptyIcon from '@icons/base/Empty';
 import ClearRulesIcon from '@icons/style/ClearRules';
 import ColorScalesListIcon from '@icons/style/ColorScalesList';
-import ConditionFormatManageRuleIcon from '@icons/style/ConditionFormatManageRule';
+import ConditionFormatManageRuleIcon
+  from '@icons/style/ConditionFormatManageRule';
 import ConditionFormatNewRuleIcon from '@icons/style/ConditionFormatNewRule';
 import DataBarIcon from '@icons/style/DataBar';
 import HighlightCellsRulesIcon from '@icons/style/HighlightCellsRules';
 import IconSetListIcon from '@icons/style/IconSetList';
 import TopBottomRulesIcon from '@icons/style/TopBottomRules';
+import { reset } from '@store/cellSettingSlice';
 import {
-    setDateCompareVisible,
-    setDuplicateCompareVisible,
-    setNumberApplyVisible,
-    setNumberCompareVisible,
-    setRuleManagerVisible,
-    setShowEditor,
-    setTextBetweenVisible,
-    setTextCompareVisible,
+  setDateCompareVisible,
+  setDuplicateCompareVisible,
+  setNumberApplyVisible,
+  setNumberCompareVisible,
+  setRuleManagerVisible,
+  setShowEditor,
+  setTextBetweenVisible,
+  setTextCompareVisible,
 } from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
-import { clearSelectedRules, clearSheetRules } from '@utils/formatterUtil';
-import { isArray, isFunction } from '@utils/objectUtil';
+import {
+  isArray,
+  isFunction,
+} from '@utils/objectUtil';
+import { exeCommand } from '@utils/spreadUtil';
 
-import { reset } from '../../store/cellSettingSlice';
-import { withBatchUpdate } from '../../utils/spreadUtil';
+import { Commands } from '../../command';
 import ConditionRuleManager from './ConditionRuleManager';
 import DateCompareDialog from './DateCompareDialog';
 import { dispatcher } from './dispatcher';
@@ -38,13 +45,13 @@ import NumberCompareDialog from './NumberCompareDialog';
 import TextBetweenDialog from './TextBetweenDialog';
 import TextCompareDialog from './TextCompareDialog';
 import {
-    getColorScalesMenu,
-    getDataBarMenu,
-    getHighlightCellsRulesMenu,
-    getIconSetMenu,
-    getTopBottomRulesMenu,
-    toConditionMenuType,
-    toNormalMenu,
+  getColorScalesMenu,
+  getDataBarMenu,
+  getHighlightCellsRulesMenu,
+  getIconSetMenu,
+  getTopBottomRulesMenu,
+  toConditionMenuType,
+  toNormalMenu,
 } from './Utils';
 
 const withHandler = function (menus) {
@@ -136,7 +143,9 @@ const Condition_Menu_Datas = [
             '清除所选单元格的规则',
             null,
             (spread, dispatcher) => {
-                clearSelectedRules(spread);
+                exeCommand(spread, Commands.ConditionStyle.Clear, {
+                    type: 'selection',
+                });
             }
         ),
         toNormalMenu(
@@ -144,7 +153,9 @@ const Condition_Menu_Datas = [
             '清除整个工作表的规则',
             null,
             (spread, dispatcher) => {
-                clearSheetRules(spread);
+                exeCommand(spread, Commands.ConditionStyle.Clear, {
+                    type: 'sheet',
+                });
             }
         ),
     ]),
@@ -209,11 +220,7 @@ export default function (props) {
     };
 
     const applyRule = (rule) => {
-        withBatchUpdate(spread, (sheet) => {
-            const selections = sheet.getSelections();
-            rule.bind(sheet);
-            rule.applySelections(selections);
-        });
+        exeCommand(spread, Commands.ConditionStyle.Apply, { rule });
     };
 
     const applyTextCompareSetting = (rule) => {

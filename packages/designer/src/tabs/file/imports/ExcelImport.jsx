@@ -11,7 +11,7 @@ import resourceManager from 'resource-manager-js';
 
 import { CheckBox } from '@components/form/Index';
 import { error } from '@utils/consoleUtil';
-import { getBaseUrl } from '@utils/environmentUtil';
+import { toExcelPluginUrl } from '@utils/environmentUtil';
 import {
   showErrorMessage,
   showLoadingMessage,
@@ -63,7 +63,7 @@ function ExcelImport(props) {
                 reader.onload = () => {
                     try {
                         resourceManager
-                            .loadScript([getBaseUrl()+'/vendor/plugins/excelio.min.js'])
+                            .loadScript([toExcelPluginUrl('excelio.min.js')])
                             .then(() => {
                                 const GC = getNamespace();
                                 const excelIo = new GC.Spread.Excel.IO();

@@ -1794,6 +1794,7 @@ export default function (props) {
                                 const sheets = spread.sheets;
                                 if (sheets && sheets.length > 0) {
                                     sheets.forEach((sheet) => {
+                                        sheet.options.sheetAreaOffset ={ left:1,top:1}
                                         sheet.recalcAll(true);
                                     });
                                 }
@@ -1817,6 +1818,7 @@ export default function (props) {
                                 } = sheet.props;
                                 const workSheet =
                                     new GC.Spread.Sheets.Worksheet(name);
+                                workSheet.options.sheetAreaOffset ={ left:1,top:1}
                                 workSheet.setRowCount(rowCount);
                                 workSheet.setColumnCount(colCount);
                                 spread.addSheet(index, workSheet);
@@ -1932,7 +1934,6 @@ export default function (props) {
         onSheetNameChanged,
         onSheetNameChanging,
     ]);
-
     return (
         <Wrap>
             {data.showError ? (

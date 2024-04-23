@@ -1,8 +1,8 @@
 import { isNullOrUndef } from './objectUtil';
 import {
-    applyToSelectedCell,
-    getNamespace,
-    withBatchUpdate,
+  applyToSelectedCell,
+  getNamespace,
+  withBatchUpdate,
 } from './spreadUtil';
 
 /**
@@ -254,23 +254,19 @@ export const setFormatterStyle = function (spread, type) {
     });
 };
 
-export const clearSelectedRules = function (spread) {
-    withBatchUpdate(spread, (sheet) => {
-        const selections = sheet.getSelections();
-        for (let i = 0; i < selections.length; i++) {
-            const { row, col, rowCount, colCount } = selections[i];
-            sheet.conditionalFormats.removeRuleByRange(
-                row,
-                col,
-                rowCount,
-                colCount
-            );
-        }
-    });
+export const clearSelectedRules = function (sheet) {
+    const selections = sheet.getSelections();
+    for (let i = 0; i < selections.length; i++) {
+        const { row, col, rowCount, colCount } = selections[i];
+        sheet.conditionalFormats.removeRuleByRange(
+            row,
+            col,
+            rowCount,
+            colCount
+        );
+    }
 };
 
-export const clearSheetRules = function (spread) {
-    withBatchUpdate(spread, (sheet) => {
-        sheet.conditionalFormats.clearRule();
-    });
+export const clearSheetRules = function (sheet) {
+    sheet.conditionalFormats.clearRule();
 };

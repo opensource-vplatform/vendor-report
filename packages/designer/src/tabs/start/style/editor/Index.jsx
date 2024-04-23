@@ -15,13 +15,11 @@ import ClearCellTypeIcon from '@icons/style/ClearCellType';
 import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
 
+import { Commands } from '../../../../command';
 import context from '../../../../DesignerContext';
 import ImageIcon from '../../../../icons/shape/Image';
 import { showEditorDialog } from '../../../../utils/sparklineUtil';
-import {
-  applyToSelectedCell,
-  withBatchCalcUpdate,
-} from '../../../../utils/spreadUtil';
+import { exeCommand } from '../../../../utils/spreadUtil';
 import {
   getCellTagPlugin,
   setCellTagPlugin,
@@ -296,14 +294,9 @@ export default function () {
         }
     };
     const handleConfirm = (config, text) => {
-        withBatchCalcUpdate(spread, (sheet) => {
-            applyToSelectedCell(sheet, (sheet, row, col) => {
-                setCellTagPlugin(sheet, row, col, {
-                    type: 'cellSubTotal',
-                    config,
-                });
-                sheet.setText(row, col, text);
-            });
+        exeCommand(spread, Commands.CellType.SubTotal, {
+            text,
+            config,
         });
         handleCancel();
     };
