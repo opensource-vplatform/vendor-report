@@ -78,8 +78,7 @@ export const directionToStyles = function (direction) {
     return DIRECTION_TO_STYLE_MAP[direction];
 };
 
-export const valueToEnum = function(style){
-    const {textOrientation=0,isVerticalText=false} = style;
+export const valueToEnum = function(textOrientation=0,isVerticalText=false){
     const map = {textOrientation,isVerticalText};
     for(const [key,val] of Object.entries(DIRECTION_TO_STYLE_MAP)){
         let flag = true;

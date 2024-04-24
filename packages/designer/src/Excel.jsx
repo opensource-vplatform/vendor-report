@@ -17,16 +17,10 @@ import {
 } from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
-  setSelectedFontColor,
-} from '@store/cellSettingSlice/fontCellSettingSlice';
-import {
   updateActiveSheetTablePath,
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import {
-  setFontStyles,
-  setIsStrickoutLine,
-} from '@store/fontSlice/fontSlice';
+import { setFontStyles } from '@store/fontSlice/fontSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
@@ -49,7 +43,6 @@ import {
 } from './component/defineDatasource/utils/utils';
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
-import { isLineThrough } from './utils/fontUtil';
 
 export default function () {
     const dispatch = useDispatch();
@@ -76,22 +69,7 @@ export default function () {
         }
     });
     const handleEnterCell = (type, args) => {
-        const sheet = args.sheet;
-        const styles = parseFont(sheet);
-        dispatch(setFontStyles({ styles }));
         context.handleSelectionChange();
-
-        // 解析textDecoration数值，验证是否选中删除线
-        const { textDecoration } = styles;
-        dispatch(
-            setIsStrickoutLine({
-                isStrickoutLine: isLineThrough(textDecoration),
-            })
-        );
-        // 解析时更新选择的selectColor
-        let { foreColor } = styles;
-        if (foreColor === undefined) foreColor = 'black';
-        dispatch(setSelectedFontColor({ selectedFontColor: foreColor }));
         fire({
             event: EVENTS.EnterCell,
             args: [args],
@@ -168,6 +146,18 @@ export default function () {
             args: [data],
         });
     });
+    const handleUndo = useCallback((data)=>{
+        fire({
+            event: EVENTS.Undo,
+            args: [data],
+        });
+    });
+    const handleRedo = useCallback((data)=>{
+        fire({
+            event: EVENTS.Redo,
+            args: [data],
+        });
+    });
     const sheetsConf = context?.conf?.sheets || {};
     //是否显示添加选项卡按钮
     const newTabVisible = sheetsConf.newTabVisible !== false;
@@ -211,6 +201,8 @@ export default function () {
                         })
                     );
                 }}
+                onUndo={handleUndo}
+                onRedo={handleRedo}
             >
                 <Worksheet
                     name={sheetName}

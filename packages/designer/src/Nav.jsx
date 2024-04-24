@@ -17,6 +17,7 @@ import {
   Tabs,
 } from '@components/tabs/Index';
 import {
+  bind,
   EVENTS,
   fire,
 } from '@event/EventManager';
@@ -37,6 +38,7 @@ import SparklinesTab from '@tabs/sparklines/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
+import { fireCellEnter } from '@utils/eventUtil';
 
 import DesignerContext from './DesignerContext';
 import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
@@ -47,7 +49,9 @@ import {
   listenUndo,
 } from './Listener';
 import { setNavStyle } from './store/appSlice/appSlice';
+import { setStyle } from './store/styleSlice';
 import Formula from './tabs/formula/Index';
+import { parseStyle } from './utils/styleUtil';
 
 const FileTabTitle = styled.a`
     padding: 6px 12px 6px 12px;
@@ -222,12 +226,44 @@ export default function () {
             const unListenUndo = listenUndo(() => {
                 const undoManager = spread.undoManager();
                 undoManager.undo();
+                fireCellEnter(spread);
             });
             const unListenRedo = listenRedo(() => {
                 const undoManager = spread.undoManager();
                 undoManager.redo();
+                fireCellEnter(spread);
+            });
+            const unParseStyle = bind({
+                event:EVENTS.EnterCell,
+                handler:(arg)=>{
+                    const sheet = arg.sheet;
+                    const style = parseStyle(sheet);
+                    dispatch(setStyle(style));
+                }
+            });
+            const unInitHandler = bind({
+                event: EVENTS.Inited,
+                handler: (spread)=>{
+                    fireCellEnter(spread);
+                }
+            });
+            const undoHandler = bind({
+                event: EVENTS.Undo,
+                handler:()=>{
+                    fireCellEnter(spread);
+                }
+            });
+            const redoHandler =  bind({
+                event: EVENTS.Redo,
+                handler:()=>{
+                    fireCellEnter(spread);
+                }
             });
             return () => {
+                redoHandler();
+                undoHandler();
+                unInitHandler();
+                unParseStyle();
                 unListenSave();
                 unListenUndo();
                 unListenRedo();

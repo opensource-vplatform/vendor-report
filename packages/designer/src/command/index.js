@@ -5,6 +5,8 @@ import ClearConditionStyleCommand from './impls/conditionStyle/clear';
 import ResetConditionStyleCommand from './impls/conditionStyle/reset';
 import DeleteCellCommand from './impls/delete/cell';
 import DeleteSheetCommand from './impls/delete/sheet';
+import DecimalFormatCommand from './impls/format/decimal';
+import FormatterFormatCommand from './impls/format/formatter';
 import InsertCellCommand from './impls/insert/cell';
 import InsertSheetCommand from './impls/insert/sheet';
 import AutoColWidthSettingCommand from './impls/setting/autoColWidth';
@@ -13,6 +15,9 @@ import ColWidthSettingCommand from './impls/setting/colWidth';
 import DefaultColWidthSettingCommand from './impls/setting/defaultColWidth';
 import DefaultRowHeightSettingCommand from './impls/setting/defaultRowHeight';
 import RowHeightSettingCommand from './impls/setting/rowHeight';
+import BorderStyleCommand from './impls/style/border';
+import MergeStyleCommand from './impls/style/merge';
+import StyleStyleCommand from './impls/style/style';
 import HideColVisibleCommand from './impls/visible/hideCol';
 import HideRowVisibleCommand from './impls/visible/hideRow';
 import ShowColVisibleCommand from './impls/visible/showCol';
@@ -124,6 +129,36 @@ export const Commands = {
          * 取消隐藏行
          */
         ShowRow:ShowRowVisibleCommand.Command,
+    },
+    /**
+     * 格式
+     */
+    Format:{
+        /**
+         * 小数位数
+         */
+        Demimal:DecimalFormatCommand.Command,
+        /**
+         * 格式化
+         */
+        Formatter:FormatterFormatCommand.Command,
+    },
+    /**
+     * 样式
+     */
+    Style: {
+        /**
+         * 合并
+         */
+        Merge:MergeStyleCommand.Command,
+        /**
+         * 样式
+         */
+        Style:StyleStyleCommand.Command,
+        /**
+         * 边框
+         */
+        Border:BorderStyleCommand.Command,
     }
 };
 
@@ -148,4 +183,9 @@ export const registerCommand = function (spread) {
     HideRowVisibleCommand.register(commandManager);
     ShowColVisibleCommand.register(commandManager);
     ShowRowVisibleCommand.register(commandManager);
+    DecimalFormatCommand.register(commandManager);
+    FormatterFormatCommand.register(commandManager);
+    MergeStyleCommand.register(commandManager);
+    StyleStyleCommand.register(commandManager);
+    BorderStyleCommand.register(commandManager);
 };

@@ -1673,6 +1673,8 @@ export default function (props) {
         onSheetNameChanged,
         onSheetNameChanging,
         onActiveSheetChanging,
+        onUndo,
+        onRedo,
         license,
         enablePrint = false,
         json: _json = null,
@@ -1864,6 +1866,8 @@ export default function (props) {
                             'EditorStatusChanged',
                             onEditorStatusChanged
                         );
+                        bindEvent(spread,'WorkbookUndo',onUndo);
+                        bindEvent(spread,'WorkbookRedo',onRedo);
                     }
                     dataSource &&
                         bindDataSource({

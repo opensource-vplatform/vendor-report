@@ -10,7 +10,6 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import CellStyleSetting from '@components/cellStyles/cellStyleSetting';
 import { Setting as CellStylesSetting } from '@components/cellStyles/Index';
 import { DraggableDatasources } from '@components/defineDatasource/Index';
 import Error from '@components/error/Index';
@@ -196,7 +195,6 @@ function Designer(props) {
                                 </SplitPane>
                             </SpreadWrap>
                         </SplitPane>
-                        <CellStyleSetting></CellStyleSetting>
                     </Wrap>
                 </Box>
                 {mode == 'preview' ? (

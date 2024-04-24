@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import {
   useDispatch,
   useSelector,
@@ -33,25 +31,20 @@ import {
   setIsOpenCellSetting,
   setTabValueCellSetting,
 } from '@store/borderSlice/borderSlice';
+import { fireCellEnter } from '@utils/eventUtil';
 import {
-  setBackColor,
-  setFontFamily,
-  setFontSize,
-  setFontStyle,
-  setFontWeight,
-  setForeColor,
-  setTextDecoration,
-} from '@store/fontSlice/fontSlice.js';
-import {
-  decreasedFontSize,
-  increasedFontSize,
   isDoubleUnderline,
   isUnderline,
-  setBorderByType,
-  setFont,
   toDoubleUnderline,
   toUnderline,
 } from '@utils/fontUtil.js';
+import { exeCommand } from '@utils/spreadUtil';
+import {
+  decreasedFontSize,
+  increasedFontSize,
+} from '@utils/styleUtil';
+
+import { Commands } from '../../../command';
 
 const FontItem = styled.span`
     font-family: ${(props) => props.fontFamily};
@@ -72,7 +65,6 @@ const toFontFamilyDatas = function () {
 export default function () {
     const dispatch = useDispatch();
     const {
-        spread,
         fontFamily,
         fontWeight,
         fontStyle,
@@ -80,66 +72,67 @@ export default function () {
         textDecoration,
         backColor,
         foreColor,
-    } = useSelector(({ fontSlice }) => fontSlice);
+    } = useSelector(({ styleSlice }) => styleSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const exeStyleCommand = (style) => {
+        exeCommand(spread, Commands.Style.Style, style);
+    };
+
+    const handleStyle = (style) => {
+        exeStyleCommand(style);
+        fireCellEnter(spread);
+    };
 
     //设置字体
     const handleFontFamily = function (value) {
-        dispatch(setFontFamily({ fontFamily: value }));
+        handleStyle({ fontFamily: value });
     };
 
     //设置字体大小
     const handleFontSize = function (value) {
-        dispatch(setFontSize({ fontSize: value }));
+        handleStyle({ fontSize: value });
     };
 
     //增大字体大小
     const handleIncreaseFontSize = function () {
         const value = increasedFontSize(fontSize);
-        value && dispatch(setFontSize({ fontSize: value }));
+        value && handleFontSize(value);
     };
 
     //减小字体大小
     const handleDecreaseFontSize = function () {
         const value = decreasedFontSize(fontSize);
-        value && dispatch(setFontSize({ fontSize: value }));
+        value && handleFontSize(value);
     };
 
     //是否粗体
     const handleFontWeight = function () {
-        dispatch(
-            setFontWeight({
-                fontWeight: fontWeight === 'normal' ? 'bold' : 'normal',
-            })
-        );
+        handleStyle({
+            fontWeight: fontWeight === 'normal' ? 'bold' : 'normal',
+        });
     };
 
     //是否倾斜
     const handleFontItalic = function () {
-        dispatch(
-            setFontStyle({
-                fontStyle: fontStyle === 'normal' ? 'italic' : 'normal',
-            })
-        );
+        handleStyle({
+            fontStyle: fontStyle === 'normal' ? 'italic' : 'normal',
+        });
     };
 
     //是否设置下划线
     const handleUnderline = function () {
-        dispatch(
-            setTextDecoration({
-                textDecoration: isUnderline(textDecoration) ? 0 : toUnderline(),
-            })
-        );
+        handleStyle({
+            textDecoration: isUnderline(textDecoration) ? 0 : toUnderline(),
+        });
     };
 
     //是否设置双下划线
     const handleDoubleUnderline = function () {
-        dispatch(
-            setTextDecoration({
-                textDecoration: isDoubleUnderline(textDecoration)
-                    ? 0
-                    : toDoubleUnderline(),
-            })
-        );
+        handleStyle({
+            textDecoration: isDoubleUnderline(textDecoration)
+                ? 0
+                : toDoubleUnderline(),
+        });
     };
 
     const handleBorder = function (type) {
@@ -148,39 +141,19 @@ export default function () {
             dispatch(setIsOpenCellSetting(true));
             return;
         }
-        setBorderByType(spread, type);
+        exeCommand(spread,Commands.Style.Border,{type});
     };
 
     const handleBackColor = function (color) {
-        dispatch(setBackColor({ backColor: color }));
+        handleStyle({ backColor: color });
     };
 
     const handleForeColor = function (color) {
-        dispatch(setForeColor({ foreColor: color }));
+        handleStyle({ foreColor: color });
     };
     const fontFamilies = toFontFamilyDatas();
     const fontSizes = getFontSizes();
     const borders = getBorderEnums();
-    useEffect(() => {
-        setFont({
-            spread,
-            fontFamily,
-            fontWeight,
-            fontStyle,
-            fontSize,
-            textDecoration,
-            backColor,
-            foreColor,
-        });
-    }, [
-        fontFamily,
-        fontWeight,
-        fontStyle,
-        fontSize,
-        textDecoration,
-        backColor,
-        foreColor,
-    ]);
     return (
         <GroupItem
             title='字体'

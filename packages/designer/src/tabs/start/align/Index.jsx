@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import {
   useDispatch,
   useSelector,
@@ -36,20 +34,10 @@ import {
   setIsOpenCellSetting,
   setTabValueCellSetting,
 } from '@store/borderSlice/borderSlice';
-import {
-  setHAlign,
-  setTextOrientation,
-  setVAlign,
-  setWordWrap,
-} from '@store/fontSlice/fontSlice.js';
-import {
-  mergeAcross,
-  mergeCells,
-  mergeCenter,
-  setAlign,
-  setIndent,
-  unMergeCell,
-} from '@utils/fontUtil.js';
+import { fireCellEnter } from '@utils/eventUtil';
+import { exeCommand } from '@utils/spreadUtil';
+
+import { Commands } from '../../../command';
 
 const Label = styled.span`
     font-size: 12px;
@@ -57,76 +45,74 @@ const Label = styled.span`
 
 export default function FontAlign() {
     const dispatch = useDispatch();
-    const fontStyle = useSelector(({ fontSlice }) => fontSlice);
-    const {
-        spread,
-        vAlign,
-        hAlign,
-        wordWrap,
-        textOrientation,
-        isVerticalText,
-    } = fontStyle;
+    const { vAlign, hAlign, wordWrap, textOrientation, isVerticalText } =
+        useSelector(({ styleSlice }) => styleSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+
+    const exeStyleCommand = (style)=>{
+        exeCommand(spread, Commands.Style.Style, style);
+    }
 
     //顶端对齐
     const handleVTopAlign = function () {
-        dispatch(setVAlign({ vAlign: 0 }));
+        exeStyleCommand({ vAlign: 0 });
+        fireCellEnter(spread);
     };
 
     //垂直居中
     const handleVCenterAlign = function () {
-        dispatch(setVAlign({ vAlign: 1 }));
+        exeStyleCommand({ vAlign: 1 });
+        fireCellEnter(spread);
     };
 
     //底端对齐
     const handleVBottomAlign = function () {
-        dispatch(setVAlign({ vAlign: 2 }));
+        exeStyleCommand({ vAlign: 2 });
+        fireCellEnter(spread);
     };
 
     //文本左对齐
     const handleHLeftAlign = function () {
-        dispatch(setHAlign({ hAlign: 0 }));
+        exeStyleCommand({ hAlign: 0 });
+        fireCellEnter(spread);
     };
 
     //居中
     const handleHCenterAlign = function () {
-        dispatch(setHAlign({ hAlign: 1 }));
+        exeStyleCommand({ hAlign: 1 });
+        fireCellEnter(spread);
     };
 
     //文本右对齐
     const handleHRightAlign = function () {
-        dispatch(setHAlign({ hAlign: 2 }));
+        exeStyleCommand({ hAlign: 2 });
+        fireCellEnter(spread);
     };
 
     //增加缩进量
     const handleIncreaseIndent = function () {
-        setIndent(spread, 1);
+        exeStyleCommand({textIndentDelta:1});
     };
 
     //减少缩进量
     const handleDecreaseIndent = function () {
-        setIndent(spread, -1);
+        exeStyleCommand({textIndentDelta:-1});
     };
 
     //自动换行
     const handleWordWrap = function () {
-        dispatch(setWordWrap({ wordWrap: !wordWrap }));
+        exeStyleCommand({ wordWrap: !wordWrap });
+        fireCellEnter(spread); 
     };
 
     const handleMerge = function (type) {
-        if (type == 'mergeCenter') {
-            mergeCenter(spread);
-        } else if (type == 'mergeAcross') {
-            mergeAcross(spread);
-        } else if (type == 'mergeCells') {
-            mergeCells(spread);
-        } else {
-            unMergeCell(spread);
-        }
+        exeCommand(spread, Commands.Style.Merge, { type });
+        fireCellEnter(spread);
     };
 
     //合并居中
     const handleMergeCenter = () => {
-        mergeCenter(spread);
+        handleMerge('mergeCenter');
     };
     //设置文字方向
     const handleTextOrientation = (value) => {
@@ -135,22 +121,14 @@ export default function FontAlign() {
             dispatch(setIsOpenCellSetting(true));
             return;
         }
-        const styles = directionToStyles(value);
-        styles && dispatch(setTextOrientation(styles));
+        const style = directionToStyles(value);
+        if(style){
+            exeStyleCommand(style);
+            fireCellEnter(spread);
+        }
     };
     const wordDirections = getWordDirections();
     const mergeTypes = getMergeTypes();
-    useEffect(() => {
-        //store数据更新到spread中
-        setAlign({
-            spread,
-            vAlign,
-            hAlign,
-            textOrientation,
-            isVerticalText,
-            wordWrap,
-        });
-    }, [vAlign, hAlign, textOrientation, isVerticalText, wordWrap]);
     return (
         <GroupItem
             title='对齐方式'
@@ -180,7 +158,7 @@ export default function FontAlign() {
                         <LineSepatator></LineSepatator>
                         <Menu
                             datas={wordDirections}
-                            value={valueToEnum(fontStyle)}
+                            value={valueToEnum(textOrientation,isVerticalText)}
                             lineIndexs={[4]}
                             cancelAble={true}
                             cancelValue='none'
@@ -233,10 +211,7 @@ export default function FontAlign() {
                         >
                             <Label>合并后居中</Label>
                         </MergeCenter>
-                        <Menu
-                            datas={mergeTypes}
-                            onNodeClick={handleMerge}
-                        >
+                        <Menu datas={mergeTypes} onNodeClick={handleMerge}>
                             <ArrowDown tips='合并后居中'></ArrowDown>
                         </Menu>
                     </ItemList>

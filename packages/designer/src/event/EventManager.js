@@ -21,6 +21,14 @@ export const EVENTS = {
     EditorStatusChanged: "EditorStatusChanged",
 
     EnterCell: "EnterCell",
+    /**
+     * 撤销
+     */
+    Undo: "Undo",
+    /**
+     * 重做
+     */
+    Redo: "Redo",
 
     /**
      * 初始化后事件

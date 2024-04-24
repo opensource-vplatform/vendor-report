@@ -8,6 +8,7 @@ import {
   useSelector,
 } from 'react-redux';
 
+import { Commands } from '@commands/index';
 import { Select } from '@components/form/Index';
 import {
   GroupItem,
@@ -31,16 +32,13 @@ import ShortDateFormatIcon from '@icons/number/ShortDateFormat';
 import TextFormatIcon from '@icons/number/TextFormat';
 import TimeFormatIcon from '@icons/number/TimeFormat';
 import { setIsOpenCellSetting } from '@store/borderSlice/borderSlice';
+import { genUUID } from '@utils/commonUtil';
+import { exeCommand } from '@utils/spreadUtil';
 
 import {
   bind,
   EVENTS,
 } from '../../../event/EventManager';
-import { genUUID } from '../../../utils/commonUtil';
-import {
-  setFormatter,
-  setFormatterStyle,
-} from '../../../utils/formatterUtil';
 
 const GENERAL_FORMATTER = 'formatGeneral';
 
@@ -121,6 +119,10 @@ const getDatas = function () {
     ];
 };
 
+const setFormatter = function(spread,formatter){
+    exeCommand(spread,Commands.Format.Formatter,{formatter});
+}
+
 export default function () {
     const dispatch = useDispatch();
     const { spread } = useSelector(({ appSlice }) => appSlice);
@@ -159,10 +161,10 @@ export default function () {
         setFormat(val);
     };
     const handleIncreaseDecimal = () => {
-        setFormatterStyle(spread,"increase");
+        exeCommand(spread, Commands.Format.Demimal, { operator: 'increase' });
     };
     const handleDecreaseDecimal = () => {
-        setFormatterStyle(spread,"decrease");
+        exeCommand(spread, Commands.Format.Demimal, { operator: 'decrease' });
     };
     return (
         <GroupItem

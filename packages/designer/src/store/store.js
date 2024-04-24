@@ -14,6 +14,7 @@ import rangeSlice from './rangeSlice';
 import workbookSettingSlice from './settingSlice/workbookSettingSlice';
 import worksheetSettingSlice from './settingSlice/worksheetSettingSlice';
 import sparklineSlice from './sparklineSlice';
+import styleSlice from './styleSlice';
 import tableDesignSlice from './tableDesignSlice/tableDesignSlice';
 import viewSlice from './viewSlice/viewSlice';
 import wizardSlice from './wizardSlice';
@@ -63,6 +64,7 @@ export default configureStore({
         rangeSlice,
         cellSettingSlice,
         sparklineSlice,
+        styleSlice,
     },
     middleware: function (getDefaultMiddleware) {
         return getDefaultMiddleware({ serializableCheck });
