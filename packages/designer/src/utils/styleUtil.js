@@ -1,6 +1,12 @@
+import { Commands } from '@commands/index';
 import { getFontSizeValues } from '@metadatas/font';
 import { getDefault } from '@metadatas/style';
 
+import {
+  cellSettingToStyle,
+  show,
+} from './cellSettingUtil';
+import { fireCellEnter } from './eventUtil';
 import {
   isFunction,
   isString,
@@ -8,6 +14,7 @@ import {
 } from './objectUtil';
 import {
   applyStyleToSelectedCell,
+  exeCommand,
   getNamespace,
 } from './spreadUtil';
 
@@ -42,7 +49,7 @@ const toFontStr = function (params) {
         lineHeight = '',
     } = params;
     fontFamily = dealFontFamily(fontFamily);
-    fontSize = isString(fontSize) ? fontSize: `${fontSize}pt`;
+    fontSize = isString(fontSize) ? fontSize : `${fontSize}pt`;
     const fontStr = [
         fontStyle,
         fontVariant,
@@ -162,7 +169,7 @@ const attrDispatcher = {
         if (newIndent < 0) {
             newIndent = 0;
         }
-        return { attr: 'textIndent', value: newIndent };
+        return { textIndent: newIndent };
     },
     fontFamily: function (style, fontSize, newStyle) {
         return handleFont(style, newStyle);
@@ -282,3 +289,27 @@ export function decreasedFontSize(currentSize) {
         }
     }
 }
+
+export const exeStyleCommand = (spread, style) => {
+    exeCommand(spread, Commands.Style.Style, style);
+};
+
+export const handleStyle = (spread, style) => {
+    exeStyleCommand(spread,style);
+    fireCellEnter(spread);
+};
+
+export const genCellSettingVisibleHandler = function (
+    spread,
+    dispatch,
+    active
+) {
+    return () =>
+        show(dispatch, {
+            onConfirm: (cellSetting) => {
+                const style = cellSettingToStyle(cellSetting);
+                handleStyle(spread, style);
+            },
+            active,
+        });
+};

@@ -5,6 +5,7 @@ import {
 
 import { useSelector } from 'react-redux';
 
+import { Commands } from '@commands/index';
 import InsertIcon from '@icons/cell/Insert';
 import InsertRowIcon from '@icons/cell/InsertRow';
 import InsertSheet from '@icons/cell/InsertSheet';
@@ -16,9 +17,8 @@ import {
 } from '@utils/cellUtil';
 import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
+import { exeCommand } from '@utils/spreadUtil';
 
-import { Commands } from '../../../../command';
-import { exeCommand } from '../../../../utils/spreadUtil';
 import Dialog from './Dialog';
 
 const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [

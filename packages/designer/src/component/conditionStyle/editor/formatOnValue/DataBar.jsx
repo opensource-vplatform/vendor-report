@@ -202,7 +202,7 @@ export default function (props) {
                         value={
                             editorConfig.gradient ? 'gradientFill' : 'solidFill'
                         }
-                        style={selectStyle}
+                        style={{...selectStyle,width:80}}
                         datas={Fill_Options}
                         onChange={(val) =>
                             dispatcher(

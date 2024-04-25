@@ -20,7 +20,6 @@ import {
   updateActiveSheetTablePath,
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
-import { setFontStyles } from '@store/fontSlice/fontSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
@@ -35,7 +34,7 @@ import {
   findTreeNodeById,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil';
-import { parseFont } from '@utils/fontUtil';
+import { fireCellEnter } from '@utils/eventUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
 import {
@@ -78,11 +77,9 @@ export default function () {
     const handleActiveSheetChanged = useCallback(
         (type, args) => {
             const sheet = args.newSheet;
-            const styles = parseFont(sheet);
             const tablePaths = getActiveSheetTablesPath({ sheet });
             const sheetName = sheet.name();
             dispatch(updateActiveSheetTablePath({ tablePaths }));
-            dispatch(setFontStyles({ styles }));
             dispatch(resetView());
             dispatch(hideTab({ code: 'table' }));
             dispatch(
@@ -95,6 +92,7 @@ export default function () {
                 event: EVENTS.ActiveSheetChanged,
                 args: [args],
             });
+            fireCellEnter(sheet.getParent());
         },
         [template]
     );
@@ -114,7 +112,7 @@ export default function () {
             args: [spread],
         });
         registerCommand(spread);
-        enhanceContextMenu(spread);
+        enhanceContextMenu(spread,dispatch);
     });
     const handleSelectionChanged = useCallback((type, data) => {
         fire({

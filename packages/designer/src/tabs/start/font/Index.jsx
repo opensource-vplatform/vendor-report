@@ -4,6 +4,7 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
+import { Commands } from '@commands/index';
 import ColorEditor from '@components/color/Index';
 import { Select } from '@components/form/Index';
 import {
@@ -28,23 +29,18 @@ import {
   getFontSizes,
 } from '@metadatas/font';
 import {
-  setIsOpenCellSetting,
-  setTabValueCellSetting,
-} from '@store/borderSlice/borderSlice';
-import { fireCellEnter } from '@utils/eventUtil';
-import {
   isDoubleUnderline,
   isUnderline,
   toDoubleUnderline,
   toUnderline,
-} from '@utils/fontUtil.js';
+} from '@utils/fontUtil';
 import { exeCommand } from '@utils/spreadUtil';
 import {
   decreasedFontSize,
+  genCellSettingVisibleHandler,
+  handleStyle,
   increasedFontSize,
 } from '@utils/styleUtil';
-
-import { Commands } from '../../../command';
 
 const FontItem = styled.span`
     font-family: ${(props) => props.fontFamily};
@@ -53,11 +49,15 @@ const FontItem = styled.span`
 
 const toFontFamilyDatas = function () {
     const fontFamilies = getFontFamilies();
-    return fontFamilies.map(({ value, text, title }) => {
+    return fontFamilies.map(({ value, text, title, fontSize = 12 }) => {
         return {
             value,
             title,
-            text: <FontItem fontFamily={value}>{text}</FontItem>,
+            text: (
+                <FontItem fontFamily={value} style={{ fontSize }}>
+                    {text}
+                </FontItem>
+            ),
         };
     });
 };
@@ -74,23 +74,15 @@ export default function () {
         foreColor,
     } = useSelector(({ styleSlice }) => styleSlice);
     const { spread } = useSelector(({ appSlice }) => appSlice);
-    const exeStyleCommand = (style) => {
-        exeCommand(spread, Commands.Style.Style, style);
-    };
-
-    const handleStyle = (style) => {
-        exeStyleCommand(style);
-        fireCellEnter(spread);
-    };
 
     //设置字体
     const handleFontFamily = function (value) {
-        handleStyle({ fontFamily: value });
+        handleStyle(spread, { fontFamily: value });
     };
 
     //设置字体大小
     const handleFontSize = function (value) {
-        handleStyle({ fontSize: value });
+        handleStyle(spread, { fontSize: value });
     };
 
     //增大字体大小
@@ -107,28 +99,28 @@ export default function () {
 
     //是否粗体
     const handleFontWeight = function () {
-        handleStyle({
+        handleStyle(spread, {
             fontWeight: fontWeight === 'normal' ? 'bold' : 'normal',
         });
     };
 
     //是否倾斜
     const handleFontItalic = function () {
-        handleStyle({
+        handleStyle(spread, {
             fontStyle: fontStyle === 'normal' ? 'italic' : 'normal',
         });
     };
 
     //是否设置下划线
     const handleUnderline = function () {
-        handleStyle({
+        handleStyle(spread, {
             textDecoration: isUnderline(textDecoration) ? 0 : toUnderline(),
         });
     };
 
     //是否设置双下划线
     const handleDoubleUnderline = function () {
-        handleStyle({
+        handleStyle(spread, {
             textDecoration: isDoubleUnderline(textDecoration)
                 ? 0
                 : toDoubleUnderline(),
@@ -137,19 +129,18 @@ export default function () {
 
     const handleBorder = function (type) {
         if (type === 'moreBorders') {
-            dispatch(setTabValueCellSetting('边框'));
-            dispatch(setIsOpenCellSetting(true));
+            genCellSettingVisibleHandler(spread, dispatch, 'border')();
             return;
         }
-        exeCommand(spread,Commands.Style.Border,{type});
+        exeCommand(spread, Commands.Style.Border, { type });
     };
 
     const handleBackColor = function (color) {
-        handleStyle({ backColor: color });
+        handleStyle(spread, { backColor: color });
     };
 
     const handleForeColor = function (color) {
-        handleStyle({ foreColor: color });
+        handleStyle(spread, { foreColor: color });
     };
     const fontFamilies = toFontFamilyDatas();
     const fontSizes = getFontSizes();
@@ -157,10 +148,7 @@ export default function () {
     return (
         <GroupItem
             title='字体'
-            onMore={() => {
-                dispatch(setTabValueCellSetting('字体'));
-                dispatch(setIsOpenCellSetting(true));
-            }}
+            onMore={genCellSettingVisibleHandler(spread, dispatch, 'font')}
         >
             <ItemList>
                 <Select
@@ -171,7 +159,7 @@ export default function () {
                 ></Select>
                 <Select
                     datas={fontSizes}
-                    style={{ width: '50px', borderLeft: 'none' }}
+                    style={{ width: '50px' }}
                     optionStyle={{ width: '52px', fontSize: 12 }}
                     value={fontSize}
                     onChange={handleFontSize}

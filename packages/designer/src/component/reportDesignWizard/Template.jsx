@@ -189,7 +189,7 @@ export default function Template(props) {
 
     const { template, isEdit } = useSelector(({ wizardSlice }) => wizardSlice);
 
-    const { spread } = useSelector(({ fontSlice }) => fontSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     const activeSheetName = spread.getActiveSheet().name();
     debugger;
 

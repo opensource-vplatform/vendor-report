@@ -61,7 +61,7 @@ export default function Index(props) {
     //是否允许编辑数据源
     const isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
 
-    let { spread } = useSelector(({ fontSlice }) => fontSlice);
+    let { spread } = useSelector(({ appSlice }) => appSlice);
 
     const { filterButtonVisible } = useSelector(
         ({ tableDesignSlice }) => tableDesignSlice

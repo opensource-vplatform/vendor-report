@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-export const fontSlice = createSlice({
+export const styleSlice = createSlice({
     name: 'styleSlice',
     initialState: {
         fontFamily: null,
@@ -31,5 +31,5 @@ export const fontSlice = createSlice({
         },
     },
 });
-export const { setStyle } = fontSlice.actions;
-export default fontSlice.reducer;
+export const { setStyle } = styleSlice.actions;
+export default styleSlice.reducer;

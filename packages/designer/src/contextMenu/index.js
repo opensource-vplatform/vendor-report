@@ -1,3 +1,7 @@
+import {
+  registerCommand as registerCellSettingCommand,
+  registerContextMenu as registerCellSettingContextMenu,
+} from './impls/cellSetting';
 import { registerContextMenu as registerLinkContextMenu } from './impls/link';
 import {
   registerCommand as registerMergeCommand,
@@ -12,6 +16,7 @@ import { registerContextMenu as registerTableContextMenu } from './impls/table';
  */
 const registerContextMenu = function (menuDatas, spread) {
     registerTableContextMenu(menuDatas, spread);
+    registerCellSettingContextMenu(menuDatas,spread);
     registerLinkContextMenu(menuDatas, spread);
     registerMergeContextMenu(menuDatas, spread);
 };
@@ -20,12 +25,13 @@ const registerContextMenu = function (menuDatas, spread) {
  * 注册命令实现（一般为右键菜单实现）
  * @param {*} spread
  */
-const registerCommand = function (spread) {
-    registerMergeCommand(spread);
+const registerCommand = function (spread,dispatch) {
+    registerMergeCommand(spread,dispatch);
+    registerCellSettingCommand(spread,dispatch);
 };
 
-export const enhance = function (spread) {
+export const enhance = function (spread,dispatch) {
     const menuDatas = spread.contextMenu.menuData;
     registerContextMenu(menuDatas, spread);
-    registerCommand(spread);
+    registerCommand(spread,dispatch);
 };

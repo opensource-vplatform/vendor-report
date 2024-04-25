@@ -8,7 +8,7 @@ import { Button } from '@components/form/Index';
 import { Preview } from '@components/preview/Index';
 import { setEditorConfig } from '@store/conditionStyleSlice';
 import {
-  cellSettingSliceToConditionStyle,
+  cellSettingToStyle,
   jsonStyleToCellSetting,
   show,
 } from '@utils/cellSettingUtil';
@@ -55,7 +55,7 @@ export const FormatButton = function () {
             onClick={() =>
                 show(dispatcher, {
                     onConfirm: (setting) => {
-                        const style = cellSettingSliceToConditionStyle(setting);
+                        const style = cellSettingToStyle(setting);
                         const config = {
                             ...editorConfig,
                             style,

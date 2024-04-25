@@ -5,6 +5,7 @@ const IconWrap = styled.label`
     display: flex;
     cursor: pointer;
     align-items: center;
+    justify-content: center;
     &[data-hoverable='true']:hover {
         background-color: #dadada;
     }
@@ -14,6 +15,10 @@ const IconWrap = styled.label`
     }
     &[data-disabled='true']:hover {
         background-color: transparent;
+    }
+    &[data-type='toone-md'] {
+        min-height: 24px;
+        min-width: 24px;
     }
 `;
 
@@ -25,6 +30,18 @@ const Icon = styled.div`
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 100%;
+    &[data-type='toone'] {
+        padding: 0px;
+        margin: 0px;
+        height: 24px;
+        width: 24px;
+    }
+    &[data-type='toone-md'] {
+        padding: 0px;
+        margin: 0px;
+        height: 18px;
+        width: 18px;
+    }
 `;
 
 function Index(pros) {
@@ -37,6 +54,7 @@ function Index(pros) {
         disabled = false,
         style = {},
         iconStyle = {},
+        type,
         children,
         ...others
     } = pros;
@@ -55,10 +73,11 @@ function Index(pros) {
             title={tips}
             onClick={handleClick}
             style={st}
+            data-type={type}
             data-disabled={disabled}
             data-hoverable={hoverable}
         >
-            <Icon style={icSt}></Icon>
+            <Icon style={icSt} data-type={type}></Icon>
             {children}
         </IconWrap>
     );

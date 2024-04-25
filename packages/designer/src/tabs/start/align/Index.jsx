@@ -30,12 +30,13 @@ import {
   valueToEnum,
 } from '@metadatas/direction';
 import { getMergeTypes } from '@metadatas/merge';
-import {
-  setIsOpenCellSetting,
-  setTabValueCellSetting,
-} from '@store/borderSlice/borderSlice';
 import { fireCellEnter } from '@utils/eventUtil';
 import { exeCommand } from '@utils/spreadUtil';
+import {
+  exeStyleCommand,
+  genCellSettingVisibleHandler,
+  handleStyle,
+} from '@utils/styleUtil';
 
 import { Commands } from '../../../command';
 
@@ -49,60 +50,49 @@ export default function FontAlign() {
         useSelector(({ styleSlice }) => styleSlice);
     const { spread } = useSelector(({ appSlice }) => appSlice);
 
-    const exeStyleCommand = (style)=>{
-        exeCommand(spread, Commands.Style.Style, style);
-    }
-
     //顶端对齐
     const handleVTopAlign = function () {
-        exeStyleCommand({ vAlign: 0 });
-        fireCellEnter(spread);
+        handleStyle(spread, { vAlign: 0 });
     };
 
     //垂直居中
     const handleVCenterAlign = function () {
-        exeStyleCommand({ vAlign: 1 });
-        fireCellEnter(spread);
+        handleStyle(spread, { vAlign: 1 });
     };
 
     //底端对齐
     const handleVBottomAlign = function () {
-        exeStyleCommand({ vAlign: 2 });
-        fireCellEnter(spread);
+        handleStyle(spread, { vAlign: 2 });
     };
 
     //文本左对齐
     const handleHLeftAlign = function () {
-        exeStyleCommand({ hAlign: 0 });
-        fireCellEnter(spread);
+        handleStyle(spread, { hAlign: 0 });
     };
 
     //居中
     const handleHCenterAlign = function () {
-        exeStyleCommand({ hAlign: 1 });
-        fireCellEnter(spread);
+        handleStyle(spread, { hAlign: 1 });
     };
 
     //文本右对齐
     const handleHRightAlign = function () {
-        exeStyleCommand({ hAlign: 2 });
-        fireCellEnter(spread);
+        handleStyle(spread, { hAlign: 2 });
     };
 
     //增加缩进量
     const handleIncreaseIndent = function () {
-        exeStyleCommand({textIndentDelta:1});
+        exeStyleCommand(spread, { textIndentDelta: 1 });
     };
 
     //减少缩进量
     const handleDecreaseIndent = function () {
-        exeStyleCommand({textIndentDelta:-1});
+        exeStyleCommand(spread, { textIndentDelta: -1 });
     };
 
     //自动换行
     const handleWordWrap = function () {
-        exeStyleCommand({ wordWrap: !wordWrap });
-        fireCellEnter(spread); 
+        handleStyle(spread, { wordWrap: !wordWrap });
     };
 
     const handleMerge = function (type) {
@@ -114,17 +104,18 @@ export default function FontAlign() {
     const handleMergeCenter = () => {
         handleMerge('mergeCenter');
     };
+
+    const showCellSetting = genCellSettingVisibleHandler(spread, dispatch, 'align');
+
     //设置文字方向
     const handleTextOrientation = (value) => {
         if (value === 'directionSetting') {
-            dispatch(setTabValueCellSetting('对齐'));
-            dispatch(setIsOpenCellSetting(true));
+            showCellSetting();
             return;
         }
         const style = directionToStyles(value);
-        if(style){
-            exeStyleCommand(style);
-            fireCellEnter(spread);
+        if (style) {
+            handleStyle(spread, style);
         }
     };
     const wordDirections = getWordDirections();
@@ -132,10 +123,7 @@ export default function FontAlign() {
     return (
         <GroupItem
             title='对齐方式'
-            onMore={() => {
-                dispatch(setTabValueCellSetting('对齐'));
-                dispatch(setIsOpenCellSetting(true));
-            }}
+            onMore={showCellSetting}
         >
             <HLayout>
                 <VGroupItem>
@@ -158,7 +146,7 @@ export default function FontAlign() {
                         <LineSepatator></LineSepatator>
                         <Menu
                             datas={wordDirections}
-                            value={valueToEnum(textOrientation,isVerticalText)}
+                            value={valueToEnum(textOrientation, isVerticalText)}
                             lineIndexs={[4]}
                             cancelAble={true}
                             cancelValue='none'

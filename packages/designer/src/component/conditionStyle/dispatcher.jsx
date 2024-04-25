@@ -625,10 +625,24 @@ const dispatcher = {
     },
     highlightCellsMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatContain'));
+        dispatcher(setRuleType('cellValueRule'));
+        dispatcher(setEditorConfig({
+            _type: 'normalConditionRule',
+            operator: 'greaterThan',
+            value1: '',
+        }));
         dispatcher(setShowEditor(true));
     },
     topBottomRulesMoreRules: (spread, dispatcher) => {
         dispatcher(setEditorType('formatRankedValue'));
+        dispatcher(
+            setEditorConfig({
+                _type: 'normalConditionRule',
+                type: 'top',
+                rank: 10,
+            })
+        );
+        dispatcher(setRuleType('top10Rule'));
         dispatcher(setShowEditor(true));
     },
     dataBarMoreRules: (spread, dispatcher) => {

@@ -9,7 +9,8 @@ export const NumberWrap = styled.div`
     min-height: 24px;
     background: white;
     &[data-disabled='false']:hover {
-        border: solid 1px #5292f7;
+        //border: solid 1px #5292f7;
+        border: solid 1px #999999;
     }
 `;
 
@@ -21,7 +22,8 @@ export const NumberInput = styled.input`
     padding-left: 4px;
     padding-top: 2px;
     &:focus-visible {
-        border: solid 1px #5292f7;
+        //border: solid 1px #5292f7;
+        border: solid 1px #999999;
         outline: none;
     }
     &:disabled {

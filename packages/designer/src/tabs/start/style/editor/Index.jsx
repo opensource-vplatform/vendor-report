@@ -9,21 +9,21 @@ import {
   useSelector,
 } from 'react-redux';
 
+import { Commands } from '@commands/index';
 import CalculationIcon from '@icons/formula/Calculation';
+import ImageIcon from '@icons/shape/Image';
 import CellEditorsIcon from '@icons/style/cellEditors';
 import ClearCellTypeIcon from '@icons/style/ClearCellType';
 import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
-
-import { Commands } from '../../../../command';
-import context from '../../../../DesignerContext';
-import ImageIcon from '../../../../icons/shape/Image';
-import { showEditorDialog } from '../../../../utils/sparklineUtil';
-import { exeCommand } from '../../../../utils/spreadUtil';
+import { showEditorDialog } from '@utils/sparklineUtil';
+import { exeCommand } from '@utils/spreadUtil';
 import {
   getCellTagPlugin,
   setCellTagPlugin,
-} from '../../../../utils/worksheetUtil';
+} from '@utils/worksheetUtil';
+
+import context from '../../../../DesignerContext';
 import SubTotalDialog from './SubTotalDialog';
 
 const iconStyles = {

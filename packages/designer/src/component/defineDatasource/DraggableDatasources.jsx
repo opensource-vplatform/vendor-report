@@ -292,7 +292,7 @@ function subContextMenuActions(params) {
 
 //可拖拽树形数据源列表
 export default function Index() {
-    const { spread } = useSelector(({ fontSlice }) => fontSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     const { dsList, showHyperlink } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
@@ -506,11 +506,11 @@ export default function Index() {
                     <div
                         style={{
                             width: '100%',
-                            fontSize: '14px',
+                            fontSize: '12px',
                             fontWeight: 'bold',
                         }}
                     >
-                        数据源
+                        数据集
                     </div>
                     {isAllowToView && (
                         <DatasourceIcon

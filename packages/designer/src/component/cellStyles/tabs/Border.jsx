@@ -199,7 +199,7 @@ export default function (props) {
                         <div>
                             <ColorPicker
                                 style={{ width: 126, marginLeft: 5 }}
-                                panelStyle={{ width: '188px', marginLeft: 5 }}
+                                panelStyle={{ width: '100%', marginLeft: 5 }}
                                 onChange={(val) =>
                                     dispatch(
                                         setBorderSetting({

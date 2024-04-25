@@ -15,6 +15,10 @@ import {
   ItemList,
 } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
+import {
+  bind,
+  EVENTS,
+} from '@event/EventManager';
 import FormatMoreIcon from '@icons/base/Empty';
 import AccountingFormatIcon from '@icons/number/AccountingFormat';
 import CommaIcon from '@icons/number/Comma';
@@ -31,14 +35,9 @@ import ScientificFormatIcon from '@icons/number/ScientificFormat';
 import ShortDateFormatIcon from '@icons/number/ShortDateFormat';
 import TextFormatIcon from '@icons/number/TextFormat';
 import TimeFormatIcon from '@icons/number/TimeFormat';
-import { setIsOpenCellSetting } from '@store/borderSlice/borderSlice';
 import { genUUID } from '@utils/commonUtil';
 import { exeCommand } from '@utils/spreadUtil';
-
-import {
-  bind,
-  EVENTS,
-} from '../../../event/EventManager';
+import { genCellSettingVisibleHandler } from '@utils/styleUtil';
 
 const GENERAL_FORMATTER = 'formatGeneral';
 
@@ -114,6 +113,7 @@ const getDatas = function () {
             value: 'formatMore',
             title: '其他数字格式...',
             text: '其他数字格式...',
+            frozen: true,
             icon: <FormatMoreIcon></FormatMoreIcon>,
         },
     ];
@@ -141,12 +141,13 @@ export default function () {
         return unBindHandler;
     }, []);
     const [format, setFormat] = useState(GENERAL_FORMATTER);
+    const showCellSetting = genCellSettingVisibleHandler(spread,dispatch,'number');
     const handleStyle = (val) => {
         if (val == 'formatMore') {
             setFormat(GENERAL_FORMATTER);
-            dispatch(setIsOpenCellSetting(true));
+            showCellSetting();
         } else {
-            setFormatter(spread, val);
+            setFormatter(spread, val==GENERAL_FORMATTER ? null:val);
             setFormat(val);
         }
     };
@@ -169,10 +170,7 @@ export default function () {
     return (
         <GroupItem
             title='数字'
-            onMore={() => {
-                //dispatch(setTabValueCellSetting('数字'));
-                dispatch(setIsOpenCellSetting(true));
-            }}
+            onMore={showCellSetting}
         >
             <ItemList>
                 <Select

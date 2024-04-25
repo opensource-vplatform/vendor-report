@@ -5,15 +5,15 @@ import {
 
 import { useSelector } from 'react-redux';
 
+import { Commands } from '@commands/index';
 import EmptyIcon from '@icons/base/Empty';
 import ColWidth from '@icons/cell/ColWidth';
 import RowHeight from '@icons/cell/RowHeight';
 import SettingIcon from '@icons/cell/Setting';
 import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
+import { exeCommand } from '@utils/spreadUtil';
 
-import { Commands } from '../../../../command';
-import { exeCommand } from '../../../../utils/spreadUtil';
 import Dialog from './Dialog';
 
 const SettingIconMenu = WithIconMenu('设置', SettingIcon, [

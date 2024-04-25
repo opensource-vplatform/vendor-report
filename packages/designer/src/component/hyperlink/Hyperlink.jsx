@@ -174,7 +174,7 @@ function Color(props) {
 }
 
 export default function Index(props) {
-    const { spread } = useSelector(({ fontSlice }) => fontSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     const activeSheet = spread.getActiveSheet();
     const activeRowIndex = activeSheet.getActiveRowIndex();
     const activeColumnIndex = activeSheet.getActiveColumnIndex();

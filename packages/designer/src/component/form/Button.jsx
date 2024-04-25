@@ -23,6 +23,18 @@ const Button = styled.button`
     &[data-type='primary']:disabled{
         border-color: #2d8cf0 !important;
     }
+    &[data-type='warning']{
+        background-color: #f90;
+        border-color: #f90;
+        color: #fff;
+    }
+    &[data-type='warning']:hover{
+        background-color: #ffad33;
+        border-color: #ffad33;
+    }
+    &[data-type='warning']:disabled{
+        border-color: #2d8cf0 !important;
+    }
     &:disabled {
         background-color: transparent !important;
         border-color:#d5d5d5 !important;

@@ -22,7 +22,7 @@ import {
   onConfirm,
 } from '@utils/cellSettingUtil';
 import { WithTabItem } from '@utils/componentUtils';
-import { parseFont } from '@utils/fontUtil';
+import { parseStyle } from '@utils/styleUtil';
 
 import Align from './tabs/Align';
 import Border from './tabs/Border';
@@ -107,8 +107,8 @@ export default function () {
                 textOrientation,
                 textDecoration,
                 isVerticalText,
-            } = parseFont(sheet);
-            const alignSetting = {
+            } = parseStyle(sheet);
+            dispatch(setAlignSetting({
                 hAlign,
                 vAlign,
                 textIndent,
@@ -117,17 +117,15 @@ export default function () {
                 shrinkToFit,
                 textOrientation,
                 isMergeCells,
-            };
-            dispatch(setAlignSetting(alignSetting));
-            const fontSetting = {
+            }));
+            dispatch(setFontSetting({
                 fontFamily,
                 fontWeight,
                 fontStyle,
                 fontSize,
                 textDecoration,
                 foreColor,
-            };
-            dispatch(setFontSetting(fontSetting));
+            }));
         }
     }, []);
     const handleConfirm = () => {

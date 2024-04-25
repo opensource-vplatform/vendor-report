@@ -121,7 +121,7 @@ const paddingEnums = {
     },
 };
 
-const isMatch = function(source,target){
+const isMatch = function (source, target) {
     const attrs = ['left', 'top', 'right', 'bottom', 'header', 'footer'];
     let allMatch = true;
     for (let i = 0, l = attrs.length; i < l; i++) {
@@ -132,7 +132,7 @@ const isMatch = function(source,target){
         }
     }
     return allMatch;
-}
+};
 
 const toPaddingType = function (margin) {
     if (margin) {
@@ -140,16 +140,16 @@ const toPaddingType = function (margin) {
         for (let attr in paddingEnums) {
             if (paddingEnums.hasOwnProperty(attr)) {
                 const val = paddingEnums[attr];
-                const allMatch = isMatch(val,margin);
+                const allMatch = isMatch(val, margin);
                 if (allMatch) {
                     return attr;
                 }
             }
         }
         const custom = getCustomMargin();
-        if(custom){
-            const matched = isMatch(custom,margin);
-            if(matched){
+        if (custom) {
+            const matched = isMatch(custom, margin);
+            if (matched) {
                 return 'custom';
             }
         }
@@ -157,15 +157,17 @@ const toPaddingType = function (margin) {
     return null;
 };
 
-const getCustomMargin = ()=>{
-    const customStr = localStorage.getItem("TOONE_REPORT_DESIGNER_PAGE_CUSTOM_PADDING");
-    if(customStr){
-        try{
+const getCustomMargin = () => {
+    const customStr = localStorage.getItem(
+        'TOONE_REPORT_DESIGNER_PAGE_CUSTOM_PADDING'
+    );
+    if (customStr) {
+        try {
             return JSON.parse(customStr);
-        }catch(e){}
+        } catch (e) {}
     }
     return null;
-}
+};
 
 const PaddingItem = WithIconMenu('页边距', PaddingIcon, () => {
     const paddings = [
@@ -205,18 +207,13 @@ const PaddingItem = WithIconMenu('页边距', PaddingIcon, () => {
             title: '自定义页边距...',
             text: '自定义页边距...',
         },
-    ]
+    ];
     const custom = getCustomMargin();
-    if(custom){
-        paddings.splice(0,0,{
+    if (custom) {
+        paddings.splice(0, 0, {
             value: 'custom',
             title: '自定义',
-            text: (
-                <PageSnapshot
-                    title='自定义'
-                    {...custom}
-                ></PageSnapshot>
-            ),
+            text: <PageSnapshot title='自定义' {...custom}></PageSnapshot>,
             icon: <CustomIcon iconStyle={paddingIconStyle}></CustomIcon>,
         });
     }
@@ -404,7 +401,7 @@ export default function () {
             dispatch(setMargin({ ...margin, ...paddingEnums.board }));
         } else if (type == 'narrow') {
             dispatch(setMargin({ ...margin, ...paddingEnums.narrow }));
-        } else if( type == 'custom'){
+        } else if (type == 'custom') {
             const custom = getCustomMargin();
             dispatch(setMargin({ ...margin, ...custom }));
         }
@@ -470,6 +467,14 @@ export default function () {
             setPrintInfo(sheet, { orientation, margin, paperKind });
         }
     }, [orientation, margin, paperKind]);
+    const closeEditor = () => {
+        setData((data) => {
+            return {
+                ...data,
+                showDialog: false,
+            };
+        });
+    };
     return (
         <Fragment>
             <GroupItem title='页面设置'>
@@ -493,18 +498,8 @@ export default function () {
             </GroupItem>
             {data.showDialog ? (
                 <EditDialog
-                    onConfirm={() => {
-                        setData({
-                            ...data,
-                            showDialog: false,
-                        });
-                    }}
-                    onCancel={() => {
-                        setData({
-                            ...data,
-                            showDialog: false,
-                        });
-                    }}
+                    onConfirm={closeEditor}
+                    onCancel={closeEditor}
                 ></EditDialog>
             ) : null}
         </Fragment>

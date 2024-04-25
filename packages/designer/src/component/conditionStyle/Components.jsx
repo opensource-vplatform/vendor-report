@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import { Select } from '@components/form/Index';
 import {
-  cellSettingSliceToConditionStyle,
+  cellSettingToStyle,
   jsonStyleToCellSetting,
   show,
 } from '@utils/cellSettingUtil';
@@ -244,7 +244,7 @@ export const StyleSelect = function (props) {
                     show(dispatcher, {
                         onConfirm: (setting) => {
                             const style =
-                                cellSettingSliceToConditionStyle(setting);
+                                cellSettingToStyle(setting);
                             dispatcher(setHandler({ ...config, style }));
                         },
                         hideCodes: ['align'],

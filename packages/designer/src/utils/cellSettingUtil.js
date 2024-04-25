@@ -281,9 +281,9 @@ export const format = function (format, value) {
     return formatter.format(value);
 };
 
-export const cellSettingSliceToConditionStyle = function (cellSettingSlice) {
+export const cellSettingToStyle = function (cellSetting) {
     const { fontSetting, alignSetting, borderSetting, numberSetting, fillSetting } =
-        cellSettingSlice;
+        cellSetting;
     let style = null;
     if (fontSetting) {
         style = { ...fontSetting };

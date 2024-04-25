@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
@@ -23,7 +27,8 @@ const Wrap = styled.div`
         cursor: not-allowed;
     }
     &[data-disabled='false']:hover {
-        border: solid 1px #5292f7;
+        //border: solid 1px #5292f7;
+        border: solid 1px #999999;
     }
 `;
 

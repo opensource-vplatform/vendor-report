@@ -150,7 +150,7 @@ export default function Index(props) {
         ({ datasourceSlice }) => datasourceSlice
     );
 
-    const { spread } = useSelector(({ fontSlice }) => fontSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     let {
         groups,
         sumColumns,

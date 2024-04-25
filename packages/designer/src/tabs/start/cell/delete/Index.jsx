@@ -5,6 +5,7 @@ import {
 
 import { useSelector } from 'react-redux';
 
+import { Commands } from '@commands/index';
 import DeleteIcon from '@icons/cell/Delete';
 import DeleteCell from '@icons/cell/DeleteCell';
 import DeleteSheet from '@icons/cell/DeleteSheet';
@@ -16,9 +17,8 @@ import {
 } from '@utils/cellUtil';
 import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
+import { exeCommand } from '@utils/spreadUtil';
 
-import { Commands } from '../../../../command/index';
-import { exeCommand } from '../../../../utils/spreadUtil';
 import Dialog from './Dialog';
 
 const DeleteIconMenu = WithIconMenu('删除', DeleteIcon, [

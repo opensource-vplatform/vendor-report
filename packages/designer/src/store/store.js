@@ -6,7 +6,6 @@ import cellSettingSlice from './cellSettingSlice';
 import fontCellSettingSlice from './cellSettingSlice/FontCellSettingSlice';
 import conditionStyleSlice from './conditionStyleSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
-import fontSlice from './fontSlice/fontSlice';
 import formulaEditorSlice from './formulaEditorSlice/formulaEditorSlice';
 import layoutSlice from './layoutSlice/layoutSlice';
 import navSlice from './navSlice/navSlice';
@@ -33,7 +32,6 @@ const serializableCheck = {
     // Ignore these paths in the state
     ignoredPaths: [
         'appSlice.spread',
-        'fontSlice.spread',
         'viewSlice.spread',
         'tableDesignSlice.spread',
         'tableDesignSlice.styleName',
@@ -49,7 +47,6 @@ export default configureStore({
     reducer: {
         appSlice,
         borderSlice,
-        fontSlice,
         datasourceSlice,
         viewSlice,
         navSlice,

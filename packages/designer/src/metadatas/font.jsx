@@ -22,16 +22,19 @@ const FONT_FAMILIES = [
         value: '仿宋',
         title: '仿宋',
         text: '仿宋',
+        fontSize:14,
     },
     {
         value: '隶书',
         title: '隶书',
         text: '隶书',
+        fontSize:14,
     },
     {
         value: '楷体',
         title: '楷体',
         text: '楷体',
+        fontSize:14,
     },
     {
         value: 'SimSun',
@@ -76,7 +79,7 @@ const FONT_FAMILIES = [
     },
     { value: 'Trebuchet MS', title: 'Trebuchet MS', text: 'Trebuchet MS' },
     { value: 'Verdana', title: 'Verdana', text: 'Verdana' },
-    { value: 'Wingdings', title: 'Wingdings', text: 'Wingdings' },
+    //{ value: 'Wingdings', title: 'Wingdings', text: 'Wingdings' },
 ];
 
 const FONT_SIZES = [
