@@ -108,7 +108,6 @@ export default function Index(props) {
         if (value === activeDs[key]) {
             return;
         }
-        console.log('onChange', e.target.value);
         const pattern = /^[a-zA-Z0-9_]+$/;
         if (key === 'code' && !pattern.test(value) && value) {
             e.target.value = activeDs[key];
@@ -225,7 +224,7 @@ export default function Index(props) {
             ) : (
                 ''
             )}
-            <h2>数据源</h2>
+            <h2>数据集</h2>
             <LineSepatator
                 type='horizontal'
                 style={{ margin: 0 }}

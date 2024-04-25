@@ -2,6 +2,7 @@ import {
   useContext,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 
 import {
@@ -17,16 +18,175 @@ import {
 import { genUUID } from '@utils/commonUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
+import DownIcon from '../../icons/arrow/Down';
+import RightIcon from '../../icons/arrow/Right';
 import { rawData } from './constant.js';
 import {
   DatasourceListOl,
   DddSubDatasource,
   DelDatasource,
   ListItemText,
+  NumberIcon,
+  TableIcon,
+  TextIcon,
 } from './ui.jsx';
 
-//树形数据源列表
+const typeIcons = {
+    table: TableIcon,
+    text: TextIcon,
+    integer: NumberIcon,
+    decimals: NumberIcon,
+};
 
+function TreeSwitch(props) {
+    const { isTable, isOpen, setOpen } = props;
+    if (!isTable) {
+        return null;
+    }
+    let Component = isOpen ? DownIcon : RightIcon;
+    return (
+        <Component
+            style={{
+                width: '16px',
+                height: '16px',
+            }}
+            onClick={function () {
+                setOpen(!isOpen);
+            }}
+        ></Component>
+    );
+}
+
+function Icon(props) {
+    const { type } = props;
+    const Icon = typeIcons[type];
+    if (Icon) {
+        return <Icon></Icon>;
+    }
+    return <div>2</div>;
+}
+
+function TreeItem(props) {
+    const {
+        id,
+        draggableClass,
+        parentId,
+        indent = 10,
+        children,
+        listDoubleClickHandler,
+        delDatasourceClickHandler,
+        addSubDatasourceClickHandler,
+        name,
+        isShowAddSubDatasource = true,
+        isAllowToEdit,
+        originalDatasourceIds,
+        type,
+        activeId,
+        isDraggable,
+        searchKey,
+        dataItem,
+        disabled,
+        treeOpenTrigger,
+        setOpenInfo,
+    } = props;
+
+    const isTable = type === 'table';
+
+    let childrenCount =
+        isTable && Array.isArray(children) ? children.length : 0;
+
+    const listItemTextClass = `${
+        id === activeId ? 'active' : ''
+    } ${draggableClass}`;
+
+    const [isOpen, setOpen] = useState(true);
+
+    useEffect(function () {
+        setOpenInfo?.(id, isOpen);
+    }, []);
+
+    useEffect(
+        function () {
+            treeOpenTrigger &&
+                treeOpenTrigger.then(function (value) {
+                    if (value !== isOpen) {
+                        setOpen(value);
+                        setOpenInfo?.(id, value);
+                    }
+                });
+        },
+        [treeOpenTrigger]
+    );
+
+    return (
+        <li className={`listItem ${draggableClass}`} data-item-id={id}>
+            <ListItemText
+                className={listItemTextClass}
+                data-item-id={id}
+                data-item-parent-id={parentId}
+                style={{ paddingLeft: isTable ? 0 : indent + 'px' }}
+                draggable={isDraggable}
+                data-children-count={childrenCount}
+                onDoubleClick={function () {
+                    if (draggableClass === 'notDraggable') {
+                        return;
+                    }
+                    listDoubleClickHandler(dataItem);
+                }}
+            >
+                <div className='text'>
+                    <TreeSwitch
+                        isTable={isTable}
+                        isOpen={isOpen}
+                        setOpen={function (val) {
+                            setOpen(val);
+                            setOpenInfo?.(id, val);
+                        }}
+                    ></TreeSwitch>
+                    <Icon type={type}></Icon>
+                    <Highlight
+                        text={name || '-'}
+                        highlight={searchKey}
+                    ></Highlight>
+                </div>
+                {isTable && isShowAddSubDatasource
+                    ? isAllowToEdit &&
+                      !originalDatasourceIds[id] && (
+                          <DddSubDatasource
+                              data-not-allow={isNotAllow}
+                              onClick={addSubDatasourceClickHandler}
+                          ></DddSubDatasource>
+                      )
+                    : ''}
+                {isShowAddSubDatasource
+                    ? isAllowToEdit &&
+                      !originalDatasourceIds[id] &&
+                      !originalDatasourceIds[parentId] && (
+                          <DelDatasource
+                              data-item-id={id}
+                              onClick={delDatasourceClickHandler}
+                          ></DelDatasource>
+                      )
+                    : ''}
+            </ListItemText>
+            {isTable && isOpen ? (
+                <Index
+                    {...props}
+                    datas={children}
+                    indent={3 * indent + 5}
+                    parentId={id}
+                    parentNode={dataItem}
+                    parentType='table'
+                    parentDisabled={disabled}
+                ></Index>
+            ) : (
+                ''
+            )}
+        </li>
+    );
+}
+
+//树形数据源列表
 export default function Index(props) {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
@@ -51,14 +211,9 @@ export default function Index(props) {
 
     const {
         datas,
-        activeId,
         click,
-        indent = 10,
-        isNotAllow = false,
-        isShowAddSubDatasource = true,
         width,
         draggable = false,
-        parentType,
         parentNode = null,
         activeSheetTablePath = {},
         notAllowEdit = true,
@@ -118,7 +273,7 @@ export default function Index(props) {
 
     const listDoubleClickHandler = function (data) {
         if (typeof onDoubleClick === 'function') {
-            onDoubleClick(data,parentNode);
+            onDoubleClick(data, parentNode);
         }
     };
 
@@ -134,7 +289,7 @@ export default function Index(props) {
 
                 let draggableClass = '';
                 let isDraggable = draggable;
-                if (draggable /* && parentType !== 'table' */) {
+                if (draggable) {
                     draggableClass = 'draggable';
                     if (
                         type === 'table' &&
@@ -145,89 +300,34 @@ export default function Index(props) {
                         draggableClass = 'notDraggable';
                         isDraggable = false;
                     }
-                } else if (draggable) {
-                    draggableClass = 'notDraggable';
-                    isDraggable = false;
                 }
+
                 const disabled = disabledTypes.includes(type);
                 if (disabled || parentDisabled) {
                     draggableClass = 'notDraggable';
                     isDraggable = false;
                 }
 
-                return (
-                    <li
-                        className={`listItem ${draggableClass}`}
-                        key={id}
-                        data-item-id={id}
-                    >
-                        <ListItemText
-                            className={`${
-                                id === activeId ? 'active' : ''
-                            } ${draggableClass}`}
-                            data-item-id={id}
-                            data-item-parent-id={parentId}
-                            style={{ paddingLeft: indent + 'px' }}
-                            draggable={isDraggable}
-                            data-children-count={
-                                type === 'table' && Array.isArray(children)
-                                    ? children.length
-                                    : 0
-                            }
-                            onDoubleClick={function () {
-                                if (
-                                    draggableClass === 'notDraggable'
-                                ) {
-                                    return;
-                                }
-                                listDoubleClickHandler(dataItem);
-                            }}
-                        >
-                            <div
-                                className={`text ${
-                                    type === 'text' ? 'string' : type
-                                }`}
-                            >
-                                <Highlight
-                                    text={name || '-'}
-                                    highlight={searchKey}
-                                ></Highlight>
-                            </div>
-                            {type === 'table' && isShowAddSubDatasource
-                                ? isAllowToEdit &&
-                                  !originalDatasourceIds[id] && (
-                                      <DddSubDatasource
-                                          data-not-allow={isNotAllow}
-                                          onClick={addSubDatasourceClickHandler}
-                                      ></DddSubDatasource>
-                                  )
-                                : ''}
-                            {isShowAddSubDatasource
-                                ? isAllowToEdit &&
-                                  !originalDatasourceIds[id] &&
-                                  !originalDatasourceIds[parentId] && (
-                                      <DelDatasource
-                                          data-item-id={id}
-                                          onClick={delDatasourceClickHandler}
-                                      ></DelDatasource>
-                                  )
-                                : ''}
-                        </ListItemText>
-                        {type === 'table' ? (
-                            <Index
-                                {...props}
-                                datas={children}
-                                indent={2 * indent}
-                                parentId={id}
-                                parentNode={dataItem}
-                                parentType='table'
-                                parentDisabled={disabled}
-                            ></Index>
-                        ) : (
-                            ''
-                        )}
-                    </li>
-                );
+                const _props = {
+                    ...props,
+                    id,
+                    draggableClass,
+                    parentId,
+                    children,
+                    listDoubleClickHandler,
+                    delDatasourceClickHandler,
+                    addSubDatasourceClickHandler,
+                    name,
+                    isAllowToEdit,
+                    originalDatasourceIds,
+                    type,
+                    isDraggable,
+                    searchKey,
+                    dataItem,
+                    disabled,
+                };
+
+                return <TreeItem {..._props} key={id}></TreeItem>;
             })}
         </DatasourceListOl>
     );

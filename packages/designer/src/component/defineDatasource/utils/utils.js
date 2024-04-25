@@ -24,7 +24,7 @@ import {
 
 const GC = getNamespace();
 
-export function test(params) {
+export function newTable(params) {
     const {
         columnsTemp,
         sheet,
@@ -41,6 +41,8 @@ export function test(params) {
     } = params;
 
     const sheetJson = sheet.toJSON();
+    sheetJson.data = sheetJson.data || {};
+    sheetJson.data.dataTable = sheetJson.data.dataTable || {};
     const dataTable = sheetJson.data.dataTable;
     const rowDataTable = (dataTable[row] = dataTable[row]
         ? dataTable[row]

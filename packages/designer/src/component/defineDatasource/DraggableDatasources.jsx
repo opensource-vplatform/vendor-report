@@ -2,6 +2,7 @@ import {
   useContext,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 
 import {
@@ -26,6 +27,8 @@ import { setTableCornerMarks } from '@utils/tableUtil.js';
 import { setCellTag } from '@utils/worksheetUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
+import DownIcon from '../../icons/arrow/Down';
+import RightIcon from '../../icons/arrow/Right';
 import Datasources from './Datasources.jsx';
 import DialogDatasourcesEdit from './DialogDatasourcesEdit.jsx';
 import {
@@ -39,8 +42,8 @@ import {
   getCellInfo,
   getPath,
   highlightBlock,
+  newTable,
   removeHighlightOneBlock,
-  test,
 } from './utils/utils.js';
 
 //删除表格
@@ -301,10 +304,6 @@ export default function Index() {
     //是否允许查看数据源
     const isAllowToView = context?.conf?.dataSource?.allowToView !== false;
 
-    const { filterButtonVisible } = useSelector(
-        ({ tableDesignSlice }) => tableDesignSlice
-    );
-
     const dispatch = useDispatch();
     const cacheDatasRef = useRef({
         hasBindEvent: false,
@@ -312,6 +311,33 @@ export default function Index() {
         dsList,
         tableNameIndex: 0,
     });
+
+    const [treeOpenTrigger, setTreeOpenTrigger] = useState(
+        Promise.resolve(true)
+    );
+
+    const [openInfos, setOpenInfos] = useState({});
+    const isOpenAll = Object.values(openInfos).some(function (val) {
+        return val;
+    });
+
+    const openAll = function () {
+        const result = Object.values(openInfos).some(function (val) {
+            return val;
+        });
+        debugger;
+        setOpenInfos({});
+        setTreeOpenTrigger(Promise.resolve(!result));
+    };
+
+    const setOpenInfo = function (id, value) {
+        debugger;
+        setOpenInfos({
+            ...openInfos,
+            [id]: value,
+        });
+    };
+
     window.mySpread = spread;
     cacheDatasRef.current.spread = spread;
     cacheDatasRef.current.dsList = dsList;
@@ -459,7 +485,7 @@ export default function Index() {
                             filterButtonVisible,
                         }); */
 
-                        test({
+                        newTable({
                             columnsTemp: current.children,
                             sheet,
                             dispatch,
@@ -503,6 +529,11 @@ export default function Index() {
             <DialogDatasourcesEdit></DialogDatasourcesEdit>
             <DraggableDatasourcesBox>
                 <DraggableDatasourcesHeander>
+                    {isOpenAll ? (
+                        <DownIcon onClick={openAll}></DownIcon>
+                    ) : (
+                        <RightIcon onClick={openAll}></RightIcon>
+                    )}
                     <div
                         style={{
                             width: '100%',
@@ -528,6 +559,8 @@ export default function Index() {
                     <Datasources
                         isShowAddSubDatasource={false}
                         draggable={true}
+                        treeOpenTrigger={treeOpenTrigger}
+                        setOpenInfo={setOpenInfo}
                     ></Datasources>
                 </DraggableDatasourcesContent>
                 <DraggableDatasourcesFooter></DraggableDatasourcesFooter>

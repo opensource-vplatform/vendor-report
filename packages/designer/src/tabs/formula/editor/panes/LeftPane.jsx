@@ -119,20 +119,22 @@ export default function () {
             >
                 <Tab
                     code='table'
-                    title='数据源'
+                    title='数据集'
                     style={{
                         height: 'calc(100% - 35px)',
                         display: 'flex',
                         flexDirection: 'column',
                     }}
                 >
-                    <DatasourceSelect onChange={(val)=>{
-                        dispatch(
-                            insert({
-                                formula: val,
-                            })
-                        );
-                    }}></DatasourceSelect>
+                    <DatasourceSelect
+                        onChange={(val) => {
+                            dispatch(
+                                insert({
+                                    formula: val,
+                                })
+                            );
+                        }}
+                    ></DatasourceSelect>
                     {/*<Search
                         onClear={function () {
                             setSearchKey({
