@@ -51,7 +51,6 @@ function removeTable(params) {
     const { dispatch, context, spread, tableName } = params;
     const sheet = spread.getActiveSheet();
     const table = sheet.tables.findByName(tableName);
-    debugger;
     setTableCornerMarks({
         setType: 'onlyRemove',
         sheet,
@@ -325,13 +324,11 @@ export default function Index() {
         const result = Object.values(openInfos).some(function (val) {
             return val;
         });
-        debugger;
         setOpenInfos({});
         setTreeOpenTrigger(Promise.resolve(!result));
     };
 
     const setOpenInfo = function (id, value) {
-        debugger;
         setOpenInfos({
             ...openInfos,
             [id]: value,
@@ -507,7 +504,6 @@ export default function Index() {
                             );
                             cell.value(`[${parent?.name}.${current?.name}]`);
                         }
-                        debugger;
                         setCellTag(sheet, row, col, 'bindInfo', {
                             bindType: 'cell',
                             bindDsInstanceId: itemId,
