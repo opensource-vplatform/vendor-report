@@ -1,3 +1,7 @@
+import qdzfbb from './jlzf/qdzfbb';
+import zjjlb from './jlzf/zjjlb';
+import zjjlzfhzb from './jlzf/zjjlzfhzb';
+import zqzfzs from './jlzf/zqzfzs';
 import otherData from './jsonData/otherData.json';
 import jsonStr from './jsonData/reportJsonData';
 import salesData from './jsonData/salesData.json';
@@ -53,9 +57,12 @@ export default {
     dataSource: {
         dataSourceDefinition: [
             ...otherData.ds,
-
             salesData.ds,
             tourismData.ds,
+            zqzfzs.metadata,
+            qdzfbb.metadata,
+            zjjlb.metadata,
+            zjjlzfhzb.metadata,
             {
                 id: 'stu',
                 type: 'table',
@@ -87,6 +94,10 @@ export default {
         ], //数据源定义
         datas: {
             ...otherData.data,
+            ...zqzfzs.datas,
+            ...qdzfbb.datas,
+            ...zjjlb.datas,
+            ...zjjlzfhzb.datas,
             sales: salesData.data,
             tourism: tourismData.data,
             stu: [

@@ -12,8 +12,9 @@ import styled from 'styled-components';
 import Dialog from '@components/dialog/Index';
 import { getFormulaMetadata } from '@metadatas/formula';
 import { showErrorMessage } from '@utils/messageUtil';
-import { withBatchUpdate } from '@utils/spreadUtil';
 
+import { Commands } from '../../command';
+import { exeCommand } from '../../utils/spreadUtil';
 import {
   ButtonWrap,
   FormulaButton,
@@ -144,15 +145,13 @@ export default function (props) {
         };
     });
     const handleFormulaSetting = () => {
+        spread.setActiveSheet(hostSheet.name());
+        const { hostRow, hostCol, funCode, args } = data;
         try {
-            withBatchUpdate(spread, () => {
-                const { hostRow, hostCol, funCode, args } = data;
-                hostSheet.setFormula(
-                    hostRow,
-                    hostCol,
-                    `=${funCode}(${argsToFormulaArgs(args).join(',')})`
-                );
-                spread.setActiveSheet(hostSheet.name());
+            exeCommand(spread,Commands.Formula.Set,{
+                formula:`=${funCode}(${argsToFormulaArgs(args).join(',')})`,
+                row:hostRow,
+                col:hostCol,
             });
         } catch (e) {
             showErrorMessage(dispatch, typeof e == 'string' ? e : e.message);

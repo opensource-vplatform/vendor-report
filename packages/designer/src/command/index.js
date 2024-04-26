@@ -7,6 +7,7 @@ import DeleteCellCommand from './impls/delete/cell';
 import DeleteSheetCommand from './impls/delete/sheet';
 import DecimalFormatCommand from './impls/format/decimal';
 import FormatterFormatCommand from './impls/format/formatter';
+import SetFormulaCommand from './impls/formula/set';
 import InsertCellCommand from './impls/insert/cell';
 import InsertSheetCommand from './impls/insert/sheet';
 import AutoColWidthSettingCommand from './impls/setting/autoColWidth';
@@ -159,6 +160,15 @@ export const Commands = {
          * 边框
          */
         Border:BorderStyleCommand.Command,
+    },
+    /**
+     * 公式
+     */
+    Formula:{
+        /**
+         * 设置
+         */
+        Set: SetFormulaCommand.Command,
     }
 };
 
@@ -188,4 +198,5 @@ export const registerCommand = function (spread) {
     MergeStyleCommand.register(commandManager);
     StyleStyleCommand.register(commandManager);
     BorderStyleCommand.register(commandManager);
+    SetFormulaCommand.register(commandManager);
 };

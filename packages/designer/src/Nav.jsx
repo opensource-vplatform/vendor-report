@@ -51,6 +51,7 @@ import {
 import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
 import Formula from './tabs/formula/Index';
+import { saveAsImg } from './utils/canvas2image';
 import { parseStyle } from './utils/styleUtil';
 
 const FileTabTitle = styled.a`
@@ -153,7 +154,16 @@ export default function () {
             const define = parseUsedDatasource(spread, finalDsList);
             const result = fire({
                 event: EVENTS.onSave,
-                args: [json, { dsList: finalDsList, define }],
+                args: [
+                    json,
+                    {
+                        dsList: finalDsList,
+                        define,
+                        toImage: (width, height) => {
+                            return saveAsImg(spread,width,height);
+                        },
+                    },
+                ],
             });
             if (result.length > 0) {
                 dispatch(setWaitMsg({ message: '正在保存，请稍候...' }));
@@ -234,30 +244,30 @@ export default function () {
                 fireCellEnter(spread);
             });
             const unParseStyle = bind({
-                event:EVENTS.EnterCell,
-                handler:(arg)=>{
+                event: EVENTS.EnterCell,
+                handler: (arg) => {
                     const sheet = arg.sheet;
                     const style = parseStyle(sheet);
                     dispatch(setStyle(style));
-                }
+                },
             });
             const unInitHandler = bind({
                 event: EVENTS.Inited,
-                handler: (spread)=>{
+                handler: (spread) => {
                     fireCellEnter(spread);
-                }
+                },
             });
             const undoHandler = bind({
                 event: EVENTS.Undo,
-                handler:()=>{
+                handler: () => {
                     fireCellEnter(spread);
-                }
+                },
             });
-            const redoHandler =  bind({
+            const redoHandler = bind({
                 event: EVENTS.Redo,
-                handler:()=>{
+                handler: () => {
                     fireCellEnter(spread);
-                }
+                },
             });
             return () => {
                 redoHandler();
