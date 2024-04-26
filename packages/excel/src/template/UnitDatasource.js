@@ -40,24 +40,45 @@ class UnitDatasource {
         }
     }
 
+    _toUniqueKey(tableCode, fieldCode) {
+        return `${tableCode},${fieldCode}`;
+    }
+
     /**
      * 根据主从关系联合数据
-     * @param {*} datasetMap 
-     * @param {*} result 
-     * @returns 
+     * @param {*} datasetMap
+     * @param {*} result
+     * @returns
      */
-    _unitDataByReferences(datasetMap,result) {
+    _unitDataByReferences(datasetMap, except) {
         const datas = [];
         if (this.references) {
-            this.references.forEach(reference=>{
-                const {main,slave} = reference;
+            const mainTableMap = {};
+            this.references.forEach((reference) => {
+                const { main, slave } = reference;
                 const mainCode = main.code;
                 const mainFieldCode = main.fieldCode;
+                except.push(mainCode);
+                const key = this._toUniqueKey(mainCode, mainFieldCode);
+                let mainTableDataMap = mainTableMap[key];
+                if (!mainTableDataMap) {
+                    mainTableDataMap = {};
+                    mainTableMap[key] = mainTableDataMap;
+                    const mainDatas = datasetMap[mainCode];
+                    mainDatas.forEach((data) => {
+                        mainTableDataMap[data[mainFieldCode]] = data;
+                    });
+                }
                 const slaveCode = slave.code;
+                except.push(slaveCode);
                 const slaveFieldCode = slave.fieldCode;
-                const mainDatas = datasetMap[mainCode];
                 const slaveDatas = datasetMap[slaveCode];
-                
+                slaveDatas.forEach((data) => {
+                    datas.push({
+                        [slaveCode]: data,
+                        [mainCode]: mainTableDataMap[data[slaveFieldCode]],
+                    });
+                });
             });
         }
         return datas;
@@ -65,16 +86,18 @@ class UnitDatasource {
 
     /**
      * 根据下标联合数据
-     * @param {} datasetMap 
-     * @param {*} result 
+     * @param {} datasetMap
+     * @param {*} result
      */
-    _unitDataByIndex(datasetMap,result){
-        for(let [dsCode,datas] of Object.entries(datasetMap)){
-            for (let i = 0,len=datas.length; i < len; i++) {
-                const item = datas[i];
-                const data = result[i]||{}
-                data[dsCode] = item;
-                result[i] = data;
+    _unitDataByIndex(datasetMap, result, except) {
+        for (let [dsCode, datas] of Object.entries(datasetMap)) {
+            if (except.indexOf(dsCode) == -1) {
+                for (let i = 0, len = datas.length; i < len; i++) {
+                    const item = datas[i];
+                    const data = result[i] || {};
+                    data[dsCode] = item;
+                    result[i] = data;
+                }
             }
         }
         return result;
@@ -89,8 +112,9 @@ class UnitDatasource {
      */
     load(datas) {
         const datasetMap = { ...datas };
-        const result = this._unitDataByReferences(datasetMap);
-        this.datas = this._unitDataByIndex(datasetMap,result);
+        let except = [];
+        const result = this._unitDataByReferences(datasetMap, except);
+        this.datas = this._unitDataByIndex(datasetMap, result, except);
     }
 
     /**
