@@ -13,6 +13,7 @@ import {
   setOnCloseHandlerId,
   setRange,
   setRangeSelectMode,
+  setSelectionType,
   setVisible,
 } from '@store/rangeSlice';
 import { genUUID } from '@utils/commonUtil';
@@ -31,6 +32,7 @@ export default function (props) {
         error=false,
         absoluteReference = false,
         rangeSelectMode = true,
+        selectionType="cell",
         onStartSelect,
         onEndSelect,
     } = props;
@@ -45,6 +47,7 @@ export default function (props) {
         dispatcher(setRange(data));
         dispatcher(setAbsoluteReference(absoluteReference));
         dispatcher(setRangeSelectMode(rangeSelectMode));
+        dispatcher(setSelectionType(selectionType));
         const closeId = 'close_'+genUUID();
         window[closeId] = ()=>{
             delete window[closeId];

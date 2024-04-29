@@ -62,6 +62,7 @@ export default function (props) {
         range,
         absoluteReference,
         rangeSelectMode,
+        selectionType,
         onCloseHandlerId,
         onChangeHandlerId,
     } = useSelector(({ rangeSlice }) => rangeSlice);
@@ -78,6 +79,7 @@ export default function (props) {
                         absoluteReference,
                         needSheetName: false,
                         rangeSelectMode,
+                        selectionUnit: selectionType=='cell' ? 0:(selectionType=='row' ? 1:2)
                     }
                 );
             formulaTextBox.workbook(spread);
