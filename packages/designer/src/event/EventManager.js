@@ -14,6 +14,10 @@ export const EVENTS = {
      */
     onSave: "onSave",
     /**
+     * 设计器初始化完成
+     */
+    onDesignerInited:"onDesignerInited",
+    /**
      * 激活工作表变更事件
      */
     ActiveSheetChanged: "ActiveSheetChanged",

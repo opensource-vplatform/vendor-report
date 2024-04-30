@@ -63,14 +63,16 @@ export const exeCommandImpl = function(handler,context, options, isUndo){
     } else {
         Commands.startTransaction(context, options);
         const sheet = options.sheet;
-        const config = options.options
-        sheet.suspendPaint();
-        sheet.suspendCalcService();
-        handler(sheet,config);
-        sheet.resumeCalcService();
-        sheet.resumePaint();
-        Commands.endTransaction(context, options);
-        return true;
+        if(sheet){
+            const config = options.options
+            sheet.suspendPaint();
+            sheet.suspendCalcService();
+            handler(sheet,config);
+            sheet.resumeCalcService();
+            sheet.resumePaint();
+            Commands.endTransaction(context, options);
+            return true;
+        }
     }
 }
 
@@ -83,8 +85,10 @@ export const exeCommandImpl = function(handler,context, options, isUndo){
 export const exeCommand = function (spread, cmd, options) {
     const commandManager = spread.commandManager();
     const sheet = spread.getActiveSheet();
-    const sheetName = sheet.name();
-    commandManager.execute({ cmd, sheetName, sheet, options });
+    if(sheet){
+        const sheetName = sheet.name();
+        commandManager.execute({ cmd, sheetName, sheet, options });
+    }
 };
 
 export const withBatchCalcUpdate = function (spread, updateHandler, ...args) {

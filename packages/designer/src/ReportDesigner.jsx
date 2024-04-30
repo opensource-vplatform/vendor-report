@@ -1,5 +1,6 @@
 /* import { StrictMode } from 'react'; */
 
+import axios from 'axios';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 
@@ -8,10 +9,11 @@ import { saveAsImg } from '@utils/canvas2image';
 
 import Designer from './Designer';
 import { bind } from './event/EventManager';
+import { genUUID } from './utils/commonUtil';
+import { showConfirm } from './utils/messageUtil';
 
 class ReportDesigner {
-    conf = {
-    };
+    conf = {};
 
     constructor(conf) {
         this.conf = conf;
@@ -34,9 +36,17 @@ class ReportDesigner {
         );
     }
 
-    toImage(width,height){
-        saveAsImg(width,height);
+    toImage(width, height) {
+        saveAsImg(width, height);
     }
 }
+
+ReportDesigner.Utils = {
+    md5: genUUID,
+    RPC: axios,
+    msg:{
+        confirm:showConfirm,
+    }
+};
 
 export default ReportDesigner;

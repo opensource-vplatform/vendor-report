@@ -1,4 +1,20 @@
+import { Fragment } from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import { createGlobalStyle } from 'styled-components';
+
+import { Setting as CellStylesSetting } from '@components/cellStyles/Index';
+import Confirm from '@components/confirm/Index';
+import Error from '@components/error/Index';
+import Loading from '@components/loading/Index';
+import { SelectBox } from '@components/range/Index';
+import SparkLine from '@components/sparkline/SparkLine';
+import { setErrorMsg } from '@store/appSlice/appSlice';
+
+import { setDispatch } from './utils/messageUtil';
 
 export const GlobalStyle = createGlobalStyle`
     ::-webkit-scrollbar {
@@ -40,3 +56,31 @@ export const GlobalStyle = createGlobalStyle`
         background-repeat: no-repeat;
     }
 `;
+
+export const GlobalComponent = function () {
+    const dispatch = useDispatch();
+    setDispatch(dispatch);
+    const { sparklineSlice, cellSettingSlice, rangeSlice, appSlice } =
+        useSelector((slice) => slice);
+    return (
+        <Fragment>
+            {appSlice.waitMsg != null ? (
+                <Loading title={appSlice.waitMsg}></Loading>
+            ) : null}
+            {appSlice.errorMsg != null ? (
+                <Error
+                    message={appSlice.errorMsg}
+                    onClose={() => {
+                        dispatch(setErrorMsg({ message: null }));
+                    }}
+                ></Error>
+            ) : null}
+            {appSlice.confirmMsg != null ? <Confirm></Confirm>:null}
+            {rangeSlice.visible ? <SelectBox></SelectBox> : null}
+            {cellSettingSlice.visible ? (
+                <CellStylesSetting></CellStylesSetting>
+            ) : null}
+            {sparklineSlice.visible ? <SparkLine></SparkLine> : null}
+        </Fragment>
+    );
+};

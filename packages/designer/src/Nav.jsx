@@ -21,11 +21,7 @@ import {
   EVENTS,
   fire,
 } from '@event/EventManager';
-import {
-  setErrorMsg,
-  setMode,
-  setWaitMsg,
-} from '@store/appSlice/appSlice';
+import { setMode } from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
@@ -41,6 +37,7 @@ import ViewTab from '@tabs/view/Index';
 import { fireCellEnter } from '@utils/eventUtil';
 
 import DesignerContext from './DesignerContext';
+import { GlobalComponent } from './Global';
 import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
 import VerticalAlignTop from './icons/arrow/VerticalAlignTop';
 import {
@@ -52,6 +49,7 @@ import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
 import Formula from './tabs/formula/Index';
 import { saveAsImg } from './utils/canvas2image';
+import { handleEventPrmiseResult } from './utils/eventUtil';
 import { parseStyle } from './utils/styleUtil';
 
 const FileTabTitle = styled.a`
@@ -160,48 +158,17 @@ export default function () {
                         dsList: finalDsList,
                         define,
                         toImage: (width, height) => {
-                            return saveAsImg(spread,width,height);
+                            return saveAsImg(spread, width, height);
                         },
                     },
                 ],
             });
-            if (result.length > 0) {
-                dispatch(setWaitMsg({ message: '正在保存，请稍候...' }));
-                const promise = result[0];
-                if (promise instanceof Promise) {
-                    promise
-                        .then((data) => {
-                            if (data.success) {
-                                dispatch(setWaitMsg({ message: null }));
-                            } else {
-                                dispatch(setWaitMsg({ message: null }));
-                                dispatch(
-                                    setErrorMsg({ message: data.message })
-                                );
-                            }
-                        })
-                        .catch((e) => {
-                            dispatch(setWaitMsg({ message: null }));
-                            dispatch(
-                                setErrorMsg({
-                                    message:
-                                        typeof e == 'string'
-                                            ? e
-                                            : e.message
-                                              ? e.message
-                                              : null,
-                                })
-                            );
-                        });
-                } else {
-                    throw Error(
-                        'onSave事件回调返回值不正确，期望：Promise实例，实际：' +
-                            typeof promise
-                    );
-                }
-            } else {
-                dispatch(setWaitMsg({ message: null }));
-            }
+            handleEventPrmiseResult(
+                result,
+                dispatch,
+                '正在保存，请稍候...',
+                EVENTS.onSave
+            );
         }
     };
 
@@ -281,159 +248,163 @@ export default function () {
         }
     }, [navStyle, spread]);
     return (
-        <Tabs
-            value={active}
-            hideCodes={hideCodes}
-            onChange={(code) => dispatch(setActive({ code }))}
-            appearance={navStyle}
-            tool={
-                <Fragment>
-                    {navStyle == 'normal' ? (
-                        <VerticalAlignTop
-                            tips='自动隐藏功能区域'
-                            style={{
-                                marginRight: 8,
-                            }}
-                            pathAttrs={{ fill: '#999' }}
-                            onClick={() => {
-                                dispatch(setActive({ code: null }));
-                                dispatch(setNavStyle('toolbar'));
-                            }}
-                        ></VerticalAlignTop>
-                    ) : (
-                        <VerticalAlignBottom
-                            tips='显示功能区域'
-                            style={{
-                                marginRight: 8,
-                            }}
-                            pathAttrs={{ fill: '#999' }}
-                            onClick={() => {
-                                if (active == null) {
-                                    dispatch(setActive({ code: 'start' }));
-                                }
-                                dispatch(setNavStyle('normal'));
-                            }}
-                        ></VerticalAlignBottom>
-                    )}
-                    <Button
-                        style={{
-                            marginRight: 8,
-                        }}
-                        type='primary'
-                        onClick={handleSave}
-                    >
-                        保存
-                    </Button>
-                    <Button
-                        style={{ marginRight: 8 }}
-                        onClick={async () => {
-                            let datas = null;
-
-                            const { batchGetDatasURL, datasPath } =
-                                context?.conf || {};
-
-                            if (batchGetDatasURL && datasPath) {
-                                try {
-                                    let define = parseUsedDatasource(
-                                        spread,
-                                        finalDsList
-                                    );
-                                    define = define.map(function (item) {
-                                        return {
-                                            type: item.type,
-                                            code: item.code,
-                                        };
-                                    });
-
-                                    const response = await axios.post(
-                                        batchGetDatasURL,
-                                        {
-                                            datasource: define,
-                                        }
-                                    );
-
-                                    const datasPathArr = datasPath.split('/');
-                                    datas = response?.data;
-                                    while (datasPathArr.length) {
-                                        datas = datas[datasPathArr.shift()];
+        <Fragment>
+            <GlobalComponent></GlobalComponent>
+            <Tabs
+                value={active}
+                hideCodes={hideCodes}
+                onChange={(code) => dispatch(setActive({ code }))}
+                appearance={navStyle}
+                tool={
+                    <Fragment>
+                        {navStyle == 'normal' ? (
+                            <VerticalAlignTop
+                                tips='自动隐藏功能区域'
+                                style={{
+                                    marginRight: 8,
+                                }}
+                                pathAttrs={{ fill: '#999' }}
+                                onClick={() => {
+                                    dispatch(setActive({ code: null }));
+                                    dispatch(setNavStyle('toolbar'));
+                                }}
+                            ></VerticalAlignTop>
+                        ) : (
+                            <VerticalAlignBottom
+                                tips='显示功能区域'
+                                style={{
+                                    marginRight: 8,
+                                }}
+                                pathAttrs={{ fill: '#999' }}
+                                onClick={() => {
+                                    if (active == null) {
+                                        dispatch(setActive({ code: 'start' }));
                                     }
-                                } catch (error) {}
-                            }
-                            dispatch(genPreviewDatas({ datas }));
-                            dispatch(setMode({ mode: 'preview' }));
-                        }}
-                    >
-                        预览
-                    </Button>
-                    {toolbar.map(function (
-                        { title, type, onClick, desc },
-                        index
-                    ) {
-                        return (
-                            <Button
-                                style={{ marginRight: 8 }}
-                                onClick={onClick}
-                                key={index}
-                                type={type}
-                                title={desc}
-                            >
-                                {title}
-                            </Button>
-                        );
-                    })}
-                </Fragment>
-            }
-        >
-            <FileNavItem
-                code='file'
-                autoSelect={false}
-                title={<FileTabTitle>文件</FileTabTitle>}
-                tabProps={{
-                    closeHandler: () => dispatch(setActive({ code: null })),
-                    hidden: isHiddenFile,
-                }}
-            ></FileNavItem>
-            <StartNavItem
-                code='start'
-                title='开始'
-                tabProps={{ hidden: isHiddenStart }}
-            ></StartNavItem>
-            <LayoutNavItem
-                code='layout'
-                title='页面布局'
-                tabProps={{ hidden: isHiddenLayout }}
-            ></LayoutNavItem>
-            <FormulaNavItem
-                code='formula'
-                title='公式'
-                tabProps={{ hidden: isHiddenFormula }}
-            ></FormulaNavItem>
-            <DataNavItem
-                code='data'
-                title='数据'
-                tabProps={{ hidden: isHiddenData }}
-            ></DataNavItem>
-            <ViewNavItem
-                code='view'
-                title='视图'
-                tabProps={{ hidden: isHiddenView }}
-            ></ViewNavItem>
-            <TableNavItem
-                code='table'
-                title='表设计'
-                tabProps={{ hidden: isHiddenTable }}
-            ></TableNavItem>
-            <SettingNavItem
-                code='Setting'
-                title='设置'
-                tabProps={{ hidden: isHiddenSetting }}
-            ></SettingNavItem>
-            <ReportNavItem code='Report' title='报表设计'></ReportNavItem>
-            <SparklinesNavItem
-                code='sparklines'
-                title='迷你图'
-                tabProps={{ hidden: isHiddenSparklines }}
-            ></SparklinesNavItem>
-        </Tabs>
+                                    dispatch(setNavStyle('normal'));
+                                }}
+                            ></VerticalAlignBottom>
+                        )}
+                        <Button
+                            style={{
+                                marginRight: 8,
+                            }}
+                            type='primary'
+                            onClick={handleSave}
+                        >
+                            保存
+                        </Button>
+                        <Button
+                            style={{ marginRight: 8 }}
+                            onClick={async () => {
+                                let datas = null;
+
+                                const { batchGetDatasURL, datasPath } =
+                                    context?.conf || {};
+
+                                if (batchGetDatasURL && datasPath) {
+                                    try {
+                                        let define = parseUsedDatasource(
+                                            spread,
+                                            finalDsList
+                                        );
+                                        define = define.map(function (item) {
+                                            return {
+                                                type: item.type,
+                                                code: item.code,
+                                            };
+                                        });
+
+                                        const response = await axios.post(
+                                            batchGetDatasURL,
+                                            {
+                                                datasource: define,
+                                            }
+                                        );
+
+                                        const datasPathArr =
+                                            datasPath.split('/');
+                                        datas = response?.data;
+                                        while (datasPathArr.length) {
+                                            datas = datas[datasPathArr.shift()];
+                                        }
+                                    } catch (error) {}
+                                }
+                                dispatch(genPreviewDatas({ datas }));
+                                dispatch(setMode({ mode: 'preview' }));
+                            }}
+                        >
+                            预览
+                        </Button>
+                        {toolbar.map(function (
+                            { title, type, onClick, desc },
+                            index
+                        ) {
+                            return (
+                                <Button
+                                    style={{ marginRight: 8 }}
+                                    onClick={onClick}
+                                    key={index}
+                                    type={type}
+                                    title={desc}
+                                >
+                                    {title}
+                                </Button>
+                            );
+                        })}
+                    </Fragment>
+                }
+            >
+                <FileNavItem
+                    code='file'
+                    autoSelect={false}
+                    title={<FileTabTitle>文件</FileTabTitle>}
+                    tabProps={{
+                        closeHandler: () => dispatch(setActive({ code: null })),
+                        hidden: isHiddenFile,
+                    }}
+                ></FileNavItem>
+                <StartNavItem
+                    code='start'
+                    title='开始'
+                    tabProps={{ hidden: isHiddenStart }}
+                ></StartNavItem>
+                <LayoutNavItem
+                    code='layout'
+                    title='页面布局'
+                    tabProps={{ hidden: isHiddenLayout }}
+                ></LayoutNavItem>
+                <FormulaNavItem
+                    code='formula'
+                    title='公式'
+                    tabProps={{ hidden: isHiddenFormula }}
+                ></FormulaNavItem>
+                <DataNavItem
+                    code='data'
+                    title='数据'
+                    tabProps={{ hidden: isHiddenData }}
+                ></DataNavItem>
+                <ViewNavItem
+                    code='view'
+                    title='视图'
+                    tabProps={{ hidden: isHiddenView }}
+                ></ViewNavItem>
+                <TableNavItem
+                    code='table'
+                    title='表设计'
+                    tabProps={{ hidden: isHiddenTable }}
+                ></TableNavItem>
+                <SettingNavItem
+                    code='Setting'
+                    title='设置'
+                    tabProps={{ hidden: isHiddenSetting }}
+                ></SettingNavItem>
+                <ReportNavItem code='Report' title='报表设计'></ReportNavItem>
+                <SparklinesNavItem
+                    code='sparklines'
+                    title='迷你图'
+                    tabProps={{ hidden: isHiddenSparklines }}
+                ></SparklinesNavItem>
+            </Tabs>
+        </Fragment>
     );
 }

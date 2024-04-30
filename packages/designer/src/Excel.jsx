@@ -17,6 +17,7 @@ import {
 } from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
+  initDatasource,
   updateActiveSheetTablePath,
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
@@ -42,10 +43,12 @@ import {
 } from './component/defineDatasource/utils/utils';
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
+import { handleEventPrmiseResult } from './utils/eventUtil';
 
 export default function () {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
+    const json = context?.conf?.json?.reportJson;
     const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
     const cacheDatas = useRef({ template }).current;
@@ -67,13 +70,13 @@ export default function () {
             );
         }
     });
-    const handleEnterCell = (type, args) => {
+    const handleEnterCell = useCallback((type, args) => {
         context.handleSelectionChange();
         fire({
             event: EVENTS.EnterCell,
             args: [args],
         });
-    };
+    });
     const handleActiveSheetChanged = useCallback(
         (type, args) => {
             const sheet = args.newSheet;
@@ -97,22 +100,41 @@ export default function () {
         [template]
     );
     const handleWorkbookInitialized = useCallback((spread) => {
-        const sheet = spread.getActiveSheet();
-        const tablePaths = getActiveSheetTablesPath({ sheet });
-        dispatch(updateActiveSheetTablePath({ tablePaths }));
+        return new Promise((resolve, reject) => {
+            const sheet = spread.getActiveSheet();
+            const tablePaths = getActiveSheetTablesPath({ sheet });
+            dispatch(updateActiveSheetTablePath({ tablePaths }));
 
-        dispatch(setSpread({ spread }));
+            dispatch(setSpread({ spread }));
 
-        //对已经绑定了数据源的单元格进行类型设置，设置后就可以看到当前单元格已经绑定了哪个数据源
-        spread.sheets.forEach((sheet) => {
-            formatBindingPathCellType(sheet);
+            //对已经绑定了数据源的单元格进行类型设置，设置后就可以看到当前单元格已经绑定了哪个数据源
+            spread.sheets.forEach((sheet) => {
+                formatBindingPathCellType(sheet);
+            });
+            fire({
+                event: EVENTS.Inited,
+                args: [spread],
+            });
+            registerCommand(spread);
+            enhanceContextMenu(spread, dispatch);
+            const result = fire({
+                event: EVENTS.onDesignerInited,
+                args: [],
+            });
+            handleEventPrmiseResult(
+                result,
+                dispatch,
+                '正在初始化设计器，请稍候...',
+                EVENTS.onDesignerInited
+            ).then(({ excelJson, tableMetadata }) => {
+                excelJson && resolve(excelJson);
+                dispatch(
+                    initDatasource({
+                        datasource: tableMetadata,
+                    })
+                );
+            });
         });
-        fire({
-            event: EVENTS.Inited,
-            args: [spread],
-        });
-        registerCommand(spread);
-        enhanceContextMenu(spread,dispatch);
     });
     const handleSelectionChanged = useCallback((type, data) => {
         fire({
@@ -144,18 +166,29 @@ export default function () {
             args: [data],
         });
     });
-    const handleUndo = useCallback((data)=>{
+    const handleUndo = useCallback((data) => {
         fire({
             event: EVENTS.Undo,
             args: [data],
         });
     });
-    const handleRedo = useCallback((data)=>{
+    const handleRedo = useCallback((data) => {
         fire({
             event: EVENTS.Redo,
             args: [data],
         });
     });
+
+    const handleSheetNameChanged = useCallback((aciton, datas) => {
+        const { newValue, oldValue } = datas;
+        dispatch(
+            updateTemplateName({
+                oldName: oldValue,
+                newName: newValue,
+            })
+        );
+    });
+
     const sheetsConf = context?.conf?.sheets || {};
     //是否显示添加选项卡按钮
     const newTabVisible = sheetsConf.newTabVisible !== false;
@@ -165,8 +198,6 @@ export default function () {
     const tabStripVisible = sheetsConf.tabStripVisible !== false;
     //许可证
     const license = context?.conf?.license;
-
-    const json = context?.conf?.json?.reportJson;
 
     return (
         <Fragment>
@@ -180,25 +211,13 @@ export default function () {
                 onInited={handleWorkbookInitialized}
                 onEnterCell={handleEnterCell}
                 onActiveSheetChanged={handleActiveSheetChanged}
-                onActiveSheetChanging={function (a, b, c) {
-                    console.log(a, b);
-                    console.log(11111);
-                }}
                 onValueChanged={handleValueChanged}
                 onSelectionChanged={handleSelectionChanged}
                 onSelectionChanging={handleSelectionChanging}
                 onSheetChanged={handleSheetChanged}
                 onEditorStatusChanged={handleEditorStatusChanged}
                 onRendered={handleRendered}
-                onSheetNameChanged={function (aciton, datas) {
-                    const { newValue, oldValue } = datas;
-                    dispatch(
-                        updateTemplateName({
-                            oldName: oldValue,
-                            newName: newValue,
-                        })
-                    );
-                }}
+                onSheetNameChanged={handleSheetNameChanged}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
             >

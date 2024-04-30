@@ -23,7 +23,7 @@ import Workbook from './Workbook';
  * report.mount(document.getElementById('app'));
  * report.exportExcel("test.xlsx")
  */
-class Preview {
+class Report {
     conf = {};
 
     spread = null;
@@ -79,7 +79,7 @@ class Preview {
 
         const { rowMerge, columnMerge } =
             this.conf?.json?.context?.tableDesignSlice || {};
-
+        const {onFetchData} = this.conf?.event||{};
         const {
             sumColumns,
             tableGroups: groupColumns,
@@ -93,6 +93,7 @@ class Preview {
                 onPrintHandler: (handler) => {
                     this.printHandler = handler;
                 },
+                onFetchData,
                 rowMerge,
                 columnMerge,
                 sumColumns,
@@ -245,4 +246,4 @@ class Preview {
     }
 }
 
-export default Preview;
+export default Report;

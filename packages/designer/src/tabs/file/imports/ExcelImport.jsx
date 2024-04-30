@@ -73,9 +73,19 @@ function ExcelImport(props) {
                                         if (target) {
                                             target.value = null;
                                         }
-                                        spread.fromJSON(json, excelOpenFlags);
+                                        const promise = spread.fromJSON(json, excelOpenFlags);
                                         closeHandler();
                                         showLoadingMessage(dispatch, null);
+                                        if(promise){
+                                            promise.then(()=>{
+                                                spread.refresh();
+                                            });
+                                        }else{
+                                            setTimeout(()=>{
+                                                //解决导入后工作表导航栏消失问题
+                                                spread.refresh();
+                                            },100);
+                                        }
                                     },
                                     (err) => {
                                         if (target) {

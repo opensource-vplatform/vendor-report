@@ -7,6 +7,9 @@ export const appSlice = createSlice({
         mode: 'edit',
         waitMsg: null,
         errorMsg: null,
+        confirmMsg: null,
+        confirmTitle: null,
+        confirmCallbackId: null,
         navStyle: 'normal',
         rangeSelect: {
             //范围选择器配置
@@ -34,6 +37,12 @@ export const appSlice = createSlice({
         setRangeSelect(state, action) {
             state.rangeSelect = action.payload;
         },
+        setConfirmMsg(state,{payload}){
+            const {message,title,callbackId} = payload;
+            state.confirmMsg = message;
+            state.confirmTitle = title;
+            state.confirmCallbackId = callbackId
+        }
     },
 });
 export const {
@@ -43,5 +52,6 @@ export const {
     setWaitMsg,
     setErrorMsg,
     setNavStyle,
+    setConfirmMsg,
 } = appSlice.actions;
 export default appSlice.reducer;

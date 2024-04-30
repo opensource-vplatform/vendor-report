@@ -10,17 +10,12 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { Setting as CellStylesSetting } from '@components/cellStyles/Index';
 import { DraggableDatasources } from '@components/defineDatasource/Index';
-import Error from '@components/error/Index';
-import Loading from '@components/loading/Index';
-import { SelectBox } from '@components/range/Index';
 import {
   Pane,
   Resizer,
   SplitPane,
 } from '@components/splitpane/Index';
-import { setErrorMsg } from '@store/appSlice/appSlice';
 import { initDatasource } from '@store/datasourceSlice/datasourceSlice';
 import {
   hideTab,
@@ -31,7 +26,6 @@ import { initWizardSlice } from '@store/wizardSlice';
 import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 
-import SparkLine from './component/sparkline/SparkLine';
 import DesignerContext from './DesignerContext';
 import EditorBar from './EditorBar';
 import Excel from './Excel';
@@ -69,14 +63,9 @@ function Designer(props) {
         setBaseUrl(conf.baseUrl);
     }
     const dispatch = useDispatch();
-    const { mode, spread, waitMsg, errorMsg, navStyle } = useSelector(
-        ({ appSlice }) => appSlice
-    );
+    const { mode, spread, navStyle } = useSelector(({ appSlice }) => appSlice);
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
-    const { visible } = useSelector(({rangeSlice})=>rangeSlice);
-    const cellSettingSlice = useSelector(({cellSettingSlice})=>cellSettingSlice);
-    const sparklineSlice = useSelector(({sparklineSlice})=>sparklineSlice);
-    const [data] = useState({}); 
+    const [data] = useState({});
     data.spread = spread;
     data.active = active;
     data.hideCodes = hideCodes;
@@ -94,10 +83,7 @@ function Designer(props) {
                 //不在表格区域，且存在表设计页签，需要隐藏表设计页签
                 dispatch(hideTab({ code: 'table' }));
             }
-            const sparklinesSel = hasCellTagPlugin(
-                sheet,
-                "cellImage"
-            );
+            const sparklinesSel = hasCellTagPlugin(sheet, 'cellImage');
             if (sparklinesSel) {
                 if (data.hideCodes.indexOf('sparklines') != -1) {
                     dispatch(showTab({ code: 'sparklines' }));
@@ -144,26 +130,14 @@ function Designer(props) {
         <Fragment>
             <DesignerContext.Provider value={ctxValue}>
                 <GlobalStyle></GlobalStyle>
-                {waitMsg != null ? <Loading title={waitMsg}></Loading> : null}
-                {errorMsg != null ? (
-                    <Error
-                        message={errorMsg}
-                        onClose={() => {
-                            dispatch(setErrorMsg({ message: null }));
-                        }}
-                    ></Error>
-                ) : null}
                 <Box style={{ display: mode == 'edit' ? 'block' : 'none' }}>
                     <Wrap>
-                        {visible ? <SelectBox></SelectBox>:null}
-                        {cellSettingSlice.visible ? <CellStylesSetting></CellStylesSetting>:null}
-                        {sparklineSlice.visible ? <SparkLine></SparkLine>:null}
                         {isShowNav && <Nav></Nav>}
                         <SplitPane
                             style={{
                                 width: '100%',
                                 display: 'flex',
-                                height:'100%',
+                                height: '100%',
                                 flexDirection: 'column',
                                 overflow: 'hidden',
                             }}

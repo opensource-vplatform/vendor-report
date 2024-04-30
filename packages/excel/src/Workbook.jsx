@@ -58,6 +58,14 @@ const bindEvent = function (spread, typeName, handler) {
     }
 };
 
+const bindEvents = function (spread, events) {
+    if (spread && events) {
+        for (let [event, handler] of Object.entries(events)) {
+            bindEvent(spread, event, handler);
+        }
+    }
+};
+
 const setValue = function (val, fn) {
     if (val !== null && typeof val !== undefined) {
         fn(val);
@@ -1658,6 +1666,8 @@ const bindDataSource = function (params) {
     });
 };
 
+
+
 export default function (props) {
     const {
         newTabVisible = true,
@@ -1673,6 +1683,7 @@ export default function (props) {
         onSheetNameChanged,
         onSheetNameChanging,
         onActiveSheetChanging,
+        onFetchData,
         onUndo,
         onRedo,
         license,
@@ -1721,9 +1732,9 @@ export default function (props) {
 
     const el = useRef(null);
     const { json, sheetsInfo } = useMemo(
-        function () {
+        ()=> {
             let sheetsInfo = null;
-            let json = JSON.parse(JSON.stringify(_json));
+            const json = JSON.parse(JSON.stringify(_json));
             if (json) {
                 sheetsInfo =
                     dataSource && parseJsonData(json, dataSource, template);
@@ -1732,211 +1743,180 @@ export default function (props) {
                 sheetsInfo,
                 json,
             };
-        },
-        [_json, dataSource, JSON.stringify(template)]
+        },[_json, dataSource, JSON.stringify(template)]
     );
-
-    /*  debugger;
-        if (json) {
-            Object.values(json.sheets).forEach(function (sheet) {
-                sheet.data.dataTable[2] = {
-                    1: {
-                        hyperlink: {
-                            url: 'sjs://Sheet2!A1',
-                            tooltip: '',
-                            target: 0,
-                            drawUnderline: true,
-                            command: '',
-                        },
-                    },
-                };
-                sheet.data.dataTable[3] = {
-                    1: {
-                        hyperlink: {
-                            url: 'sjs://Sheet3!A1',
-                            tooltip: '',
-                            target: 0,
-                            drawUnderline: true,
-                            command: '',
-                        },
-                    },
-                };
+    const initSpread = async () => {
+        if (enablePrint) {
+            const plugins = getPluginSrc('print');
+            await resourceManager.loadScript(plugins);
+        }
+        if (!data.spread && el.current && !el.showError) {
+            const GC = getNamespace();
+            const spread = new GC.Spread.Sheets.Workbook(el.current, {
+                sheetCount: 0,
+                newTabVisible,
+                tabEditable,
+                tabStripVisible,
             });
-        } */
+            data.spread = spread;
+            spread.suspendEvent();
+            register(spread);
+            spread.resumeEvent();
+            return true;
+        }
+        return false;
+    };
+    //处理事件绑定
+    const handleEvents = ()=>{
+        if(!data.spread)return;
+        const spread = data.spread;
+        spread.unbindAll();
+        bindEvents(spread, {
+            EnterCell: onEnterCell,
+            ActiveSheetChanged: onActiveSheetChanged,
+            ValueChanged: onValueChanged,
+            ActiveSheetChanging: onActiveSheetChanging,
+            SheetNameChanged: onSheetNameChanged,
+            SheetNameChanging: onSheetNameChanging,
+            SelectionChanged: onSelectionChanged,
+            SelectionChanging: onSelectionChanging,
+            EditorStatusChanged: onEditorStatusChanged,
+            WorkbookUndo: onUndo,
+            WorkbookRedo: onRedo,
+        });
+    }
+    //处理工作表生成，优先使用json
+    const handleSheets = (json)=>{
+        if(!data.spread)return;
+        const spread = data.spread;
+        if (json) {
+            withBatchCalcUpdate(spread, () => {
+                spread.fromJSON(json);
+                const sheets = spread.sheets;
+                if (sheets && sheets.length > 0) {
+                    sheets.forEach((sheet) => {
+                        sheet.options.sheetAreaOffset = {
+                            left: 1,
+                            top: 1,
+                        };
+                        sheet.recalcAll(true);
+                    });
+                }
+            });
+        }else{
+            //不存在json数据时才根据子组件创建工作表
+            withBatchCalcUpdate(spread, () => {
+                let sheetList;
+                if (children) {
+                    sheetList = Array.isArray(children)
+                        ? children
+                        : [children];
+                } else {
+                    sheetList = [];
+                }
+                spread.clearSheets();
+                const GC = getNamespace();
+                sheetList.forEach((sheet, index) => {
+                    const {
+                        name = `Sheet${index + 1}`,
+                        rowCount = 20,
+                        colCount = 20,
+                    } = sheet.props;
+                    const workSheet = new GC.Spread.Sheets.Worksheet(
+                        name
+                    );
+                    workSheet.options.sheetAreaOffset = {
+                        left: 1,
+                        top: 1,
+                    };
+                    workSheet.setRowCount(rowCount);
+                    workSheet.setColumnCount(colCount);
+                    spread.addSheet(index, workSheet);
+                });
+            });
+        }
+    }
+    //处理数据
+    const handleDatas = ()=>{
+        if(!data.spread)return;
+        const spread = data.spread;
+        if (dataSource) {
+            bindDataSource({
+                spread: spread,
+                dataSource,
+                sumColumns,
+                groupColumns,
+                rowMerge,
+                columnMerge,
+                rowMergeColumns,
+                colMergeColumns,
+                isFillData,
+                sheetsInfo,
+            });
+        }
+    }
+
+    const handlePrint = ()=>{
+        if(!data.spread)return;
+        const spread = data.spread;
+        if (onPrintHandler) {
+            onPrintHandler((params) => {
+                return new Promise((resolve, reject) => {
+                    if (spread) {
+                        if (enablePrint) {
+                            const sheets = spread.sheets;
+                            sheets.forEach((sheet) => {
+                                setPrintInfo(sheet, params || {});
+                            });
+                            spread.print();
+                            resolve();
+                        } else {
+                            reject(
+                                Error(
+                                    '打印失败，原因：初始化报表时未开启打印功能'
+                                )
+                            );
+                        }
+                    } else {
+                        reject(Error('打印失败，原因：报表未初始化'));
+                    }
+                });
+            });
+        }
+    }
 
     useEffect(() => {
-        if (el.current && !data.showError) {
-            let plugins = [];
-            if (enablePrint) {
-                plugins = plugins.concat(getPluginSrc('print'));
-            }
-            const handler = () => {
-                let spread = null;
-                const unInited = !data.spread;
-                if (unInited) {
-                    const GC = getNamespace();
-                    spread = new GC.Spread.Sheets.Workbook(el.current, {
-                        sheetCount: 0,
-                        newTabVisible,
-                        tabEditable,
-                        tabStripVisible,
-                    });
-                    data.spread = spread;
-                } else {
-                    spread = data.spread;
-                }
-                spread.suspendPaint();
-                spread.suspendEvent();
-                try {
-                    if (unInited) {
-                        if (json) {
-                            withBatchCalcUpdate(spread, () => {
-                                spread.fromJSON(json);
-                                register(spread);
-                                const sheets = spread.sheets;
-                                if (sheets && sheets.length > 0) {
-                                    sheets.forEach((sheet) => {
-                                        sheet.options.sheetAreaOffset ={ left:1,top:1}
-                                        sheet.recalcAll(true);
-                                    });
-                                }
-                            });
-                        } else {
-                            let sheetList;
-                            if (children) {
-                                sheetList = Array.isArray(children)
-                                    ? children
-                                    : [children];
-                            } else {
-                                sheetList = [
-                                    /*{ props: { name: 'Sheet1' } }*/
-                                ];
-                            }
-                            sheetList.forEach((sheet, index) => {
-                                const {
-                                    name = `Sheet${index + 1}`,
-                                    rowCount = 20,
-                                    colCount = 20,
-                                } = sheet.props;
-                                const workSheet =
-                                    new GC.Spread.Sheets.Worksheet(name);
-                                workSheet.options.sheetAreaOffset ={ left:1,top:1}
-                                workSheet.setRowCount(rowCount);
-                                workSheet.setColumnCount(colCount);
-                                spread.addSheet(index, workSheet);
-                            });
-                            register(spread);
-                        }
-                        onInited && onInited(spread);
-                        bindEvent(spread, 'EnterCell', onEnterCell);
-                        bindEvent(
-                            spread,
-                            'ActiveSheetChanged',
-                            onActiveSheetChanged
-                        );
-                        bindEvent(spread, 'ValueChanged', onValueChanged);
-                        bindEvent(
-                            spread,
-                            'ActiveSheetChanging',
-                            onActiveSheetChanging
-                        );
-                        bindEvent(
-                            spread,
-                            'SheetNameChanged',
-                            onSheetNameChanged
-                        );
-                        bindEvent(
-                            spread,
-                            'SheetNameChanging',
-                            onSheetNameChanging
-                        );
-                        bindEvent(
-                            spread,
-                            'SelectionChanged',
-                            onSelectionChanged
-                        );
-                        bindEvent(
-                            spread,
-                            'SelectionChanging',
-                            onSelectionChanging
-                        );
-                        bindEvent(spread, 'SheetChanged', () => {});
-                        bindEvent(
-                            spread,
-                            'EditorStatusChanged',
-                            onEditorStatusChanged
-                        );
-                        bindEvent(spread,'WorkbookUndo',onUndo);
-                        bindEvent(spread,'WorkbookRedo',onRedo);
-                    }
-                    dataSource &&
-                        bindDataSource({
-                            spread: data.spread,
-                            dataSource,
-                            sumColumns,
-                            groupColumns,
-                            rowMerge,
-                            columnMerge,
-                            rowMergeColumns,
-                            colMergeColumns,
-                            isFillData,
-                            sheetsInfo,
+        (async () => {
+            const inited = await initSpread();
+            handleEvents();
+            if(inited){
+                handleSheets(json);
+                handleDatas();
+                handlePrint();
+                if(onInited){
+                   const promise = onInited(data.spread);
+                   if(promise&&promise.then){
+                        promise.then((json)=>{
+                            handleSheets(json);
                         });
-                    if (onPrintHandler) {
-                        onPrintHandler((params) => {
-                            return new Promise((resolve, reject) => {
-                                if (spread) {
-                                    if (enablePrint) {
-                                        const sheets = spread.sheets;
-                                        sheets.forEach((sheet) => {
-                                            setPrintInfo(sheet, params || {});
-                                        });
-                                        spread.print();
-                                        resolve();
-                                    } else {
-                                        reject(
-                                            Error(
-                                                '打印失败，原因：初始化报表时未开启打印功能'
-                                            )
-                                        );
-                                    }
-                                } else {
-                                    reject(
-                                        Error('打印失败，原因：报表未初始化')
-                                    );
-                                }
-                            });
-                        });
-                    }
-                } finally {
-                    spread.resumePaint();
-                    spread.resumeEvent();
+                   }
                 }
-            };
-            if (plugins.length > 0) {
-                resourceManager.loadScript(plugins).then(() => {
-                    handler();
-                });
-            } else {
-                handler();
             }
-        }
+        })();
     }, [
-        onInited,
+        json,
+        dataSource,
         onEnterCell,
         onActiveSheetChanged,
         onValueChanged,
-        onSelectionChanged,
-        onSelectionChanging,
-        dataSource,
-        sumColumns,
-        groupColumns,
-        rowMerge,
-        columnMerge,
-        rowMergeColumns,
-        colMergeColumns,
+        onActiveSheetChanging,
         onSheetNameChanged,
         onSheetNameChanging,
+        onSelectionChanged,
+        onSelectionChanging,
+        onEditorStatusChanged,
+        onUndo,
+        onRedo,
     ]);
     return (
         <Wrap>

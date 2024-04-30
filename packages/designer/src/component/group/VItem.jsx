@@ -22,7 +22,7 @@ const TitleWrap = styled.div`
 
 const Title = styled.div`
     align-self: center;
-    font-size: 10px;
+    font-size: 12px;
     width:100%;
     text-align:center;
 `;

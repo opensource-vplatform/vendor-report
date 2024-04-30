@@ -1,39 +1,32 @@
 const path = require('path');
 
-const fs = require('fs');
+const xmljs = require('xml-js');
+
+const buildUtils = require('../../../scripts/buildUtils');
 
 const indexHtmlPath = path.resolve(__dirname, '../dist/report.html');
 
-const distPath = path.resolve(__dirname,'../dist');
+const distPath = path.resolve(__dirname, '../dist');
 
-const filenames = fs.readdirSync(path.resolve(__dirname,'../dist'));
+const vendorImportPath = path.resolve(distPath, 'vendor-report-import.xml');
 
-let indexScriptName = null;
+const importPath = path.resolve(distPath, 'report-import.xml');
 
 const INDEX_SCRIPT_REG = /^report\-[\w\d]+\.umd\.js$/;
 
-const SCRIPT_REG = /<script\s+src=["'](\.\/report.+?umd\.js)["']\s*>/;
+//获取build名称生成的js文件名称
+let distFilePath = buildUtils.getBuildFilenamePath(distPath, INDEX_SCRIPT_REG);
 
-for (let index = 0; index < filenames.length; index++) {
-    const filename = filenames[index];
-    if(INDEX_SCRIPT_REG.test(filename)){
-        indexScriptName = filename;
-        break;
-    }
-}
+if (distFilePath) {
+    
+    //生成html需要导入资源的xml信息
+    buildUtils.genImportXML(
+        distFilePath,
+        vendorImportPath,
+        xmljs.xml2js,
+        importPath
+    );
 
-if(indexScriptName!=null){
-    let content = fs.readFileSync(indexHtmlPath)
-    content = new String(content);
-    content = content.replace(SCRIPT_REG,function(){
-        return "<script src='./script/"+indexScriptName+"'>";
-    });
-    fs.writeFileSync(indexHtmlPath,content);
-    const distScriptPath = path.resolve(distPath,indexScriptName);
-    const distDir = path.resolve(distPath,'script');
-    if(!fs.existsSync(distDir)){
-        fs.mkdirSync(distDir,{ recursive: true });
-    }
-    fs.copyFileSync(distScriptPath, path.resolve(distDir,indexScriptName));
-    fs.unlinkSync(distScriptPath);
+    //将导入信息填充到html中
+    buildUtils.importToHtml(xmljs.xml2js, importPath, indexHtmlPath);
 }
