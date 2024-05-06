@@ -126,14 +126,11 @@ const designer = new Designer({
                 };
                 RPC.post(getSaveReportUrl(), params)
                     .then((response) => {
-                        if (response?.data?.success) {
-                            resolve({ success: true });
-                        } else {
-                            reject({
-                                success: false,
-                                message: response?.data?.message,
-                            });
+                        const error = getError(response);
+                        if (error != null) {
+                            return reject(Error(error));
                         }
+                        resolve({ success: true });
                     })
                     .catch((e) => {
                         console.error(e);

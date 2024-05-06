@@ -108,7 +108,6 @@ const designer = new Designer({
     dataSource: {
         allowToView: false, //不允许查看数据源
         allowToEdit: false, //不允许编辑数据源
-        allowToSelect:false,//不允许选择数据源
     },
     event: {
         onSave: function (json, context) {
@@ -126,14 +125,11 @@ const designer = new Designer({
                 };
                 RPC.post(getSaveReportUrl(), params)
                     .then((response) => {
-                        if (response?.data?.success) {
-                            resolve({ success: true });
-                        } else {
-                            reject({
-                                success: false,
-                                message: response?.data?.message,
-                            });
+                        const error = getError(response);
+                        if (error != null) {
+                            return reject(Error(error));
                         }
+                        resolve({ success: true });
                     })
                     .catch((e) => {
                         console.error(e);
