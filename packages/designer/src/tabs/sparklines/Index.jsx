@@ -1,6 +1,10 @@
 import { useContext } from 'react';
 
 import { Group } from '@components/group/Index';
+import {
+  getNavConfig,
+  getNavSparklinesConfig,
+} from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext';
 import Setting from './setting/Index';
@@ -8,12 +12,12 @@ import Setting from './setting/Index';
 function Index() {
     const context = useContext(DesignerContext);
     //是否隐藏开始导航
-    const isHidden = context?.conf?.nav?.sparklines === false;
+    const isHidden =getNavConfig(context,'sparklines');
     if (isHidden) {
         return null;
     }
 
-    const isSetting = context?.conf?.nav?.sparklines?.setting !== false;
+    const isSetting = !getNavSparklinesConfig(context,'setting');
 
     return (
         <Group>

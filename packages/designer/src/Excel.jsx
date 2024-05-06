@@ -38,6 +38,7 @@ import {
   genUUID,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil';
+import { getLicense } from '@utils/configUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import {
   getCellTag,
@@ -211,7 +212,7 @@ export default function () {
     //实现显示选项卡
     const tabStripVisible = sheetsConf.tabStripVisible !== false;
     //许可证
-    const license = context?.conf?.license;
+    const license = getLicense(context);
 
     useEffect(() => {
         const id = genUUID();

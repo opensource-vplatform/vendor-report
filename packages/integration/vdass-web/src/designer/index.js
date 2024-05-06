@@ -108,6 +108,7 @@ const designer = new Designer({
     dataSource: {
         allowToView: false, //不允许查看数据源
         allowToEdit: false, //不允许编辑数据源
+        allowToSelect:false,//不允许选择数据源
     },
     event: {
         onSave: function (json, context) {

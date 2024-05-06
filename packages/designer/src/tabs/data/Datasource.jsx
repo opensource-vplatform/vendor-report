@@ -8,6 +8,7 @@ import {
 } from '@components/group/Index';
 import DatasourceIcon from '@icons/data/datasource';
 import { setIsShowDatasource } from '@store/datasourceSlice/datasourceSlice';
+import { getDataSourceConfig } from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext';
 
@@ -15,7 +16,7 @@ export default function () {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
     //是否允许查看数据源
-    const isAllowToView = context?.conf?.dataSource?.allowToView !== false;
+    const isAllowToView = !getDataSourceConfig(context,'allowToView');
     const cursor = isAllowToView ? 'pointer' : 'not-allowed';
     return (
         <GroupItem title='数据绑定'>

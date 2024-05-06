@@ -1,7 +1,7 @@
 {
-    "name": "@toone/integration-vdaas-web",
+    "name": "@toone/integration-vdaas-console",
     "version": "1.0.0",
-    "description": "VDAAS集成",
+    "description": "VDAAS控制台集成",
     "main": "index.js",
     "scripts": {
         "dev": "vite --host -c=vite.config.dev.js",

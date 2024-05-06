@@ -5,6 +5,8 @@ import {
 
 import styled from 'styled-components';
 
+import { getNavFileConfig } from '@utils/configUtil';
+
 import DesignerContext from '../../DesignerContext';
 import Export from './Export';
 import Import from './Import';
@@ -47,11 +49,11 @@ function Index(props) {
 
     const context = useContext(DesignerContext);
     //是否显示导入菜单
-    const isShowImport = context?.conf?.nav?.file?.import !== false;
+    const isShowImport = !getNavFileConfig(context,'import');
     //是否显示导出菜单
-    const isShowExport = context?.conf?.nav?.file?.export !== false;
+    const isShowExport = !getNavFileConfig(context,'export');
     //是否显示打印菜单
-    const isShowPrint = context?.conf?.nav?.file?.print !== false;
+    const isShowPrint = !getNavFileConfig(context,'print');
 
     let initMenuCode = '';
     if (isShowImport) {

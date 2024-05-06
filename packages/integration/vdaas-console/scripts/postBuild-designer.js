@@ -8,11 +8,11 @@ const buildUtils = require('../../../../scripts/buildUtils');
 
 const distPath = path.resolve(__dirname, '../designerDist');
 
-const designerHtmlPath = path.resolve(distPath, 'designer.html');
+const designerHtmlPath = path.resolve(distPath, 'designer/index.html');
 
 const importPath = path.resolve(__dirname, '../../../designer/dist/designer-import.xml');
 
-const spreadsheetPath = path.resolve(__dirname,"../resources/page/spreadsheet")
+const spreadsheetPath = path.resolve(__dirname,"../resources/static/spreadsheet")
 
 const INDEX_SCRIPT_REG = /^integration\-vdaas\-designer\-[\w\d]+\.umd\.js$/;
 
@@ -27,10 +27,10 @@ if(distFilePath){
     buildUtils.appendScript(result,distFilePath);
 
     //将导入信息写入到html中
-    buildUtils.importToHtmlByObject(result,designerHtmlPath);
+    buildUtils.importToHtmlByObject(result,designerHtmlPath,"../");
 
     //移除report.html
-    del.sync(["designerDist/report.html"]);
+    del.sync(["designerDist/report/index.html"]);
 
     //将build结果拷贝到spreadsheet目录
     buildUtils.copy(distPath,spreadsheetPath)

@@ -4,7 +4,7 @@ import {
 } from './utils';
 
 const appendParam = function () {
-    const paramUrl = parameterToUrl(['tenant', 'id']);
+    const paramUrl = parameterToUrl();
     return paramUrl != '' ? '&' + paramUrl : '';
 };
 

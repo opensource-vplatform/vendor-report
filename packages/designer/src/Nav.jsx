@@ -49,6 +49,10 @@ import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
 import Formula from './tabs/formula/Index';
 import { saveAsImg } from './utils/canvas2image';
+import {
+  getNavConfig,
+  getToolbar,
+} from './utils/configUtil';
 import { handleEventPrmiseResult } from './utils/eventUtil';
 import { parseStyle } from './utils/styleUtil';
 
@@ -174,28 +178,28 @@ export default function () {
 
     const context = useContext(DesignerContext);
     //是否隐藏文件导航
-    const isHiddenFile = context?.conf?.nav?.file === false;
+    const isHiddenFile = getNavConfig(context,"file");
     //是否隐藏开始导航
-    const isHiddenStart = context?.conf?.nav?.start === false;
+    const isHiddenStart = getNavConfig(context,"start");
     //是否隐藏公式导航
-    const isHiddenFormula = context?.conf?.nav?.formula === false;
+    const isHiddenFormula = getNavConfig(context,"formula");
     //是否隐藏数据导航
-    const isHiddenData = context?.conf?.nav?.data === false;
+    const isHiddenData = getNavConfig(context,"data");
     //是否隐藏视图导航
-    const isHiddenView = context?.conf?.nav?.view === false;
+    const isHiddenView = getNavConfig(context,"view");
     //是否隐藏表设计导航
-    const isHiddenTable = context?.conf?.nav?.table === false;
+    const isHiddenTable = getNavConfig(context,"table");
     //是否隐藏设置导航
-    const isHiddenSetting = context?.conf?.nav?.setting === false;
+    const isHiddenSetting = getNavConfig(context,"setting");
     //是否隐藏插入导航
-    const isHiddenInsert = context?.conf?.nav?.insert === false;
+    const isHiddenInsert = getNavConfig(context,"insert");
     //是否隐藏迷你图导航
-    const isHiddenSparklines = context?.conf?.nav?.sparklines === false;
+    const isHiddenSparklines = getNavConfig(context,"sparklines");
     //是否隐藏页面布局
-    const isHiddenLayout = context?.conf?.nav?.layout === false;
-    const toolbar = Array.isArray(context?.conf?.toolbar)
-        ? context?.conf?.toolbar
-        : [];
+    const isHiddenLayout = getNavConfig(context,"layout");
+    //是否可以预览
+    const isPreview = !getNavConfig(context,"preview");
+    const toolbar = getToolbar(context);
     useEffect(() => {
         if (spread) {
             spread.refresh();
@@ -293,7 +297,7 @@ export default function () {
                         >
                             保存
                         </Button>
-                        <Button
+                        {isPreview && <Button
                             style={{ marginRight: 8 }}
                             onClick={async () => {
                                 let datas = null;
@@ -334,7 +338,7 @@ export default function () {
                             }}
                         >
                             预览
-                        </Button>
+                        </Button>}
                         {toolbar.map(function (
                             { title, type, onClick, desc },
                             index

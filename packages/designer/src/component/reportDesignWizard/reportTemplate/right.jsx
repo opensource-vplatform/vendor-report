@@ -16,6 +16,7 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
+import { getLicense } from '@utils/configUtil';
 import CrossDatas from '@utils/crossDatas';
 import { getNamespace } from '@utils/spreadUtil';
 
@@ -231,7 +232,7 @@ export default function Index(props) {
     const { value, field, exclude, reportType } = props;
     const context = useContext(DesignerContext);
     //许可证
-    const license = context?.conf?.license;
+    const license = getLicense(context);
 
     const onInitedHandler = function (spread) {
         setSpread(spread);

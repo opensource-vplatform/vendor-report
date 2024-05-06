@@ -1,6 +1,10 @@
 import { useContext } from 'react';
 
 import { Group } from '@components/group/Index';
+import {
+  getNavConfig,
+  getNavFormulaConfig,
+} from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext';
 import Calculation from './Calculation';
@@ -10,18 +14,17 @@ import Library from './Library';
 function Index() {
     const context = useContext(DesignerContext);
     //是否隐藏公式导航
-    const isHidden = context?.conf?.nav?.formula === false;
+    const isHidden =getNavConfig(context,'formula');
     if (isHidden) {
         return null;
     }
 
     //是否显示函数库
-    const isSHowLibary = context?.conf?.nav?.formula?.library !== false;
+    const isSHowLibary = !getNavFormulaConfig(context,'library');
     //是否显示计算
-    const isSHowCalculation =
-        context?.conf?.nav?.formula?.calculation !== false;
+    const isSHowCalculation = !getNavFormulaConfig(context,'calculation');
 
-    const isShowEditor = context?.conf?.nav?.formula?.editor !== false;
+    const isShowEditor = !getNavFormulaConfig(context,'editor');
     return (
         <Group>
             {isSHowLibary && <Library></Library>}

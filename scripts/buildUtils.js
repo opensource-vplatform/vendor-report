@@ -105,21 +105,22 @@ const appendScript = function (root, src) {
     });
 };
 
-const importToHtmlByObject = function(object,htmlPath){
+const importToHtmlByObject = function(object,htmlPath,prefix){
     const styles = object.elements[0].elements[0].elements;
     const scripts = object.elements[0].elements[1].elements;
     const styleImportScript = [];
     const scriptImportScript = [];
+    prefix = prefix ? prefix:'./'
     styles.forEach((style) => {
         const attributes = style.attributes;
         styleImportScript.push(
-            `<link rel="stylesheet" href="${attributes.href}"></link>`
+            `<link rel="stylesheet" href="${attributes.href.startsWith('./') ? prefix+attributes.href.substring(2):prefix+attributes.href}"></link>`
         );
     });
     scripts.forEach((script) => {
         const attributes = script.attributes;
         scriptImportScript.push(
-            `<script type="text/javascript" src="${attributes.src}"></script>`
+            `<script type="text/javascript" src="${attributes.src.startsWith('./') ? prefix+attributes.src.substring(2):prefix+attributes.src}"></script>`
         );
     });
     let htmlContent = new String(fs.readFileSync(htmlPath));

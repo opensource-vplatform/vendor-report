@@ -10,7 +10,7 @@ const reportDist = path.resolve(__dirname, '../packages/excel/dist');
 
 const spreadsheetDir = path.resolve(
     __dirname,
-    '../packages/integration/vdaas-console/resources/page/spreadsheet'
+    '../packages/integration/vdaas-console/resources/static/spreadsheet'
 );
 
 const getDirNames = function (sourcePath) {

@@ -11,6 +11,10 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
+import {
+  getLicense,
+  getToolbar,
+} from '@utils/configUtil';
 
 import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
@@ -103,10 +107,8 @@ export default function () {
     );
     const json = JSON.parse(sourceJson);
     //许可证
-    const license = context?.conf?.license;
-    const toolbar = Array.isArray(context?.conf?.toolbar)
-        ? context?.conf?.toolbar
-        : [];
+    const license = getLicense(context);
+    const toolbar = getToolbar(context);
     let printHandler = null;
     const handlePrint = () => {
         printHandler && printHandler();

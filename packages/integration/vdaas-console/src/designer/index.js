@@ -104,6 +104,7 @@ const designer = new Designer({
         table: {
             tableOptions: false,
         },
+        preview: false,//禁用预览
     },
     dataSource: {
         allowToView: false, //不允许查看数据源
@@ -152,7 +153,7 @@ const designer = new Designer({
                             return reject(Error(error));
                         }
                         resolve(
-                            enhanceMetadata(metadata?.data?.data?.define || [])
+                            enhanceMetadata(metadata?.data?.data?.data?.define || [])
                         );
                     })
                     .catch(reject);
@@ -192,7 +193,7 @@ const designer = new Designer({
                                     }
                                     resolve({
                                         tableMetadata: enhanceMetadata(
-                                            metadata?.data?.data?.define || []
+                                            metadata?.data?.data?.data?.define || []
                                         ),
                                         excelJson: excelJson
                                             ? excelJson.reportJson

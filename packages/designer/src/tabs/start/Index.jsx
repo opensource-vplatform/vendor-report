@@ -1,6 +1,10 @@
 import { useContext } from 'react';
 
 import { Group } from '@components/group/Index';
+import {
+  getNavConfig,
+  getNavStartConfig,
+} from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext';
 import Align from './align/Index';
@@ -12,22 +16,22 @@ import Style from './style/Index';
 function Index() {
     const context = useContext(DesignerContext);
     //是否隐藏开始导航
-    const isHidden = context?.conf?.nav?.start === false;
+    const isHidden = getNavConfig(context,'start');
     if (isHidden) {
         return null;
     }
 
     //是否显示 font
-    const isShowFont = context?.conf?.nav?.start?.font !== false;
+    const isShowFont = !getNavStartConfig(context,'font');
 
     //是否显示 align
-    const isSHowAlign = context?.conf?.nav?.start?.align !== false;
+    const isSHowAlign = !getNavStartConfig(context,'align');
 
-    const isShowCell = context?.conf?.nav?.start?.isShowCell !== false;
+    const isShowCell = !getNavStartConfig(context,'isShowCell');
 
-    const isShowNumber = context?.conf?.nav?.start?.isShowNumber !== false;
+    const isShowNumber = !getNavStartConfig(context,'isShowNumber');
 
-    const isShowStyle = context?.conf?.nav?.start?.isShowStyle !== false;
+    const isShowStyle = !getNavStartConfig(context,'isShowStyle');
 
     return (
         <Group>

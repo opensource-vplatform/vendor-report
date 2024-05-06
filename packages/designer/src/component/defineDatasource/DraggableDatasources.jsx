@@ -23,6 +23,10 @@ import {
   findTreeNodeById,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
+import {
+  getDataSourceConfig,
+  getNavConfig,
+} from '@utils/configUtil';
 import { getNamespace } from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
 import { setCellTag } from '@utils/worksheetUtil.js';
@@ -304,9 +308,9 @@ export default function Index() {
 
     const context = useContext(DesignerContext);
     //是否允许查看数据源
-    const isAllowToView = context?.conf?.dataSource?.allowToView !== false;
+    const isAllowToView = !getDataSourceConfig(context,'allowToView');
 
-    const isAllowSelect = context?.conf?.dataSource?.allowToSelect !== false;
+    const isAllowSelect = !getDataSourceConfig(context,'allowToSelect');
 
     const dispatch = useDispatch();
     const cacheDatasRef = useRef({
@@ -551,9 +555,7 @@ export default function Index() {
                     {isAllowToView && (
                         <DatasourceIcon
                             onClick={function () {
-                                const isShowData =
-                                    context?.conf?.nav?.data !== false;
-                                isShowData &&
+                                !getNavConfig(context,'data') &&
                                     dispatch(setActive({ code: 'data' }));
                                 dispatch(setIsShowDatasource());
                             }}

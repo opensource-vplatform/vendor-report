@@ -25,6 +25,7 @@ import {
   getActiveSheetTablesPath,
   hasSameNode,
 } from '@utils/commonUtil.js';
+import { getDataSourceConfig } from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
@@ -59,7 +60,7 @@ export default function Index(props) {
     const context = useContext(DesignerContext);
 
     //是否允许编辑数据源
-    const isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
+    const isAllowToEdit = !getDataSourceConfig(context,'allowToEdit');
 
     let { spread } = useSelector(({ appSlice }) => appSlice);
 

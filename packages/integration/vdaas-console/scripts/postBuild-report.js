@@ -8,9 +8,9 @@ const buildUtils = require('../../../../scripts/buildUtils');
 
 const distPath = path.resolve(__dirname, '../reportDist');
 
-const reportHtmlPath = path.resolve(distPath, 'report.html');
+const reportHtmlPath = path.resolve(distPath, 'report/index.html');
 
-const spreadsheetPath = path.resolve(__dirname,"../resources/page/spreadsheet")
+const spreadsheetPath = path.resolve(__dirname,"../resources/static/spreadsheet")
 
 const importPath = path.resolve(__dirname, '../../../excel/dist/report-import.xml');
 
@@ -27,10 +27,10 @@ if(distFilePath){
     buildUtils.appendScript(result,distFilePath);
 
     //将导入信息写入到html中
-    buildUtils.importToHtmlByObject(result,reportHtmlPath);
+    buildUtils.importToHtmlByObject(result,reportHtmlPath,"../");
 
     //designer.html
-    del.sync(["reportDist/designer.html"]);
+    del.sync(["reportDist/designer/index.html"]);
 
     //将build结果拷贝到spreadsheet目录
     buildUtils.copy(distPath,spreadsheetPath)

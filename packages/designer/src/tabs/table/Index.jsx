@@ -10,6 +10,10 @@ import {
 
 import { Group } from '@components/group/Index';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
+import {
+  getNavConfig,
+  getNavTableConfig,
+} from '@utils/configUtil';
 import { parseTable } from '@utils/tableUtil';
 
 import DesignerContext from '../../DesignerContext';
@@ -26,17 +30,16 @@ export default function () {
     }, []);
     const context = useContext(DesignerContext);
     //是否隐藏表格导航
-    const isHidden = context?.conf?.nav?.table === false;
+    const isHidden = getNavConfig(context,"table");
     if (isHidden) {
         return null;
     }
 
     //是否显示 表格选项
-    const isShowTableOptions =
-        context?.conf?.nav?.table?.tableOptions !== false;
+    const isShowTableOptions = !getNavTableConfig(context,"tableOptions");
 
     //是否显示 表格样式
-    const isSHowTableStyle = context?.conf?.nav?.table?.tableStyle !== false;
+    const isSHowTableStyle = !getNavTableConfig(context,"tableStyle");
 
     return (
         <Group>

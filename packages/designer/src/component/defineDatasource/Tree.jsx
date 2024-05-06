@@ -16,6 +16,7 @@ import {
   pushDsList,
 } from '@store/datasourceSlice/datasourceSlice';
 import { genUUID } from '@utils/commonUtil.js';
+import { getDataSourceConfig } from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import DownIcon from '../../icons/arrow/Down';
@@ -236,7 +237,7 @@ export default function Index(props) {
         });
     }
 
-    let isAllowToEdit = context?.conf?.dataSource?.allowToEdit !== false;
+    let isAllowToEdit = !getDataSourceConfig(context,'allowToEdit');
     if (!notAllowEdit) {
         isAllowToEdit = false;
     }
