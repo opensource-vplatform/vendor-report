@@ -23,6 +23,8 @@ export const withBatchCalcUpdate = function (spread, updateHandler) {
 
 const PLUGIN_SRCS = {
     print: ['print.min.js'],
+    pdf:['print.min.js','pdf.min.js'],
+    excel:['excelio.min.js']
 };
 
 export const getPluginSrc = function (type) {

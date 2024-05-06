@@ -16,6 +16,9 @@ const Label = styled.label`
         background-color: transparent !important;
         cursor: not-allowed;
     }
+    &[data-readonly='true'] {
+        background-color: transparent !important;
+    }
 `;
 
 const Input = styled.input`
@@ -39,6 +42,7 @@ export default function (props) {
         disabled,
         desc = '',
         children,
+        readonly=false,
         titleStyle = {},
         hover = 'defaultHover',
     } = props;
@@ -51,6 +55,7 @@ export default function (props) {
         <Label
             className={hover}
             data-disabled={dsb}
+            data-readonly={readonly}
             style={style}
             title={desc}
             onClick={() => !disabled && onChange && onChange(!checked)}
@@ -61,6 +66,7 @@ export default function (props) {
                         ...defaultStyle,
                         color: dsb ? '#bdbdbd' : '#0075ff',
                     }}
+                    hoverable={!(readonly||disabled)}
                     iconStyle={iconStyle}
                 >
                     {children}
@@ -71,6 +77,7 @@ export default function (props) {
                         ...defaultStyle,
                         color: dsb ? '#bdbdbd' : '#6d6d6d',
                     }}
+                    hoverable={!(readonly||disabled)}
                     iconStyle={iconStyle}
                 >
                     {children}

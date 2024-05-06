@@ -4,13 +4,11 @@ import { createRoot } from 'react-dom/client';
 import resourceManager from 'resource-manager-js';
 
 import WorkBookApi from './api/WorkBook';
-import {
-  getBaseUrl,
-  setBaseUrl,
-} from './utils/environmentUtil';
+import { setBaseUrl } from './utils/environmentUtil';
 import { download } from './utils/fileUtil';
 import {
   getNamespace,
+  getPluginSrc,
   withBatchCalcUpdate,
 } from './utils/spreadUtil';
 import Workbook from './Workbook';
@@ -79,7 +77,7 @@ class Report {
 
         const { rowMerge, columnMerge } =
             this.conf?.json?.context?.tableDesignSlice || {};
-        const {onFetchData} = this.conf?.event||{};
+        const { onFetchData } = this.conf?.event || {};
         const {
             sumColumns,
             tableGroups: groupColumns,
@@ -122,38 +120,34 @@ class Report {
                 filename = filename.endsWith('.xlsx')
                     ? filename
                     : filename + '.xlsx';
-                resourceManager
-                    .loadScript([
-                        getBaseUrl() + '/vendor/plugins/excelio.min.js',
-                    ])
-                    .then(() => {
-                        const GC = getNamespace();
-                        const excelIO = new GC.Spread.Excel.IO();
-                        const json = JSON.stringify(this.spread.toJSON());
-                        excelIO.save(
-                            json,
-                            (blob) => {
-                                download(blob, filename);
-                                resolve();
-                            },
-                            (err) => {
-                                reject(err);
-                            },
-                            {
-                                columnHeadersAsFrozenRows: false,
-                                includeAutoMergedCells: false,
-                                includeBindingSource: false,
-                                includeCalcModelCache: false,
-                                includeEmptyRegionCells: true,
-                                includeFormulas: !options.ignoreFormula,
-                                includeStyles: !options.ignoreStyle,
-                                includeUnusedNames: true,
-                                password: undefined,
-                                rowHeadersAsFrozenColumns: false,
-                                saveAsView: false,
-                            }
-                        );
-                    });
+                resourceManager.loadScript(getPluginSrc('excel')).then(() => {
+                    const GC = getNamespace();
+                    const excelIO = new GC.Spread.Excel.IO();
+                    const json = JSON.stringify(this.spread.toJSON());
+                    excelIO.save(
+                        json,
+                        (blob) => {
+                            download(blob, filename);
+                            resolve();
+                        },
+                        (err) => {
+                            reject(err);
+                        },
+                        {
+                            columnHeadersAsFrozenRows: false,
+                            includeAutoMergedCells: false,
+                            includeBindingSource: false,
+                            includeCalcModelCache: false,
+                            includeEmptyRegionCells: true,
+                            includeFormulas: !options.ignoreFormula,
+                            includeStyles: !options.ignoreStyle,
+                            includeUnusedNames: true,
+                            password: undefined,
+                            rowHeadersAsFrozenColumns: false,
+                            saveAsView: false,
+                        }
+                    );
+                });
             } else {
                 reject(Error('导出excel失败，原因:没有传递导出文件名'));
             }
@@ -182,33 +176,27 @@ class Report {
                 filename = filename.endsWith('.pdf')
                     ? filename
                     : filename + '.pdf';
-                const baseUrl = getBaseUrl();
-                resourceManager
-                    .loadScript([
-                        baseUrl + '/vendor/plugins/print.min.js',
-                        baseUrl + '/vendor/plugins/pdf.min.js',
-                    ])
-                    .then(() => {
-                        this.spread.savePDF(
-                            (data) => {
-                                download(data, filename);
-                                resolve();
-                            },
-                            (err) => {
-                                reject(err);
-                            },
-                            {
-                                author: options.auther,
-                                creator: options.application,
-                                keywords: options.keyword,
-                                subject: options.subject,
-                                title: options.title,
-                            },
-                            options.sheetIndex == null
-                                ? undefined
-                                : options.sheetIndex
-                        );
-                    });
+                resourceManager.loadScript(getPluginSrc('pdf')).then(() => {
+                    this.spread.savePDF(
+                        (data) => {
+                            download(data, filename);
+                            resolve();
+                        },
+                        (err) => {
+                            reject(err);
+                        },
+                        {
+                            author: options.auther,
+                            creator: options.application,
+                            keywords: options.keyword,
+                            subject: options.subject,
+                            title: options.title,
+                        },
+                        options.sheetIndex == null
+                            ? undefined
+                            : options.sheetIndex
+                    );
+                });
             } else {
                 reject(Error('导出pdf失败，原因:没有传递导出文件名'));
             }

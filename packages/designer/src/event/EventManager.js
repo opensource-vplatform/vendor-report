@@ -18,6 +18,10 @@ export const EVENTS = {
      */
     onDesignerInited:"onDesignerInited",
     /**
+     * 数据集选择界面显示事件
+     */
+    onDatasourceSelectVisible:"onDatasourceSelectVisible",
+    /**
      * 激活工作表变更事件
      */
     ActiveSheetChanged: 'ActiveSheetChanged',

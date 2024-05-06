@@ -36,6 +36,8 @@ export const datasourceSlice = createSlice({
         colMergeColumns: {},
         conditions: {},
         showHyperlink: false,
+        datasources:[],
+        datasourceSelectorVisible:false,
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -379,6 +381,18 @@ export const datasourceSlice = createSlice({
                 state[code] = !state[code];
             }
         },
+        setDatasourceSelectorVisible(state, { payload }){
+            state.datasourceSelectorVisible = payload
+        },
+        setDatasources(state, { payload }){
+            state.datasources = payload;
+        },
+        clear(state, { payload }){
+            state.ds = {};
+            state.activeDs = {};
+            state.finalDsList = [];
+            state.dsList =  [];
+        }
     },
 });
 export const {
@@ -392,5 +406,8 @@ export const {
     initDatasource,
     saveTables,
     toggleBooleanValue,
+    setDatasourceSelectorVisible,
+    setDatasources,
+    clear,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

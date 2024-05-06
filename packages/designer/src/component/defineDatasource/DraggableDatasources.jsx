@@ -13,6 +13,7 @@ import {
 import Hyperlink from '@components/hyperlink';
 import DatasourceIcon from '@icons/data/datasource';
 import {
+  setDatasourceSelectorVisible,
   setIsShowDatasource,
   toggleBooleanValue,
   updateActiveSheetTablePath,
@@ -29,7 +30,9 @@ import { setCellTag } from '@utils/worksheetUtil.js';
 import DesignerContext from '../../DesignerContext.jsx';
 import DownIcon from '../../icons/arrow/Down';
 import RightIcon from '../../icons/arrow/Right';
+import AddIcon from '../../icons/shape/Add.jsx';
 import Datasources from './Datasources.jsx';
+import DatasourceSelector from './DatasourceSelector.jsx';
 import DialogDatasourcesEdit from './DialogDatasourcesEdit.jsx';
 import {
   DraggableDatasourcesBox,
@@ -295,13 +298,15 @@ function subContextMenuActions(params) {
 //可拖拽树形数据源列表
 export default function Index() {
     const { spread } = useSelector(({ appSlice }) => appSlice);
-    const { dsList, showHyperlink } = useSelector(
+    const { dsList, showHyperlink,datasourceSelectorVisible } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
 
     const context = useContext(DesignerContext);
     //是否允许查看数据源
     const isAllowToView = context?.conf?.dataSource?.allowToView !== false;
+
+    const isAllowSelect = context?.conf?.dataSource?.allowToSelect !== false;
 
     const dispatch = useDispatch();
     const cacheDatasRef = useRef({
@@ -523,6 +528,7 @@ export default function Index() {
         <>
             {showHyperlink && <Hyperlink></Hyperlink>}
             <DialogDatasourcesEdit></DialogDatasourcesEdit>
+            {datasourceSelectorVisible && <DatasourceSelector></DatasourceSelector>}
             <DraggableDatasourcesBox>
                 <DraggableDatasourcesHeander>
                     {isOpenAll ? (
@@ -539,6 +545,9 @@ export default function Index() {
                     >
                         数据集
                     </div>
+                    {isAllowSelect && (<AddIcon onClick={()=>{
+                        dispatch(setDatasourceSelectorVisible(true));
+                    }}></AddIcon>)}
                     {isAllowToView && (
                         <DatasourceIcon
                             onClick={function () {

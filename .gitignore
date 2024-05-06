@@ -3,3 +3,5 @@ dist
 demo
 .svn/
 dist/
+packages/integration/vdaas-console/resources/page/spreadsheet/
+packages/integration/vdass-web/resources/static/vdaasweb/spreadsheet/
