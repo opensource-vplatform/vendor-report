@@ -8,8 +8,9 @@ import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
-/* salesData.data.length = 200 || 21;
-tourismData.data.length = 11 || 21; */
+
+//salesData.data.length = 25 || 21;
+tourismData.data.length = 5 || 21;
 export default {
     json,
     /* json: { reportJson: json }, */
@@ -56,6 +57,85 @@ export default {
     },
     dataSource: {
         dataSourceDefinition: [
+            {
+                id: 'purchaseContract',
+                type: 'table',
+                typeName: '表',
+                desc: 'purchaseContract',
+                code: 'purchaseContract',
+                name: '采购合同',
+                children: [
+                    {
+                        id: 'A',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'code',
+                        code: 'code',
+                        name: '编码',
+                        parentId: 'purchaseContract',
+                    },
+                    {
+                        id: 'BB',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'name',
+                        code: 'name',
+                        name: '名称',
+                        parentId: 'purchaseContract',
+                    },
+                    {
+                        id: 'C',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: '负责人',
+                        code: 'person',
+                        name: '负责人',
+                        parentId: 'purchaseContract',
+                    },
+                ],
+            },
+            {
+                id: 'purchaseInfo',
+                type: 'table',
+                typeName: '表',
+                desc: 'purchaseInfo',
+                code: 'purchaseInfo',
+                name: '采购详情',
+                children: [
+                    {
+                        id: 'A',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'code',
+                        code: 'code',
+                        name: '外键',
+                        parentId: 'purchaseInfo',
+                        reference: {
+                            //外键信息
+                            tableCode: 'purchaseContract',
+                            fieldCode: 'code',
+                        },
+                    },
+                    {
+                        id: 'BB',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'name',
+                        code: 'name',
+                        name: '名称',
+                        parentId: 'purchaseInfo',
+                    },
+                    {
+                        id: 'C',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: '采购人',
+                        code: 'person',
+                        name: '采购人',
+                        parentId: 'purchaseInfo',
+                    },
+                ],
+            },
             ...otherData.ds,
             salesData.ds,
             tourismData.ds,
@@ -113,6 +193,50 @@ export default {
             ...JSON.parse(
                 '{"ff8081818ee4d888018ee4dfe463211e":[{"标段":"TJ3","计量号":"TJ3-201812A","开始日期":"2018-11-21T00:00:00","截止日期":"2018-12-25T00:00:00","本期完成(元)":36085616,"累计完成(元)":58186150,"制表人":"姜程","制表日期":"2018-12-18T00:00:00","申报单位":"广东省长大公路工程有限公司","监理单位":"广东华路交通科技有限公司","中期支付证书备注":"无"}],"ff8081818ee4d888018ee4e14fa0280c":[{"审批人角色":"承包人计量员 ","审批人":"姜程","审批时间":"2018-12-18T20:24:46","审批意见":"已完成、请审核"},{"审批人角色":"承包人项目经理 ","审批人":"谢书良","审批时间":"2018-12-19T09:33:03","审批意见":"已审核"},{"审批人角色":"现场监理","审批人":"刘德刚","审批时间":"2019-01-13T09:31:40","审批意见":""},{"审批人角色":"承包人项目经理","审批人":"谢书良","审批时间":"2019-01-13T09:36:31","审批意见":""},{"审批人角色":"承包人计量员 ","审批人":"姜程","审批时间":"2019-01-13T10:32:55","审批意见":"已完成、请审核"},{"审批人角色":"承包人项目经理 ","审批人":"谢书良","审批时间":"2019-01-13T10:34:47","审批意见":"已审核"},{"审批人角色":"现场监理","审批人":"刘德刚","审批时间":"2019-01-14T17:10:39","审批意见":"同意上报"},{"审批人角色":"总监办计量负责人","审批人":"侯秀全 ","审批时间":"2019-01-14T17:18:29","审批意见":"数量已核，同意上报。"},{"审批人角色":"总监理工程师","审批人":"柯杰平","审批时间":"2019-01-15T17:25:49","审批意见":"同意计量。"},{"审批人角色":"业务部门经办人","审批人":"张力嘉","审批时间":"2019-01-21T10:29:34","审批意见":"同意计量"},{"审批人角色":"业务部门负责人","审批人":"汪胜","审批时间":"2019-01-21T10:58:04","审批意见":"不同意"}]}'
             ),
+            purchaseContract: [
+                {
+                    code: 'PC1',
+                    name: '水果采购',
+                    person: '张三',
+                },
+                {
+                    code: 'PC2',
+                    name: '蔬菜采购',
+                    person: '李四',
+                },
+            ],
+            purchaseInfo: [
+                {
+                    code: 'PC1',
+                    name: '香蕉',
+                    person: '王五',
+                },
+                {
+                    code: 'PC1',
+                    name: '雪梨',
+                    person: '王五',
+                },
+                {
+                    code: 'PC1',
+                    name: '火龙果',
+                    person: '赵六',
+                },
+                {
+                    code: 'PC1',
+                    name: '苹果',
+                    person: '刘七',
+                },
+                {
+                    code: 'PC2',
+                    name: '大白菜',
+                    person: '陈八',
+                },
+                {
+                    code: 'PC2',
+                    name: '辣椒',
+                    person: '周九',
+                },
+            ],
         }, //数据源数据
         allowToView: true, //是否允许查看数据源
         allowToEdit: true, //是否允许编辑数据源

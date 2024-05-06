@@ -1,7 +1,6 @@
 import { Group } from '@components/group/Index';
 
 import Datasource from './Datasource';
-import Other from './Other';
 import SortAndFilter from './SortAndFilter';
 
 export default function () {
@@ -9,7 +8,6 @@ export default function () {
         <Group>
             <Datasource></Datasource>
             <SortAndFilter></SortAndFilter>
-            <Other></Other>
         </Group>
     );
 }

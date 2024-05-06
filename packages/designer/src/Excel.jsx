@@ -2,6 +2,7 @@ import {
   Fragment,
   useCallback,
   useContext,
+  useEffect,
   useRef,
 } from 'react';
 
@@ -12,6 +13,7 @@ import {
 
 import { registerCommand } from '@commands/index';
 import {
+  bind,
   EVENTS,
   fire,
 } from '@event/EventManager';
@@ -33,10 +35,15 @@ import {
 } from '@toone/report-excel';
 import {
   findTreeNodeById,
+  genUUID,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil';
 import { fireCellEnter } from '@utils/eventUtil';
-import { getCellTag } from '@utils/worksheetUtil';
+import {
+  getCellTag,
+  getSheetTag,
+  setSheetTag,
+} from '@utils/worksheetUtil';
 
 import {
   formatBindingPathCellType,
@@ -189,6 +196,13 @@ export default function () {
         );
     });
 
+    const handleRowChanged = useCallback((event, data) => {
+        fire({
+            event: EVENTS.RowChanged,
+            args: [event, data],
+        });
+    });
+
     const sheetsConf = context?.conf?.sheets || {};
     //是否显示添加选项卡按钮
     const newTabVisible = sheetsConf.newTabVisible !== false;
@@ -198,6 +212,45 @@ export default function () {
     const tabStripVisible = sheetsConf.tabStripVisible !== false;
     //许可证
     const license = context?.conf?.license;
+
+    useEffect(() => {
+        const id = genUUID();
+        return bind({
+            id,
+            event: EVENTS.RowChanged,
+            handler: (event, { sheet, row, newValue, propertyName }) => {
+                const range = getSheetTag(sheet, 'pageArea');
+                if (!range) {
+                    return;
+                }
+                const REG = /^\d+:\d+$/;
+                if (!REG.test(range)) {
+                    return;
+                }
+
+                const ranges = range.split(':');
+                let newStartRow = Number(ranges[0]);
+                let newEndRow = Number(ranges[1]);
+                let startRow = newStartRow - 1;
+                let count = newValue;
+                if (propertyName !== 'addRows') {
+                    count = 0 - count;
+                    if (row === startRow) {
+                        startRow += 1;
+                    }
+                }
+
+                if (row <= startRow) {
+                    newStartRow = startRow + count + 1;
+                    newEndRow = newEndRow + count;
+                } else if (row > startRow && row < newEndRow) {
+                    newEndRow = newEndRow + count;
+                }
+
+                setSheetTag(sheet, 'pageArea', `${newStartRow}:${newEndRow}`);
+            },
+        });
+    }, []);
 
     return (
         <Fragment>
@@ -220,6 +273,7 @@ export default function () {
                 onSheetNameChanged={handleSheetNameChanged}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
+                onRowChanged={handleRowChanged}
             >
                 <Worksheet
                     name={sheetName}

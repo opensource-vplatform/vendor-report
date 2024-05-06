@@ -4,15 +4,15 @@ export const EVENTS = {
     /**
      * 选择变更事件
      */
-    SelectionChanging:"SelectionChanging",
+    SelectionChanging: 'SelectionChanging',
     /**
      * 选择变更后事件
      */
-    SelectionChanged:"SelectionChanged",
+    SelectionChanged: 'SelectionChanged',
     /**
      * 保存
      */
-    onSave: "onSave",
+    onSave: 'onSave',
     /**
      * 设计器初始化完成
      */
@@ -20,24 +20,28 @@ export const EVENTS = {
     /**
      * 激活工作表变更事件
      */
-    ActiveSheetChanged: "ActiveSheetChanged",
+    ActiveSheetChanged: 'ActiveSheetChanged',
 
-    EditorStatusChanged: "EditorStatusChanged",
+    EditorStatusChanged: 'EditorStatusChanged',
 
-    EnterCell: "EnterCell",
+    EnterCell: 'EnterCell',
     /**
      * 撤销
      */
-    Undo: "Undo",
+    Undo: 'Undo',
     /**
      * 重做
      */
-    Redo: "Redo",
+    Redo: 'Redo',
 
     /**
      * 初始化后事件
      */
-    Inited: "Inited",
+    Inited: 'Inited',
+    /**
+     * 当对此表单中的行或行区域进行更改，可能需要重新绘制行或行区域时触发
+     */
+    RowChanged: 'RowChanged',
 };
 
 const check = function (params) {
@@ -46,18 +50,18 @@ const check = function (params) {
         throw Error(`不支持[${event}]事件，请检查！`);
     }
 };
-const checkId = function(params){
+const checkId = function (params) {
     const { id } = params;
     if (id === undefined) {
         throw Error(`未传递id值，请检查！`);
     }
-}
+};
 
 /**
  * {
  *  [event]:{
  *      [id]:handler
- *  } 
+ *  }
  * }
  */
 const EVENT_HANDLER_MAP = {};
@@ -72,19 +76,20 @@ const EVENT_HANDLER_MAP = {};
  */
 export const bind = function (params) {
     check(params);
-    const { id=genUUID(),event, handler } = params;
+    const { id = genUUID(), event, handler } = params;
     const handlers = EVENT_HANDLER_MAP[event] || {};
-    handlers[id] = handler
+    handlers[id] = handler;
     EVENT_HANDLER_MAP[event] = handlers;
-    if(SPREAD_INITED&&event === EVENTS.Inited){
+    if (SPREAD_INITED && event === EVENTS.Inited) {
         //解决热更新时，Inited事件不再触发引发的一系列问题
         handler(SPREAD);
     }
-    return ()=>{
+    return () => {
         unbind({
-            id,event
+            id,
+            event,
         });
-    }
+    };
 };
 
 /**
@@ -92,7 +97,7 @@ export const bind = function (params) {
  * @param {
  *  id: 回调唯一标识
  *  event:事件名称
- * } params 
+ * } params
  */
 export const unbind = function (params) {
     check(params);
@@ -105,29 +110,29 @@ export const unbind = function (params) {
     }
 };
 
-let SPREAD_INITED = false
+let SPREAD_INITED = false;
 
 let SPREAD = null;
 
 /**
  * 触发事件
- * @param {event:事件名称,args:事件参数} params 
+ * @param {event:事件名称,args:事件参数} params
  */
 export const fire = function (params) {
     check(params);
-    const {event,args} = params;
+    const { event, args } = params;
     const handlers = EVENT_HANDLER_MAP[event];
     const result = [];
-    if(handlers){
-        for(let [id,handler] of Object.entries(handlers)){
-            try{
-                result.push(handler.apply(handler,args));
-            }catch(e){
-                handler(null,e);
+    if (handlers) {
+        for (let [id, handler] of Object.entries(handlers)) {
+            try {
+                result.push(handler.apply(handler, args));
+            } catch (e) {
+                handler(null, e);
             }
         }
     }
-    if(event == EVENTS.Inited){
+    if (event == EVENTS.Inited) {
         SPREAD_INITED = true;
         SPREAD = args[0];
     }

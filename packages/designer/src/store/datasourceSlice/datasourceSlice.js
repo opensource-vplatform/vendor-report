@@ -35,7 +35,6 @@ export const datasourceSlice = createSlice({
         rowMergeColumns: {},
         colMergeColumns: {},
         conditions: {},
-        isFillData: false,
         showHyperlink: false,
     },
     reducers: {
@@ -372,15 +371,6 @@ export const datasourceSlice = createSlice({
                 ...colMergeColumns,
             };
         },
-        setIsFillData(state, { payload }) {
-            const { value } = payload;
-            if (typeof value === 'boolean') {
-                state.isFillData = value;
-                return;
-            }
-
-            state.isFillData = !state.isFillData;
-        },
         toggleBooleanValue(state, { payload }) {
             const { code, value } = payload;
             if (typeof value === 'boolean') {
@@ -401,7 +391,6 @@ export const {
     updateActiveSheetTablePath,
     initDatasource,
     saveTables,
-    setIsFillData,
     toggleBooleanValue,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

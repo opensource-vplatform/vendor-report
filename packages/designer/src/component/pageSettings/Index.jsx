@@ -1,19 +1,19 @@
 import { useState } from 'react';
 
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { OperationDialog } from '@components/dialog/Index';
+import { CheckBox } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import InfoIcon from '@icons/shape/Info';
 import { genUUID } from '@utils/commonUtil';
 import { isString } from '@utils/objectUtil';
-import { getNamespace } from '@utils/spreadUtil';
 
 const Wrap = styled.div`
     padding: 10px;
     display: flex;
     flex-direction: column;
+    user-select: none;
 `;
 
 const Text = styled.div`
@@ -27,10 +27,17 @@ const HLayout = styled.div`
 `;
 
 const Default_Info = '选择需要分页的区域';
+const REG = /^\d+:\d+$/;
 
 export default function (props) {
-    const { functionNum = 109, range, onConfirm, onCancel } = props;
-    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const {
+        functionNum = 109,
+        onConfirm,
+        onCancel,
+        range,
+        isFillData = false,
+    } = props;
+
     const [data, setData] = useState(() => {
         return {
             functionNum,
@@ -39,53 +46,19 @@ export default function (props) {
             visible: true,
             error: false,
             message: Default_Info,
+            isFillData,
         };
     });
+
     const handleConfirm = () => {
         const rangeStr = data.range;
         if (rangeStr) {
-            const GC = getNamespace();
-            const sheet = spread.getActiveSheet();
-            const { ranges } = GC.Spread.Sheets.CalcEngine.formulaToRanges(
-                sheet,
-                rangeStr
-            )[0];
-            const { row, col } = ranges[0];
-            const bindingPath = sheet.getBindingPath(row, col);
-            if (bindingPath) {
-                const [tableCode, fieldCode] = bindingPath.split('.');
-                if (tableCode && fieldCode) {
-                    const option = Function_Options.find(
-                        (option) => option.value == data.functionNum
-                    );
-                    let text = sheet.getText(row, col) || '';
-                    if (text) {
-                        text = text.startsWith('[') ? text.substring(1) : text;
-                        text = text.endsWith(']')
-                            ? text.substring(0, text.length - 1)
-                            : text;
-                    }
-                    const desc = `[${option.text}(${text})]`;
-                    onConfirm &&
-                        onConfirm(
-                            {
-                                functionNum: data.functionNum,
-                                range: rangeStr,
-                                tableCode,
-                                fieldCode,
-                            },
-                            desc
-                        );
-                    return;
-                }
+            if (typeof onConfirm === 'function') {
+                onConfirm({
+                    range: rangeStr,
+                    isFillData: data.isFillData,
+                });
             }
-            setData((data) => {
-                return {
-                    ...data,
-                    message: NOT_Bingding_Cell,
-                    error: true,
-                };
-            });
         } else {
             setData((data) => {
                 return {
@@ -109,11 +82,30 @@ export default function (props) {
         >
             <Wrap>
                 <HLayout>
+                    <Text>填充数据：</Text>
+                    <CheckBox
+                        value={data.isFillData}
+                        onChange={(checked) => {
+                            setData((data) => {
+                                return {
+                                    ...data,
+                                    isFillData: checked,
+                                };
+                            });
+                        }}
+                    ></CheckBox>
+                    <InfoIcon
+                        iconStyle={{ color: '#228ee5' }}
+                        tips='数据不满一页时会填充满一页'
+                    ></InfoIcon>
+                </HLayout>
+                <HLayout>
                     <Text>分页范围：</Text>
                     <Range
                         value={data.range}
                         hostId={data.domId}
                         error={data.error}
+                        selectionType='row'
                         onStartSelect={() =>
                             setData((data) => {
                                 return {

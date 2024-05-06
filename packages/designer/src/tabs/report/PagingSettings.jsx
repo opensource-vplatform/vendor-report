@@ -1,23 +1,43 @@
 import { useState } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import {
   GroupItem,
   VItem,
 } from '@components/group/Index';
 import PageSettings from '@components/pageSettings/Index';
 import PagingSettingsIcon from '@icons/report/pagingSettings';
+import {
+  getSheetTag,
+  setSheetTag,
+} from '@utils/worksheetUtil';
 
 export default function Index(props) {
     const [show, setShow] = useState(false);
-    const clickHandler = function () {
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const sheet = spread.getActiveSheet();
+    const range = getSheetTag(sheet, 'pageArea');
+    const isFillData = getSheetTag(sheet, 'isFillData');
+
+    const clickHandler = function (datas) {
         setShow(!show);
     };
+
+    const onConfirmHandler = function (datas) {
+        setSheetTag(sheet, 'pageArea', datas.range);
+        setSheetTag(sheet, 'isFillData', datas.isFillData);
+        setShow(false);
+    };
+
     return (
         <>
             {show && (
                 <PageSettings
-                    onConfirm={clickHandler}
+                    onConfirm={onConfirmHandler}
                     onCancel={clickHandler}
+                    range={range}
+                    isFillData={isFillData}
                 ></PageSettings>
             )}
             <GroupItem title='分页设置'>
