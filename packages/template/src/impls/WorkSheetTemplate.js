@@ -1,4 +1,5 @@
 import BaseTemplate from '../BaseTemplate';
+import RowSpan from '../model/RowSpan';
 import RowTemplate from './RowTemplate';
 
 class WorkSheetTemplate extends BaseTemplate {
@@ -7,32 +8,6 @@ class WorkSheetTemplate extends BaseTemplate {
     constructor(sheet, context) {
         super(sheet, context);
         this._parse();
-    }
-
-    /**
-     * 是否在其中
-     * @param {*} start
-     * @param {*} end
-     * @param {*} index
-     */
-    _isIn(start, end, index) {
-        return start >= index && index <= end;
-    }
-
-    /**
-     * 扩大行模板范围
-     * 返回一个新的行模板范围
-     * @param {*} rowSpan
-     * @param {*} span
-     */
-    _unionSpan(rowSpan, span) {
-        let { start, end, spans = [] } = rowSpan;
-        const { row, rowCount } = span;
-        const spanEnd = row + rowCount - 1;
-        start = start > row ? row : start;
-        end = end < spanEnd ? spanEnd : end;
-        spans.push(span);
-        return { start, end, spans };
     }
 
     /**
@@ -46,22 +21,16 @@ class WorkSheetTemplate extends BaseTemplate {
         const spanEnd = row + rowCount - 1;
         const hasCross = false;
         for (let i = 0, l = rowSpans.length; i < l; i++) {
-            const { start, end } = ranges[i];
-            if (
-                this._isIn(start, end, row) ||
-                this._isIn(start, end, spanEnd)
-            ) {
-                //扩大行模板范围
-                ranges[i] = this._unionSpan(ranges[i], span);
+            const rowSpan = rowSpans[i];
+            if (rowSpan.hasCross(span)) {
+                //有交集，扩大行模板范围
+                rowSpan.union(span);
                 hasCross = true;
                 break;
             }
         }
         if (!hasCross) {
-            rowSpans.push({
-                start: row,
-                end: spanEnd,
-            });
+            rowSpans.push(new RowSpan(row,spanEnd));
         }
     }
 
@@ -84,7 +53,7 @@ class WorkSheetTemplate extends BaseTemplate {
      * 属于某个行合并
      */
     _belongToRowSpans(row, rowSpans) {
-        return rowSpans.find(({ start, end }) => row >= start && row <= end);
+        return rowSpans.find(rowSpan => rowSpan.isIn(row));
     }
 
     /**
@@ -111,7 +80,7 @@ class WorkSheetTemplate extends BaseTemplate {
                     } else {
                         const rowSpan1 = temp.rowSpan;
                         if (rowSpan1 !== rowSpan) {
-                            //不同属于同一个行合并区域
+                            //不同属于同一个行合并区域,将之前的行合并区域实例化成行模板实例
                             this.rowTemplates.push(
                                 new RowTemplate(
                                     temp.dataTable,
