@@ -16,11 +16,15 @@ export const EVENTS = {
     /**
      * 设计器初始化完成
      */
-    onDesignerInited:"onDesignerInited",
+    onDesignerInited: 'onDesignerInited',
     /**
      * 数据集选择界面显示事件
      */
-    onDatasourceSelectVisible:"onDatasourceSelectVisible",
+    onDatasourceSelectVisible: 'onDatasourceSelectVisible',
+    /**
+     * 预览事件
+     */
+    onPreview: 'onPreview',
     /**
      * 激活工作表变更事件
      */
@@ -141,4 +145,15 @@ export const fire = function (params) {
         SPREAD = args[0];
     }
     return result;
+};
+
+/**
+ * 是否有绑定事件
+ * @param {*} params
+ */
+export const hasBind = function (params) {
+    check(params);
+    const { event } = params;
+    const handlers = EVENT_HANDLER_MAP[event];
+    return handlers&&Object.values(handlers).length>0;
 };

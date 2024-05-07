@@ -39,6 +39,7 @@ import {
   getActiveSheetTablesPath,
 } from '@utils/commonUtil';
 import { getLicense } from '@utils/configUtil';
+import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import {
   getCellTag,
@@ -256,6 +257,7 @@ export default function () {
     return (
         <Fragment>
             <Workbook
+                baseUrl={getBaseUrl()}
                 license={license}
                 json={json}
                 enablePrint={true}

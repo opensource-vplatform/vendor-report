@@ -540,7 +540,7 @@ export default class Render {
                 tableInfos.dataCount = 0;
                 tableInfos.pageSizes = [];
                 tableCodesArray.forEach(function (code) {
-                    let ds = datas[code];
+                    let ds = datas[code]||[];
                     const groupedDs =
                         groupsDatas?.[sheetName]?.[code]?.[sheetName];
                     if (Array.isArray(groupedDs)) {

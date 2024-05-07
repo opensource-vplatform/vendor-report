@@ -20,7 +20,7 @@ class ReportDesigner {
         if (this.conf && this.conf.event) {
             const events = this.conf.event;
             for (let [event, handler] of Object.entries(events)) {
-                bind({ id: 'TOONE_EXCEL_ONSAVE', event, handler });
+                bind({ event, handler });
             }
         }
     }

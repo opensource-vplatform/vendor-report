@@ -20,6 +20,7 @@ import {
   bind,
   EVENTS,
   fire,
+  hasBind,
 } from '@event/EventManager';
 import { setMode } from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
@@ -176,6 +177,66 @@ export default function () {
         }
     };
 
+    const handlePreview = async ()=>{
+        const flag = hasBind({
+            event:EVENTS.onPreview
+        });
+        if(flag){
+            const define = parseUsedDatasource(spread, finalDsList);
+            const result = fire({
+                event: EVENTS.onPreview,
+                args: [
+                    {
+                        dsList: finalDsList,
+                        define,
+                    },
+                ],
+            });
+            const datas = await handleEventPrmiseResult(
+                result,
+                dispatch,
+                '正在预览，请稍候...',
+                EVENTS.onPreview
+            );
+            dispatch(genPreviewDatas({ datas }));
+            dispatch(setMode({ mode: 'preview' }));
+        }else{
+            let datas = null;
+            const { batchGetDatasURL, datasPath } =
+                context?.conf || {};
+            if (batchGetDatasURL && datasPath) {
+                try {
+                    let define = parseUsedDatasource(
+                        spread,
+                        finalDsList
+                    );
+                    define = define.map(function (item) {
+                        return {
+                            type: item.type,
+                            code: item.code,
+                        };
+                    });
+
+                    const response = await axios.post(
+                        batchGetDatasURL,
+                        {
+                            datasource: define,
+                        }
+                    );
+
+                    const datasPathArr =
+                        datasPath.split('/');
+                    datas = response?.data;
+                    while (datasPathArr.length) {
+                        datas = datas[datasPathArr.shift()];
+                    }
+                } catch (error) {}
+            }
+            dispatch(genPreviewDatas({ datas }));
+            dispatch(setMode({ mode: 'preview' }));
+        }
+    }
+
     const context = useContext(DesignerContext);
     //是否隐藏文件导航
     const isHiddenFile = getNavConfig(context,"file");
@@ -299,43 +360,7 @@ export default function () {
                         </Button>
                         {isPreview && <Button
                             style={{ marginRight: 8 }}
-                            onClick={async () => {
-                                let datas = null;
-
-                                const { batchGetDatasURL, datasPath } =
-                                    context?.conf || {};
-
-                                if (batchGetDatasURL && datasPath) {
-                                    try {
-                                        let define = parseUsedDatasource(
-                                            spread,
-                                            finalDsList
-                                        );
-                                        define = define.map(function (item) {
-                                            return {
-                                                type: item.type,
-                                                code: item.code,
-                                            };
-                                        });
-
-                                        const response = await axios.post(
-                                            batchGetDatasURL,
-                                            {
-                                                datasource: define,
-                                            }
-                                        );
-
-                                        const datasPathArr =
-                                            datasPath.split('/');
-                                        datas = response?.data;
-                                        while (datasPathArr.length) {
-                                            datas = datas[datasPathArr.shift()];
-                                        }
-                                    } catch (error) {}
-                                }
-                                dispatch(genPreviewDatas({ datas }));
-                                dispatch(setMode({ mode: 'preview' }));
-                            }}
+                            onClick={handlePreview}
                         >
                             预览
                         </Button>}

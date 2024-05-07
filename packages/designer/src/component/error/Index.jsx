@@ -14,13 +14,16 @@ const Wrap = styled.div`
 
 const ContentWrap = styled.div`
     display: flex;
-    height: 50px;
+    min-height: 50px;
     margin: 10px;
     align-items: center;
 `;
 
 const Content = styled.div`
     margin-left: 10px;
+    max-width: 500px;
+    overflow: visible;
+    word-break: break-all;
 `;
 
 const ActionWrap = styled.div`

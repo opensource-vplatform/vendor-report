@@ -4,7 +4,6 @@ import { createRoot } from 'react-dom/client';
 import resourceManager from 'resource-manager-js';
 
 import WorkBookApi from './api/WorkBook';
-import { setBaseUrl } from './utils/environmentUtil';
 import { download } from './utils/fileUtil';
 import {
   getNamespace,
@@ -38,9 +37,6 @@ class Report {
      */
     constructor(conf) {
         this.conf = conf;
-        if (conf.baseUrl) {
-            setBaseUrl(conf.baseUrl);
-        }
     }
 
     replacer(key, value) {
@@ -91,6 +87,7 @@ class Report {
                 onPrintHandler: (handler) => {
                     this.printHandler = handler;
                 },
+                baseUrl:this.conf?.baseUrl,
                 onFetchData,
                 rowMerge,
                 columnMerge,

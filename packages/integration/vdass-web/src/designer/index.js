@@ -1,6 +1,7 @@
 import {
   getReportConfigUrl,
   getSaveReportUrl,
+  getTableDataUrl,
   getTableMetadataUrl,
 } from '../utils/constant';
 import { license } from '../utils/license';
@@ -205,6 +206,20 @@ const designer = new Designer({
                                     : null,
                             });
                         }
+                    })
+                    .catch(reject);
+            });
+        },
+        onPreview: function (context) {
+            return new Promise(function (resolve, reject) {
+                const usedDatasources = getUsedDatasources(context);
+                RPC.get(getTableDataUrl(usedDatasources.join(',')))
+                    .then((data) => {
+                        let error = getError(data);
+                        if (error != null) {
+                            return reject(error);
+                        }
+                        resolve(data.data?.data?.data);
                     })
                     .catch(reject);
             });
