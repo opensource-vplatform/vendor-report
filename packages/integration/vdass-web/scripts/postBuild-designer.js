@@ -29,8 +29,8 @@ if(distFilePath){
     //将导入信息写入到html中
     buildUtils.importToHtmlByObject(result,designerHtmlPath);
 
-    //移除report.html
-    del.sync(["designerDist/report.html"]);
+    //移除view.html
+    del.sync(["designerDist/view.html"]);
 
     //将build结果拷贝到spreadsheet目录
     buildUtils.copy(distPath,spreadsheetPath)

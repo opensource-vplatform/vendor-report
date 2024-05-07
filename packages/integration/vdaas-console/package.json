@@ -5,12 +5,12 @@
     "main": "index.js",
     "scripts": {
         "dev": "vite --host -c=vite.config.dev.js",
-        "postBuild-report": "node scripts/postBuild-report.js",
+        "postBuild-view": "node scripts/postBuild-view.js",
         "postBuild-designer": "node scripts/postBuild-designer.js",
         "clean": "node scripts/clean.js",
         "build-designer": "vite build -c=vite.config.build-designer.js && npm run postBuild-designer",
-        "build-report": "vite build -c=vite.config.build-report.js && npm run postBuild-report",
-        "build": "npm run clean && npm run build-designer && npm run build-report"
+        "build-view": "vite build -c=vite.config.build-view.js && npm run postBuild-view",
+        "build": "npm run clean && npm run build-designer && npm run build-view"
     },
     "devDependencies": {
         "@babel/plugin-transform-runtime": "^7.23.7",
