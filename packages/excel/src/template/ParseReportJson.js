@@ -2,6 +2,38 @@ import {
   execute,
   PluginTool,
 } from '../plugin';
+import { getNamespace } from '../utils/spreadUtil';
+
+const GC = getNamespace();
+const spreadNS = GC.Spread.Sheets;
+
+function genAutoMergeRanges(merge, autoMergeRanges, startRow) {
+    let direction = spreadNS.AutoMerge.AutoMergeDirection.column; //1
+    let mode = spreadNS.AutoMerge.AutoMergeMode.free; //0
+    let sheetArea = spreadNS.SheetArea.viewport; //3
+    let selectionMode = spreadNS.AutoMerge.SelectionMode.merged; //0
+
+    if (merge.columnMerge && merge.rowMerge) {
+        direction = spreadNS.AutoMerge.AutoMergeDirection.rowColumn; //值等于4。在行方向上优先于列方向应用自动合并
+    } else if (merge.rowMerge) {
+        direction = spreadNS.AutoMerge.AutoMergeDirection.row; //值等于2.在行方向上应用自动合并
+    }
+
+    let range = {
+        row: merge.row - startRow,
+        col: merge.col,
+        rowCount: merge?.rowCount,
+        colCount: merge?.colCount,
+    };
+
+    autoMergeRanges.push({
+        range,
+        direction,
+        mode,
+        sheetArea,
+        selectionMode,
+    });
+}
 
 function genSpans({ spans, row, startRow }) {
     const newSpans = [];
@@ -276,6 +308,7 @@ export default class Render {
                 rows: {},
                 rules: [],
                 dataTable: {},
+                autoMergeRanges: [],
                 rowCount: 0,
                 contentHeight,
                 headerInfos,
@@ -402,6 +435,7 @@ export default class Render {
                 pageInfos.spans = [];
                 pageInfos.rows = {};
                 pageInfos.rules = [];
+                pageInfos.autoMergeRanges = [];
                 pageInfos.pageIndex = 1;
                 pageInfos.rowCount = 0;
             }
@@ -422,6 +456,8 @@ export default class Render {
                     dataTable,
                     tableDatas,
                     pageSizes = [],
+                    copyAutoMergeRanges = [],
+                    updateAutoMergeRanges = [],
                 } = temp;
                 const rowCount = endRow - row;
                 const baseParams = {
@@ -429,6 +465,8 @@ export default class Render {
                     temp,
                 };
                 let index = 0;
+
+                const contentStartRow = pageInfos.rowCount;
 
                 while (index < pageSize) {
                     //取出每一个实体数据的第一条记录，用于渲染表格模板
@@ -444,19 +482,35 @@ export default class Render {
                     index++;
                     //行高,合并信息等
                     this.genOtherInfos(baseParams);
-
                     this.renderTableHandler({
                         dataTable,
                         pageInfos,
                         tableData,
                     });
-
+                    //复制自动合并区域(断续的行合并区域)
+                    copyAutoMergeRanges.forEach(function (item) {
+                        const cobyItem = jsonDeepCopy(item);
+                        cobyItem.range.row += pageInfos.rowCount;
+                        pageInfos.autoMergeRanges.push(cobyItem);
+                    });
                     pageInfos.rowCount += rowCount;
                 }
 
                 if (!pageInfos.isFillData) {
                     pageSize = pageSizes.shift();
                 }
+                const contentEndRow = pageInfos.rowCount;
+
+                //纵向扩大自动合并区域(列合并或未断续的行合并区域)
+                updateAutoMergeRanges.forEach(function (item) {
+                    if (rowCount === item.range.rowCount) {
+                        const cobyItem = jsonDeepCopy(item);
+                        cobyItem.range.row = contentStartRow;
+                        cobyItem.range.rowCount =
+                            contentEndRow - contentStartRow;
+                        pageInfos.autoMergeRanges.push(cobyItem);
+                    }
+                });
             }
 
             //底部区域
@@ -502,7 +556,15 @@ export default class Render {
         }
     }
     resetSheet(params) {
-        const { sheet, dataTable, rules, spans, rows, rowCount } = params;
+        const {
+            sheet,
+            dataTable,
+            rules,
+            spans,
+            rows,
+            rowCount,
+            autoMergeRanges,
+        } = params;
         if (!sheet) {
             return;
         }
@@ -526,6 +588,8 @@ export default class Render {
 
         //行高
         this.setSheetRows(sheet, rows);
+
+        sheet.autoMergeRangeInfos = autoMergeRanges;
     }
     enhanceTable({ tableInfos, datas, pageInfos, groupsDatas, sheetName }) {
         //表格需要的数据以及总页数等
@@ -540,7 +604,7 @@ export default class Render {
                 tableInfos.dataCount = 0;
                 tableInfos.pageSizes = [];
                 tableCodesArray.forEach(function (code) {
-                    let ds = datas[code]||[];
+                    let ds = datas[code] || [];
                     const groupedDs =
                         groupsDatas?.[sheetName]?.[code]?.[sheetName];
                     if (Array.isArray(groupedDs)) {
@@ -596,6 +660,7 @@ export default class Render {
             height: 0,
             rules: [],
             pageTotal: 1,
+            autoMergeRanges: [],
         };
         const { tableInfos, headerInfos, footerInfos } = this.splitTemp(temp);
         this.enhanceTable({
@@ -616,7 +681,7 @@ export default class Render {
     commonDataTableHandler({ infos, pageInfos = {}, pluginTool }) {
         const { dataTable: pageDataTable = {} } = pageInfos;
 
-        const { dataTable, rowCount } = infos;
+        const { dataTable, rowCount, autoMergeRanges = [] } = infos;
         Object.entries(dataTable).forEach(([rowStr, dataTable]) => {
             if (pluginTool) {
                 pluginTool.setPageHandler(
@@ -634,6 +699,12 @@ export default class Render {
         this.genOtherInfos({
             pageInfos,
             temp: infos,
+        });
+
+        autoMergeRanges.forEach(function (item) {
+            const cobyItem = jsonDeepCopy(item);
+            cobyItem.range.row += pageInfos.rowCount;
+            pageInfos.autoMergeRanges.push(cobyItem);
         });
 
         pageInfos.rowCount += rowCount;
@@ -656,9 +727,15 @@ export default class Render {
             rows: pageRows = {},
             rules: pageRules = [],
             rowCount: pageRowCount = 0,
+            autoMergeRanges: pageAutoMergeRanges = [],
         } = pageInfos;
 
-        const { spans = [], rows = {}, rules = [] } = temp;
+        const {
+            spans = [],
+            rows = {},
+            rules = [],
+            autoMergeRanges = [],
+        } = temp;
 
         //合并信息
         spans.forEach(function (span) {
@@ -688,6 +765,16 @@ export default class Render {
                 ],
             });
         });
+
+        /*   autoMergeRanges.forEach(function (info) {
+            pageAutoMergeRanges.push({
+                ...info,
+                range: {
+                    ...info.range,
+                    row: info.range.row + pageRowCount,
+                },
+            });
+        }); */
     }
     splitTemp(infos, options = {}) {
         const {
@@ -734,6 +821,9 @@ export default class Render {
             startRow: -1,
             endRow: -1,
             tableCodes,
+            autoMergeRanges: [],
+            copyAutoMergeRanges: [],
+            updateAutoMergeRanges: [],
         };
 
         let startRow = 0;
@@ -765,10 +855,12 @@ export default class Render {
 
                 const rowRules = getRowRules({ rules, row });
                 const newRules = [];
+                const autoMergeRanges = [];
+                const mergeInfos = [];
 
                 Object.entries(rowDataTable).forEach(function ([
                     colStr,
-                    { bindingPath },
+                    { bindingPath, tag },
                 ]) {
                     const col = Number(colStr);
                     let res = bindingPath?.includes?.('.');
@@ -783,6 +875,28 @@ export default class Render {
                                 startRow = row;
                             }
                             hasBindTableField = res;
+                        }
+
+                        if (tag) {
+                            //收集当前单元格是否已经设置了行合并或列合并
+                            const jsonTag = JSON.parse(tag);
+                            const columnMerge = jsonTag.columnMerge || false;
+                            const rowMerge = jsonTag.rowMerge || false;
+                            if (columnMerge || rowMerge) {
+                                const span = spans.find(function (span) {
+                                    return span.row === row && span.col === col;
+                                }) || {
+                                    rowCount: 1,
+                                    colCount: 1,
+                                };
+                                mergeInfos.push({
+                                    ...span,
+                                    row,
+                                    col,
+                                    columnMerge,
+                                    rowMerge,
+                                });
+                            }
                         }
                     }
                     const newRow = row - startRow;
@@ -805,6 +919,36 @@ export default class Render {
                     });
                 });
 
+                //根据单元格的行列合并信息生成自动合并的区域
+                const len = mergeInfos.length;
+                if (len > 0) {
+                    let merge = mergeInfos[0];
+                    for (let i = 1; i < len; i++) {
+                        const item = mergeInfos[i];
+                        if (
+                            merge.row === item.row &&
+                            merge.rowCount === item.rowCount &&
+                            merge.columnMerge === item.columnMerge &&
+                            merge.rowMerge === item.rowMerge &&
+                            merge.col + merge.colCount === item.col
+                        ) {
+                            merge.colCount += item.colCount;
+                        } else {
+                            genAutoMergeRanges(
+                                merge,
+                                autoMergeRanges,
+                                tableInfos.startRow
+                            );
+                            merge = item;
+                        }
+                    }
+                    genAutoMergeRanges(
+                        merge,
+                        autoMergeRanges,
+                        tableInfos.startRow
+                    );
+                }
+
                 if (hasBindTableField) {
                     const newRow = row - tableInfos.startRow;
                     const res = genSpans({
@@ -816,10 +960,13 @@ export default class Render {
                     const { spans: newSpans, maxRowCount } = res;
 
                     tableInfos.endRow = row + maxRowCount;
+                    tableInfos.rowCount +=
+                        tableInfos.endRow - tableInfos.startRow;
                     tableInfos.dataTable[newRow] = rowDataTable;
                     tableInfos.rows[newRow] = getOldRowHeight(rows, row);
                     tableInfos.rules.push(...newRules);
                     tableInfos.spans.push(...newSpans);
+                    tableInfos.autoMergeRanges.push(...autoMergeRanges);
                     continue;
                 }
                 const newSpans = genSpans({
@@ -887,6 +1034,16 @@ export default class Render {
         for (let i = 0; i < footerInfos.rowCount; i++) {
             footerInfos.height += footerInfos?.rows?.[i]?.size || 20;
         }
+
+        //拆分自动合并区域
+        tableInfos.autoMergeRanges.filter(function (item) {
+            if (item.range.rowCount === tableInfos.rowCount) {
+                tableInfos.updateAutoMergeRanges.push(item);
+            } else if (item.range.colCount > 1) {
+                tableInfos.copyAutoMergeRanges.push(item);
+            }
+        });
+
         return {
             headerInfos,
             footerInfos,

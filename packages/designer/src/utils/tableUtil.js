@@ -6,7 +6,7 @@ import {
 const GC = getNamespace();
 
 //设置角标
-function setCornerMark(params) {
+export function setCornerMark(params) {
     const {
         sheet,
         row = 0,
@@ -15,25 +15,31 @@ function setCornerMark(params) {
         color = 'red',
         size = 8,
         setType = 'toggle' /* toggle | onlyAdd | onlyRemove */,
+        decoration,
     } = params;
     let style = sheet.getStyle(row, col);
     if (!style) {
         style = new GC.Spread.Sheets.Style();
     }
     if (
-        style?.decoration?.cornerFold?.markType === 'table' &&
-        (setType === 'toggle' || setType === 'onlyRemove')
+        /* style?.decoration?.cornerFold?.markType === 'table' && */
+        setType === 'toggle' ||
+        setType === 'onlyRemove'
     ) {
-        delete style.decoration.cornerFold;
+        style.decoration = {};
     } else if (setType === 'toggle' || setType === 'onlyAdd') {
-        style.decoration = {
-            cornerFold: {
-                size,
-                position,
-                color,
-                markType: 'table',
-            },
-        };
+        if (decoration) {
+            style.decoration = decoration;
+        } else {
+            style.decoration = {
+                cornerFold: {
+                    size,
+                    position,
+                    color,
+                    markType: 'table',
+                },
+            };
+        }
     }
     sheet.setStyle(row, col, style);
 }
@@ -218,7 +224,6 @@ export function setTableStyles(params) {
                 }
             }
 
-            debugger;
             //添加表格区域样式
             const newRange = table.range();
             setTableCornerMarks({

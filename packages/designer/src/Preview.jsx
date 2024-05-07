@@ -49,7 +49,10 @@ const ExcelWrap = styled.div`
 
 function replacer(key, value) {
     //删除角标信息
-    if (key === 'cornerFold' && value?.markType === 'table') {
+    /*  if (key === 'cornerFold' && value?.markType === 'table') {
+        return undefined;
+    } */
+    if (key === 'decoration') {
         return undefined;
     }
     return value;
