@@ -163,7 +163,7 @@ export const ListItemText = styled.div`
         align-items: center;
         gap: 2px;
 
-        & > span {
+        & > .textBox {
             overflow: hidden;
             width: 100%;
             text-overflow: ellipsis;

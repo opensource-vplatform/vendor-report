@@ -145,10 +145,12 @@ function TreeItem(props) {
                         }}
                     ></TreeSwitch>
                     <Icon type={type}></Icon>
-                    <Highlight
-                        text={name || '-'}
-                        highlight={searchKey}
-                    ></Highlight>
+                    <div className='textBox'>
+                        <Highlight
+                            text={name || '-'}
+                            highlight={searchKey}
+                        ></Highlight>
+                    </div>
                 </div>
                 {isTable && isShowAddSubDatasource
                     ? isAllowToEdit &&
