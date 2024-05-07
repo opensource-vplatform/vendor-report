@@ -4,8 +4,7 @@
     "description": "报表模板",
     "main": "src/index.jsx",
     "scripts": {
-        "postBuild": "node scripts/postBuild.js",
-        "build": "vite build -c=vite.config.build.js && npm run postBuild"
+        "test": "vite -c=vite.config.js"
     },
     "dependencies": {
         "react": "^18.2.0",

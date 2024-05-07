@@ -3,10 +3,9 @@ import RowSpan from '../model/RowSpan';
 import RowTemplate from './RowTemplate';
 
 class WorkSheetTemplate extends BaseTemplate {
-    rowTemplates = [];
-
     constructor(sheet, context) {
         super(sheet, context);
+        this.rowTemplates = [];
         this._parse();
     }
 
@@ -19,7 +18,7 @@ class WorkSheetTemplate extends BaseTemplate {
     _appendSpan(rowSpans, span) {
         const { row, rowCount } = span;
         const spanEnd = row + rowCount - 1;
-        const hasCross = false;
+        let hasCross = false;
         for (let i = 0, l = rowSpans.length; i < l; i++) {
             const rowSpan = rowSpans[i];
             if (rowSpan.hasCross(span)) {
@@ -30,7 +29,9 @@ class WorkSheetTemplate extends BaseTemplate {
             }
         }
         if (!hasCross) {
-            rowSpans.push(new RowSpan(row,spanEnd));
+            const rowSpan = new RowSpan(row, spanEnd);
+            rowSpan.appendSpan(span);
+            rowSpans.push(rowSpan);
         }
     }
 
@@ -53,7 +54,22 @@ class WorkSheetTemplate extends BaseTemplate {
      * 属于某个行合并
      */
     _belongToRowSpans(row, rowSpans) {
-        return rowSpans.find(rowSpan => rowSpan.isIn(row));
+        return rowSpans.find((rowSpan) => rowSpan.isIn(row));
+    }
+
+    _toRowTempateByTemp(temp) {
+        return this._toRowTemplate(temp.dataTable, temp.rowSpan);
+    }
+
+    _toRowTemplate(dataTable, rowSpan) {
+        return new RowTemplate(dataTable, this.getContext(), rowSpan);
+    }
+
+    _initTemp(row, rowTemplate, rowSpan) {
+        return {
+            dataTable: { [row]: rowTemplate },
+            rowSpan,
+        };
     }
 
     /**
@@ -73,60 +89,34 @@ class WorkSheetTemplate extends BaseTemplate {
                 const rowSpan = this._belongToRowSpans(parseInt(row), rowSpans);
                 if (rowSpan) {
                     if (!temp) {
-                        temp = {
-                            dataTable: { [row]: rowTemplate },
-                            rowSpan,
-                        };
+                        temp = this._initTemp(row, rowTemplate, rowSpan);
                     } else {
                         const rowSpan1 = temp.rowSpan;
                         if (rowSpan1 !== rowSpan) {
                             //不同属于同一个行合并区域,将之前的行合并区域实例化成行模板实例
                             this.rowTemplates.push(
-                                new RowTemplate(
-                                    temp.dataTable,
-                                    this.getContext(),
-                                    temp.rowSpan
-                                )
+                                this._toRowTempateByTemp(temp)
                             );
-                            temp = {
-                                dataTable: { [row]: rowTemplate },
-                                rowSpan,
-                            };
+                            temp = this._initTemp(row, rowTemplate, rowSpan);
                         } else {
                             temp.dataTable[row] = rowTemplate;
                         }
                     }
                 } else {
                     if (temp != null) {
-                        this.rowTemplates.push(
-                            new RowTemplate(
-                                temp.dataTable,
-                                this.getContext(),
-                                temp.rowSpan
-                            )
-                        );
+                        this.rowTemplates.push(this._toRowTempateByTemp(temp));
                         temp = null;
                     }
                     this.rowTemplates.push(
-                        new RowTemplate(
-                            { [row]: rowTemplate },
-                            this.getContext(),
-                            null
-                        )
+                        this._toRowTemplate({ [row]: rowTemplate }, null)
                     );
                 }
             }
+            if (temp != null) {
+                this.rowTemplates.push(this._toRowTempateByTemp(temp));
+                temp = null;
+            }
         }
-    }
-
-    /**
-     * 加载数据
-     * @param {*} datas
-     */
-    load(datas) {
-        this.rowTemplates.forEach((rowTemplate) => {
-            rowTemplate.load(datas);
-        });
     }
 
     /**
@@ -137,11 +127,24 @@ class WorkSheetTemplate extends BaseTemplate {
     toJson() {
         const worksheet = this.getTemplate();
         if (worksheet && this.rowTemplates.length > 0) {
+            const context = this.getContext();
+            let spans = worksheet.spans;
+            if (spans && spans.length > 0) {
+                spans.forEach((span) => {
+                    context.appendSpan(span);
+                });
+            }
             const dataTable = {};
+            let offset = 0;
             this.rowTemplates.forEach((rowTemplate) => {
+                rowTemplate.setOffset(offset);
                 const row = rowTemplate.toJson();
+                const delta = rowTemplate.getOffset();
+                offset += delta;
                 Object.assign(dataTable, row);
             });
+            spans = context.getSpans();
+            worksheet.spans = spans;
             worksheet.data.dataTable = dataTable;
         }
         return worksheet;

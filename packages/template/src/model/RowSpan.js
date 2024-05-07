@@ -24,7 +24,7 @@ class RowSpan {
      * @param {*} index
      */
     isIn(index) {
-        return this.start >= index && index <= this.end;
+        return index >= this.start && index <= this.end;
     }
 
     /**
@@ -42,6 +42,14 @@ class RowSpan {
      */
     appendSpan(span) {
         this.spans.push(span);
+    }
+
+    /**
+     * 获取所有单元格合并信息
+     * @returns
+     */
+    getSpans() {
+        return this.spans;
     }
 }
 

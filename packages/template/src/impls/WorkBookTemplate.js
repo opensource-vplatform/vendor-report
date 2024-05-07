@@ -3,11 +3,10 @@ import Context from '../Context';
 import WorkSheetTemplate from './WorkSheetTemplate';
 
 class WorkBookTemplate extends BaseTemplate {
-    //工作表模板实例
-    sheetTemplates = [];
-
-    constructor(workbook) {
-        super(workbook,new Context());
+    constructor(workbook, datasource) {
+        super(workbook, new Context(datasource));
+        //工作表模板实例
+        this.sheetTemplates = [];
         this._parse();
     }
 
@@ -15,7 +14,9 @@ class WorkBookTemplate extends BaseTemplate {
         const workbook = this.getTemplate();
         const sheets = workbook.sheets;
         for (let sheet of Object.values(sheets)) {
-            this.sheetTemplates.push(new WorkSheetTemplate(sheet,this.getContext()));
+            this.sheetTemplates.push(
+                new WorkSheetTemplate(sheet, this.getContext())
+            );
         }
     }
 
@@ -30,16 +31,6 @@ class WorkBookTemplate extends BaseTemplate {
             sheets[sheetJson.name] = sheetJson;
         });
         return sheets;
-    }
-
-    /**
-     * 加载数据
-     * @param {*} datas
-     */
-    load(datas) {
-        this.sheetTemplates.forEach((sheetTemplate) => {
-            sheetTemplate.load(datas);
-        });
     }
 
     /**

@@ -1,41 +1,32 @@
-
 /**
- * 
+ *
  */
-class BaseTemplate{
-
-    constructor(template,context){
+class BaseTemplate {
+    constructor(template, context) {
         this.template = template;
         this.context = context;
     }
 
     /**
      * 获取json模板
-     * @returns 
+     * @returns
      */
-    getTemplate(){
+    getTemplate() {
         return this.template;
     }
 
     /**
      * 获取上下文
-     * @returns 
+     * @returns
      */
-    getContext(){
+    getContext() {
         return this.context;
     }
 
     /**
      * 转换成json
      */
-    toJson(){
-
-    }
-
-    load(datas){
-
-    }
-
+    toJson() {}
 }
 
 export default BaseTemplate;
