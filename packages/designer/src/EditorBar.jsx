@@ -19,9 +19,7 @@ import {
 import {
   bind,
   EVENTS,
-  unbind,
 } from './event/EventManager';
-import { genUUID } from './utils/commonUtil';
 import FormulaTextBox from './utils/FormulaTextBox';
 import { getNamespace } from './utils/spreadUtil';
 
@@ -43,6 +41,7 @@ export default function () {
         formulaBtnDisabled: false,
         formulaTextBox: null,
         nameRangeBox: null,
+        isEdit:false,
     });
     const [showEditor,setEditorVisible] = useState(false);
     const refreshBtnStatus = () => {
@@ -56,6 +55,7 @@ export default function () {
                 ...data,
                 cancelBtnDisabled: isReady,
                 checkBtnDisabled: isReady,
+                isEdit,
                 formulaBtnDisabled: isEdit
                     ? data.formulaTextBox
                           ?.getCurrentEditingText()
@@ -73,9 +73,7 @@ export default function () {
         }
     };
     useEffect(() => {
-        const id = genUUID();
-        bind({
-            id,
+        const unBindHandler = bind({
             event: EVENTS.Inited,
             handler: (spread) => {
                 if (rangeBoxRef.current) {
@@ -101,25 +99,19 @@ export default function () {
             if (data.formulaTextBox != null) {
                 data.formulaTextBox.destroy();
             }
-            unbind({
-                id,
-                event: EVENTS.Inited,
-            });
+            unBindHandler();
         };
     }, []);
     useEffect(() => {
-        const id = genUUID();
-        bind({
-            id,
-            event: EVENTS.EditorStatusChanged,
-            handler: refreshBtnStatus,
-        });
-        return () => {
-            unbind({
-                id,
+        if(spread){
+            const unBindHandler = bind({
                 event: EVENTS.EditorStatusChanged,
+                handler: refreshBtnStatus,
             });
-        };
+            return () => {
+                unBindHandler();
+            };
+        }
     }, [spread]);
     return (
         <Wrap>

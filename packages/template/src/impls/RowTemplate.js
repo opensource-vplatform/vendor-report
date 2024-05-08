@@ -76,9 +76,9 @@ class RowTemplate extends BaseTemplate {
     }
 
     toJson() {
+        const template = this.getTemplate();
         let count = this.hasFieldBind ? this.unionDatasource.getCount() : 1;
         const json = {};
-        const template = this.getTemplate();
         for (let index = 0; index < count; index++) {
             for (let [row, rowTemplate] of Object.entries(template)) {
                 const rowClone = {};
@@ -107,7 +107,7 @@ class RowTemplate extends BaseTemplate {
                 spans.forEach((span) => {
                     let row = span.row;
                     const clone = { ...span };
-                    row += this.rowCount * (index + 1);
+                    row += this.rowCount * index;
                     clone.row = row;
                     context.appendSpan(clone);
                 });

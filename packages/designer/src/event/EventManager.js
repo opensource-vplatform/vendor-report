@@ -50,6 +50,10 @@ export const EVENTS = {
      * 当对此表单中的行或行区域进行更改，可能需要重新绘制行或行区域时触发
      */
     RowChanged: 'RowChanged',
+    /**
+     * 数据源双击事件
+     */
+    onDatasourceDBClick:"onDatasourceDBClick",
 };
 
 const check = function (params) {

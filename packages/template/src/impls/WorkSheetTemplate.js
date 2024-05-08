@@ -128,12 +128,12 @@ class WorkSheetTemplate extends BaseTemplate {
         const worksheet = this.getTemplate();
         if (worksheet && this.rowTemplates.length > 0) {
             const context = this.getContext();
-            let spans = worksheet.spans;
+            /*let spans = worksheet.spans;
             if (spans && spans.length > 0) {
                 spans.forEach((span) => {
                     context.appendSpan(span);
                 });
-            }
+            }*/
             const dataTable = {};
             let offset = 0;
             this.rowTemplates.forEach((rowTemplate) => {
@@ -143,7 +143,7 @@ class WorkSheetTemplate extends BaseTemplate {
                 offset += delta;
                 Object.assign(dataTable, row);
             });
-            spans = context.getSpans();
+            const spans = context.getSpans();
             worksheet.spans = spans;
             worksheet.data.dataTable = dataTable;
         }

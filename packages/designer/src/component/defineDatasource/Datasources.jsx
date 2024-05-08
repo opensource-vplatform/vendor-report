@@ -18,7 +18,7 @@ const Wrap = styled.div`
 
 //数据源列表
 export default function Index(props) {
-    const { draggable, isEditData = true, isCanAdd = true } = props;
+    const { draggable, isEditData = true, isCanAdd = true, onDoubleClick } = props;
     let { dsList, activeDs, finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
@@ -52,6 +52,7 @@ export default function Index(props) {
                 {...props}
                 datas={dsList}
                 isNotAllow={!isCanAdd}
+                onDoubleClick={onDoubleClick}
                 activeSheetTablePath={activeSheetTablePath}
                 searchKey={searchKey.dsSearchKey}
             ></Tree>

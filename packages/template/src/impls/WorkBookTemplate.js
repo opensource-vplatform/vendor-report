@@ -41,7 +41,7 @@ class WorkBookTemplate extends BaseTemplate {
     toJson() {
         const workbook = this.getTemplate();
         workbook.sheets = this._sheetsToJson();
-        workbook.sheetTabCount = this.sheetTemplates.length;
+        workbook.sheetCount = this.sheetTemplates.length;
         return workbook;
     }
 }

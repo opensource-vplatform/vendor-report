@@ -356,6 +356,9 @@ export default function Index() {
         },
         [spread]
     );
+    const setCellBindPath = ()=>{
+
+    }
     useEffect(function () {
         if (!cacheDatasRef.current.hasBindEvent) {
             cacheDatasRef.current.hasBindEvent = true;
@@ -528,6 +531,55 @@ export default function Index() {
             });
         }
     }, []);
+    const handleDbClick = (node,parent)=>{
+        if(!node||node.children&&node.children.length>0){
+            //双击实体节点不做任何处理
+            return;
+        }
+        //数据源双击，对选中单元格进行字段绑定，如果当前单元格有函数，则作为函数参数
+        const sheet = spread.getActiveSheet();
+        if(sheet){
+            const row = sheet.getActiveRowIndex();
+            const col = sheet.getActiveColumnIndex();
+            const cell = sheet.getCell(row,col);
+            let formula = cell.formula();
+            if(formula){
+                const txt = parent ? `TOONE.GET("${parent.code}","${node.code}")`:`TOONE.GET("${node.code}")`;
+                const handleFormula = (formula,flag)=>{
+                    formula = formula.trim();
+                    const lastIndex = formula.length-1;
+                    const char = formula.charAt(lastIndex);
+                    if(char == ')'&&!flag){
+                        formula = formula.substring(0,lastIndex)
+                        formula = handleFormula(formula,true)+')'
+                    }else if(char == '('){
+                        formula += txt;
+                    }else{
+                        formula += ','+ txt;
+                    }
+                    return formula;
+                }
+                formula = handleFormula(formula);
+                cell.formula(formula);
+            }else{
+                //单元格整个进行数据源绑定
+                let dataPath = node.code;
+                if(parent){
+                    dataPath = parent.code +'.' + dataPath;
+                }
+                const bindingPathCellType = new BindingPathCellType();
+                cell.bindingPath(dataPath).cellType(
+                    bindingPathCellType
+                );
+                let value =  parent ? `[${parent.name}.${node.name}]`:`[${node.name}]`;
+                cell.value(value);
+                setCellTag(sheet, row, col, 'bindInfo', {
+                    bindType: 'cell',
+                    bindDsInstanceId: node.id,
+                });
+            }
+        }
+    }
     return (
         <>
             {showHyperlink && <Hyperlink></Hyperlink>}
@@ -566,6 +618,7 @@ export default function Index() {
                     <Datasources
                         isShowAddSubDatasource={false}
                         draggable={true}
+                        onDoubleClick={handleDbClick}
                         treeOpenTrigger={treeOpenTrigger}
                         setOpenInfo={setOpenInfo}
                     ></Datasources>

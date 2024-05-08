@@ -62,16 +62,16 @@ export const Commands = {
         /**
          * 工作表
          */
-        Sheet:InsertSheetCommand.Command,
+        Sheet: InsertSheetCommand.Command,
         /**
          * 单元格
          */
-        Cell: InsertCellCommand.Command
+        Cell: InsertCellCommand.Command,
     },
     /**
      * 删除
      */
-    Delete:{
+    Delete: {
         /**
          * 单元格
          */
@@ -79,12 +79,12 @@ export const Commands = {
         /**
          * 工作表
          */
-        Sheet: DeleteSheetCommand.Command
+        Sheet: DeleteSheetCommand.Command,
     },
     /**
      * 设置
      */
-    Setting:{
+    Setting: {
         /**
          * 自动列宽
          */
@@ -96,53 +96,53 @@ export const Commands = {
         /**
          * 列宽
          */
-        ColWidth:ColWidthSettingCommand.Command,
+        ColWidth: ColWidthSettingCommand.Command,
         /**
          * 默认列宽
          */
-        DefaultColWidth:DefaultColWidthSettingCommand.Command,
+        DefaultColWidth: DefaultColWidthSettingCommand.Command,
         /**
          * 默认行高
          */
-        DefaultRowHeight:DefaultRowHeightSettingCommand.Command,
+        DefaultRowHeight: DefaultRowHeightSettingCommand.Command,
         /**
          * 行高
          */
-        RowHeight:RowHeightSettingCommand.Command,
+        RowHeight: RowHeightSettingCommand.Command,
     },
     /**
      * 显示
      */
-    Visible:{
+    Visible: {
         /**
          * 隐藏列
          */
-        HideCol:HideColVisibleCommand.Command,
+        HideCol: HideColVisibleCommand.Command,
         /**
          * 隐藏行
          */
-        HideRow:HideRowVisibleCommand.Command,
+        HideRow: HideRowVisibleCommand.Command,
         /**
          * 取消隐藏列
          */
-        ShowCol:ShowColVisibleCommand.Command,
+        ShowCol: ShowColVisibleCommand.Command,
         /**
          * 取消隐藏行
          */
-        ShowRow:ShowRowVisibleCommand.Command,
+        ShowRow: ShowRowVisibleCommand.Command,
     },
     /**
      * 格式
      */
-    Format:{
+    Format: {
         /**
          * 小数位数
          */
-        Demimal:DecimalFormatCommand.Command,
+        Demimal: DecimalFormatCommand.Command,
         /**
          * 格式化
          */
-        Formatter:FormatterFormatCommand.Command,
+        Formatter: FormatterFormatCommand.Command,
     },
     /**
      * 样式
@@ -151,52 +151,63 @@ export const Commands = {
         /**
          * 合并
          */
-        Merge:MergeStyleCommand.Command,
+        Merge: MergeStyleCommand.Command,
         /**
          * 样式
          */
-        Style:StyleStyleCommand.Command,
+        Style: StyleStyleCommand.Command,
         /**
          * 边框
          */
-        Border:BorderStyleCommand.Command,
+        Border: BorderStyleCommand.Command,
     },
     /**
      * 公式
      */
-    Formula:{
+    Formula: {
         /**
          * 设置
          */
         Set: SetFormulaCommand.Command,
-    }
+    },
+};
+
+const register = function (impls, commandManager) {
+    impls.forEach((impl) => {
+        impl.register(commandManager);
+    });
 };
 
 export const registerCommand = function (spread) {
     const commandManager = spread.commandManager();
-    ImageCellTypeCommand.register(commandManager);
-    SubTotalCellTypeCommand.register(commandManager);
-    ApplyConditionStyleCommand.register(commandManager);
-    ClearConditionStyleCommand.register(commandManager);
-    ResetConditionStyleCommand.register(commandManager);
-    InsertSheetCommand.register(commandManager);
-    InsertCellCommand.register(commandManager);
-    DeleteCellCommand.register(commandManager);
-    DeleteSheetCommand.register(commandManager);
-    AutoColWidthSettingCommand.register(commandManager);
-    AutoRowHeightSettingCommand.register(commandManager);
-    ColWidthSettingCommand.register(commandManager);
-    DefaultColWidthSettingCommand.register(commandManager);
-    DefaultRowHeightSettingCommand.register(commandManager);
-    RowHeightSettingCommand.register(commandManager);
-    HideColVisibleCommand.register(commandManager);
-    HideRowVisibleCommand.register(commandManager);
-    ShowColVisibleCommand.register(commandManager);
-    ShowRowVisibleCommand.register(commandManager);
-    DecimalFormatCommand.register(commandManager);
-    FormatterFormatCommand.register(commandManager);
-    MergeStyleCommand.register(commandManager);
-    StyleStyleCommand.register(commandManager);
-    BorderStyleCommand.register(commandManager);
-    SetFormulaCommand.register(commandManager);
+    register(
+        [
+            ImageCellTypeCommand,
+            SubTotalCellTypeCommand,
+            ApplyConditionStyleCommand,
+            ClearConditionStyleCommand,
+            ResetConditionStyleCommand,
+            InsertSheetCommand,
+            InsertCellCommand,
+            DeleteCellCommand,
+            DeleteSheetCommand,
+            AutoColWidthSettingCommand,
+            AutoRowHeightSettingCommand,
+            ColWidthSettingCommand,
+            DefaultColWidthSettingCommand,
+            DefaultRowHeightSettingCommand,
+            RowHeightSettingCommand,
+            HideColVisibleCommand,
+            HideRowVisibleCommand,
+            ShowColVisibleCommand,
+            ShowRowVisibleCommand,
+            DecimalFormatCommand,
+            FormatterFormatCommand,
+            MergeStyleCommand,
+            StyleStyleCommand,
+            BorderStyleCommand,
+            SetFormulaCommand,
+        ],
+        commandManager
+    );
 };

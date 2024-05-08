@@ -399,8 +399,12 @@ export default function (props) {
     useEffect(() => {
         (async () => {
             const inited = await initSpread();
-            handleEvents();
             if (inited) {
+                /**
+                 * 处理事件绑定必须在第一次spread初始才做，
+                 * 否则导致设计器编辑栏在初始化时注册的事件被清空
+                 */
+                handleEvents();
                 handleSheets(json);
                 handleDatas();
                 handlePrint();
