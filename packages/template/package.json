@@ -4,7 +4,7 @@
     "description": "报表模板",
     "main": "src/index.jsx",
     "scripts": {
-        "test": "vite -c=vite.config.js"
+        "test": "vite -c=vite.config.js --host"
     },
     "dependencies": {
         "react": "^18.2.0",

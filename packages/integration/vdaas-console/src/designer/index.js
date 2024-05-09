@@ -49,9 +49,9 @@ const getSelectedDatasources = function (context) {
 };
 
 const Type_Map = {
-    table: 'table',
-    query: 'table',
-    api: 'table',
+    apiView: 'table',
+    mode: 'table',
+    view: 'table',
     char: 'text',
     text: 'text',
     number: 'decimals',
@@ -108,7 +108,7 @@ const designer = new Designer({
         preview: false,//禁用预览
     },
     dataSource: {
-        allowToView: false, //不允许查看数据源
+        //allowToView: false, //不允许查看数据源
         allowToEdit: false, //不允许编辑数据源
     },
     event: {
@@ -116,6 +116,7 @@ const designer = new Designer({
             return new Promise(function (resolve, reject) {
                 json.usedDatasources = getUsedDatasources(context);
                 json.selectedDatasources = getSelectedDatasources(context);
+                json.datasourceSetting = context.datasourceSetting;
                 const config = JSON.stringify(json);
                 //保存的参数
                 const params = {
@@ -196,6 +197,7 @@ const designer = new Designer({
                                         excelJson: excelJson
                                             ? excelJson.reportJson
                                             : null,
+                                        datasourceSetting:excelJson.datasourceSetting||{},
                                     });
                                 })
                                 .catch(reject);
@@ -205,6 +207,7 @@ const designer = new Designer({
                                 excelJson: excelJson
                                     ? excelJson.reportJson
                                     : null,
+                                datasourceSetting:excelJson.datasourceSetting||{},
                             });
                         }
                     })

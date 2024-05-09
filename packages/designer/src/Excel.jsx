@@ -20,6 +20,7 @@ import {
 import { setSpread } from '@store/appSlice/appSlice';
 import {
   initDatasource,
+  setSetting,
   updateActiveSheetTablePath,
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
@@ -135,13 +136,14 @@ export default function () {
                 dispatch,
                 '正在初始化设计器，请稍候...',
                 EVENTS.onDesignerInited
-            ).then(({ excelJson, tableMetadata }) => {
+            ).then(({ excelJson, tableMetadata,datasourceSetting }) => {
                 excelJson && resolve(excelJson);
                 dispatch(
                     initDatasource({
                         datasource: tableMetadata,
                     })
                 );
+                datasourceSetting&&dispatch(setSetting(datasourceSetting))
             });
         });
     });

@@ -26,7 +26,8 @@ import {
 } from '../../utils/sparklineUtil';
 
 const Wrapper = styled.div`
-    margin: 10px;
+    background-color:white;
+    padding: 10px;
 `;
 
 export const HLayout = styled.div`
@@ -229,7 +230,7 @@ export default function (props) {
             onConfirm={handleConfirm}
         >
             <Wrapper>
-                <Warn>注意：本功能不支持导出到Excel，请谨慎使用！</Warn>
+                {/*<Warn>注意：本功能不支持导出到Excel，请谨慎使用！</Warn>*/}
                 <VGroupItem style={{ width: 480 }}>
                     <HLayout>
                         {setting?.url === false ? null : (

@@ -3,7 +3,6 @@ import { configureStore } from '@reduxjs/toolkit';
 import appSlice from './appSlice/appSlice';
 import borderSlice from './borderSlice/borderSlice';
 import cellSettingSlice from './cellSettingSlice';
-import fontCellSettingSlice from './cellSettingSlice/FontCellSettingSlice';
 import conditionStyleSlice from './conditionStyleSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
 import formulaEditorSlice from './formulaEditorSlice/formulaEditorSlice';
@@ -36,7 +35,6 @@ const serializableCheck = {
         'tableDesignSlice.spread',
         'tableDesignSlice.styleName',
         'borderSlice.spread',
-        'fontCellSettingSlice.spread',
         'workbookSettingSlice.spread',
         'worksheetSettingSlice.spread',
         'conditionStyleSlice.ruleManagerConfig',
@@ -51,7 +49,6 @@ export default configureStore({
         viewSlice,
         navSlice,
         tableDesignSlice,
-        fontCellSettingSlice,
         workbookSettingSlice,
         worksheetSettingSlice,
         formulaEditorSlice,

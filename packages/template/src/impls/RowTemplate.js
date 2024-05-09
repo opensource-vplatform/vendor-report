@@ -107,7 +107,7 @@ class RowTemplate extends BaseTemplate {
                 spans.forEach((span) => {
                     let row = span.row;
                     const clone = { ...span };
-                    row += this.rowCount * index;
+                    row += this.rowCount * index + this.offset;
                     clone.row = row;
                     context.appendSpan(clone);
                 });

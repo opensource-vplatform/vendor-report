@@ -4,22 +4,29 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import CheckBox from '../../../../component/form/CheckBox';
 import {
+  CheckBox,
   Radio,
   RadioGroup,
-} from '../../../../component/form/RadioGroup';
+} from '@components/form';
+import { Range } from '@components/range/Index';
 import {
+  setArea,
   setBlackAndWhite,
+  setEditorVisible,
   setPageOrder,
   setShowBorder,
   setShowGridLine,
   setShowHeader,
-} from '../../../../store/layoutSlice/layoutSlice';
+} from '@store/layoutSlice/layoutSlice';
+import { rangeToFormula } from '@utils/printUtil';
+import { getNamespace } from '@utils/spreadUtil';
+
 import {
   Divider,
   HLayout,
   Padding,
+  Title,
   VGroupItem,
   Wrapper,
 } from '../../Component';
@@ -38,19 +45,88 @@ const RowToColumn = styled.div`
     height: 74px;
 `;
 
-export default function () {
-    const { showHeader, showGridLine, blackAndWhite, pageOrder,showBorder } = useSelector(
-        ({ layoutSlice }) => layoutSlice
-    );
+export default function (props) {
+    const { hostId } = props;
+    const {
+        showHeader,
+        showGridLine,
+        blackAndWhite,
+        pageOrder,
+        showBorder,
+        rowStart,
+        rowEnd,
+        columnStart,
+        columnEnd,
+    } = useSelector(({ layoutSlice }) => layoutSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
     const dispatch = useDispatch();
     return (
         <Wrapper>
-            {/*<VGroupItem>
-                <HLayout>
+            <VGroupItem>
+                <HLayout
+                    style={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                    }}
+                >
                     <Title>打印区域：</Title>
+                    <Range
+                        value={rangeToFormula(
+                            rowStart,
+                            columnStart,
+                            rowEnd,
+                            columnEnd
+                        )}
+                        hostId={hostId}
+                        onStartSelect={() => {
+                            dispatch(setEditorVisible(false));
+                        }}
+                        onEndSelect={() => {
+                            dispatch(setEditorVisible(true));
+                        }}
+                        onChange={(expression) => {
+                            let rowStart = -1,
+                                columnStart = -1,
+                                rowEnd = -1,
+                                columnEnd = -1;
+                            if (expression && expression.trim() && spread) {
+                                const GC = getNamespace();
+                                const sheet = spread.getActiveSheet();
+                                const range =
+                                    GC.Spread.Sheets.CalcEngine.formulaToRange(
+                                        sheet,
+                                        expression
+                                    );
+                                if (range) {
+                                    const { row, col, rowCount, colCount } =
+                                        range;
+                                    rowStart = row;
+                                    columnStart = col;
+                                    rowEnd =
+                                        row == -1
+                                            ? rowCount - 1
+                                            : row + rowCount - 1;
+                                    columnEnd =
+                                        col == -1
+                                            ? colCount - 1
+                                            : col + colCount - 1;
+                                    rowEnd = rowEnd < -1 ? -1:rowEnd;
+                                    columnEnd = columnEnd < -1 ? -1:columnEnd;
+                                }
+                            }
+                            dispatch(
+                                setArea({
+                                    rowStart,
+                                    columnStart,
+                                    rowEnd,
+                                    columnEnd,
+                                })
+                            );
+                        }}
+                    ></Range>
                 </HLayout>
             </VGroupItem>
-            <Divider title='打印标题'></Divider>
+            {/*<Divider title='打印标题'></Divider>
             <Padding>
                 <VGroupItem>
                     <HLayout>
@@ -93,7 +169,7 @@ export default function () {
             <Divider title='打印顺序'></Divider>
             <Padding>
                 <HLayout>
-                    <VGroupItem style={{width:120,flex:'unset'}}>
+                    <VGroupItem style={{ width: 120, flex: 'unset' }}>
                         <RadioGroup
                             value={pageOrder}
                             onChange={(val) => dispatch(setPageOrder(val))}
@@ -103,7 +179,11 @@ export default function () {
                         </RadioGroup>
                     </VGroupItem>
                     <VGroupItem>
-                        {pageOrder==1 ? <ColumnToRow></ColumnToRow>:pageOrder == 2 ? <RowToColumn></RowToColumn>:null}
+                        {pageOrder == 1 ? (
+                            <ColumnToRow></ColumnToRow>
+                        ) : pageOrder == 2 ? (
+                            <RowToColumn></RowToColumn>
+                        ) : null}
                     </VGroupItem>
                 </HLayout>
             </Padding>

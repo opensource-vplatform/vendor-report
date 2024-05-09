@@ -1,8 +1,4 @@
-import {
-  Fragment,
-  useEffect,
-  useState,
-} from 'react';
+import { Fragment } from 'react';
 
 import {
   useDispatch,
@@ -18,39 +14,36 @@ import EmptyIcon from '@icons/base/Empty';
 import DirectionIcon from '@icons/layout/page/direction/Direction';
 import LandscapeIcon from '@icons/layout/page/direction/Landscape';
 import PortraitIcon from '@icons/layout/page/direction/Portrait';
+import CustomIcon from '@icons/layout/page/padding/Custom';
+import NarrowIcon from '@icons/layout/page/padding/Narrow';
 import PaddingIcon from '@icons/layout/page/padding/Normal';
 import AreaIcon from '@icons/layout/page/print/Area';
 import SetIcon from '@icons/layout/page/print/Set';
 import SizeIcon from '@icons/layout/page/size/Size';
 import SplitIcon from '@icons/layout/page/Split';
-import { WithIconMenu } from '@utils/componentUtils';
-
-import {
-  bind,
-  EVENTS,
-  unbind,
-} from '../../../event/EventManager';
-import CustomIcon from '../../../icons/layout/page/padding/Custom';
-import NarrowIcon from '../../../icons/layout/page/padding/Narrow';
-import { getAll } from '../../../metadatas/paper';
 import {
   setActive,
-  setInfo,
-  setMargin,
-  setOrientation,
-  setPaperKind,
-} from '../../../store/layoutSlice/layoutSlice';
-import { genUUID } from '../../../utils/commonUtil';
+  setEditorVisible,
+} from '@store/layoutSlice/layoutSlice';
+import { WithIconMenu } from '@utils/componentUtils';
+import {
+  isFunction,
+  isString,
+} from '@utils/objectUtil';
 import {
   clearPrintArea,
+  getMargin,
+  getOrientation,
+  getPageKind,
   insertPageSplit,
-  parsePrintInfo,
   removePageSplit,
   resetAllPageSplit,
   setPrintArea,
   setPrintInfo,
-} from '../../../utils/printUtil';
-import { getNamespace } from '../../../utils/spreadUtil';
+} from '@utils/printUtil';
+import { getNamespace } from '@utils/spreadUtil';
+
+import { getAll } from '../../../metadatas/paper';
 import EditDialog from './edit/Index';
 
 const PageSnapshot = function (props) {
@@ -136,7 +129,6 @@ const isMatch = function (source, target) {
 
 const toPaddingType = function (margin) {
     if (margin) {
-        const attrs = ['left', 'top', 'right', 'bottom', 'header', 'footer'];
         for (let attr in paddingEnums) {
             if (paddingEnums.hasOwnProperty(attr)) {
                 const val = paddingEnums[attr];
@@ -169,6 +161,15 @@ const getCustomMargin = () => {
     return null;
 };
 
+const setPagePadding = function (spread, type) {
+    const sheet = spread.getActiveSheet();
+    const margin = getMargin(spread);
+    const setting = isString(type) ? paddingEnums[type] : type;
+    setPrintInfo(sheet, {
+        margin: { ...margin, ...setting },
+    });
+};
+
 const PaddingItem = WithIconMenu('页边距', PaddingIcon, () => {
     const paddings = [
         {
@@ -181,6 +182,9 @@ const PaddingItem = WithIconMenu('页边距', PaddingIcon, () => {
                 ></PageSnapshot>
             ),
             icon: <PaddingIcon iconStyle={paddingIconStyle}></PaddingIcon>,
+            handler: function (spread) {
+                setPagePadding(spread, 'normal');
+            },
         },
         {
             value: 'board',
@@ -189,6 +193,9 @@ const PaddingItem = WithIconMenu('页边距', PaddingIcon, () => {
                 <PageSnapshot title='宽' {...paddingEnums.board}></PageSnapshot>
             ),
             icon: <PaddingIcon iconStyle={paddingIconStyle}></PaddingIcon>,
+            handler: function (spread) {
+                setPagePadding(spread, 'board');
+            },
         },
         {
             value: 'narrow',
@@ -200,12 +207,19 @@ const PaddingItem = WithIconMenu('页边距', PaddingIcon, () => {
                 ></PageSnapshot>
             ),
             icon: <NarrowIcon iconStyle={paddingIconStyle}></NarrowIcon>,
+            handler: function (spread, dispatch) {
+                setPagePadding(spread, 'narrow');
+            },
         },
         'divider',
         {
             value: 'setting',
             title: '自定义页边距...',
             text: '自定义页边距...',
+            handler: function (spread, dispatch) {
+                dispatch(setEditorVisible({ visible: true, reason: 'custom' }));
+                dispatch(setActive('padding'));
+            },
         },
     ];
     const custom = getCustomMargin();
@@ -215,6 +229,10 @@ const PaddingItem = WithIconMenu('页边距', PaddingIcon, () => {
             title: '自定义',
             text: <PageSnapshot title='自定义' {...custom}></PageSnapshot>,
             icon: <CustomIcon iconStyle={paddingIconStyle}></CustomIcon>,
+            handler: function (spread) {
+                const custom = getCustomMargin();
+                setPagePadding(spread, custom);
+            },
         });
     }
     return paddings;
@@ -227,6 +245,14 @@ const DirectionItem = WithIconMenu('纸张方向', DirectionIcon, [
         icon: (
             <PortraitIcon iconStyle={{ width: 24, height: 24 }}></PortraitIcon>
         ),
+        handler: (spread) => {
+            const GC = getNamespace();
+            const sheet = spread.getActiveSheet();
+            setPrintInfo(sheet, {
+                orientation:
+                    GC.Spread.Sheets.Print.PrintPageOrientation.portrait,
+            });
+        },
     },
     {
         value: 'landscape',
@@ -237,6 +263,14 @@ const DirectionItem = WithIconMenu('纸张方向', DirectionIcon, [
                 iconStyle={{ width: 24, height: 24 }}
             ></LandscapeIcon>
         ),
+        handler: (spread) => {
+            const GC = getNamespace();
+            const sheet = spread.getActiveSheet();
+            setPrintInfo(sheet, {
+                orientation:
+                    GC.Spread.Sheets.Print.PrintPageOrientation.landscape,
+            });
+        },
     },
 ]);
 
@@ -341,6 +375,12 @@ const toPaperKinds = function (kinds) {
                 ></PaperKind>
             ),
             icon: <PaperIcon style={PAPER_STYLE[value]}></PaperIcon>,
+            handler: function (spread, dispatch, kind) {
+                const sheet = spread.getActiveSheet();
+                setPrintInfo(sheet, {
+                    paperKind: kind,
+                });
+            },
         });
     });
     return result;
@@ -353,12 +393,18 @@ const AreaItem = WithIconMenu('打印区域', AreaIcon, [
         title: '设置打印区域',
         text: '设置打印区域',
         icon: <SetIcon></SetIcon>,
+        handler: function (spread) {
+            setPrintArea(spread);
+        },
     },
     {
         value: 'cancel',
         title: '取消打印区域',
         text: '取消打印区域',
         icon: <EmptyIcon></EmptyIcon>,
+        handler: function (spread) {
+            clearPrintArea(spread);
+        },
     },
 ]);
 const SplitItem = WithIconMenu('分隔符', SplitIcon, [
@@ -366,114 +412,50 @@ const SplitItem = WithIconMenu('分隔符', SplitIcon, [
         value: 'insert',
         title: '插入分隔符',
         text: '插入分隔符',
+        handler: function (spread) {
+            insertPageSplit(spread);
+        },
     },
     {
         value: 'delete',
         title: '删除分隔符',
         text: '删除分隔符',
+        handler: function (spread) {
+            removePageSplit(spread);
+        },
     },
     'divider',
     {
         value: 'reset',
         title: '重设所有分隔符',
         text: '重设所有分隔符',
+        handler: function (spread) {
+            resetAllPageSplit(spread);
+        },
     },
 ]);
 
 export default function () {
-    const [data, setData] = useState({
-        showDialog: false,
-    });
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const {
         orientation,
         margin = {},
         paperKind,
+        editorVisible,
+        rowStart,
+        columnStart,
+        rowEnd,
+        columnEnd,
     } = useSelector(({ layoutSlice }) => layoutSlice);
     const dispatch = useDispatch();
-    const handlePaddingSet = (type) => {
-        if (type == 'setting') {
-            setData({ showDialog: true });
-            dispatch(setActive('padding'));
-        } else if (type == 'normal') {
-            dispatch(setMargin({ ...margin, ...paddingEnums.normal }));
-        } else if (type == 'board') {
-            dispatch(setMargin({ ...margin, ...paddingEnums.board }));
-        } else if (type == 'narrow') {
-            dispatch(setMargin({ ...margin, ...paddingEnums.narrow }));
-        } else if (type == 'custom') {
-            const custom = getCustomMargin();
-            dispatch(setMargin({ ...margin, ...custom }));
+    const handleNodeClick = (val, node) => {
+        const { handler } = node;
+        if (isFunction(handler)) {
+            handler(spread, dispatch, val);
         }
     };
-    const handleDirectionSet = (direction) => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            let orientation = null;
-            const GC = getNamespace();
-            if (direction == 'portrait') {
-                orientation =
-                    GC.Spread.Sheets.Print.PrintPageOrientation.portrait;
-            } else if (direction == 'landscape') {
-                orientation =
-                    GC.Spread.Sheets.Print.PrintPageOrientation.landscape;
-            }
-            if (orientation !== null) {
-                dispatch(setOrientation(orientation));
-            }
-        }
-    };
-    const handleSizeSet = (size) => {
-        dispatch(setPaperKind(size));
-    };
-    const handlePrintAreaSet = (type) => {
-        if (type == 'set') {
-            setPrintArea(spread);
-        } else if (type == 'cancel') {
-            clearPrintArea(spread);
-        }
-    };
-    const handleSplitSet = function (type) {
-        if (type == 'insert') {
-            insertPageSplit(spread);
-        } else if (type == 'delete') {
-            removePageSplit(spread);
-        } else if (type == 'reset') {
-            resetAllPageSplit(spread);
-        }
-    };
-    useEffect(() => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            const printInfo = parsePrintInfo(spread);
-            dispatch(setInfo(printInfo));
-        }
-        const eventId = genUUID();
-        bind({
-            id: eventId,
-            event: EVENTS.ActiveSheetChanged,
-            handler: ({ newSheet }) => {
-                if (newSheet) {
-                    const printInfo = parsePrintInfo(spread, newSheet);
-                    dispatch(setInfo(printInfo));
-                }
-            },
-        });
-        return () => unbind({ id: eventId, event: EVENTS.ActiveSheetChanged });
-    }, []);
-    useEffect(() => {
-        const sheet = spread.getActiveSheet();
-        if (sheet) {
-            setPrintInfo(sheet, { orientation, margin, paperKind });
-        }
-    }, [orientation, margin, paperKind]);
     const closeEditor = () => {
-        setData((data) => {
-            return {
-                ...data,
-                showDialog: false,
-            };
-        });
+        dispatch(setEditorVisible({ visible: false, reason: null }));
     };
     return (
         <Fragment>
@@ -481,22 +463,32 @@ export default function () {
                 <HLayout>
                     <PaddingItem
                         optionMaxSize={11}
-                        onNodeClick={handlePaddingSet}
-                        value={toPaddingType(margin)}
+                        onNodeClick={handleNodeClick}
+                        value={() => {
+                            const margin = getMargin(spread);
+                            return margin ? toPaddingType(margin) : null;
+                        }}
                     ></PaddingItem>
                     <DirectionItem
-                        onNodeClick={handleDirectionSet}
-                        value={orientation == 1 ? 'portrait' : 'landscape'}
+                        onNodeClick={handleNodeClick}
+                        value={() => {
+                            const orientation = getOrientation(spread);
+                            if (orientation) {
+                                return orientation == 1
+                                    ? 'portrait'
+                                    : 'landscape';
+                            }
+                        }}
                     ></DirectionItem>
                     <SizeItem
-                        onNodeClick={handleSizeSet}
-                        value={paperKind}
+                        onNodeClick={handleNodeClick}
+                        value={() => getPageKind(spread)}
                     ></SizeItem>
-                    <AreaItem onNodeClick={handlePrintAreaSet}></AreaItem>
-                    <SplitItem onNodeClick={handleSplitSet}></SplitItem>
+                    <AreaItem onNodeClick={handleNodeClick}></AreaItem>
+                    <SplitItem onNodeClick={handleNodeClick}></SplitItem>
                 </HLayout>
             </GroupItem>
-            {data.showDialog ? (
+            {editorVisible ? (
                 <EditDialog
                     onConfirm={closeEditor}
                     onCancel={closeEditor}

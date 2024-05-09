@@ -362,7 +362,7 @@ export default function (props) {
             result,
             dispatch,
             '获取数据集定义中，请稍候...',
-            EVENTS.onDesignerInited
+            EVENTS.onDatasourceSelectVisible
         ).then((data) => {
             dispatch(setDatasources(data));
             setData((oData)=>{

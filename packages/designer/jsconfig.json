@@ -1,0 +1,1372 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "allowJs": true,
+        "paths": {
+            "@components/card/Index": ["src/component/card/Index"],
+            "@components/cellStyles/Index": ["src/component/cellStyles/Index"],
+            "@components/color/Index": ["src/component/color/Index"],
+            "@components/conditionStyle/Index": ["src/component/conditionStyle/Index"],
+            "@components/confirm/Index": ["src/component/confirm/Index"],
+            "@components/defineDatasource/Index": ["src/component/defineDatasource/Index"],
+            "@components/dialog/Index": ["src/component/dialog/Index"],
+            "@components/divider/Index": ["src/component/divider/Index"],
+            "@components/error/Index": ["src/component/error/Index"],
+            "@components/form/Index": ["src/component/form/Index"],
+            "@components/formula/Index": ["src/component/formula/Index"],
+            "@components/group/Index": ["src/component/group/Index"],
+            "@components/highlight/Index": ["src/component/highlight/Index"],
+            "@components/hyperlink/Index": ["src/component/hyperlink/Index"],
+            "@components/icon/Index": ["src/component/icon/Index"],
+            "@components/integer/Index": ["src/component/integer/Index"],
+            "@components/lineSeparator/Index": ["src/component/lineSeparator/Index"],
+            "@components/list/Index": ["src/component/list/Index"],
+            "@components/loading/Index": ["src/component/loading/Index"],
+            "@components/menu/Index": ["src/component/menu/Index"],
+            "@components/pageSettings/Index": ["src/component/pageSettings/Index"],
+            "@components/popper/Index": ["src/component/popper/Index"],
+            "@components/preview/Index": ["src/component/preview/Index"],
+            "@components/range/Index": ["src/component/range/Index"],
+            "@components/reportDesignWizard/Index": [
+                "src/component/reportDesignWizard/Index"
+            ],
+            "@components/select/Index": ["src/component/select/Index"],
+            "@components/smartTag/Index": ["src/component/smartTag/Index"],
+            "@components/sparkline/Index": ["src/component/sparkline/Index"],
+            "@components/splitpane/Index": ["src/component/splitpane/Index"],
+            "@components/steps/Index": ["src/component/steps/Index"],
+            "@components/tabs/Index": ["src/component/tabs/Index"],
+            "@components/tree/Index": ["src/component/tree/Index"],
+            "@event/EventManager":["src/event/EventManager"],
+            "@utils/chartUtil": ["src/utils/chartUtil"],
+            "@utils/crossDatas": ["src/utils/crossDatas"],
+            "@utils/formulaUtil": ["src/utils/formulaUtil"],
+            "@utils/slicerUtil": ["src/utils/slicerUtil"],
+            "@utils/zIndexUtil": ["src/utils/zIndexUtil"],
+            "@utils/colorUtil": ["src/utils/colorUtil"],
+            "@utils/domUtil": ["src/utils/domUtil"],
+            "@utils/messageUtil": ["src/utils/messageUtil"],
+            "@utils/sparklineUtil": ["src/utils/sparklineUtil"],
+            "@utils/borderUtil": ["src/utils/borderUtil"],
+            "@utils/commonUtil": ["src/utils/commonUtil"],
+            "@utils/environmentUtil": ["src/utils/environmentUtil"],
+            "@utils/objectUtil": ["src/utils/objectUtil"],
+            "@utils/spreadUtil": ["src/utils/spreadUtil"],
+            "@utils/callbackUtil": ["src/utils/callbackUtil"],
+            "@utils/componentUtils": ["src/utils/componentUtils"],
+            "@utils/eventUtil": ["src/utils/eventUtil"],
+            "@utils/printUtil": ["src/utils/printUtil"],
+            "@utils/styleUtil": ["src/utils/styleUtil"],
+            "@utils/canvas2image": ["src/utils/canvas2image"],
+            "@utils/conditionRuleUtil": ["src/utils/conditionRuleUtil"],
+            "@utils/fileUtil": ["src/utils/fileUtil"],
+            "@utils/profileUtil": ["src/utils/profileUtil"],
+            "@utils/tableUtil": ["src/utils/tableUtil"],
+            "@utils/cellSettingUtil": ["src/utils/cellSettingUtil"],
+            "@utils/configUtil": ["src/utils/configUtil"],
+            "@utils/fontUtil": ["src/utils/fontUtil"],
+            "@utils/reactUtil": ["src/utils/reactUtil"],
+            "@utils/textDecorationUtil": ["src/utils/textDecorationUtil"],
+            "@utils/cellUtil": ["src/utils/cellUtil"],
+            "@utils/consoleUtil": ["src/utils/consoleUtil"],
+            "@utils/FormulaTextBox": ["src/utils/FormulaTextBox"],
+            "@utils/shapeUtil": ["src/utils/shapeUtil"],
+            "@utils/worksheetUtil": ["src/utils/worksheetUtil"],
+            "@store/appSlice/appSlice": ["src/store/appSlice/appSlice"],
+            "@store/borderSlice/borderSlice": ["src/store/borderSlice/borderSlice"],
+            "@store/cellSettingSlice": ["src/store/cellSettingSlice"],
+            "@store/conditionStyleSlice": ["src/store/conditionStyleSlice"],
+            "@store/datasourceSlice/datasourceSlice": [
+                "src/store/datasourceSlice/datasourceSlice"
+            ],
+            "@store/formulaEditorSlice/formulaEditorSlice": [
+                "src/store/formulaEditorSlice/formulaEditorSlice"
+            ],
+            "@store/layoutSlice/layoutSlice": ["src/store/layoutSlice/layoutSlice"],
+            "@store/navSlice/navSlice": ["src/store/navSlice/navSlice"],
+            "@store/rangeSlice": ["src/store/rangeSlice"],
+            "@store/settingSlice/workbookSettingSlice": [
+                "src/store/settingSlice/workbookSettingSlice"
+            ],
+            "@store/settingSlice/worksheetSettingSlice": [
+                "src/store/settingSlice/worksheetSettingSlice"
+            ],
+            "@store/sparklineSlice": ["src/store/sparklineSlice"],
+            "@store/styleSlice": ["src/store/styleSlice"],
+            "@store/tableDesignSlice/tableDesignSlice": [
+                "src/store/tableDesignSlice/tableDesignSlice"
+            ],
+            "@store/viewSlice/viewSlice": ["src/store/viewSlice/viewSlice"],
+            "@store/wizardSlice": ["src/store/wizardSlice"],
+            "@icons/align/AlignCenter": ["src/icons/align/AlignCenter"],
+            "@icons/align/AlignLeft": ["src/icons/align/AlignLeft"],
+            "@icons/align/AlignRight": ["src/icons/align/AlignRight"],
+            "@icons/align/VAlignBottom": ["src/icons/align/VAlignBottom"],
+            "@icons/align/VAlignCenter": ["src/icons/align/VAlignCenter"],
+            "@icons/align/VAlignTop": ["src/icons/align/VAlignTop"],
+            "@icons/arrow/ArrowBack": ["src/icons/arrow/ArrowBack"],
+            "@icons/arrow/ArrowDown": ["src/icons/arrow/ArrowDown"],
+            "@icons/arrow/ArrowForward": ["src/icons/arrow/ArrowForward"],
+            "@icons/arrow/Down": ["src/icons/arrow/Down"],
+            "@icons/arrow/Right": ["src/icons/arrow/Right"],
+            "@icons/arrow/VerticalAlignBottom": [
+                "src/icons/arrow/VerticalAlignBottom"
+            ],
+            "@icons/arrow/VerticalAlignTop": [
+                "src/icons/arrow/VerticalAlignTop"
+            ],
+            "@icons/base/BaseIcon": ["src/icons/base/BaseIcon"],
+            "@icons/base/Empty": ["src/icons/base/Empty"],
+            "@icons/base/SvgIcon": ["src/icons/base/SvgIcon"],
+            "@icons/base/WithSvgIcon": ["src/icons/base/WithSvgIcon"],
+            "@icons/border/BorderAll": ["src/icons/border/BorderAll"],
+            "@icons/border/BorderBottom": ["src/icons/border/BorderBottom"],
+            "@icons/border/BorderDoubleBottom": [
+                "src/icons/border/BorderDoubleBottom"
+            ],
+            "@icons/border/BorderInside": ["src/icons/border/BorderInside"],
+            "@icons/border/BorderLeft": ["src/icons/border/BorderLeft"],
+            "@icons/border/BorderNone": ["src/icons/border/BorderNone"],
+            "@icons/border/BorderOther": ["src/icons/border/BorderOther"],
+            "@icons/border/BorderOutline": ["src/icons/border/BorderOutline"],
+            "@icons/border/BorderRight": ["src/icons/border/BorderRight"],
+            "@icons/border/BorderThickBottom": [
+                "src/icons/border/BorderThickBottom"
+            ],
+            "@icons/border/BorderThickBox": ["src/icons/border/BorderThickBox"],
+            "@icons/border/BorderTop": ["src/icons/border/BorderTop"],
+            "@icons/border/BorderTopBottom": [
+                "src/icons/border/BorderTopBottom"
+            ],
+            "@icons/border/BorderTopDoubleBottom": [
+                "src/icons/border/BorderTopDoubleBottom"
+            ],
+            "@icons/border/BorderTopThickBottom": [
+                "src/icons/border/BorderTopThickBottom"
+            ],
+            "@icons/border/DiagonalDownLine": [
+                "src/icons/border/DiagonalDownLine"
+            ],
+            "@icons/border/DiagonalUpLine": ["src/icons/border/DiagonalUpLine"],
+            "@icons/border/LineHorizontalInner": [
+                "src/icons/border/LineHorizontalInner"
+            ],
+            "@icons/border/LineVerticalInner": [
+                "src/icons/border/LineVerticalInner"
+            ],
+            "@icons/cell/ColWidth": ["src/icons/cell/ColWidth"],
+            "@icons/cell/Delete": ["src/icons/cell/Delete"],
+            "@icons/cell/DeleteCell": ["src/icons/cell/DeleteCell"],
+            "@icons/cell/DeleteSheet": ["src/icons/cell/DeleteSheet"],
+            "@icons/cell/DeleteSheetCol": ["src/icons/cell/DeleteSheetCol"],
+            "@icons/cell/DeleteSheetRow": ["src/icons/cell/DeleteSheetRow"],
+            "@icons/cell/Insert": ["src/icons/cell/Insert"],
+            "@icons/cell/InsertRow": ["src/icons/cell/InsertRow"],
+            "@icons/cell/InsertSheet": ["src/icons/cell/InsertSheet"],
+            "@icons/cell/InsertSheetCol": ["src/icons/cell/InsertSheetCol"],
+            "@icons/cell/InsertSheetRow": ["src/icons/cell/InsertSheetRow"],
+            "@icons/cell/RowHeight": ["src/icons/cell/RowHeight"],
+            "@icons/cell/Setting": ["src/icons/cell/Setting"],
+            "@icons/color/Pallet": ["src/icons/color/Pallet"],
+            "@icons/common/Error": ["src/icons/common/Error"],
+            "@icons/data/Asc": ["src/icons/data/Asc"],
+            "@icons/data/datasource": ["src/icons/data/datasource"],
+            "@icons/data/Desc": ["src/icons/data/Desc"],
+            "@icons/data/filter": ["src/icons/data/filter"],
+            "@icons/data/filterOff": ["src/icons/data/filterOff"],
+            "@icons/data/Sort": ["src/icons/data/Sort"],
+            "@icons/direction/AntiClockWise": [
+                "src/icons/direction/AntiClockWise"
+            ],
+            "@icons/direction/ClockWise": ["src/icons/direction/ClockWise"],
+            "@icons/direction/Column": ["src/icons/direction/Column"],
+            "@icons/direction/DirectionSetting": [
+                "src/icons/direction/DirectionSetting"
+            ],
+            "@icons/direction/DownwardRotation": [
+                "src/icons/direction/DownwardRotation"
+            ],
+            "@icons/direction/UpwardRotation": [
+                "src/icons/direction/UpwardRotation"
+            ],
+            "@icons/font/BackColor": ["src/icons/font/BackColor"],
+            "@icons/font/Bold": ["src/icons/font/Bold"],
+            "@icons/font/BreakLine": ["src/icons/font/BreakLine"],
+            "@icons/font/DoubleUnderline": ["src/icons/font/DoubleUnderline"],
+            "@icons/font/FontSizeDown": ["src/icons/font/FontSizeDown"],
+            "@icons/font/FontSizeUp": ["src/icons/font/FontSizeUp"],
+            "@icons/font/ForeColor": ["src/icons/font/ForeColor"],
+            "@icons/font/Italic": ["src/icons/font/Italic"],
+            "@icons/font/Underline": ["src/icons/font/Underline"],
+            "@icons/formula/Calculation": ["src/icons/formula/Calculation"],
+            "@icons/formula/Calculator": ["src/icons/formula/Calculator"],
+            "@icons/formula/CalWorkSheet": ["src/icons/formula/CalWorkSheet"],
+            "@icons/formula/Date": ["src/icons/formula/Date"],
+            "@icons/formula/Editor": ["src/icons/formula/Editor"],
+            "@icons/formula/Engineering": ["src/icons/formula/Engineering"],
+            "@icons/formula/Finance": ["src/icons/formula/Finance"],
+            "@icons/formula/Formula": ["src/icons/formula/Formula"],
+            "@icons/formula/Information": ["src/icons/formula/Information"],
+            "@icons/formula/Logic": ["src/icons/formula/Logic"],
+            "@icons/formula/Math": ["src/icons/formula/Math"],
+            "@icons/formula/Other": ["src/icons/formula/Other"],
+            "@icons/formula/Recent": ["src/icons/formula/Recent"],
+            "@icons/formula/Search": ["src/icons/formula/Search"],
+            "@icons/formula/Show": ["src/icons/formula/Show"],
+            "@icons/formula/Statistical": ["src/icons/formula/Statistical"],
+            "@icons/formula/Text": ["src/icons/formula/Text"],
+            "@icons/formula/ToRange": ["src/icons/formula/ToRange"],
+            "@icons/formula/ToSetting": ["src/icons/formula/ToSetting"],
+            "@icons/formula/Web": ["src/icons/formula/Web"],
+            "@icons/frozen/FirstColumn": ["src/icons/frozen/FirstColumn"],
+            "@icons/frozen/FirstRow": ["src/icons/frozen/FirstRow"],
+            "@icons/frozen/LastColumn": ["src/icons/frozen/LastColumn"],
+            "@icons/frozen/LastRow": ["src/icons/frozen/LastRow"],
+            "@icons/frozen/Window": ["src/icons/frozen/Window"],
+            "@icons/illustration/control/Button": [
+                "src/icons/illustration/control/Button"
+            ],
+            "@icons/illustration/control/CheckBox": [
+                "src/icons/illustration/control/CheckBox"
+            ],
+            "@icons/illustration/control/ComboBox": [
+                "src/icons/illustration/control/ComboBox"
+            ],
+            "@icons/illustration/control/GroupBox": [
+                "src/icons/illustration/control/GroupBox"
+            ],
+            "@icons/illustration/control/Label": [
+                "src/icons/illustration/control/Label"
+            ],
+            "@icons/illustration/control/ListBox": [
+                "src/icons/illustration/control/ListBox"
+            ],
+            "@icons/illustration/control/OptionButton": [
+                "src/icons/illustration/control/OptionButton"
+            ],
+            "@icons/illustration/control/ScrollBar": [
+                "src/icons/illustration/control/ScrollBar"
+            ],
+            "@icons/illustration/control/SpinButton": [
+                "src/icons/illustration/control/SpinButton"
+            ],
+            "@icons/illustration/Control": ["src/icons/illustration/Control"],
+            "@icons/illustration/Img": ["src/icons/illustration/Img"],
+            "@icons/illustration/shape/arrow/BentArrow": [
+                "src/icons/illustration/shape/arrow/BentArrow"
+            ],
+            "@icons/illustration/shape/arrow/BentUpArrow": [
+                "src/icons/illustration/shape/arrow/BentUpArrow"
+            ],
+            "@icons/illustration/shape/arrow/Chevron": [
+                "src/icons/illustration/shape/arrow/Chevron"
+            ],
+            "@icons/illustration/shape/arrow/CircularArrow": [
+                "src/icons/illustration/shape/arrow/CircularArrow"
+            ],
+            "@icons/illustration/shape/arrow/CurvedDownArrow": [
+                "src/icons/illustration/shape/arrow/CurvedDownArrow"
+            ],
+            "@icons/illustration/shape/arrow/CurvedLeftArrow": [
+                "src/icons/illustration/shape/arrow/CurvedLeftArrow"
+            ],
+            "@icons/illustration/shape/arrow/CurvedRightArrow": [
+                "src/icons/illustration/shape/arrow/CurvedRightArrow"
+            ],
+            "@icons/illustration/shape/arrow/CurvedUpArrow": [
+                "src/icons/illustration/shape/arrow/CurvedUpArrow"
+            ],
+            "@icons/illustration/shape/arrow/DownArrow": [
+                "src/icons/illustration/shape/arrow/DownArrow"
+            ],
+            "@icons/illustration/shape/arrow/DownArrowCallout": [
+                "src/icons/illustration/shape/arrow/DownArrowCallout"
+            ],
+            "@icons/illustration/shape/arrow/LeftArrow": [
+                "src/icons/illustration/shape/arrow/LeftArrow"
+            ],
+            "@icons/illustration/shape/arrow/LeftArrowCallout": [
+                "src/icons/illustration/shape/arrow/LeftArrowCallout"
+            ],
+            "@icons/illustration/shape/arrow/LeftRightArrow": [
+                "src/icons/illustration/shape/arrow/LeftRightArrow"
+            ],
+            "@icons/illustration/shape/arrow/LeftRightArrowCallout": [
+                "src/icons/illustration/shape/arrow/LeftRightArrowCallout"
+            ],
+            "@icons/illustration/shape/arrow/LeftRightUpArrow": [
+                "src/icons/illustration/shape/arrow/LeftRightUpArrow"
+            ],
+            "@icons/illustration/shape/arrow/LeftUpArrow": [
+                "src/icons/illustration/shape/arrow/LeftUpArrow"
+            ],
+            "@icons/illustration/shape/arrow/NotchedRightArrow": [
+                "src/icons/illustration/shape/arrow/NotchedRightArrow"
+            ],
+            "@icons/illustration/shape/arrow/Pentagon": [
+                "src/icons/illustration/shape/arrow/Pentagon"
+            ],
+            "@icons/illustration/shape/arrow/QuadArrow": [
+                "src/icons/illustration/shape/arrow/QuadArrow"
+            ],
+            "@icons/illustration/shape/arrow/QuadArrowCallout": [
+                "src/icons/illustration/shape/arrow/QuadArrowCallout"
+            ],
+            "@icons/illustration/shape/arrow/RightArrow": [
+                "src/icons/illustration/shape/arrow/RightArrow"
+            ],
+            "@icons/illustration/shape/arrow/RightArrowCallout": [
+                "src/icons/illustration/shape/arrow/RightArrowCallout"
+            ],
+            "@icons/illustration/shape/arrow/StripedRightArrow": [
+                "src/icons/illustration/shape/arrow/StripedRightArrow"
+            ],
+            "@icons/illustration/shape/arrow/UpArrow": [
+                "src/icons/illustration/shape/arrow/UpArrow"
+            ],
+            "@icons/illustration/shape/arrow/UpArrowCallout": [
+                "src/icons/illustration/shape/arrow/UpArrowCallout"
+            ],
+            "@icons/illustration/shape/arrow/UpDownArrow": [
+                "src/icons/illustration/shape/arrow/UpDownArrow"
+            ],
+            "@icons/illustration/shape/arrow/UTurnArrow": [
+                "src/icons/illustration/shape/arrow/UTurnArrow"
+            ],
+            "@icons/illustration/shape/base/ActionButtonBackorPrevious": [
+                "src/icons/illustration/shape/base/ActionButtonBackorPrevious"
+            ],
+            "@icons/illustration/shape/base/ActionButtonBeginning": [
+                "src/icons/illustration/shape/base/ActionButtonBeginning"
+            ],
+            "@icons/illustration/shape/base/ActionButtonDocument": [
+                "src/icons/illustration/shape/base/ActionButtonDocument"
+            ],
+            "@icons/illustration/shape/base/ActionButtonEnd": [
+                "src/icons/illustration/shape/base/ActionButtonEnd"
+            ],
+            "@icons/illustration/shape/base/ActionButtonForwardorNext": [
+                "src/icons/illustration/shape/base/ActionButtonForwardorNext"
+            ],
+            "@icons/illustration/shape/base/ActionButtonHelp": [
+                "src/icons/illustration/shape/base/ActionButtonHelp"
+            ],
+            "@icons/illustration/shape/base/ActionButtonHome": [
+                "src/icons/illustration/shape/base/ActionButtonHome"
+            ],
+            "@icons/illustration/shape/base/ActionButtonInformation": [
+                "src/icons/illustration/shape/base/ActionButtonInformation"
+            ],
+            "@icons/illustration/shape/base/ActionButtonMovie": [
+                "src/icons/illustration/shape/base/ActionButtonMovie"
+            ],
+            "@icons/illustration/shape/base/ActionButtonReturn": [
+                "src/icons/illustration/shape/base/ActionButtonReturn"
+            ],
+            "@icons/illustration/shape/base/ActionButtonSound": [
+                "src/icons/illustration/shape/base/ActionButtonSound"
+            ],
+            "@icons/illustration/shape/base/Arc": [
+                "src/icons/illustration/shape/base/Arc"
+            ],
+            "@icons/illustration/shape/base/Bevel": [
+                "src/icons/illustration/shape/base/Bevel"
+            ],
+            "@icons/illustration/shape/base/BlockArc": [
+                "src/icons/illustration/shape/base/BlockArc"
+            ],
+            "@icons/illustration/shape/base/Can": [
+                "src/icons/illustration/shape/base/Can"
+            ],
+            "@icons/illustration/shape/base/ChartPlus": [
+                "src/icons/illustration/shape/base/ChartPlus"
+            ],
+            "@icons/illustration/shape/base/ChartStar": [
+                "src/icons/illustration/shape/base/ChartStar"
+            ],
+            "@icons/illustration/shape/base/ChartX": [
+                "src/icons/illustration/shape/base/ChartX"
+            ],
+            "@icons/illustration/shape/base/Chord": [
+                "src/icons/illustration/shape/base/Chord"
+            ],
+            "@icons/illustration/shape/base/Cloud": [
+                "src/icons/illustration/shape/base/Cloud"
+            ],
+            "@icons/illustration/shape/base/Corner": [
+                "src/icons/illustration/shape/base/Corner"
+            ],
+            "@icons/illustration/shape/base/CornerTabs": [
+                "src/icons/illustration/shape/base/CornerTabs"
+            ],
+            "@icons/illustration/shape/base/Cross": [
+                "src/icons/illustration/shape/base/Cross"
+            ],
+            "@icons/illustration/shape/base/Cube": [
+                "src/icons/illustration/shape/base/Cube"
+            ],
+            "@icons/illustration/shape/base/Decagon": [
+                "src/icons/illustration/shape/base/Decagon"
+            ],
+            "@icons/illustration/shape/base/DiagonalStripe": [
+                "src/icons/illustration/shape/base/DiagonalStripe"
+            ],
+            "@icons/illustration/shape/base/Diamond": [
+                "src/icons/illustration/shape/base/Diamond"
+            ],
+            "@icons/illustration/shape/base/Dodecagon": [
+                "src/icons/illustration/shape/base/Dodecagon"
+            ],
+            "@icons/illustration/shape/base/Donut": [
+                "src/icons/illustration/shape/base/Donut"
+            ],
+            "@icons/illustration/shape/base/DoubleBrace": [
+                "src/icons/illustration/shape/base/DoubleBrace"
+            ],
+            "@icons/illustration/shape/base/DoubleBracket": [
+                "src/icons/illustration/shape/base/DoubleBracket"
+            ],
+            "@icons/illustration/shape/base/FlowchartOfflineStorage": [
+                "src/icons/illustration/shape/base/FlowchartOfflineStorage"
+            ],
+            "@icons/illustration/shape/base/FoldedCorner": [
+                "src/icons/illustration/shape/base/FoldedCorner"
+            ],
+            "@icons/illustration/shape/base/Frame": [
+                "src/icons/illustration/shape/base/Frame"
+            ],
+            "@icons/illustration/shape/base/Funnel": [
+                "src/icons/illustration/shape/base/Funnel"
+            ],
+            "@icons/illustration/shape/base/Gear6": [
+                "src/icons/illustration/shape/base/Gear6"
+            ],
+            "@icons/illustration/shape/base/Gear9": [
+                "src/icons/illustration/shape/base/Gear9"
+            ],
+            "@icons/illustration/shape/base/HalfFrame": [
+                "src/icons/illustration/shape/base/HalfFrame"
+            ],
+            "@icons/illustration/shape/base/Heart": [
+                "src/icons/illustration/shape/base/Heart"
+            ],
+            "@icons/illustration/shape/base/Heptagon": [
+                "src/icons/illustration/shape/base/Heptagon"
+            ],
+            "@icons/illustration/shape/base/Hexagon": [
+                "src/icons/illustration/shape/base/Hexagon"
+            ],
+            "@icons/illustration/shape/base/HorizontalTextBox": [
+                "src/icons/illustration/shape/base/HorizontalTextBox"
+            ],
+            "@icons/illustration/shape/base/IsoscelesTriangle": [
+                "src/icons/illustration/shape/base/IsoscelesTriangle"
+            ],
+            "@icons/illustration/shape/base/LeftBrace": [
+                "src/icons/illustration/shape/base/LeftBrace"
+            ],
+            "@icons/illustration/shape/base/LeftBracket": [
+                "src/icons/illustration/shape/base/LeftBracket"
+            ],
+            "@icons/illustration/shape/base/LeftCircularArrow": [
+                "src/icons/illustration/shape/base/LeftCircularArrow"
+            ],
+            "@icons/illustration/shape/base/LeftRightCircularArrow": [
+                "src/icons/illustration/shape/base/LeftRightCircularArrow"
+            ],
+            "@icons/illustration/shape/base/LeftRightRibbon": [
+                "src/icons/illustration/shape/base/LeftRightRibbon"
+            ],
+            "@icons/illustration/shape/base/LightningBolt": [
+                "src/icons/illustration/shape/base/LightningBolt"
+            ],
+            "@icons/illustration/shape/base/LineInverse": [
+                "src/icons/illustration/shape/base/LineInverse"
+            ],
+            "@icons/illustration/shape/base/Moon": [
+                "src/icons/illustration/shape/base/Moon"
+            ],
+            "@icons/illustration/shape/base/NonIsoscelesTrapezoid": [
+                "src/icons/illustration/shape/base/NonIsoscelesTrapezoid"
+            ],
+            "@icons/illustration/shape/base/NoSymbol": [
+                "src/icons/illustration/shape/base/NoSymbol"
+            ],
+            "@icons/illustration/shape/base/Octagon": [
+                "src/icons/illustration/shape/base/Octagon"
+            ],
+            "@icons/illustration/shape/base/Oval": [
+                "src/icons/illustration/shape/base/Oval"
+            ],
+            "@icons/illustration/shape/base/Parallelogram": [
+                "src/icons/illustration/shape/base/Parallelogram"
+            ],
+            "@icons/illustration/shape/base/Pie": [
+                "src/icons/illustration/shape/base/Pie"
+            ],
+            "@icons/illustration/shape/base/PieWedge": [
+                "src/icons/illustration/shape/base/PieWedge"
+            ],
+            "@icons/illustration/shape/base/Plaque": [
+                "src/icons/illustration/shape/base/Plaque"
+            ],
+            "@icons/illustration/shape/base/PlaqueTabs": [
+                "src/icons/illustration/shape/base/PlaqueTabs"
+            ],
+            "@icons/illustration/shape/base/RegularPentagon": [
+                "src/icons/illustration/shape/base/RegularPentagon"
+            ],
+            "@icons/illustration/shape/base/RightBrace": [
+                "src/icons/illustration/shape/base/RightBrace"
+            ],
+            "@icons/illustration/shape/base/RightBracket": [
+                "src/icons/illustration/shape/base/RightBracket"
+            ],
+            "@icons/illustration/shape/base/RightTriangle": [
+                "src/icons/illustration/shape/base/RightTriangle"
+            ],
+            "@icons/illustration/shape/base/SmileyFace": [
+                "src/icons/illustration/shape/base/SmileyFace"
+            ],
+            "@icons/illustration/shape/base/SquareTabs": [
+                "src/icons/illustration/shape/base/SquareTabs"
+            ],
+            "@icons/illustration/shape/base/Sun": [
+                "src/icons/illustration/shape/base/Sun"
+            ],
+            "@icons/illustration/shape/base/SwooshArrow": [
+                "src/icons/illustration/shape/base/SwooshArrow"
+            ],
+            "@icons/illustration/shape/base/Tear": [
+                "src/icons/illustration/shape/base/Tear"
+            ],
+            "@icons/illustration/shape/base/Trapezoid": [
+                "src/icons/illustration/shape/base/Trapezoid"
+            ],
+            "@icons/illustration/shape/base/UpDownArrowCallout": [
+                "src/icons/illustration/shape/base/UpDownArrowCallout"
+            ],
+            "@icons/illustration/shape/comment/CloudCallout": [
+                "src/icons/illustration/shape/comment/CloudCallout"
+            ],
+            "@icons/illustration/shape/comment/LineCallout2": [
+                "src/icons/illustration/shape/comment/LineCallout2"
+            ],
+            "@icons/illustration/shape/comment/LineCallout2AccentBar": [
+                "src/icons/illustration/shape/comment/LineCallout2AccentBar"
+            ],
+            "@icons/illustration/shape/comment/LineCallout2BorderandAccentBar": [
+                "src/icons/illustration/shape/comment/LineCallout2BorderandAccentBar"
+            ],
+            "@icons/illustration/shape/comment/LineCallout2NoBorder": [
+                "src/icons/illustration/shape/comment/LineCallout2NoBorder"
+            ],
+            "@icons/illustration/shape/comment/LineCallout3": [
+                "src/icons/illustration/shape/comment/LineCallout3"
+            ],
+            "@icons/illustration/shape/comment/LineCallout3AccentBar": [
+                "src/icons/illustration/shape/comment/LineCallout3AccentBar"
+            ],
+            "@icons/illustration/shape/comment/LineCallout3BorderandAccentBar": [
+                "src/icons/illustration/shape/comment/LineCallout3BorderandAccentBar"
+            ],
+            "@icons/illustration/shape/comment/LineCallout3NoBorder": [
+                "src/icons/illustration/shape/comment/LineCallout3NoBorder"
+            ],
+            "@icons/illustration/shape/comment/LineCallout4": [
+                "src/icons/illustration/shape/comment/LineCallout4"
+            ],
+            "@icons/illustration/shape/comment/LineCallout4AccentBar": [
+                "src/icons/illustration/shape/comment/LineCallout4AccentBar"
+            ],
+            "@icons/illustration/shape/comment/LineCallout4BorderandAccentBar": [
+                "src/icons/illustration/shape/comment/LineCallout4BorderandAccentBar"
+            ],
+            "@icons/illustration/shape/comment/LineCallout4NoBorder": [
+                "src/icons/illustration/shape/comment/LineCallout4NoBorder"
+            ],
+            "@icons/illustration/shape/comment/OvalCallout": [
+                "src/icons/illustration/shape/comment/OvalCallout"
+            ],
+            "@icons/illustration/shape/comment/RectangularCallout": [
+                "src/icons/illustration/shape/comment/RectangularCallout"
+            ],
+            "@icons/illustration/shape/comment/RoundedRectangularCallout": [
+                "src/icons/illustration/shape/comment/RoundedRectangularCallout"
+            ],
+            "@icons/illustration/shape/flow/FlowchartAlternateProcess": [
+                "src/icons/illustration/shape/flow/FlowchartAlternateProcess"
+            ],
+            "@icons/illustration/shape/flow/FlowchartCard": [
+                "src/icons/illustration/shape/flow/FlowchartCard"
+            ],
+            "@icons/illustration/shape/flow/FlowchartCollate": [
+                "src/icons/illustration/shape/flow/FlowchartCollate"
+            ],
+            "@icons/illustration/shape/flow/FlowchartConnector": [
+                "src/icons/illustration/shape/flow/FlowchartConnector"
+            ],
+            "@icons/illustration/shape/flow/FlowchartData": [
+                "src/icons/illustration/shape/flow/FlowchartData"
+            ],
+            "@icons/illustration/shape/flow/FlowchartDecision": [
+                "src/icons/illustration/shape/flow/FlowchartDecision"
+            ],
+            "@icons/illustration/shape/flow/FlowchartDelay": [
+                "src/icons/illustration/shape/flow/FlowchartDelay"
+            ],
+            "@icons/illustration/shape/flow/FlowchartDirectAccessStorage": [
+                "src/icons/illustration/shape/flow/FlowchartDirectAccessStorage"
+            ],
+            "@icons/illustration/shape/flow/FlowchartDisplay": [
+                "src/icons/illustration/shape/flow/FlowchartDisplay"
+            ],
+            "@icons/illustration/shape/flow/FlowchartDocument": [
+                "src/icons/illustration/shape/flow/FlowchartDocument"
+            ],
+            "@icons/illustration/shape/flow/FlowchartExtract": [
+                "src/icons/illustration/shape/flow/FlowchartExtract"
+            ],
+            "@icons/illustration/shape/flow/FlowchartInternalStorage": [
+                "src/icons/illustration/shape/flow/FlowchartInternalStorage"
+            ],
+            "@icons/illustration/shape/flow/FlowchartMagneticDisk": [
+                "src/icons/illustration/shape/flow/FlowchartMagneticDisk"
+            ],
+            "@icons/illustration/shape/flow/FlowchartManualInput": [
+                "src/icons/illustration/shape/flow/FlowchartManualInput"
+            ],
+            "@icons/illustration/shape/flow/FlowchartManualOperation": [
+                "src/icons/illustration/shape/flow/FlowchartManualOperation"
+            ],
+            "@icons/illustration/shape/flow/FlowchartMerge": [
+                "src/icons/illustration/shape/flow/FlowchartMerge"
+            ],
+            "@icons/illustration/shape/flow/FlowchartMultidocument": [
+                "src/icons/illustration/shape/flow/FlowchartMultidocument"
+            ],
+            "@icons/illustration/shape/flow/FlowchartOffpageConnector": [
+                "src/icons/illustration/shape/flow/FlowchartOffpageConnector"
+            ],
+            "@icons/illustration/shape/flow/FlowchartOr": [
+                "src/icons/illustration/shape/flow/FlowchartOr"
+            ],
+            "@icons/illustration/shape/flow/FlowchartPredefinedProcess": [
+                "src/icons/illustration/shape/flow/FlowchartPredefinedProcess"
+            ],
+            "@icons/illustration/shape/flow/FlowchartPreparation": [
+                "src/icons/illustration/shape/flow/FlowchartPreparation"
+            ],
+            "@icons/illustration/shape/flow/FlowchartProcess": [
+                "src/icons/illustration/shape/flow/FlowchartProcess"
+            ],
+            "@icons/illustration/shape/flow/FlowchartPunchedTape": [
+                "src/icons/illustration/shape/flow/FlowchartPunchedTape"
+            ],
+            "@icons/illustration/shape/flow/FlowchartSequentialAccessStorage": [
+                "src/icons/illustration/shape/flow/FlowchartSequentialAccessStorage"
+            ],
+            "@icons/illustration/shape/flow/FlowchartSort": [
+                "src/icons/illustration/shape/flow/FlowchartSort"
+            ],
+            "@icons/illustration/shape/flow/FlowchartStoredData": [
+                "src/icons/illustration/shape/flow/FlowchartStoredData"
+            ],
+            "@icons/illustration/shape/flow/FlowchartSummingJunction": [
+                "src/icons/illustration/shape/flow/FlowchartSummingJunction"
+            ],
+            "@icons/illustration/shape/flow/FlowchartTerminator": [
+                "src/icons/illustration/shape/flow/FlowchartTerminator"
+            ],
+            "@icons/illustration/shape/formula/Divide": [
+                "src/icons/illustration/shape/formula/Divide"
+            ],
+            "@icons/illustration/shape/formula/Equal": [
+                "src/icons/illustration/shape/formula/Equal"
+            ],
+            "@icons/illustration/shape/formula/Minus": [
+                "src/icons/illustration/shape/formula/Minus"
+            ],
+            "@icons/illustration/shape/formula/Multiply": [
+                "src/icons/illustration/shape/formula/Multiply"
+            ],
+            "@icons/illustration/shape/formula/NotEqual": [
+                "src/icons/illustration/shape/formula/NotEqual"
+            ],
+            "@icons/illustration/shape/formula/Plus": [
+                "src/icons/illustration/shape/formula/Plus"
+            ],
+            "@icons/illustration/shape/line/Elbow": [
+                "src/icons/illustration/shape/line/Elbow"
+            ],
+            "@icons/illustration/shape/line/ElbowWithEndArrow": [
+                "src/icons/illustration/shape/line/ElbowWithEndArrow"
+            ],
+            "@icons/illustration/shape/line/ElbowWithStartEndArrow": [
+                "src/icons/illustration/shape/line/ElbowWithStartEndArrow"
+            ],
+            "@icons/illustration/shape/line/Slash": [
+                "src/icons/illustration/shape/line/Slash"
+            ],
+            "@icons/illustration/shape/line/SlashWithEndArrow": [
+                "src/icons/illustration/shape/line/SlashWithEndArrow"
+            ],
+            "@icons/illustration/shape/line/SlashWithStartEndArrow": [
+                "src/icons/illustration/shape/line/SlashWithStartEndArrow"
+            ],
+            "@icons/illustration/shape/rect/RadiusRect": [
+                "src/icons/illustration/shape/rect/RadiusRect"
+            ],
+            "@icons/illustration/shape/rect/Rect": [
+                "src/icons/illustration/shape/rect/Rect"
+            ],
+            "@icons/illustration/shape/rect/Round1Rect": [
+                "src/icons/illustration/shape/rect/Round1Rect"
+            ],
+            "@icons/illustration/shape/rect/Round2DiagRect": [
+                "src/icons/illustration/shape/rect/Round2DiagRect"
+            ],
+            "@icons/illustration/shape/rect/Round2SameRect": [
+                "src/icons/illustration/shape/rect/Round2SameRect"
+            ],
+            "@icons/illustration/shape/rect/Snip2DiagRect": [
+                "src/icons/illustration/shape/rect/Snip2DiagRect"
+            ],
+            "@icons/illustration/shape/rect/Snip2SameRect": [
+                "src/icons/illustration/shape/rect/Snip2SameRect"
+            ],
+            "@icons/illustration/shape/rect/SnipRect": [
+                "src/icons/illustration/shape/rect/SnipRect"
+            ],
+            "@icons/illustration/shape/rect/SnipRoundRect": [
+                "src/icons/illustration/shape/rect/SnipRoundRect"
+            ],
+            "@icons/illustration/shape/star/CurvedDownRibbon": [
+                "src/icons/illustration/shape/star/CurvedDownRibbon"
+            ],
+            "@icons/illustration/shape/star/CurvedUpRibbon": [
+                "src/icons/illustration/shape/star/CurvedUpRibbon"
+            ],
+            "@icons/illustration/shape/star/DoubleWave": [
+                "src/icons/illustration/shape/star/DoubleWave"
+            ],
+            "@icons/illustration/shape/star/DownRibbon": [
+                "src/icons/illustration/shape/star/DownRibbon"
+            ],
+            "@icons/illustration/shape/star/Explosion1": [
+                "src/icons/illustration/shape/star/Explosion1"
+            ],
+            "@icons/illustration/shape/star/Explosion2": [
+                "src/icons/illustration/shape/star/Explosion2"
+            ],
+            "@icons/illustration/shape/star/HorizontalScroll": [
+                "src/icons/illustration/shape/star/HorizontalScroll"
+            ],
+            "@icons/illustration/shape/star/Shape16pointStar": [
+                "src/icons/illustration/shape/star/Shape16pointStar"
+            ],
+            "@icons/illustration/shape/star/Shape24pointStar": [
+                "src/icons/illustration/shape/star/Shape24pointStar"
+            ],
+            "@icons/illustration/shape/star/Shape32pointStar": [
+                "src/icons/illustration/shape/star/Shape32pointStar"
+            ],
+            "@icons/illustration/shape/star/Shape4pointStar": [
+                "src/icons/illustration/shape/star/Shape4pointStar"
+            ],
+            "@icons/illustration/shape/star/Shape5pointStar": [
+                "src/icons/illustration/shape/star/Shape5pointStar"
+            ],
+            "@icons/illustration/shape/star/Shape8pointStar": [
+                "src/icons/illustration/shape/star/Shape8pointStar"
+            ],
+            "@icons/illustration/shape/star/Star10Point": [
+                "src/icons/illustration/shape/star/Star10Point"
+            ],
+            "@icons/illustration/shape/star/Star12Point": [
+                "src/icons/illustration/shape/star/Star12Point"
+            ],
+            "@icons/illustration/shape/star/Star6Point": [
+                "src/icons/illustration/shape/star/Star6Point"
+            ],
+            "@icons/illustration/shape/star/Star7Point": [
+                "src/icons/illustration/shape/star/Star7Point"
+            ],
+            "@icons/illustration/shape/star/UpRibbon": [
+                "src/icons/illustration/shape/star/UpRibbon"
+            ],
+            "@icons/illustration/shape/star/VerticalScroll": [
+                "src/icons/illustration/shape/star/VerticalScroll"
+            ],
+            "@icons/illustration/shape/star/Wave": [
+                "src/icons/illustration/shape/star/Wave"
+            ],
+            "@icons/illustration/Shape": ["src/icons/illustration/Shape"],
+            "@icons/indent/DecreaseIndent": ["src/icons/indent/DecreaseIndent"],
+            "@icons/indent/IncreaseIndent": ["src/icons/indent/IncreaseIndent"],
+            "@icons/layout/page/custom/Count": [
+                "src/icons/layout/page/custom/Count"
+            ],
+            "@icons/layout/page/custom/Date": [
+                "src/icons/layout/page/custom/Date"
+            ],
+            "@icons/layout/page/custom/Image": [
+                "src/icons/layout/page/custom/Image"
+            ],
+            "@icons/layout/page/custom/Index": [
+                "src/icons/layout/page/custom/Index"
+            ],
+            "@icons/layout/page/custom/Sheet": [
+                "src/icons/layout/page/custom/Sheet"
+            ],
+            "@icons/layout/page/custom/Table": [
+                "src/icons/layout/page/custom/Table"
+            ],
+            "@icons/layout/page/custom/Time": [
+                "src/icons/layout/page/custom/Time"
+            ],
+            "@icons/layout/page/direction/Direction": [
+                "src/icons/layout/page/direction/Direction"
+            ],
+            "@icons/layout/page/direction/Landscape": [
+                "src/icons/layout/page/direction/Landscape"
+            ],
+            "@icons/layout/page/direction/Portrait": [
+                "src/icons/layout/page/direction/Portrait"
+            ],
+            "@icons/layout/page/padding/Board": [
+                "src/icons/layout/page/padding/Board"
+            ],
+            "@icons/layout/page/padding/Custom": [
+                "src/icons/layout/page/padding/Custom"
+            ],
+            "@icons/layout/page/padding/Narrow": [
+                "src/icons/layout/page/padding/Narrow"
+            ],
+            "@icons/layout/page/padding/Normal": [
+                "src/icons/layout/page/padding/Normal"
+            ],
+            "@icons/layout/page/print/Area": [
+                "src/icons/layout/page/print/Area"
+            ],
+            "@icons/layout/page/print/Set": ["src/icons/layout/page/print/Set"],
+            "@icons/layout/page/size/Size": ["src/icons/layout/page/size/Size"],
+            "@icons/layout/page/Split": ["src/icons/layout/page/Split"],
+            "@icons/merge/MergeCancel": ["src/icons/merge/MergeCancel"],
+            "@icons/merge/MergeCell": ["src/icons/merge/MergeCell"],
+            "@icons/merge/MergeCenter": ["src/icons/merge/MergeCenter"],
+            "@icons/merge/MergeCross": ["src/icons/merge/MergeCross"],
+            "@icons/number/accountingFormat": [
+                "src/icons/number/accountingFormat"
+            ],
+            "@icons/number/Comma": ["src/icons/number/Comma"],
+            "@icons/number/currencyFormat": ["src/icons/number/currencyFormat"],
+            "@icons/number/DecreaseDecimal": [
+                "src/icons/number/DecreaseDecimal"
+            ],
+            "@icons/number/formatGeneral": ["src/icons/number/formatGeneral"],
+            "@icons/number/fractionFormat": ["src/icons/number/fractionFormat"],
+            "@icons/number/IncreaseDecimal": [
+                "src/icons/number/IncreaseDecimal"
+            ],
+            "@icons/number/longDateformat": ["src/icons/number/longDateformat"],
+            "@icons/number/numberFormat": ["src/icons/number/numberFormat"],
+            "@icons/number/Percent": ["src/icons/number/Percent"],
+            "@icons/number/percentageFormat": [
+                "src/icons/number/percentageFormat"
+            ],
+            "@icons/number/scientificFormat": [
+                "src/icons/number/scientificFormat"
+            ],
+            "@icons/number/shortDateFormat": [
+                "src/icons/number/shortDateFormat"
+            ],
+            "@icons/number/textFormat": ["src/icons/number/textFormat"],
+            "@icons/number/timeFormat": ["src/icons/number/timeFormat"],
+            "@icons/report/pagingSettings": ["src/icons/report/pagingSettings"],
+            "@icons/report/wizard": ["src/icons/report/wizard"],
+            "@icons/setting/Calculation": ["src/icons/setting/Calculation"],
+            "@icons/setting/Scrollbars": ["src/icons/setting/Scrollbars"],
+            "@icons/setting/SheetTitle": ["src/icons/setting/SheetTitle"],
+            "@icons/setting/SpreadGeneral": ["src/icons/setting/SpreadGeneral"],
+            "@icons/setting/Tabstrip": ["src/icons/setting/Tabstrip"],
+            "@icons/shape/Add": ["src/icons/shape/Add"],
+            "@icons/shape/Cancel": ["src/icons/shape/Cancel"],
+            "@icons/shape/Check": ["src/icons/shape/Check"],
+            "@icons/shape/CheckedRadio": ["src/icons/shape/CheckedRadio"],
+            "@icons/shape/Clear": ["src/icons/shape/Clear"],
+            "@icons/shape/Close": ["src/icons/shape/Close"],
+            "@icons/shape/DataObject": ["src/icons/shape/DataObject"],
+            "@icons/shape/DotHoriz": ["src/icons/shape/DotHoriz"],
+            "@icons/shape/DotVert": ["src/icons/shape/DotVert"],
+            "@icons/shape/FillCheck": ["src/icons/shape/FillCheck"],
+            "@icons/shape/FillUnCheck": ["src/icons/shape/FillUnCheck"],
+            "@icons/shape/FindInPage": ["src/icons/shape/FindInPage"],
+            "@icons/shape/Grid": ["src/icons/shape/Grid"],
+            "@icons/shape/Image": ["src/icons/shape/Image"],
+            "@icons/shape/Info": ["src/icons/shape/Info"],
+            "@icons/shape/Print": ["src/icons/shape/Print"],
+            "@icons/shape/RestorePage": ["src/icons/shape/RestorePage"],
+            "@icons/shape/Search": ["src/icons/shape/Search"],
+            "@icons/shape/Text": ["src/icons/shape/Text"],
+            "@icons/shape/UnCheckRadio": ["src/icons/shape/UnCheckRadio"],
+            "@icons/style/ButtonListCellType": [
+                "src/icons/style/ButtonListCellType"
+            ],
+            "@icons/style/CalculatorCellType": [
+                "src/icons/style/CalculatorCellType"
+            ],
+            "@icons/style/CellDropdowns": ["src/icons/style/CellDropdowns"],
+            "@icons/style/cellEditors": ["src/icons/style/cellEditors"],
+            "@icons/style/CellStyles": ["src/icons/style/CellStyles"],
+            "@icons/style/CheckboxCellType": [
+                "src/icons/style/CheckboxCellType"
+            ],
+            "@icons/style/CheckboxListCellType": [
+                "src/icons/style/CheckboxListCellType"
+            ],
+            "@icons/style/ClearCellDropdown": [
+                "src/icons/style/ClearCellDropdown"
+            ],
+            "@icons/style/ClearCellType": ["src/icons/style/ClearCellType"],
+            "@icons/style/ClearRules": ["src/icons/style/ClearRules"],
+            "@icons/style/colorgradation/ColorScaleBwr": [
+                "src/icons/style/colorgradation/ColorScaleBwr"
+            ],
+            "@icons/style/colorgradation/ColorScaleGw": [
+                "src/icons/style/colorgradation/ColorScaleGw"
+            ],
+            "@icons/style/colorgradation/ColorScaleGwr": [
+                "src/icons/style/colorgradation/ColorScaleGwr"
+            ],
+            "@icons/style/colorgradation/ColorScaleGy": [
+                "src/icons/style/colorgradation/ColorScaleGy"
+            ],
+            "@icons/style/colorgradation/ColorScaleGyr": [
+                "src/icons/style/colorgradation/ColorScaleGyr"
+            ],
+            "@icons/style/colorgradation/ColorScaleRw": [
+                "src/icons/style/colorgradation/ColorScaleRw"
+            ],
+            "@icons/style/colorgradation/ColorScaleRwb": [
+                "src/icons/style/colorgradation/ColorScaleRwb"
+            ],
+            "@icons/style/colorgradation/ColorScaleRwg": [
+                "src/icons/style/colorgradation/ColorScaleRwg"
+            ],
+            "@icons/style/colorgradation/ColorScaleRyg": [
+                "src/icons/style/colorgradation/ColorScaleRyg"
+            ],
+            "@icons/style/colorgradation/ColorScaleWg": [
+                "src/icons/style/colorgradation/ColorScaleWg"
+            ],
+            "@icons/style/colorgradation/ColorScaleWr": [
+                "src/icons/style/colorgradation/ColorScaleWr"
+            ],
+            "@icons/style/colorgradation/ColorScaleYg": [
+                "src/icons/style/colorgradation/ColorScaleYg"
+            ],
+            "@icons/style/ColorPickerCellType": [
+                "src/icons/style/ColorPickerCellType"
+            ],
+            "@icons/style/ColorScalesList": ["src/icons/style/ColorScalesList"],
+            "@icons/style/ComboBoxCellType": [
+                "src/icons/style/ComboBoxCellType"
+            ],
+            "@icons/style/conditionFormat": ["src/icons/style/conditionFormat"],
+            "@icons/style/ConditionFormatManageRule": [
+                "src/icons/style/ConditionFormatManageRule"
+            ],
+            "@icons/style/ConditionFormatNewRule": [
+                "src/icons/style/ConditionFormatNewRule"
+            ],
+            "@icons/style/databar/GradientFillBlueDataBar": [
+                "src/icons/style/databar/GradientFillBlueDataBar"
+            ],
+            "@icons/style/databar/GradientFillGreenDataBar": [
+                "src/icons/style/databar/GradientFillGreenDataBar"
+            ],
+            "@icons/style/databar/GradientFillLightBlueDataBar": [
+                "src/icons/style/databar/GradientFillLightBlueDataBar"
+            ],
+            "@icons/style/databar/GradientFillOrangeDataBar": [
+                "src/icons/style/databar/GradientFillOrangeDataBar"
+            ],
+            "@icons/style/databar/GradientFillPurpleDataBar": [
+                "src/icons/style/databar/GradientFillPurpleDataBar"
+            ],
+            "@icons/style/databar/GradientFillRedDataBar": [
+                "src/icons/style/databar/GradientFillRedDataBar"
+            ],
+            "@icons/style/databar/SolidFillBlueDataBar": [
+                "src/icons/style/databar/SolidFillBlueDataBar"
+            ],
+            "@icons/style/databar/SolidFillGreenDataBar": [
+                "src/icons/style/databar/SolidFillGreenDataBar"
+            ],
+            "@icons/style/databar/SolidFillLightBlueDataBar": [
+                "src/icons/style/databar/SolidFillLightBlueDataBar"
+            ],
+            "@icons/style/databar/SolidFillOrangeDataBar": [
+                "src/icons/style/databar/SolidFillOrangeDataBar"
+            ],
+            "@icons/style/databar/SolidFillPurpleDataBar": [
+                "src/icons/style/databar/SolidFillPurpleDataBar"
+            ],
+            "@icons/style/databar/SolidFillRedDataBar": [
+                "src/icons/style/databar/SolidFillRedDataBar"
+            ],
+            "@icons/style/DataBar": ["src/icons/style/DataBar"],
+            "@icons/style/DateTimePickerCellType": [
+                "src/icons/style/DateTimePickerCellType"
+            ],
+            "@icons/style/HighlightCellsRules": [
+                "src/icons/style/HighlightCellsRules"
+            ],
+            "@icons/style/HighlightCellsRulesBetween": [
+                "src/icons/style/HighlightCellsRulesBetween"
+            ],
+            "@icons/style/HighlightCellsRulesContains": [
+                "src/icons/style/HighlightCellsRulesContains"
+            ],
+            "@icons/style/HighlightCellsRulesDateOccurring": [
+                "src/icons/style/HighlightCellsRulesDateOccurring"
+            ],
+            "@icons/style/HighlightCellsRulesDuplicateValues": [
+                "src/icons/style/HighlightCellsRulesDuplicateValues"
+            ],
+            "@icons/style/HighlightCellsRulesEqualTo": [
+                "src/icons/style/HighlightCellsRulesEqualTo"
+            ],
+            "@icons/style/HighlightCellsRulesGreaterThan": [
+                "src/icons/style/HighlightCellsRulesGreaterThan"
+            ],
+            "@icons/style/HighlightCellsRulesLessThan": [
+                "src/icons/style/HighlightCellsRulesLessThan"
+            ],
+            "@icons/style/HyperlinkCellType": [
+                "src/icons/style/HyperlinkCellType"
+            ],
+            "@icons/style/icons/detail/Icon0": [
+                "src/icons/style/icons/detail/Icon0"
+            ],
+            "@icons/style/icons/detail/Icon1": [
+                "src/icons/style/icons/detail/Icon1"
+            ],
+            "@icons/style/icons/detail/Icon10": [
+                "src/icons/style/icons/detail/Icon10"
+            ],
+            "@icons/style/icons/detail/Icon11": [
+                "src/icons/style/icons/detail/Icon11"
+            ],
+            "@icons/style/icons/detail/Icon12": [
+                "src/icons/style/icons/detail/Icon12"
+            ],
+            "@icons/style/icons/detail/Icon13": [
+                "src/icons/style/icons/detail/Icon13"
+            ],
+            "@icons/style/icons/detail/Icon14": [
+                "src/icons/style/icons/detail/Icon14"
+            ],
+            "@icons/style/icons/detail/Icon15": [
+                "src/icons/style/icons/detail/Icon15"
+            ],
+            "@icons/style/icons/detail/Icon16": [
+                "src/icons/style/icons/detail/Icon16"
+            ],
+            "@icons/style/icons/detail/Icon17": [
+                "src/icons/style/icons/detail/Icon17"
+            ],
+            "@icons/style/icons/detail/Icon18": [
+                "src/icons/style/icons/detail/Icon18"
+            ],
+            "@icons/style/icons/detail/Icon19": [
+                "src/icons/style/icons/detail/Icon19"
+            ],
+            "@icons/style/icons/detail/Icon2": [
+                "src/icons/style/icons/detail/Icon2"
+            ],
+            "@icons/style/icons/detail/Icon20": [
+                "src/icons/style/icons/detail/Icon20"
+            ],
+            "@icons/style/icons/detail/Icon21": [
+                "src/icons/style/icons/detail/Icon21"
+            ],
+            "@icons/style/icons/detail/Icon22": [
+                "src/icons/style/icons/detail/Icon22"
+            ],
+            "@icons/style/icons/detail/Icon23": [
+                "src/icons/style/icons/detail/Icon23"
+            ],
+            "@icons/style/icons/detail/Icon24": [
+                "src/icons/style/icons/detail/Icon24"
+            ],
+            "@icons/style/icons/detail/Icon25": [
+                "src/icons/style/icons/detail/Icon25"
+            ],
+            "@icons/style/icons/detail/Icon26": [
+                "src/icons/style/icons/detail/Icon26"
+            ],
+            "@icons/style/icons/detail/Icon27": [
+                "src/icons/style/icons/detail/Icon27"
+            ],
+            "@icons/style/icons/detail/Icon28": [
+                "src/icons/style/icons/detail/Icon28"
+            ],
+            "@icons/style/icons/detail/Icon29": [
+                "src/icons/style/icons/detail/Icon29"
+            ],
+            "@icons/style/icons/detail/Icon3": [
+                "src/icons/style/icons/detail/Icon3"
+            ],
+            "@icons/style/icons/detail/Icon30": [
+                "src/icons/style/icons/detail/Icon30"
+            ],
+            "@icons/style/icons/detail/Icon31": [
+                "src/icons/style/icons/detail/Icon31"
+            ],
+            "@icons/style/icons/detail/Icon32": [
+                "src/icons/style/icons/detail/Icon32"
+            ],
+            "@icons/style/icons/detail/Icon33": [
+                "src/icons/style/icons/detail/Icon33"
+            ],
+            "@icons/style/icons/detail/Icon34": [
+                "src/icons/style/icons/detail/Icon34"
+            ],
+            "@icons/style/icons/detail/Icon35": [
+                "src/icons/style/icons/detail/Icon35"
+            ],
+            "@icons/style/icons/detail/Icon36": [
+                "src/icons/style/icons/detail/Icon36"
+            ],
+            "@icons/style/icons/detail/Icon37": [
+                "src/icons/style/icons/detail/Icon37"
+            ],
+            "@icons/style/icons/detail/Icon38": [
+                "src/icons/style/icons/detail/Icon38"
+            ],
+            "@icons/style/icons/detail/Icon39": [
+                "src/icons/style/icons/detail/Icon39"
+            ],
+            "@icons/style/icons/detail/Icon4": [
+                "src/icons/style/icons/detail/Icon4"
+            ],
+            "@icons/style/icons/detail/Icon40": [
+                "src/icons/style/icons/detail/Icon40"
+            ],
+            "@icons/style/icons/detail/Icon41": [
+                "src/icons/style/icons/detail/Icon41"
+            ],
+            "@icons/style/icons/detail/Icon42": [
+                "src/icons/style/icons/detail/Icon42"
+            ],
+            "@icons/style/icons/detail/Icon43": [
+                "src/icons/style/icons/detail/Icon43"
+            ],
+            "@icons/style/icons/detail/Icon44": [
+                "src/icons/style/icons/detail/Icon44"
+            ],
+            "@icons/style/icons/detail/Icon45": [
+                "src/icons/style/icons/detail/Icon45"
+            ],
+            "@icons/style/icons/detail/Icon46": [
+                "src/icons/style/icons/detail/Icon46"
+            ],
+            "@icons/style/icons/detail/Icon47": [
+                "src/icons/style/icons/detail/Icon47"
+            ],
+            "@icons/style/icons/detail/Icon48": [
+                "src/icons/style/icons/detail/Icon48"
+            ],
+            "@icons/style/icons/detail/Icon49": [
+                "src/icons/style/icons/detail/Icon49"
+            ],
+            "@icons/style/icons/detail/Icon5": [
+                "src/icons/style/icons/detail/Icon5"
+            ],
+            "@icons/style/icons/detail/Icon50": [
+                "src/icons/style/icons/detail/Icon50"
+            ],
+            "@icons/style/icons/detail/Icon51": [
+                "src/icons/style/icons/detail/Icon51"
+            ],
+            "@icons/style/icons/detail/Icon52": [
+                "src/icons/style/icons/detail/Icon52"
+            ],
+            "@icons/style/icons/detail/Icon6": [
+                "src/icons/style/icons/detail/Icon6"
+            ],
+            "@icons/style/icons/detail/Icon7": [
+                "src/icons/style/icons/detail/Icon7"
+            ],
+            "@icons/style/icons/detail/Icon8": [
+                "src/icons/style/icons/detail/Icon8"
+            ],
+            "@icons/style/icons/detail/Icon9": [
+                "src/icons/style/icons/detail/Icon9"
+            ],
+            "@icons/style/icons/IconSet3Triangles": [
+                "src/icons/style/icons/IconSet3Triangles"
+            ],
+            "@icons/style/icons/IconSetFiveArrowsColored": [
+                "src/icons/style/icons/IconSetFiveArrowsColored"
+            ],
+            "@icons/style/icons/IconSetFiveArrowsGray": [
+                "src/icons/style/icons/IconSetFiveArrowsGray"
+            ],
+            "@icons/style/icons/IconSetFiveBoxes": [
+                "src/icons/style/icons/IconSetFiveBoxes"
+            ],
+            "@icons/style/icons/IconSetFiveQuarters": [
+                "src/icons/style/icons/IconSetFiveQuarters"
+            ],
+            "@icons/style/icons/IconSetFiveRatings": [
+                "src/icons/style/icons/IconSetFiveRatings"
+            ],
+            "@icons/style/icons/IconSetFourArrowsColored": [
+                "src/icons/style/icons/IconSetFourArrowsColored"
+            ],
+            "@icons/style/icons/IconSetFourArrowsGray": [
+                "src/icons/style/icons/IconSetFourArrowsGray"
+            ],
+            "@icons/style/icons/IconSetFourRatings": [
+                "src/icons/style/icons/IconSetFourRatings"
+            ],
+            "@icons/style/icons/IconSetFourRedToBlack": [
+                "src/icons/style/icons/IconSetFourRedToBlack"
+            ],
+            "@icons/style/icons/IconSetFourTrafficLights": [
+                "src/icons/style/icons/IconSetFourTrafficLights"
+            ],
+            "@icons/style/icons/IconSetThreeArrowsColored": [
+                "src/icons/style/icons/IconSetThreeArrowsColored"
+            ],
+            "@icons/style/icons/IconSetThreeArrowsGray": [
+                "src/icons/style/icons/IconSetThreeArrowsGray"
+            ],
+            "@icons/style/icons/IconSetThreeFlags": [
+                "src/icons/style/icons/IconSetThreeFlags"
+            ],
+            "@icons/style/icons/IconSetThreeSigns": [
+                "src/icons/style/icons/IconSetThreeSigns"
+            ],
+            "@icons/style/icons/IconSetThreeStars": [
+                "src/icons/style/icons/IconSetThreeStars"
+            ],
+            "@icons/style/icons/IconSetThreeSymbolsCircled": [
+                "src/icons/style/icons/IconSetThreeSymbolsCircled"
+            ],
+            "@icons/style/icons/IconSetThreeSymbolsUnCircled": [
+                "src/icons/style/icons/IconSetThreeSymbolsUnCircled"
+            ],
+            "@icons/style/icons/IconSetThreeTrafficLightsRimmed": [
+                "src/icons/style/icons/IconSetThreeTrafficLightsRimmed"
+            ],
+            "@icons/style/icons/IconSetThreeTrafficLightsUnRimmed": [
+                "src/icons/style/icons/IconSetThreeTrafficLightsUnRimmed"
+            ],
+            "@icons/style/IconSetList": ["src/icons/style/IconSetList"],
+            "@icons/style/ListCellType": ["src/icons/style/ListCellType"],
+            "@icons/style/MonthPickerCellType": [
+                "src/icons/style/MonthPickerCellType"
+            ],
+            "@icons/style/MultiColumnPicker": [
+                "src/icons/style/MultiColumnPicker"
+            ],
+            "@icons/style/RadioListCellType": [
+                "src/icons/style/RadioListCellType"
+            ],
+            "@icons/style/RangeTemplateCellType": [
+                "src/icons/style/RangeTemplateCellType"
+            ],
+            "@icons/style/RibbonButtonButtonCellType": [
+                "src/icons/style/RibbonButtonButtonCellType"
+            ],
+            "@icons/style/SliderCellType": ["src/icons/style/SliderCellType"],
+            "@icons/style/TimePickerCellType": [
+                "src/icons/style/TimePickerCellType"
+            ],
+            "@icons/style/TopBottomRules": ["src/icons/style/TopBottomRules"],
+            "@icons/style/TopBottomRulesAboveAverage": [
+                "src/icons/style/TopBottomRulesAboveAverage"
+            ],
+            "@icons/style/TopBottomRulesBelowAverage": [
+                "src/icons/style/TopBottomRulesBelowAverage"
+            ],
+            "@icons/style/TopBottomRulesBottom10": [
+                "src/icons/style/TopBottomRulesBottom10"
+            ],
+            "@icons/style/TopBottomRulesTop10": [
+                "src/icons/style/TopBottomRulesTop10"
+            ],
+            "@icons/style/WorkflowList": ["src/icons/style/WorkflowList"],
+            "@icons/table/Clear": ["src/icons/table/Clear"],
+            "@icons/table/style/Dark1": ["src/icons/table/style/Dark1"],
+            "@icons/table/style/Dark10": ["src/icons/table/style/Dark10"],
+            "@icons/table/style/Dark11": ["src/icons/table/style/Dark11"],
+            "@icons/table/style/Dark2": ["src/icons/table/style/Dark2"],
+            "@icons/table/style/Dark3": ["src/icons/table/style/Dark3"],
+            "@icons/table/style/Dark4": ["src/icons/table/style/Dark4"],
+            "@icons/table/style/Dark5": ["src/icons/table/style/Dark5"],
+            "@icons/table/style/Dark6": ["src/icons/table/style/Dark6"],
+            "@icons/table/style/Dark7": ["src/icons/table/style/Dark7"],
+            "@icons/table/style/Dark8": ["src/icons/table/style/Dark8"],
+            "@icons/table/style/Dark9": ["src/icons/table/style/Dark9"],
+            "@icons/table/style/Light1": ["src/icons/table/style/Light1"],
+            "@icons/table/style/Light10": ["src/icons/table/style/Light10"],
+            "@icons/table/style/Light11": ["src/icons/table/style/Light11"],
+            "@icons/table/style/Light12": ["src/icons/table/style/Light12"],
+            "@icons/table/style/Light13": ["src/icons/table/style/Light13"],
+            "@icons/table/style/Light14": ["src/icons/table/style/Light14"],
+            "@icons/table/style/Light15": ["src/icons/table/style/Light15"],
+            "@icons/table/style/Light16": ["src/icons/table/style/Light16"],
+            "@icons/table/style/Light17": ["src/icons/table/style/Light17"],
+            "@icons/table/style/Light18": ["src/icons/table/style/Light18"],
+            "@icons/table/style/Light19": ["src/icons/table/style/Light19"],
+            "@icons/table/style/Light2": ["src/icons/table/style/Light2"],
+            "@icons/table/style/Light20": ["src/icons/table/style/Light20"],
+            "@icons/table/style/Light21": ["src/icons/table/style/Light21"],
+            "@icons/table/style/Light22": ["src/icons/table/style/Light22"],
+            "@icons/table/style/Light3": ["src/icons/table/style/Light3"],
+            "@icons/table/style/Light4": ["src/icons/table/style/Light4"],
+            "@icons/table/style/Light5": ["src/icons/table/style/Light5"],
+            "@icons/table/style/Light6": ["src/icons/table/style/Light6"],
+            "@icons/table/style/Light7": ["src/icons/table/style/Light7"],
+            "@icons/table/style/Light8": ["src/icons/table/style/Light8"],
+            "@icons/table/style/Light9": ["src/icons/table/style/Light9"],
+            "@icons/table/style/Medium1": ["src/icons/table/style/Medium1"],
+            "@icons/table/style/Medium10": ["src/icons/table/style/Medium10"],
+            "@icons/table/style/Medium11": ["src/icons/table/style/Medium11"],
+            "@icons/table/style/Medium12": ["src/icons/table/style/Medium12"],
+            "@icons/table/style/Medium13": ["src/icons/table/style/Medium13"],
+            "@icons/table/style/Medium14": ["src/icons/table/style/Medium14"],
+            "@icons/table/style/Medium15": ["src/icons/table/style/Medium15"],
+            "@icons/table/style/Medium16": ["src/icons/table/style/Medium16"],
+            "@icons/table/style/Medium17": ["src/icons/table/style/Medium17"],
+            "@icons/table/style/Medium18": ["src/icons/table/style/Medium18"],
+            "@icons/table/style/Medium19": ["src/icons/table/style/Medium19"],
+            "@icons/table/style/Medium2": ["src/icons/table/style/Medium2"],
+            "@icons/table/style/Medium20": ["src/icons/table/style/Medium20"],
+            "@icons/table/style/Medium21": ["src/icons/table/style/Medium21"],
+            "@icons/table/style/Medium22": ["src/icons/table/style/Medium22"],
+            "@icons/table/style/Medium23": ["src/icons/table/style/Medium23"],
+            "@icons/table/style/Medium24": ["src/icons/table/style/Medium24"],
+            "@icons/table/style/Medium25": ["src/icons/table/style/Medium25"],
+            "@icons/table/style/Medium26": ["src/icons/table/style/Medium26"],
+            "@icons/table/style/Medium27": ["src/icons/table/style/Medium27"],
+            "@icons/table/style/Medium28": ["src/icons/table/style/Medium28"],
+            "@icons/table/style/Medium3": ["src/icons/table/style/Medium3"],
+            "@icons/table/style/Medium4": ["src/icons/table/style/Medium4"],
+            "@icons/table/style/Medium5": ["src/icons/table/style/Medium5"],
+            "@icons/table/style/Medium6": ["src/icons/table/style/Medium6"],
+            "@icons/table/style/Medium7": ["src/icons/table/style/Medium7"],
+            "@icons/table/style/Medium8": ["src/icons/table/style/Medium8"],
+            "@icons/table/style/Medium9": ["src/icons/table/style/Medium9"],
+            "@icons/table/Style": ["src/icons/table/Style"],
+            "@commands/index":["src/command/index"],
+        }
+    },
+    "include": ["src/**/*.js", "src/**/*.jsx"],
+    "exclude": []
+}

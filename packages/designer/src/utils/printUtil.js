@@ -17,6 +17,8 @@ const getSheet = function (spread) {
         : spread.getActiveSheet();
 };
 
+
+
 export const setPrintArea = function (spread) {
     withBatchCalcUpdate(spread, (sheet) => {
         sheet = getSheet(spread);
@@ -41,6 +43,7 @@ export const clearPrintArea = function (spread) {
             printInfo.rowEnd(-1);
             printInfo.columnStart(-1);
             printInfo.columnEnd(-1);
+            sheet.removeCustomName('Print_Area');
         }
     });
 };
@@ -109,7 +112,7 @@ export const setPageLayout = function (spread, layout) {
             differentFirst,
             pageHeaderFooter,
         } = layout;
-        setPrintInfo(sheet,layout)
+        setPrintInfo(sheet, layout);
 
         var i = rowStart,
             l = rowEnd,
@@ -418,18 +421,11 @@ const parseFormatString = function (format, spread) {
                     n.push('?');
                     break;
                 case STYLE_ENUM.workbookName:
-                    n.push(
-                        spread && spread.name
-                            ? spread.name
-                            : "工作簿"
-                    );
+                    n.push(spread && spread.name ? spread.name : '工作簿');
                     break;
                 case STYLE_ENUM.worksheetName:
                     var c = '';
-                    (c = sheet
-                        ? sheet.name()
-                        : "工作表"),
-                        n.push(c);
+                    (c = sheet ? sheet.name() : '工作表'), n.push(c);
                     break;
                 case STYLE_ENUM.date:
                     n.push(
@@ -518,25 +514,14 @@ const getHeadersOrFootersArray = function (selectedValue, spread) {
     }));
 };
 
-export const parsePrintInfo = function (spread,sheet) {
-    if(!sheet){
-        sheet = getSheet(spread);
-    }
-    const printInfo = sheet.printInfo();
-    const GC = getNamespace();
-    const rowStart = printInfo.rowStart();
-    const columnStart = printInfo.columnStart();
-    const rowEnd = printInfo.rowEnd();
-    const columnEnd = printInfo.columnEnd();
-    const repeatRowStart = printInfo.repeatRowStart();
-    const repeatColumnStart = printInfo.repeatColumnStart();
-    const repeatRowEnd = printInfo.repeatRowEnd();
-    const repeatColumnEnd = printInfo.repeatColumnEnd();
-    const showBorder = printInfo.showBorder();
-    let formula = '',
-        formula1 = '',
-        formula2 = '';
+export const rangeToFormula = function (
+    rowStart,
+    columnStart,
+    rowEnd,
+    columnEnd
+) {
     if (rowStart !== -1 || columnStart !== -1 || columnEnd !== -1) {
+        const GC = getNamespace();
         const range = new GC.Spread.Sheets.Range(
             rowStart,
             columnStart,
@@ -551,26 +536,70 @@ export const parsePrintInfo = function (spread,sheet) {
             range.col = 0;
             range.colCount = columnEnd - columnStart + 1;
         }
-        formula = GC.Spread.Sheets.CalcEngine.rangeToFormula(range);
+        return GC.Spread.Sheets.CalcEngine.rangeToFormula(range);
     }
-    if (repeatRowStart !== -1 || repeatRowEnd !== -1) {
+    return '';
+};
+
+const repeatRangeToFormula = function (start, end) {
+    if (start !== -1 || end !== -1) {
+        const GC = getNamespace();
         const range = new GC.Spread.Sheets.Range(
-            repeatRowStart,
+            start,
             -1,
-            repeatRowEnd - repeatRowStart + 1,
+            end - start + 1,
             -1
         );
-        formula1 = GC.Spread.Sheets.CalcEngine.rangeToFormula(range);
+        return GC.Spread.Sheets.CalcEngine.rangeToFormula(range);
     }
-    if (repeatColumnStart !== -1 || repeatColumnEnd !== -1) {
-        const range = new GC.Spread.Sheets.Range(
-            -1,
-            repeatColumnStart,
-            -1,
-            repeatColumnEnd - repeatColumnStart + 1
-        );
-        formula2 = GC.Spread.Sheets.CalcEngine.rangeToFormula(range);
+    return '';
+};
+
+const getPrintInfo = function(spread){
+    const sheet = spread?.getActiveSheet();
+    return sheet?.printInfo();
+}
+
+export const getPageKind = function(spread){
+    const printInfo = getPrintInfo(spread);
+    return printInfo?.paperSize().kind();
+}
+
+export const getMargin = function(spread){
+    const printInfo = getPrintInfo(spread);
+    let margin = printInfo?.margin();
+    if(margin){
+        margin = deepClone(margin);
+        handleMargin(margin, px2inch);
+        margin.centering = {
+            vertically: 1 < printInfo.centering(),
+            horizontally:
+                1 === printInfo.centering() || 3 === printInfo.centering(),
+        };
+        return margin;
     }
+}
+
+export const getOrientation = function(spread){
+    const printInfo = getPrintInfo(spread);
+    return printInfo?.orientation();
+}
+
+export const parsePrintInfo = function (spread, sheet) {
+    if (!sheet) {
+        sheet = getSheet(spread);
+    }
+    const printInfo = sheet.printInfo();
+    const GC = getNamespace();
+    const rowStart = printInfo.rowStart();
+    const columnStart = printInfo.columnStart();
+    const rowEnd = printInfo.rowEnd();
+    const columnEnd = printInfo.columnEnd();
+    const repeatRowStart = printInfo.repeatRowStart();
+    const repeatColumnStart = printInfo.repeatColumnStart();
+    const repeatRowEnd = printInfo.repeatRowEnd();
+    const repeatColumnEnd = printInfo.repeatColumnEnd();
+    const showBorder = printInfo.showBorder();
     const headerFooter = deepClone(printInfo.pageHeaderFooter());
     const setting = headerFooter.normal || headerFooter.odd;
     let normal = null;
@@ -600,14 +629,18 @@ export const parsePrintInfo = function (spread,sheet) {
         printButtonGroup: {
             showFileMenu: false,
         },
+        rowStart,
+        rowEnd,
+        columnStart,
+        columnEnd,
         orientation: printInfo.orientation(),
         zoomFactor: Math.round(100 * printInfo.zoomFactor()),
         fitPagesWide: printInfo.fitPagesWide(),
         fitPagesTall: printInfo.fitPagesTall(),
-        paperKind: printInfo.paperSize().kind(),
+        paperKind: getPageKind(spread),
         printQuality: printInfo.qualityFactor(),
         firstPageNumber: printInfo.firstPageNumber(),
-        margin: deepClone(printInfo.margin()),
+        margin: getMargin(spread),
         headerAndFooter: {
             headerFormat: {
                 selectedValue: JSON.stringify({
@@ -636,20 +669,14 @@ export const parsePrintInfo = function (spread,sheet) {
         showGridLine: printInfo.showGridLine(),
         blackAndWhite: printInfo.blackAndWhite(),
         pageOrder: printInfo.pageOrder(),
-        sheetArea: formula,
-        repeatAtLeft: formula2,
-        repeatAtTop: formula1,
+        sheetArea: rangeToFormula(rowStart, columnStart, rowEnd, columnEnd),
+        repeatAtLeft: repeatRangeToFormula(repeatColumnStart, repeatColumnEnd),
+        repeatAtTop: repeatRangeToFormula(repeatRowStart, repeatRowEnd),
         showBorder,
     };
-    handleMargin(result.margin, px2inch);
     if (printInfo.fitPagesTall() === -1 && printInfo.fitPagesWide() === -1) {
         result.scaleType = ScaleType.zoomFactor;
     }
-    result.margin.centering = {
-        vertically: 1 < printInfo.centering(),
-        horizontally:
-            1 === printInfo.centering() || 3 === printInfo.centering(),
-    };
     result.headerAndFooter.headerFormat.items = getHeadersOrFootersArray(
         result.headerAndFooter.headerFormat.selectedValue,
         spread

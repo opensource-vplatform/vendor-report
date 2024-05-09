@@ -38,6 +38,23 @@ export const datasourceSlice = createSlice({
         showHyperlink: false,
         datasources:[],
         datasourceSelectorVisible:false,
+        /**
+         * 额外设置信息，如属性结构等
+         * {
+         *    treeStruct:{
+         *      [tableCode]:{
+         *          enable:boolean,//是否启用，
+         *          idField: string,//标识字段
+         *          pidField: string,//父标识字段
+         *          leafField?: string,//叶子节点标识字段
+         *          sortField?: string,//排序字段
+         *          sortType?: "asc"|"desc",//排序类型
+         *          sumFeilds: Array<String>,//汇总字段
+         *      }
+         *    }
+         * }
+         */
+        setting:{},
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -392,6 +409,9 @@ export const datasourceSlice = createSlice({
             state.activeDs = {};
             state.finalDsList = [];
             state.dsList =  [];
+        },
+        setSetting(state,{payload}){
+            state.setting = payload;
         }
     },
 });
@@ -409,5 +429,6 @@ export const {
     setDatasourceSelectorVisible,
     setDatasources,
     clear,
+    setSetting,
 } = datasourceSlice.actions;
 export default datasourceSlice.reducer;

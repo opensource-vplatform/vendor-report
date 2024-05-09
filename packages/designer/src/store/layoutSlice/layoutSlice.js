@@ -4,6 +4,10 @@ export const navSlice = createSlice({
     name: 'layoutSlice',
     initialState: {
         active: null,
+        //显示编辑器
+        editorVisible:false,
+        //显示编辑器原因
+        editorVisibleReason: null,
         //方向
         orientation: null,
         //缩放类型
@@ -34,6 +38,14 @@ export const navSlice = createSlice({
         pageOrder:null,
         //显示边框
         showBorder:null,
+        //开始行
+        rowStart:-1,
+        //结束行
+        rowEnd: -1,
+        //开始列
+        columnStart: -1,
+        //结束列
+        columnEnd: -1,
     },
     reducers: {
         /**
@@ -45,6 +57,16 @@ export const navSlice = createSlice({
             if (state.active != action.payload) {
                 state.active = action.payload;
             }
+        },
+        /**
+         * 设置编辑器显示状态
+         * @param {*} state 
+         * @param {*} param1 
+         */
+        setEditorVisible(state,{payload}){
+            const {visible,reason} = payload;
+            state.editorVisible = visible;
+            state.editorVisibleReason = reason;
         },
         /**
          * 设置信息
@@ -112,10 +134,14 @@ export const navSlice = createSlice({
             state.showBorder = action.payload;
         },
         
+        setArea(state,{payload}){
+            Object.assign(state,payload);
+        }
     },
 });
 export const {
     setActive,
+    setEditorVisible,
     setInfo,
     setOrientation,
     setScaleType,
@@ -132,5 +158,6 @@ export const {
     setBlackAndWhite,
     setPageOrder,
     setShowBorder,
+    setArea,
 } = navSlice.actions;
 export default navSlice.reducer;

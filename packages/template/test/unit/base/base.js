@@ -115,7 +115,7 @@ export default {
             'Person Address': {
                 name: 'Person Address',
                 isSelected: true,
-                rowCount: 20,
+                rowCount: 3,
                 activeRow: 9,
                 activeCol: 8,
                 visible: 1,

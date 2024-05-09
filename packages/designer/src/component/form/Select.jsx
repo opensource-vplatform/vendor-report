@@ -30,6 +30,12 @@ const Wrap = styled.div`
         //border: solid 1px #5292f7;
         border: solid 1px #999999;
     }
+    &[data-error='true']{
+        border: 1px solid red !important;
+    }
+    &[data-error='true']:hover{
+        border: 1px solid red !important;
+    }
 `;
 
 const Text = styled.div`
@@ -90,6 +96,7 @@ export default function (props) {
         disabled = false,
         //取消选择值
         cancelValue = undefined,
+        error=false,
         value,
     } = props;
     const [data, setData] = useState({ text: null, value });
@@ -114,7 +121,7 @@ export default function (props) {
             disabled={disabled}
             value={data.value}
         >
-            <Wrap style={style} data-disabled={disabled}>
+            <Wrap style={style} data-disabled={disabled} data-error={error}>
                 {isReactNode(data.text) ? (
                     <TextWrap>{data.text}</TextWrap>
                 ) : (

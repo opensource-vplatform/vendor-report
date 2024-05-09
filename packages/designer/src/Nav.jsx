@@ -162,6 +162,7 @@ export default function () {
                     {
                         dsList: finalDsList,
                         define,
+                        datasourceSetting:datasourceSlice.setting,
                         toImage: (width, height) => {
                             return saveAsImg(spread, width, height);
                         },

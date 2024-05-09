@@ -1,3 +1,7 @@
+import { useState } from 'react';
+
+import { isFunction } from '@utils/objectUtil';
+
 import Popper from '../popper/Popper';
 import ItemsPanel from './ItemsPanel';
 
@@ -14,7 +18,7 @@ export default function (props) {
         children,
         //菜单项最大个数，超出此个数将出现竖向滚动条
         optionMaxSize = 10,
-        disabled=false,
+        disabled = false,
         value,
     } = props;
     let contentStyle = {
@@ -25,19 +29,34 @@ export default function (props) {
         overflowX: 'visible',
         overflowY: 'visible',
     };
-    const handleNodeClick = (val,item)=>{
-        if(cancelAble&&val===value){
+    const handleNodeClick = (val, item) => {
+        if (cancelAble && val === value) {
             val = cancelValue;
         }
-        onNodeClick(val,item);
-    }
+        onNodeClick(val, item);
+    };
+    const [data,setData] = useState(()=>{
+        return isFunction(value) ? null:value;
+    })
+    const handleVisibleChange = isFunction(value) ? (visible) => {
+        if(visible){
+            const data = value();
+            setData(data);
+        }
+    } : undefined;
     return (
         <Popper
             style={style}
             disabled={disabled}
             content={
-                <ItemsPanel value={value} items={datas} optionMaxSize={optionMaxSize} onNodeClick={handleNodeClick}></ItemsPanel>
+                <ItemsPanel
+                    value={data}
+                    items={datas}
+                    optionMaxSize={optionMaxSize}
+                    onNodeClick={handleNodeClick}
+                ></ItemsPanel>
             }
+            onVisibleChange={handleVisibleChange}
             contentStyle={contentStyle}
         >
             {children}

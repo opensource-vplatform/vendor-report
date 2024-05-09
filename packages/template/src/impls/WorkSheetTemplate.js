@@ -128,12 +128,6 @@ class WorkSheetTemplate extends BaseTemplate {
         const worksheet = this.getTemplate();
         if (worksheet && this.rowTemplates.length > 0) {
             const context = this.getContext();
-            /*let spans = worksheet.spans;
-            if (spans && spans.length > 0) {
-                spans.forEach((span) => {
-                    context.appendSpan(span);
-                });
-            }*/
             const dataTable = {};
             let offset = 0;
             this.rowTemplates.forEach((rowTemplate) => {
@@ -145,6 +139,8 @@ class WorkSheetTemplate extends BaseTemplate {
             });
             const spans = context.getSpans();
             worksheet.spans = spans;
+            const rowCount = Object.keys(dataTable).length;
+            worksheet.rowCount = rowCount;
             worksheet.data.dataTable = dataTable;
         }
         return worksheet;

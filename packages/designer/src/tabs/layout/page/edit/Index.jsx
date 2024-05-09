@@ -1,18 +1,31 @@
 import {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
   useDispatch,
   useSelector,
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '../../../../component/dialog/Index';
-import { Button } from '../../../../component/form/Index';
+import { OperationDialog } from '@components/dialog/Index';
+import { Button } from '@components/form/Index';
 import {
   Tab,
   Tabs,
-} from '../../../../component/tabs/Index';
-import { setActive } from '../../../../store/layoutSlice/layoutSlice';
-import { setPrintInfo } from '../../../../utils/printUtil';
-import { getNamespace } from '../../../../utils/spreadUtil';
+} from '@components/tabs/Index';
+import {
+  setActive,
+  setInfo,
+} from '@store/layoutSlice/layoutSlice';
+import { genUUID } from '@utils/commonUtil';
+import {
+  parsePrintInfo,
+  setPrintInfo,
+} from '@utils/printUtil';
+import { getNamespace } from '@utils/spreadUtil';
+
 import HeaderFooter from './HeaderFooter';
 import Padding from './Padding';
 import Page from './Page';
@@ -29,7 +42,7 @@ let pre_print_info = null;
 
 export default function (props) {
     const { onConfirm, onCancel } = props;
-    const { active, ...printInfo } = useSelector(
+    const { active,editorVisible, ...printInfo } = useSelector(
         ({ layoutSlice }) => layoutSlice
     );
     const { spread } = useSelector(({ appSlice }) => appSlice);
@@ -45,8 +58,19 @@ export default function (props) {
             spread.print();
         }
     };
+    const [id] = useState(()=>{
+        return genUUID();
+    });
+    useEffect(() => {
+        const sheet = spread?.getActiveSheet();
+        if (sheet) {
+            const printInfo = parsePrintInfo(spread);
+            dispatch(setInfo(printInfo));
+        }
+    }, []);
     return (
         <OperationDialog
+            id={id}
             onConfirm={() => {
                 const sheet = spread.getActiveSheet();
                 if (sheet) {
@@ -80,7 +104,7 @@ export default function (props) {
                     <HeaderFooter></HeaderFooter>
                 </Tab>
                 <Tab code='sheet' title='工作表'>
-                    <Sheet></Sheet>
+                    <Sheet hostId={id}></Sheet>
                 </Tab>
             </Tabs>
             <Wrap>

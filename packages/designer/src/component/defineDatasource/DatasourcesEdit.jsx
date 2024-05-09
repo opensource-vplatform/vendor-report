@@ -28,6 +28,7 @@ import {
 import { getDataSourceConfig } from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext.jsx';
+import AdvanceSetting from './component/AdvanceSetting.jsx';
 import ConfirmDialog from './ConfirmDialog.jsx';
 import {
   rawData,
@@ -321,6 +322,7 @@ export default function Index(props) {
                             disabled={disabled}
                         ></Textarea>
                     </div>
+                    <AdvanceSetting datasource={activeDs}></AdvanceSetting>
                     {activeDs.type === 'table_该方案暂时放弃' && (
                         <FillConditions
                             conditions={activeDs.fillConditions}
