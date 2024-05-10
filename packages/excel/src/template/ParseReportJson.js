@@ -683,8 +683,6 @@ export default class Render {
 
             let startRow = pageInfos.rowCount;
             let dataIndex = startIndex;
-            page[pageInfos.pageIndex] = page[pageInfos.pageIndex] || {};
-
             for (let i = startIndex; i < dataLen; i++) {
                 if (pageInfos.pageArea) {
                     if (
@@ -732,6 +730,8 @@ export default class Render {
 
                             const instanceId = tagObj.instanceId;
                             //当前单元格在当前页中的起始行，记录数等信息
+                            page[pageInfos.pageIndex] =
+                                page[pageInfos.pageIndex] || {};
                             page[pageInfos.pageIndex][instanceId] =
                                 page[pageInfos.pageIndex][instanceId] || {};
                             page[pageInfos.pageIndex][instanceId]['row'] =
