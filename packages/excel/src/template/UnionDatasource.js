@@ -1,13 +1,14 @@
 /**
  * 联合数据源定义
  */
-class UnitDatasource {
+class UnionDatasource {
     datas = [];
 
     references = [];
 
-    constructor(datasources) {
+    constructor(datasources,setting) {
         this.datasources = datasources;
+        this.setting = setting;
         this._anlysisReferences();
     }
 
@@ -140,4 +141,4 @@ class UnitDatasource {
     }
 }
 
-export default UnitDatasource;
+export default UnionDatasource;
