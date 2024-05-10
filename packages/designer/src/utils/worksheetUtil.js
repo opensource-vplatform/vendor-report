@@ -4,6 +4,17 @@ import {
   withBatchUpdate,
 } from './spreadUtil';
 
+export const getActiveIndexBySpread = function(spread){
+    const sheet = spread.getActiveSheet();
+    return getActiveIndexBySheet(sheet);
+}
+
+export const getActiveIndexBySheet = function(sheet){
+    const row = sheet.getActiveRowIndex();
+    const col = sheet.getActiveColumnIndex();
+    return {sheet,row,col}
+}
+
 //设置表单的标签值
 export function setSheetTag(sheetInstance, key, vlaue) {
     if (!sheetInstance) {
@@ -57,8 +68,7 @@ function getCellTagPlugins(sheet, row, col) {
 }
 
 export function hasCellTagPlugin(sheet, pluginType) {
-    const row = sheet.getActiveRowIndex();
-    const col = sheet.getActiveColumnIndex();
+    const {row,col} = getActiveIndexBySheet(sheet);
     const plugins = getCellTagPlugins(sheet, row, col);
     if (plugins) {
         const pl = plugins.find((pl) => pl.type == pluginType);
@@ -88,6 +98,17 @@ export function clearCellTagPlugin(sheet, row, col, plugin) {
             setCellTag(sheet, row, col, 'plugins', plugins);
         }
     }
+}
+
+export function clearAllCellTagPlugin(sheet, row, col){
+    withBatchUpdate(sheet.getParent(),()=>{
+        const plugins = getCellTagPlugins(sheet, row, col);
+        if (plugins) {
+            plugins.forEach(plugin=>clearCellTagPlugin(sheet,row,col,plugin));
+        }
+        const GC = getNamespace();
+        sheet.clear(row,col,1,1,GC.Spread.Sheets.SheetArea.viewport,GC.Spread.Sheets.StorageType.data);
+    })
 }
 
 /**
@@ -198,8 +219,7 @@ export function inTableArea(sheet, row, col) {
  * @param {*} sheet
  */
 export function isBindingTable(sheet) {
-    const row = sheet.getActiveRowIndex();
-    const col = sheet.getActiveColumnIndex();
+    const {row,col} = getActiveIndexBySheet(sheet);
     return inTableArea(sheet, row, col);
 }
 

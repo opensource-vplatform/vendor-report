@@ -2,6 +2,7 @@ import {
   getNamespace,
   withBatchUpdate,
 } from './spreadUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 const GC = getNamespace();
 
@@ -107,10 +108,8 @@ export function setTableCornerMarks(params) {
 }
 
 const getTable = function (sheet) {
-    return sheet.tables.find(
-        sheet.getActiveRowIndex(),
-        sheet.getActiveColumnIndex()
-    );
+    const { row, col } = getActiveIndexBySheet(sheet);
+    return sheet.tables.find(row, col);
 };
 
 export function parseTable(sheet) {

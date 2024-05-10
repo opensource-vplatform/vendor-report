@@ -10,6 +10,7 @@ import styled from 'styled-components';
 import FormulaIcon from '@icons/formula/Formula';
 import CheckIcon from '@icons/shape/Check';
 import CancelIcon from '@icons/shape/Close';
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import Formula from './component/formula/Index';
 import {
@@ -41,9 +42,9 @@ export default function () {
         formulaBtnDisabled: false,
         formulaTextBox: null,
         nameRangeBox: null,
-        isEdit:false,
+        isEdit: false,
     });
-    const [showEditor,setEditorVisible] = useState(false);
+    const [showEditor, setEditorVisible] = useState(false);
     const refreshBtnStatus = () => {
         const sheet = spread?.getActiveSheet();
         if (sheet) {
@@ -51,6 +52,7 @@ export default function () {
             const status = sheet.editorStatus();
             const isReady = status == GC.Spread.Sheets.EditorStatus.ready;
             const isEdit = status == GC.Spread.Sheets.EditorStatus.edit;
+            const { row, col } = getActiveIndexBySheet(sheet);
             setData({
                 ...data,
                 cancelBtnDisabled: isReady,
@@ -63,12 +65,7 @@ export default function () {
                         ? true
                         : false
                     : sheet.options.isProtected &&
-                      sheet
-                          .getCell(
-                              sheet.getActiveRowIndex(),
-                              sheet.getActiveColumnIndex()
-                          )
-                          .locked(),
+                      sheet.getCell(row, col).locked(),
             });
         }
     };
@@ -103,7 +100,7 @@ export default function () {
         };
     }, []);
     useEffect(() => {
-        if(spread){
+        if (spread) {
             const unBindHandler = bind({
                 event: EVENTS.EditorStatusChanged,
                 handler: refreshBtnStatus,
@@ -167,9 +164,7 @@ export default function () {
                 ></div>
             </SplitPane>
             {showEditor ? (
-                <Formula
-                    onClose={() => setEditorVisible(false)}
-                ></Formula>
+                <Formula onClose={() => setEditorVisible(false)}></Formula>
             ) : null}
         </Wrap>
     );

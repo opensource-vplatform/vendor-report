@@ -7,6 +7,7 @@ import {
   applyToSelectedCell,
   withBatchUpdate,
 } from './spreadUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 const tempSpan = document.createElement('span');
 export function px2pt(pxValue) {
@@ -123,7 +124,7 @@ const parseFontStr = function (font) {
             }
         }
     }
-    if(!fontSize){
+    if (!fontSize) {
         fontSize = 11;
     }
     return {
@@ -138,20 +139,18 @@ const parseFontStr = function (font) {
 
 //解析激活状态的单元格字体
 export function parseFont(sheet) {
-    const style = sheet.getActualStyle(
-        sheet.getActiveRowIndex(),
-        sheet.getActiveColumnIndex()
-    );
+    const { row, col } = getActiveIndexBySheet(sheet);
+    const style = sheet.getActualStyle(row, col);
     let wordWrap = !!style?.wordWrap,
         textDecoration = style?.textDecoration || 0,
-        textOrientation = style?.textOrientation||0,
+        textOrientation = style?.textOrientation || 0,
         isVerticalText = !!style?.isVerticalText,
         hAlign = style?.hAlign || 0,
         vAlign = style?.vAlign || 0,
         backColor = style?.backColor,
         showEllipsis = !!style?.showEllipsis,
         shrinkToFit = !!style?.shrinkToFit,
-        textIndent = style?.textIndent||0,
+        textIndent = style?.textIndent || 0,
         foreColor = style?.foreColor;
     const {
         fontFamily,
@@ -231,11 +230,17 @@ export function setAlign(params) {
     withBatchUpdate(spread, (sheet) => {
         applyStyleToSelectedCell(sheet, function (sheet, row, col) {
             const style = sheet.getActualStyle(row, col);
-            style.vAlign = toValue(vAlign,style.vAlign);
-            style.hAlign = toValue(hAlign,style.hAlign);
-            style.textOrientation = toValue(textOrientation,style.textOrientation);
-            style.isVerticalText = toValue(isVerticalText,style.isVerticalText);
-            style.wordWrap = toValue(wordWrap,style.wordWrap);
+            style.vAlign = toValue(vAlign, style.vAlign);
+            style.hAlign = toValue(hAlign, style.hAlign);
+            style.textOrientation = toValue(
+                textOrientation,
+                style.textOrientation
+            );
+            style.isVerticalText = toValue(
+                isVerticalText,
+                style.isVerticalText
+            );
+            style.wordWrap = toValue(wordWrap, style.wordWrap);
             sheet.setStyle(row, col, style);
         });
     });
@@ -272,7 +277,7 @@ export function setFont(params) {
             //需要实例化一个新的Style，否则字体设置无效
             const GC = getNamespace();
             const style = new GC.Spread.Sheets.Style();
-            const preStyle = sheet.getStyle(row, col)||{};
+            const preStyle = sheet.getStyle(row, col) || {};
             Object.assign(style, preStyle);
             const preFont = parseFontStr(preStyle.font);
             fontFamily = toValue(fontFamily, preFont.fontFamily);

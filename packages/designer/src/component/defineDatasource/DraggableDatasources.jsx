@@ -29,6 +29,7 @@ import {
 } from '@utils/configUtil';
 import { getNamespace } from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 import { setCellTag } from '@utils/worksheetUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
@@ -539,8 +540,7 @@ export default function Index() {
         //数据源双击，对选中单元格进行字段绑定，如果当前单元格有函数，则作为函数参数
         const sheet = spread.getActiveSheet();
         if(sheet){
-            const row = sheet.getActiveRowIndex();
-            const col = sheet.getActiveColumnIndex();
+            const {row,col} = getActiveIndexBySheet(sheet);
             const cell = sheet.getCell(row,col);
             let formula = cell.formula();
             if(formula){

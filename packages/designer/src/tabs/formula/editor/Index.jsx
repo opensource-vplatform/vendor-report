@@ -17,6 +17,7 @@ import {
   setFormula,
   setSelection,
 } from '@store/formulaEditorSlice/formulaEditorSlice';
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import LeftPane from './panes/LeftPane';
 import RightPane from './panes/RightPane';
@@ -37,11 +38,9 @@ export default function (props) {
         if (spread) {
             const sheet = spread.getActiveSheet();
             if (sheet) {
-                let formula = sheet.getFormula(
-                    sheet.getActiveRowIndex(),
-                    sheet.getActiveColumnIndex()
-                );
-                formula = formula==null ? '':formula;
+                const { row, col } = getActiveIndexBySheet(sheet);
+                let formula = sheet.getFormula(row, col);
+                formula = formula == null ? '' : formula;
                 dispatch(clear({}));
                 dispatch(setFormula({ formula }));
                 dispatch(

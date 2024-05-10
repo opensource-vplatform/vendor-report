@@ -3,6 +3,7 @@ import {
   getNamespace,
   withBatchCalcUpdate,
 } from './spreadUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 class FormulaTextBox {
     spread = null;
@@ -116,8 +117,9 @@ class FormulaTextBox {
                 let row = undefined;
                 let col = undefined;
                 if (isNullOrUndef(this.hostRow) || isNullOrUndef(this.hostCol)) {
-                    row = sheet.getActiveColumnIndex();
-                    col = sheet.getActiveRowIndex();
+                    const index = getActiveIndexBySheet(sheet);
+                    row = index.row;
+                    col = index.col;
                 } else {
                     row = this.hostRow;
                     col = this.hostCol;

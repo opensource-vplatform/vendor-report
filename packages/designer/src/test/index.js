@@ -311,7 +311,7 @@ export default {
                     num: 20,
                 },
                 {
-                    code: 'B',
+                    code: 'C',
                     name: '李四',
                     PID: 'A',
                     leaf: true,

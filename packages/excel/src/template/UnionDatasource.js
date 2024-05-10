@@ -100,7 +100,7 @@ class UnionDatasource {
     _isLeaf(node) {
         return node.hasOwnProperty('isLeaf')
             ? node.isLeaf
-            : !children || children.length == 0;
+            : !node.children || node.children.length == 0;
     }
 
     /**

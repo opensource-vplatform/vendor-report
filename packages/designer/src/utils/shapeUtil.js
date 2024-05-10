@@ -9,6 +9,7 @@ import {
   getNamespace,
   withBatchUpdate,
 } from './spreadUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 const getShapes = function () {
     const GC = getNamespace();
@@ -218,8 +219,7 @@ const getSheetMaxSize = function (sheet) {
 };
 
 const getShapePosition = function (sheet, width, height) {
-    const row = sheet.getActiveRowIndex();
-    const col = sheet.getActiveColumnIndex();
+    const {row,col} = getActiveIndexBySheet(sheet);
     const bottomRow = sheet.getViewportBottomRow(1);
     const topRow = sheet.getViewportTopRow(1);
     const leftColumn = sheet.getViewportLeftColumn(1);

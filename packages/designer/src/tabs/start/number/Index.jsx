@@ -38,6 +38,7 @@ import TimeFormatIcon from '@icons/number/TimeFormat';
 import { genUUID } from '@utils/commonUtil';
 import { exeCommand } from '@utils/spreadUtil';
 import { genCellSettingVisibleHandler } from '@utils/styleUtil';
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 const GENERAL_FORMATTER = 'formatGeneral';
 
@@ -132,8 +133,7 @@ export default function () {
             id,
             event: EVENTS.EnterCell,
             handler: ({ sheet }) => {
-                const row = sheet.getActiveRowIndex();
-                const col = sheet.getActiveColumnIndex();
+                const {row,col} = getActiveIndexBySheet(sheet);
                 const style = sheet.getStyle(row, col);
                 setFormat(style ? style.formatter : GENERAL_FORMATTER);
             },

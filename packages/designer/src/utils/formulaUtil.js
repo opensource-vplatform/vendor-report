@@ -14,6 +14,7 @@ import {
   SelectionTypes,
   withBatchCalcUpdate,
 } from './spreadUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 const CATALOG_MAP_FORMULA_METADATA = {};
 
@@ -586,8 +587,7 @@ export const isFormulaSparklineSelected = function (spread, sheet) {
         const chart = getSelectedChart(sheet);
         const shape = getSelectedShapes(sheet)[0];
         const plugin = slicer || chart || shape;
-        const row = sheet.getActiveRowIndex();
-        const col = sheet.getActiveColumnIndex();
+        const {row,col} = getActiveIndexBySheet(sheet);
         //const selections = sheet.getSelections();
         //if (selections && selections.length >= 1) {
         let flag = false;

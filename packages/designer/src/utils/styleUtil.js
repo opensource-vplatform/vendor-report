@@ -17,6 +17,7 @@ import {
   exeCommand,
   getNamespace,
 } from './spreadUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 const tempSpan = document.createElement('span');
 
@@ -214,10 +215,8 @@ export const setStyle = function (sheet, style) {
  * @returns
  */
 export function parseStyle(sheet) {
-    const style = sheet.getActualStyle(
-        sheet.getActiveRowIndex(),
-        sheet.getActiveColumnIndex()
-    );
+    const { row, col } = getActiveIndexBySheet(sheet);
+    const style = sheet.getActualStyle(row, col);
     let wordWrap = !!style?.wordWrap,
         textDecoration = style?.textDecoration || 0,
         textOrientation = style?.textOrientation || 0,
@@ -295,7 +294,7 @@ export const exeStyleCommand = (spread, style) => {
 };
 
 export const handleStyle = (spread, style) => {
-    exeStyleCommand(spread,style);
+    exeStyleCommand(spread, style);
     fireCellEnter(spread);
 };
 

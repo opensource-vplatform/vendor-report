@@ -18,6 +18,7 @@ import {
   getNamespace,
 } from './spreadUtil';
 import {
+  getActiveIndexBySheet,
   getCellTagPlugin,
   setCellTagPlugin,
 } from './worksheetUtil';
@@ -157,8 +158,7 @@ export const applyImageSetting = function (sheet,config) {
 
 export const showEditorDialog = function (spread, dispatch, ctx) {
     const sheet = spread.getActiveSheet();
-    const row = sheet.getActiveRowIndex();
-    const col = sheet.getActiveColumnIndex();
+    const {row,col} = getActiveIndexBySheet(sheet);
     const plugin = getCellTagPlugin(sheet, row, col, 'cellImage');
     const config = plugin?.config;
     show(dispatch, {

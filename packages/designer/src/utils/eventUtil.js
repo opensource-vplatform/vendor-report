@@ -8,12 +8,12 @@ import {
   showErrorMessage,
   showLoadingMessage,
 } from './messageUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 export const fireCellEnter = function (spread) {
     const sheet = spread.getActiveSheet();
     if (sheet) {
-        const col = sheet.getActiveColumnIndex();
-        const row = sheet.getActiveRowIndex();
+        const {row,col} = getActiveIndexBySheet(sheet);
         const sheetName = sheet.name();
         const arg = { row, col, sheet, sheetName };
         fire({

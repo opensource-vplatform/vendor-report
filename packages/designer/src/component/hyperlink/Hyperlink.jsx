@@ -18,6 +18,7 @@ import {
 } from '@components/tabs/Index';
 import { toggleBooleanValue } from '@store/datasourceSlice/datasourceSlice';
 import {
+  getActiveIndexBySheet,
   getCellTag,
   setCellTag,
 } from '@utils/worksheetUtil';
@@ -176,16 +177,15 @@ function Color(props) {
 export default function Index(props) {
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const activeSheet = spread.getActiveSheet();
-    const activeRowIndex = activeSheet.getActiveRowIndex();
-    const activeColumnIndex = activeSheet.getActiveColumnIndex();
+    const {row,col} = getActiveIndexBySheet(activeSheet);
     const activeCellValue =
-        activeSheet.getCell(activeRowIndex, activeColumnIndex).value() || '';
+        activeSheet.getCell(row, col).value() || '';
     const sheetNameList = spread.sheets.map(function (sheet) {
         return sheet.name();
     });
 
     const hyperlinkInfo =
-        activeSheet.getHyperlink(activeRowIndex, activeColumnIndex) || {};
+        activeSheet.getHyperlink(row, col) || {};
     const initDatas = {
         text: activeCellValue,
         tooltip: activeCellValue,
@@ -202,8 +202,8 @@ export default function Index(props) {
 
     const _hyperlinkInfo = getCellTag(
         activeSheet,
-        activeRowIndex,
-        activeColumnIndex,
+        row,
+        col,
         'hyperlinkInfo'
     );
     if (_hyperlinkInfo) {
@@ -434,8 +434,8 @@ export default function Index(props) {
                         style={btnStyles}
                         onClick={function () {
                             activeSheet.setHyperlink(
-                                activeRowIndex,
-                                activeColumnIndex,
+                                row,
+                                col,
                                 null
                             );
                             handleOnClose();
@@ -447,8 +447,8 @@ export default function Index(props) {
                         style={btnStyles}
                         onClick={function () {
                             activeSheet.setHyperlink(
-                                activeRowIndex,
-                                activeColumnIndex,
+                                row,
+                                col,
                                 {
                                     ...datas,
                                 }
@@ -456,8 +456,8 @@ export default function Index(props) {
                             handleOnClose();
                             setCellTag(
                                 activeSheet,
-                                activeRowIndex,
-                                activeColumnIndex,
+                                row,
+                                col,
                                 'hyperlinkInfo',
                                 datas
                             );

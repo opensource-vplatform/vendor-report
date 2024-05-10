@@ -1,5 +1,6 @@
 import { isNullOrUndef } from '@utils/objectUtil';
 import { applyToSelectedCell } from '@utils/spreadUtil';
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import { genCommandImpl } from '../../util';
 
@@ -93,8 +94,7 @@ function afterAdjustFormatString(formatter, split) {
 }
 
 const setDecimalFormat = function (sheet, operator) {
-    const row = sheet.getActiveRowIndex();
-    const col = sheet.getActiveColumnIndex();
+    const {row,col} = getActiveIndexBySheet(sheet);
     const cell = sheet.getCell(row, col);
     let formatter = cell.formatter();
     const value = cell.value();

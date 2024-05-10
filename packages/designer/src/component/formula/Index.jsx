@@ -5,6 +5,8 @@ import {
 
 import { useSelector } from 'react-redux';
 
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
+
 import FormulaSelector from './FormulaSelector';
 import FormulaSetting from './FormulaSetting';
 
@@ -15,8 +17,7 @@ export default function (props) {
         if (spread) {
             const sheet = spread.getActiveSheet();
             if (sheet) {
-                const row = sheet.getActiveRowIndex();
-                const col = sheet.getActiveColumnIndex();
+                const {row,col} = getActiveIndexBySheet(sheet);
                 const cell = sheet.getCell(row, col);
                 if (cell) {
                     return {

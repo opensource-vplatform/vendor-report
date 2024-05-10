@@ -5,6 +5,7 @@ import {
 
 import Button from '@components/button/Index';
 import { setError } from '@store/formulaEditorSlice/formulaEditorSlice';
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import {
   setErrorDetailVisible,
@@ -21,11 +22,8 @@ const Operations = function (props) {
         if (formula != '') {
             const sheet = spread?.getActiveSheet();
             try {
-                sheet?.setFormula(
-                    sheet?.getActiveRowIndex(),
-                    sheet?.getActiveColumnIndex(),
-                    formula
-                );
+                const { row, col } = getActiveIndexBySheet(sheet);
+                sheet?.setFormula(row, col, formula);
             } catch (e) {
                 dispatch(
                     setError({ message: typeof e == 'string' ? e : e.message })

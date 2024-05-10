@@ -19,6 +19,9 @@ import { isFunction } from '@utils/objectUtil';
 import { showEditorDialog } from '@utils/sparklineUtil';
 import { exeCommand } from '@utils/spreadUtil';
 import {
+  clearAllCellTagPlugin,
+  getActiveIndexBySheet,
+  getActiveIndexBySpread,
   getCellTagPlugin,
   setCellTagPlugin,
 } from '@utils/worksheetUtil';
@@ -42,8 +45,7 @@ const EditorIconMenu = WithIconMenu(
             icon: <ImageIcon></ImageIcon>,
             handler(spread, dispatch, ctx) {
                 const sheet = spread.getActiveSheet();
-                const row = sheet.getActiveRowIndex();
-                const col = sheet.getActiveColumnIndex();
+                const {row,col} = getActiveIndexBySheet(sheet);
                 const plugin = getCellTagPlugin(
                     sheet,
                     row,
@@ -66,8 +68,7 @@ const EditorIconMenu = WithIconMenu(
             icon: <ImageIcon></ImageIcon>,
             handler(spread, dispatch, ctx) {
                 const sheet = spread.getActiveSheet();
-                const row = sheet.getActiveRowIndex();
-                const col = sheet.getActiveColumnIndex();
+                const {row,col} = getActiveIndexBySheet(sheet);
                 const plugin = getCellTagPlugin(
                     sheet,
                     row,
@@ -97,8 +98,7 @@ const EditorIconMenu = WithIconMenu(
             icon: <CalculationIcon></CalculationIcon>,
             handler: (spread, disptach, context, setData) => {
                 const sheet = spread.getActiveSheet();
-                const row = sheet.getActiveRowIndex();
-                const col = sheet.getActiveColumnIndex();
+                const {row,col} = getActiveIndexBySheet(sheet);
                 const plugin = getCellTagPlugin(
                     sheet,
                     row,
@@ -121,6 +121,10 @@ const EditorIconMenu = WithIconMenu(
             title: '清除单元格类型',
             text: '清除单元格类型',
             icon: <ClearCellTypeIcon></ClearCellTypeIcon>,
+            handler: function(spread){
+                const {sheet,row,col} = getActiveIndexBySpread(spread);
+                clearAllCellTagPlugin(sheet,row,col);
+            }
         },
         /*{
         value: 'cellType',
