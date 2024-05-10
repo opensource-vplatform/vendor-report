@@ -10,6 +10,8 @@ class UnionDatasource {
 
     treeStruct = {};
 
+    treeDataIndexMap = {};
+
     constructor(datasources, setting) {
         /**
          * 表编号集合
@@ -95,6 +97,12 @@ class UnionDatasource {
         return `${tableCode},${fieldCode}`;
     }
 
+    _isLeaf(node) {
+        return node.hasOwnProperty('isLeaf')
+            ? node.isLeaf
+            : !children || children.length == 0;
+    }
+
     /**
      * 树形结构数据处理
      * @param {*} datasetMap
@@ -120,7 +128,7 @@ class UnionDatasource {
                  *   }
                  * }
                  */
-                const dataIndexMap = {};
+                const dataIndexMap = this.treeDataIndexMap[tableCode] || {};
                 datas.forEach((data) => {
                     const id = data[idField];
                     const item = { data, children: [] };
@@ -130,6 +138,7 @@ class UnionDatasource {
                     }
                     dataIndexMap[id] = item;
                 });
+                this.treeDataIndexMap[tableCode] = dataIndexMap;
                 //开始构造树
                 const root = { data: null, children: [] }; //虚拟根节点
                 datas.forEach((data) => {
@@ -142,10 +151,8 @@ class UnionDatasource {
                 });
                 if (sumFields && sumFields.length > 0) {
                     //开始进行树形汇总
-                    const treeSum = function (node) {
-                        const isLeaf = node.hasOwnProperty('isLeaf')
-                            ? node.isLeaf
-                            : !children || children.length == 0;
+                    const treeSum =  (node)=> {
+                        const isLeaf = this._isLeaf(node);
                         if (!isLeaf) {
                             //非叶子节点需要先对子节点进行汇总
                             const children = node.children || [];
@@ -259,6 +266,41 @@ class UnionDatasource {
     }
 
     /**
+     * 是否为树形汇总字段
+     * @param {*} tableCode
+     * @param {*} fieldCode
+     */
+    isTreeSumField(tableCode, fieldCode) {
+        const setting = this.treeStruct[tableCode];
+        if (setting?.sumFields?.length > 0) {
+            return setting.sumFields.indexOf(fieldCode) != -1;
+        }
+        return false;
+    }
+    /**
+     * 获取叶子节点范围
+     * @param {*} start
+     * @param {*} end
+     */
+    getLeafRanges(tableCode, start, end) {
+        const dataIndexMap = this.treeDataIndexMap[tableCode];
+        let ranges = [];
+        const idField = this.setting.treeStruct[tableCode].idField;
+        for (let index = start; index <= end; index++) {
+            const data = this.datas[index];
+            if (data&&data[tableCode]) {
+                const record = data[tableCode];
+                const id = record[idField];
+                const node = dataIndexMap[id];
+                if(this._isLeaf(node)){
+                    ranges.push(index);
+                }
+            }
+        }
+        return ranges;
+    }
+
+    /**
      * 加载数据
      * @param {Object} datas 数据源数据
      * {
@@ -291,7 +333,7 @@ class UnionDatasource {
         let value = null;
         if (data) {
             const val = data[dsCode]?.[fieldCode];
-            value = val === undefined ? null : val ;
+            value = val === undefined ? null : val;
         }
         return { type: 'text', value };
     }

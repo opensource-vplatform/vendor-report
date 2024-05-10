@@ -6,16 +6,27 @@ class CellSubTotal extends Plugin {
         debugger;
         const config = this.getConfig();
         const { functionNum, tableCode, fieldCode } = config;
-        const { row, col } = tool.getFieldIndex(tableCode, fieldCode);
+        const unionDatasource = tool.getUnionDatasource();
+        const isTreeSum = unionDatasource.isTreeSumField(tableCode,fieldCode);
         const count = tool.getDataCount(tableCode);
+        const { row, col } = tool.getFieldIndex(tableCode, fieldCode);
         const GC = getNamespace();
-        /*const r1c1Style =
-            GC.Spread.Sheets.ReferenceStyle.r1c1 ===
-            spread.options.referenceStyle;*/
+        const Sheets = GC.Spread.Sheets;
+        const Range = Sheets.Range;
+        const CalcEngine = Sheets.CalcEngine;
+        let ranges = [];
+        if(isTreeSum){
+            const index = tool.getDataIndex(tableCode,fieldCode);
+            const indexs = unionDatasource.getLeafRanges(tableCode,index,index+count);
+            indexs.forEach(ind=>{
+                ranges.push(new Range(row+(ind-index), col, 1, 1));
+            });
+        }else{
+            ranges.push(new Range(row, col, count, 1));
+        }
         const allRelative =
-            GC.Spread.Sheets.CalcEngine.RangeReferenceRelative.allRelative;
-        const rangesToFormula = GC.Spread.Sheets.CalcEngine.rangesToFormula;
-        const ranges = [new GC.Spread.Sheets.Range(row, col, count, 1)];
+            CalcEngine.RangeReferenceRelative.allRelative;
+        const rangesToFormula = CalcEngine.rangesToFormula;
         return {
             type: 'formula',
             value: `SUBTOTAL(${functionNum},${rangesToFormula(
