@@ -146,16 +146,16 @@ class UnionDatasource {
                         const isLeaf = node.hasOwnProperty('isLeaf')
                             ? node.isLeaf
                             : !children || children.length == 0;
-                        if(!isLeaf){
+                        if (!isLeaf) {
                             //非叶子节点需要先对子节点进行汇总
-                            const children = node.children||[];
-                            children.forEach(child=>treeSum(child));
+                            const children = node.children || [];
+                            children.forEach((child) => treeSum(child));
                             const data = node.data;
-                            sumFields.forEach(sumField=>{
+                            sumFields.forEach((sumField) => {
                                 const values = [];
-                                children.forEach(child=>{
+                                children.forEach((child) => {
                                     const val = child.data[sumField];
-                                    if(!isNaN(val)){
+                                    if (!isNaN(val)) {
                                         values.push(val);
                                     }
                                 });
@@ -164,7 +164,7 @@ class UnionDatasource {
                             });
                         }
                     };
-                    root.children.forEach(child=>treeSum(child));
+                    root.children.forEach((child) => treeSum(child));
                 }
                 if (sortField) {
                     //设置有排序字段，则按照排序字段对记录进行排序
@@ -290,7 +290,7 @@ class UnionDatasource {
         const data = this.datas[index];
         if (data) {
             const val = data[dsCode]?.[fieldCode];
-            return val === undefined ? null : val;
+            return val === undefined ? null : { type: 'text', value: val };
         }
         return null;
     }
