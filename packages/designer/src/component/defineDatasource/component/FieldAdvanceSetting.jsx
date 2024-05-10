@@ -31,11 +31,11 @@ export default function (props) {
         return false;
     });
     const  handleConfirm = ()=>{
-        const sumFields = datasourceTreeStruct.sumFields||[];
+        let sumFields = datasourceTreeStruct.sumFields||[];
         const index = sumFields.indexOf(fieldCode);
         if(data){
             if(index==-1){
-                sumFields.push(fieldCode);
+                sumFields = [...sumFields,fieldCode];
             }
         }else{
             if(index != -1){
