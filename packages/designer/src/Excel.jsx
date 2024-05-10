@@ -59,9 +59,7 @@ export default function () {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
     const json = context?.conf?.json?.reportJson;
-    const { dsList, setting } = useSelector(
-        ({ datasourceSlice }) => datasourceSlice
-    );
+    const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
     const cacheDatas = useRef({ template }).current;
     cacheDatas.template = template;
@@ -281,7 +279,6 @@ export default function () {
                 onUndo={handleUndo}
                 onRedo={handleRedo}
                 onRowChanged={handleRowChanged}
-                setting={setting}
             >
                 <Worksheet
                     name={sheetName}

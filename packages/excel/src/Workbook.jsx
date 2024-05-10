@@ -223,7 +223,6 @@ export default function (props) {
         template,
         setting,
     } = props;
-
     if (license) {
         setLicense(license);
     }
@@ -252,19 +251,15 @@ export default function (props) {
     });
 
     const el = useRef(null);
-    const { json } = useMemo(
-        () => {
-            const json = JSON.parse(JSON.stringify(_json));
-            if (json && dataSource) {
-                new ParseReportJson(json, dataSource, template, setting);
-            }
-            return {
-                json,
-            };
-        },
-        [_json, dataSource, JSON.stringify(template)],
-        JSON.stringify(setting)
-    );
+    const { json } = useMemo(() => {
+        const json = JSON.parse(JSON.stringify(_json));
+        if (json && dataSource) {
+            new ParseReportJson(json, dataSource, template, setting);
+        }
+        return {
+            json,
+        };
+    }, [_json, dataSource, JSON.stringify(template), JSON.stringify(setting)]);
 
     const initSpread = async () => {
         if (enablePrint) {

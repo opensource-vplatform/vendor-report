@@ -90,6 +90,7 @@ export default function () {
         originalDatasourceCodes,
         rowMergeColumns,
         colMergeColumns,
+        setting,
     } = useSelector(({ datasourceSlice }) => datasourceSlice);
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
 
@@ -168,6 +169,7 @@ export default function () {
                     onInited={function (a) {
                         window.mapTest = a;
                     }}
+                    setting={setting}
                 >
                     <Worksheet></Worksheet>
                 </Workbook>

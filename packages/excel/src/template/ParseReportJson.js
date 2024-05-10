@@ -165,6 +165,7 @@ function getColRules({ rules, col, colHandler }) {
 
 export default class Render {
     constructor(reportJson, datas, tempConfig = {}, setting) {
+        debugger;
         this.datas = datas;
         this.reportJson = reportJson;
         this.tempConfig = tempConfig;
