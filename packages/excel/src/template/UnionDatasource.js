@@ -288,11 +288,12 @@ class UnionDatasource {
      */
     getValue(dsCode, fieldCode, index = 0) {
         const data = this.datas[index];
+        let value = null;
         if (data) {
             const val = data[dsCode]?.[fieldCode];
-            return val === undefined ? null : { type: 'text', value: val };
+            value = val === undefined ? null : val ;
         }
-        return null;
+        return { type: 'text', value };
     }
 }
 
