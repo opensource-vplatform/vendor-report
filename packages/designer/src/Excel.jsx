@@ -59,7 +59,9 @@ export default function () {
     const dispatch = useDispatch();
     const context = useContext(DesignerContext);
     const json = context?.conf?.json?.reportJson;
-    const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
+    const { dsList, setting } = useSelector(
+        ({ datasourceSlice }) => datasourceSlice
+    );
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
     const cacheDatas = useRef({ template }).current;
     cacheDatas.template = template;
@@ -136,14 +138,14 @@ export default function () {
                 dispatch,
                 '正在初始化设计器，请稍候...',
                 EVENTS.onDesignerInited
-            ).then(({ excelJson, tableMetadata,datasourceSetting }) => {
+            ).then(({ excelJson, tableMetadata, datasourceSetting }) => {
                 excelJson && resolve(excelJson);
                 dispatch(
                     initDatasource({
                         datasource: tableMetadata,
                     })
                 );
-                datasourceSetting&&dispatch(setSetting(datasourceSetting))
+                datasourceSetting && dispatch(setSetting(datasourceSetting));
             });
         });
     });
@@ -279,6 +281,7 @@ export default function () {
                 onUndo={handleUndo}
                 onRedo={handleRedo}
                 onRowChanged={handleRowChanged}
+                setting={setting}
             >
                 <Worksheet
                     name={sheetName}

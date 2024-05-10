@@ -82,9 +82,9 @@ function calcTempHeight(params) {
     };
 }
 
-function getUnionDatasource(datas) {
+function getUnionDatasource(datas, setting) {
     const _datas = Object.fromEntries(datas);
-    const unionDatasource = new UnionDatasource(Object.keys(_datas));
+    const unionDatasource = new UnionDatasource(Object.keys(_datas), setting);
     unionDatasource.load(_datas);
     return unionDatasource;
 }
@@ -164,11 +164,12 @@ function getColRules({ rules, col, colHandler }) {
 }
 
 export default class Render {
-    constructor(reportJson, datas, tempConfig = {}) {
+    constructor(reportJson, datas, tempConfig = {}, setting) {
         this.datas = datas;
         this.reportJson = reportJson;
         this.tempConfig = tempConfig;
         this.newSheets = {};
+        this.setting;
 
         //如果有模板，则对数据进行分组，每个组一个sheet
         this.groupTemplate();
@@ -697,12 +698,15 @@ export default class Render {
                             const [tableCode, fieldCode] =
                                 bindingPath.split('.');
                             delete colDataTable.bindingPath;
-                            const newVlaue = unionDatasource.getValue(
-                                tableCode,
-                                fieldCode,
-                                i
-                            );
-                            colDataTable.value = newVlaue;
+                            const { type, value: newVlaue } =
+                                unionDatasource.getValue(
+                                    tableCode,
+                                    fieldCode,
+                                    i
+                                );
+                            if (type === 'text') {
+                                colDataTable.value = newVlaue;
+                            }
                         }
 
                         if (tag) {
