@@ -171,7 +171,7 @@ class UnionDatasource {
                                     values.push(val);
                                 }
                             });
-                            const result = sum(...values);
+                            const result = sum(values);
                             data[sumField] = result;
                         });
                     };
