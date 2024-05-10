@@ -121,24 +121,14 @@ class UnionDatasource {
                  * }
                  */
                 const dataIndexMap = {};
-                /**
-                 * {
-                 *   [父节点id值]：Array<string> 子节点id值集合
-                 * }
-                 */
-                const childrenIndexMap = {};
                 datas.forEach((data) => {
                     const id = data[idField];
-                    const pid = data[pidField];
                     const item = { data, children: [] };
                     if (leafField) {
                         //设置有叶子结点字段
-                        item.isLeaf = !![data[leafField]];
+                        item.isLeaf = !!data[leafField];
                     }
                     dataIndexMap[id] = item;
-                    const childrenIds = childrenIndexMap[pid] || [];
-                    childrenIds.push(id);
-                    childrenIndexMap[pid] = childrenIds;
                 });
                 //开始构造树
                 const root = { data: null, children: [] }; //虚拟根节点
@@ -160,20 +150,19 @@ class UnionDatasource {
                             //非叶子节点需要先对子节点进行汇总
                             const children = node.children||[];
                             children.forEach(child=>treeSum(child));
-                        }
-                        const data = node.data;
-                        const children = node.children;
-                        sumFields.forEach(sumField=>{
-                            const values = [];
-                            children.forEach(child=>{
-                                const val = child[sumField];
-                                if(!isNaN(val)){
-                                    values.push(val);
-                                }
+                            const data = node.data;
+                            sumFields.forEach(sumField=>{
+                                const values = [];
+                                children.forEach(child=>{
+                                    const val = child.data[sumField];
+                                    if(!isNaN(val)){
+                                        values.push(val);
+                                    }
+                                });
+                                const result = sum(values);
+                                data[sumField] = result;
                             });
-                            const result = sum(values);
-                            data[sumField] = result;
-                        });
+                        }
                     };
                     root.children.forEach(child=>treeSum(child));
                 }
