@@ -11,7 +11,7 @@ let json = JSON.parse(jsonStr);
 
 salesData.data.length = 150 || 21;
 salesData.data = salesData.data.filter(function (item) {
-    return ['东北', '华北'].includes(item.sales_area);
+    return [/* '东北', */ '华北'].includes(item.sales_area);
 });
 tourismData.data.length = 1 || 21;
 export default {
@@ -60,6 +60,61 @@ export default {
     },
     dataSource: {
         dataSourceDefinition: [
+            {
+                id: 'zonaTree',
+                type: 'table',
+                typeName: '表',
+                desc: 'zonaTree',
+                code: 'zonaTree',
+                name: '树形数据',
+                children: [
+                    {
+                        id: 'code',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'code',
+                        code: 'code',
+                        name: '编码',
+                        parentId: 'zonaTree',
+                    },
+                    {
+                        id: 'PID',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'PID',
+                        code: 'PID',
+                        name: '父ID',
+                        parentId: 'zonaTree',
+                    },
+                    {
+                        id: 'leaf',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'leaf',
+                        code: 'leaf',
+                        name: '叶子节点',
+                        parentId: 'zonaTree',
+                    },
+                    {
+                        id: 'name',
+                        type: 'text',
+                        typeName: '文本',
+                        desc: 'name',
+                        code: 'name',
+                        name: '名称',
+                        parentId: 'zonaTree',
+                    },
+                    {
+                        id: 'num',
+                        type: 'integer',
+                        typeName: '整数',
+                        desc: '购买数量',
+                        code: 'num',
+                        name: '购买数量',
+                        parentId: 'zonaTree',
+                    },
+                ],
+            },
             {
                 id: 'purchaseContract',
                 type: 'table',
@@ -238,6 +293,29 @@ export default {
                     code: 'PC2',
                     name: '辣椒',
                     person: '周九',
+                },
+            ],
+            zonaTree: [
+                {
+                    code: 'A',
+                    name: '同望',
+                    PID: '',
+                    leaf: false,
+                    num: 10,
+                },
+                {
+                    code: 'B',
+                    name: '张三',
+                    PID: 'A',
+                    leaf: true,
+                    num: 20,
+                },
+                {
+                    code: 'B',
+                    name: '李四',
+                    PID: 'A',
+                    leaf: true,
+                    num: 30,
                 },
             ],
         }, //数据源数据

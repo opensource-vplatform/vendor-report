@@ -443,10 +443,9 @@ export default class Render {
                 if (isBindEntity) {
                     const tableCode = bindingPath.split('.')[0];
                     let ds = this.datas?.[tableCode] || [];
+                    const groupName = this.nameMaps[sheetName];
                     const groupedDs =
-                        this.groupsDatas?.[sheetName]?.[tableCode]?.[
-                            this.nameMaps[sheetName]
-                        ];
+                        this.groupsDatas?.[sheetName]?.[tableCode]?.[groupName];
                     if (Array.isArray(groupedDs)) {
                         ds = groupedDs;
                     }
@@ -732,7 +731,7 @@ export default class Render {
                             const tagObj = JSON.parse(tag);
 
                             const instanceId = tagObj.instanceId;
-
+                            //当前单元格在当前页中的起始行，记录数等信息
                             page[pageInfos.pageIndex][instanceId] =
                                 page[pageInfos.pageIndex][instanceId] || {};
                             page[pageInfos.pageIndex][instanceId]['row'] =
