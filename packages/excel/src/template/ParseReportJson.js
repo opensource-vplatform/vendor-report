@@ -815,7 +815,10 @@ export default class Render {
                                     });
 
                                     const { type, value } = execute(
-                                        '',
+                                        {
+                                            type: 'text',
+                                            value: colDataTable.value,
+                                        },
                                         plugins,
                                         pluginTool
                                     );
