@@ -36,8 +36,8 @@ export const datasourceSlice = createSlice({
         colMergeColumns: {},
         conditions: {},
         showHyperlink: false,
-        datasources:[],
-        datasourceSelectorVisible:false,
+        datasources: [],
+        datasourceSelectorVisible: false,
         /**
          * 额外设置信息，如属性结构等
          * {
@@ -54,7 +54,7 @@ export const datasourceSlice = createSlice({
          *    }
          * }
          */
-        setting:{},
+        setting: {},
     },
     reducers: {
         updateActiveSheetTablePath(state, { payload }) {
@@ -324,27 +324,24 @@ export const datasourceSlice = createSlice({
                     });
                 }
                 const { id, code } = item;
-                const itemInDsListIndex = state.dsList.findIndex(
-                    ({ id: _id, code: _code }) => {
-                        return id === _id || code === _code;
+                function updateDS(ds, key) {
+                    const { id, code } = ds;
+                    let index = -1;
+                    state[key] = state[key].map((value, i) => {
+                        const { id: _id, code: _code } = value;
+                        if (id === _id || code === _code) {
+                            index = i;
+                            return ds;
+                        } else {
+                            return value;
+                        }
+                    });
+                    if (index < 0) {
+                        state[key].push(item);
                     }
-                );
-                if (itemInDsListIndex >= 0) {
-                    state.dsList.splice(itemInDsListIndex, 1, item);
-                } else {
-                    state.dsList.push(item);
                 }
-
-                const itemInFinalDsListIndex = state.finalDsList.findIndex(
-                    ({ id: _id, code: _code }) => {
-                        return id === _id || code === _code;
-                    }
-                );
-                if (itemInFinalDsListIndex >= 0) {
-                    state.finalDsList.splice(itemInFinalDsListIndex, 1, item);
-                } else {
-                    state.finalDsList.push(item);
-                }
+                updateDS(item, 'dsList');
+                updateDS(item, 'finalDsList');
 
                 //标识当前数据源是通过配置项数据源定义生成的，这些数据源不可编辑
                 state.originalDatasourceIds[id] = true;
@@ -398,21 +395,21 @@ export const datasourceSlice = createSlice({
                 state[code] = !state[code];
             }
         },
-        setDatasourceSelectorVisible(state, { payload }){
-            state.datasourceSelectorVisible = payload
+        setDatasourceSelectorVisible(state, { payload }) {
+            state.datasourceSelectorVisible = payload;
         },
-        setDatasources(state, { payload }){
+        setDatasources(state, { payload }) {
             state.datasources = payload;
         },
-        clear(state, { payload }){
+        clear(state, { payload }) {
             state.ds = {};
             state.activeDs = {};
             state.finalDsList = [];
-            state.dsList =  [];
+            state.dsList = [];
         },
-        setSetting(state,{payload}){
+        setSetting(state, { payload }) {
             state.setting = payload;
-        }
+        },
     },
 });
 export const {
