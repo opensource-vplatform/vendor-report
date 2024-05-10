@@ -169,7 +169,7 @@ export default class Render {
         this.reportJson = reportJson;
         this.tempConfig = tempConfig;
         this.newSheets = {};
-        this.setting;
+        this.setting = setting;
 
         //如果有模板，则对数据进行分组，每个组一个sheet
         this.groupTemplate();
@@ -181,6 +181,12 @@ export default class Render {
             reportJson.sheets[sheetName] = sheet;
             reportJson.sheetCount += 1;
         });
+
+        const newSheets = {};
+        Object.values(reportJson.sheets).forEach(function (sheet) {
+            newSheets[sheet.name] = sheet;
+        });
+        reportJson.sheets = newSheets;
     }
     render(pageInfos) {
         const { headerTemplates, footerTemplates, contentTemplates } = this;
@@ -259,19 +265,19 @@ export default class Render {
                 startIndex += contentTempCount;
                 index++;
             }
-            //总页数需延后渲染
-            while (pageInfos.delayPlugins.length) {
-                const pluginHandler = pageInfos.delayPlugins.pop();
-                pluginHandler();
-            }
-            resetSheet(pageInfos);
         } else {
             this.genPageDataTables({
                 templates: headerTemplates,
                 pageInfos,
             });
-            resetSheet(pageInfos);
         }
+        debugger;
+        //总页数需延后渲染
+        while (pageInfos.delayPlugins.length) {
+            const pluginHandler = pageInfos.delayPlugins.pop();
+            pluginHandler();
+        }
+        resetSheet(pageInfos);
     }
 
     splitTemplate(sheet, pageArea) {
@@ -430,7 +436,6 @@ export default class Render {
         result.height = dataTableInfos?.rows?.size;
 
         let maxRowCount = 1;
-
         Object.entries(rowDataTable).forEach(
             ([colStr, { bindingPath, tag }]) => {
                 const col = Number(colStr);
@@ -439,7 +444,9 @@ export default class Render {
                     const tableCode = bindingPath.split('.')[0];
                     let ds = this.datas?.[tableCode] || [];
                     const groupedDs =
-                        this.groupsDatas?.[sheetName]?.[tableCode]?.[sheetName];
+                        this.groupsDatas?.[sheetName]?.[tableCode]?.[
+                            this.nameMaps[sheetName]
+                        ];
                     if (Array.isArray(groupedDs)) {
                         ds = groupedDs;
                     }
@@ -492,9 +499,9 @@ export default class Render {
         let groupTableCode = undefined;
         const changedGroupNames = []; //用于判断sheet名称是否重复
 
+        const nameMaps = {};
         const groupsDatas = {};
         const template = { ...tempConfig };
-        /*     tempConfig = {}; */
         Object.entries(tempConfig).forEach(function ([
             sheetName,
             templateValue,
@@ -530,7 +537,7 @@ export default class Render {
                 }
             });
             const sheet = reportJson?.sheets?.[sheetName];
-            if (sheet) {
+            if (sheet && sheet.visible !== 0) {
                 const cobySheet = JSON.stringify(sheet);
                 //根据分组名称创建sheet，Object.values(groupsDatas)[0]，只支持一个实体进行分组
                 const grouedData = Object.values(currentSheetDatas)[0];
@@ -560,6 +567,7 @@ export default class Render {
                     changedGroupNames.push(newSheetName);
 
                     groupsDatas[newSheetName] = currentSheetDatas;
+                    nameMaps[newSheetName] = _newSheetName;
 
                     if (index <= 0) {
                         sheet.name = newSheetName;
@@ -581,6 +589,7 @@ export default class Render {
 
         this.template = template;
         this.groupsDatas = groupsDatas;
+        this.nameMaps = nameMaps;
     }
     analysisTemplate() {
         Object.values(this.reportJson.sheets).forEach((sheet) => {
@@ -650,6 +659,7 @@ export default class Render {
                 isCurrentSheet: templateInfo?.isCurrentSheet,
                 isTemplate,
                 cobySheet: JSON.stringify(sheet),
+                page: {},
             };
 
             this.render(pageInfos);
@@ -663,27 +673,32 @@ export default class Render {
         templates.forEach((temp) => {
             const { datas, dataTables, height: tempHeight } = temp;
             let { verticalAutoMergeRanges } = temp;
-            const unionDatasource = getUnionDatasource(datas);
+            const unionDatasource = getUnionDatasource(datas, this.setting);
             const dataLen = endIndex || unionDatasource.getCount() || 1;
             verticalAutoMergeRanges = Copy(verticalAutoMergeRanges);
             verticalAutoMergeRanges.forEach(function (item) {
                 item.range.row = pageInfos.rowCount;
             });
 
-            let _startIndex = startIndex;
+            const page = pageInfos.page;
+
+            let startRow = pageInfos.rowCount;
+            let dataIndex = startIndex;
+            page[pageInfos.pageIndex] = page[pageInfos.pageIndex] || {};
+
             for (let i = startIndex; i < dataLen; i++) {
                 if (pageInfos.pageArea) {
                     if (
                         pageInfos.pageHeight + tempHeight >
                         pageInfos.pageTotalHeight
                     ) {
-                        console.log(_startIndex);
+                        startRow = pageInfos.rowCount;
+                        dataIndex = i;
                         this.onAfterPage(pageInfos, tempHeight);
                     } else {
                         pageInfos.pageHeight += tempHeight;
                     }
                 }
-                _startIndex = i;
                 dataTables.forEach(function ({
                     rows = {},
                     rowDataTable,
@@ -692,7 +707,11 @@ export default class Render {
                     autoMergeRanges = [],
                 }) {
                     const dataTable = Copy(rowDataTable);
-                    Object.values(dataTable).forEach(function (colDataTable) {
+                    Object.entries(dataTable).forEach(function ([
+                        colStr,
+                        colDataTable,
+                    ]) {
+                        const col = Number(colStr);
                         const { bindingPath, tag } = colDataTable;
                         if (bindingPath?.includes?.('.')) {
                             const [tableCode, fieldCode] =
@@ -711,6 +730,22 @@ export default class Render {
 
                         if (tag) {
                             const tagObj = JSON.parse(tag);
+
+                            const instanceId = tagObj.instanceId;
+
+                            page[pageInfos.pageIndex][instanceId] =
+                                page[pageInfos.pageIndex][instanceId] || {};
+                            page[pageInfos.pageIndex][instanceId]['row'] =
+                                startRow;
+                            page[pageInfos.pageIndex][instanceId]['col'] = col;
+                            page[pageInfos.pageIndex][instanceId]['count'] =
+                                page[pageInfos.pageIndex][instanceId][
+                                    'count'
+                                ] || 0;
+                            page[pageInfos.pageIndex][instanceId]['count'] += 1;
+                            page[pageInfos.pageIndex][instanceId]['dataIndex'] =
+                                dataIndex;
+
                             //处理超链接信息
                             const hyperlinkInfo = tagObj.hyperlinkInfo;
                             if (
@@ -728,12 +763,22 @@ export default class Render {
                             //执行插件
                             const plugins = tagObj.plugins;
                             if (Array.isArray(plugins)) {
-                                const isTotalCell = plugins.some(function ({
+                                let targetInstanceId = '';
+                                const isDelay = plugins.some(function ({
                                     type,
+                                    config,
                                 }) {
-                                    return type === 'totalPagesCellType';
+                                    if (type === 'cellSubTotal') {
+                                        targetInstanceId = config?.instanceId;
+                                    }
+
+                                    return [
+                                        'totalPagesCellType',
+                                        'cellSubTotal',
+                                    ].includes(type);
                                 });
 
+                                const pageIndex = pageInfos.pageIndex;
                                 function pluginHandler() {
                                     const pluginTool = new PluginTool();
 
@@ -745,12 +790,27 @@ export default class Render {
                                         () => pageInfos.pageTotal
                                     );
 
-                                    /*   pluginTool.setFieldIndexHandler(function (tableCode, fieldCode) {
-                                    return tableFieldIndexs?.[tableCode]?.[fieldCode];
-                                });
-                                pluginTool.setDataCountHandler(function (tableCode) {
-                                    return tableDataCounts[tableCode];
-                                }); */
+                                    //汇总
+                                    const targetCell =
+                                        page?.[pageIndex]?.[targetInstanceId];
+                                    pluginTool.setFieldIndexHandler(() => {
+                                        return {
+                                            row: targetCell?.['row'],
+                                            col: targetCell?.['col'],
+                                        };
+                                    });
+
+                                    pluginTool.setDataCountHandler(() => {
+                                        return targetCell?.['count'];
+                                    });
+
+                                    pluginTool.setDataIndex(() => {
+                                        return targetCell?.['dataIndex'];
+                                    });
+
+                                    pluginTool.setUnionDatasourceHandler(() => {
+                                        return unionDatasource;
+                                    });
 
                                     const { type, value } = execute(
                                         '',
@@ -762,7 +822,7 @@ export default class Render {
                                     colDataTable[key] = value;
                                 }
 
-                                if (isTotalCell && pageInfos.pageArea) {
+                                if (isDelay) {
                                     pageInfos.delayPlugins.push(pluginHandler);
                                 } else {
                                     pluginHandler();
@@ -809,7 +869,6 @@ export default class Render {
                     }
                 });
             }
-            console.log(_startIndex);
             verticalAutoMergeRanges.forEach(function (item) {
                 item.range.rowCount = pageInfos.rowCount - item.range.row;
                 pageInfos.autoMergeRanges.push(item);
