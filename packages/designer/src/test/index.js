@@ -9,8 +9,11 @@ import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
 
-//salesData.data.length = 25 || 21;
-tourismData.data.length = 5 || 21;
+salesData.data.length = 150 || 21;
+salesData.data = salesData.data.filter(function (item) {
+    return ['东北', '华北'].includes(item.sales_area);
+});
+tourismData.data.length = 1 || 21;
 export default {
     json,
     /* json: { reportJson: json }, */
