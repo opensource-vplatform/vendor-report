@@ -165,7 +165,6 @@ function getColRules({ rules, col, colHandler }) {
 
 export default class Render {
     constructor(reportJson, datas, tempConfig = {}, setting) {
-        debugger;
         this.datas = datas;
         this.reportJson = reportJson;
         this.tempConfig = tempConfig;
@@ -745,6 +744,9 @@ export default class Render {
                             page[pageInfos.pageIndex][instanceId]['count'] += 1;
                             page[pageInfos.pageIndex][instanceId]['dataIndex'] =
                                 dataIndex;
+                            page[pageInfos.pageIndex][instanceId][
+                                'unionDatasource'
+                            ] = unionDatasource;
 
                             //处理超链接信息
                             const hyperlinkInfo = tagObj.hyperlinkInfo;
@@ -809,7 +811,7 @@ export default class Render {
                                     });
 
                                     pluginTool.setUnionDatasourceHandler(() => {
-                                        return unionDatasource;
+                                        return targetCell?.['unionDatasource'];
                                     });
 
                                     const { type, value } = execute(
