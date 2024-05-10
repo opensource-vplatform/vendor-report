@@ -10,6 +10,7 @@ import InfoIcon from '@icons/shape/Info';
 import { genUUID } from '@utils/commonUtil';
 import { isString } from '@utils/objectUtil';
 import { getNamespace } from '@utils/spreadUtil';
+import { getCellTag } from '@utils/worksheetUtil';
 
 const Wrap = styled.div`
     padding: 10px;
@@ -91,6 +92,7 @@ export default function (props) {
             const bindingPath = sheet.getBindingPath(row,col);
             if(bindingPath){
                 const [tableCode,fieldCode] = bindingPath.split('.')
+                const instanceId = getCellTag(sheet,row,col,"instanceId");
                 if(tableCode&&fieldCode){
                     const option = Function_Options.find(option=>option.value == data.functionNum);
                     let text = sheet.getText(row,col)||"";
@@ -102,6 +104,7 @@ export default function (props) {
                     onConfirm&&onConfirm({
                         functionNum:data.functionNum,
                         range:rangeStr,
+                        instanceId,
                         tableCode,
                         fieldCode,
                     },desc);
