@@ -160,7 +160,7 @@ const TitleWrap = styled.div`
 
 const Title = styled.div`
     align-self: center;
-    font-size: 10px;
+    font-size: 12px;
     width: 100%;
     text-align: center;
 `;
@@ -176,7 +176,7 @@ function AutoSumItem(props) {
         >
             <IconWrap onClick={() => onNodeClick('SUM')}>
                 <CalculationIcon
-                    iconStyle={{ width: 28, height: 28 }}
+                    iconStyle={{ width: 46, height: 46 }}
                 ></CalculationIcon>
             </IconWrap>
             <Menu

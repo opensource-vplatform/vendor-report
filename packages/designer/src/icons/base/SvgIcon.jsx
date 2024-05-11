@@ -1,21 +1,6 @@
 import styled from 'styled-components';
 
-const IconWrap = styled.label`
-    margin: 0px 2px;
-    display: flex;
-    align-items: center;
-    &[data-hoverable='true']:hover {
-        cursor: pointer;
-        background-color: #dadada;
-    }
-    &[data-disabled='true'] {
-        cursor: not-allowed;
-        opacity: 0.5;
-    }
-    &[data-disabled='true']:hover {
-        background-color: transparent;
-    }
-`;
+import { IconWrap } from './Component';
 
 const Icon = styled.svg`
     height: 24px;

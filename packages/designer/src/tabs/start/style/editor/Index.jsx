@@ -23,7 +23,6 @@ import {
   getActiveIndexBySheet,
   getActiveIndexBySpread,
   getCellTagPlugin,
-  setCellTagPlugin,
 } from '@utils/worksheetUtil';
 
 import context from '../../../../DesignerContext';
@@ -38,7 +37,7 @@ const EditorIconMenu = WithIconMenu(
     '单元格类型',
     CellEditorsIcon,
     [
-        {
+        /*{
             value: 'pageCellType',
             title: '当前页',
             text: '当前页',
@@ -83,7 +82,7 @@ const EditorIconMenu = WithIconMenu(
                     sheet.setText(row, col, `[总页数]`);
                 }
             },
-        },
+        },*/
         {
             value: 'imageCellType',
             title: '图片',

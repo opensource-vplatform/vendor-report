@@ -10,7 +10,7 @@ export default function (props) {
         <BaseIcon
             {...props}
             type='toone'
-            icon='url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAAAAXNSR0IArs4c6QAAAARzQklUCAgICHwIZIgAAADNSURBVHic7drBDcAgDARBkpbovwRqSmrgcbJDZiqwxP64MQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIASV/UBu+acT/UNFdZan3qru/oAziQsIoRFhLCIEBYRwiJCWAAAAAAAAO21WCX+dRWa0mFt6q+QCGERISwihEWEsIgQFhHCAgAAAAAAaK98abjrr2vTDqvQHf4KiRAWEcIiQlhECIsIYREhLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICTvAcWDC5zSZ3SAAAAAElFTkSuQmCC)'
+            icon='url(./css/icons/align/vAlignCenter.png)'
         ></BaseIcon>
     );
 }

@@ -121,7 +121,7 @@ export const toBarIconMenuItem = function (value, title, Icon, handler) {
     return {
         value,
         title,
-        text: <Icon iconStyle={{ width: 100, height: 8 }}></Icon>,
+        text: <Icon iconStyle={{ width: 100, height: 12 }}></Icon>,
         height: 30,
         handler,
     };
@@ -160,7 +160,7 @@ export const toNormalMenu = function (value, title, Icon, children, handler) {
         value,
         title,
         text: title,
-        icon: Icon ? <Icon></Icon> : null,
+        icon: Icon ? <Icon type='toone'></Icon> : null,
         handler,
         children,
     };
