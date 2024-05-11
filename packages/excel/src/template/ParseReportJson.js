@@ -876,7 +876,10 @@ export default class Render {
 
                                         tool.setValueHandler((...args) => {
                                             if (args.length === 1) {
-                                                return this.datas[args[0]];
+                                                return {
+                                                    type: 'text',
+                                                    value: this.datas[args[0]],
+                                                };
                                             } else {
                                                 return unionDatasource.getValue(
                                                     args[0],
