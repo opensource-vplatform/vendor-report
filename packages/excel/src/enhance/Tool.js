@@ -23,6 +23,10 @@ export default class Tool {
         this.dataIndexHandler = handler;
     }
 
+    setValueHandler(handler){
+        this.valueHandler = handler;
+    }
+
     /**
      * 获取字段下标（在工作表中的起始位置）
      * @param {*} tableCode 
@@ -57,5 +61,30 @@ export default class Tool {
 
     getTotalPages() {
         return this.totalPagesHandler();
+    }
+
+    /**
+     * 获取当前页下标
+     * @returns 
+     */
+    getPageIndex(){
+        return this.pageHandler();
+    }
+
+    /**
+     * 获取总页数
+     * @returns 
+     */
+    getPageCount(){
+        return this.totalPagesHandler();
+    }
+
+    /**
+     * 获取值
+     * @param {*} code 
+     * @param {*} fieldCode 
+     */
+    getValue(code,fieldCode){
+        return this.valueHandler(code,fieldCode);
     }
 }
