@@ -1,6 +1,7 @@
 import {
   enhanceFormula,
   exePlugins,
+  getTableCodesFromFormula,
 } from '../enhance/index';
 import Tool from '../enhance/Tool';
 import { getNamespace } from '../utils/spreadUtil';
@@ -401,6 +402,22 @@ export default class Render {
         this.footerTemplates = footerTemplates;
         this.contentTemplates = contentTemplates;
     }
+    setTemplateDatas(template, tableCode, sheetName) {
+        let ds = this.datas?.[tableCode] || [];
+        const groupName = this.nameMaps[sheetName];
+        const groupedDs =
+            this.groupsDatas?.[sheetName]?.[tableCode]?.[groupName];
+        if (Array.isArray(groupedDs)) {
+            ds = groupedDs;
+        }
+
+        if (!template.datas.has(tableCode)) {
+            template.datas.set(tableCode, Copy(ds));
+            if (ds.length > template.dataLen) {
+                template.dataLen = ds.length;
+            }
+        }
+    }
     parseRowDataTable(params) {
         const { row, sheet } = params;
         const {
@@ -443,22 +460,13 @@ export default class Render {
 
         let maxRowCount = 1;
         Object.entries(rowDataTable).forEach(
-            ([colStr, { bindingPath, tag }]) => {
+            ([colStr, { bindingPath, tag, formula }]) => {
                 const col = Number(colStr);
                 let isBindEntity = bindingPath?.includes?.('.');
+
                 if (isBindEntity) {
                     const tableCode = bindingPath.split('.')[0];
-                    let ds = this.datas?.[tableCode] || [];
-                    const groupName = this.nameMaps[sheetName];
-                    const groupedDs =
-                        this.groupsDatas?.[sheetName]?.[tableCode]?.[groupName];
-                    if (Array.isArray(groupedDs)) {
-                        ds = groupedDs;
-                    }
-                    if (ds.length > result.dataLen) {
-                        result.dataLen = ds.length;
-                    }
-                    result.datas.set(tableCode, Copy(ds));
+                    this.setTemplateDatas(result, tableCode, sheetName);
                     const span = rowSpans.find((span) => span.col === col) || {
                         rowCount: 1,
                         colCount: 1,
@@ -480,6 +488,14 @@ export default class Render {
                                 rowMerge,
                             });
                         }
+                    }
+                }
+                if (formula) {
+                    const tableCodes = getTableCodesFromFormula(formula);
+                    if (Array.isArray(tableCodes)) {
+                        tableCodes.forEach((tableCode) => {
+                            this.setTemplateDatas(result, tableCode, sheetName);
+                        });
                     }
                 }
 
@@ -704,190 +720,226 @@ export default class Render {
                         pageInfos.pageHeight += tempHeight;
                     }
                 }
-                dataTables.forEach(function ({
-                    rows = {},
-                    rowDataTable,
-                    spans = [],
-                    rules = [],
-                    autoMergeRanges = [],
-                }) {
-                    const dataTable = Copy(rowDataTable);
-                    Object.entries(dataTable).forEach(function ([
-                        colStr,
-                        colDataTable,
-                    ]) {
-                        const col = Number(colStr);
-                        const { bindingPath, tag, formula } = colDataTable;
-                        if (bindingPath?.includes?.('.')) {
-                            const [tableCode, fieldCode] =
-                                bindingPath.split('.');
-                            delete colDataTable.bindingPath;
-                            const { type, value: newVlaue } =
-                                unionDatasource.getValue(
-                                    tableCode,
-                                    fieldCode,
-                                    i
-                                );
-                            if (type === 'text') {
-                                colDataTable.value = newVlaue;
-                            }
-                        }
-
-                        const tool = new Tool();
-
-                        if (tag) {
-                            const tagObj = JSON.parse(tag);
-
-                            const instanceId = tagObj.instanceId;
-                            //当前单元格在当前页中的起始行，记录数等信息
-                            page[pageInfos.pageIndex] =
-                                page[pageInfos.pageIndex] || {};
-                            page[pageInfos.pageIndex][instanceId] =
-                                page[pageInfos.pageIndex][instanceId] || {};
-                            const targetCell =
-                                page[pageInfos.pageIndex][instanceId];
-                            targetCell['row'] = startRow;
-                            targetCell['col'] = col;
-                            targetCell['count'] = targetCell['count'] || 0;
-                            targetCell['count'] += 1;
-                            targetCell['dataIndex'] = dataIndex;
-                            targetCell['unionDatasource'] = unionDatasource;
-
-                            //处理超链接信息
-                            const hyperlinkInfo = tagObj.hyperlinkInfo || {};
-                            if (
-                                hyperlinkInfo?.type === 'document' &&
-                                hyperlinkInfo?.isAutoDoc
-                            ) {
-                                colDataTable.hyperlink.url = `sjs://${colDataTable.value}!A1`;
-                                if (colDataTable.hyperlink.tooltip) {
-                                    colDataTable.hyperlink.tooltip =
-                                        colDataTable.value;
-                                }
-                            }
-
-                            //执行插件
-                            const plugins = tagObj.plugins;
-                            if (Array.isArray(plugins)) {
-                                let targetInstanceId = '';
-                                const isDelay = plugins.some(function ({
-                                    type,
-                                    config,
-                                }) {
-                                    if (type === 'cellSubTotal') {
-                                        targetInstanceId = config?.instanceId;
+                dataTables.forEach(
+                    ({
+                        rows = {},
+                        rowDataTable,
+                        spans = [],
+                        rules = [],
+                        autoMergeRanges = [],
+                    }) => {
+                        const dataTable = Copy(rowDataTable);
+                        Object.entries(dataTable).forEach(
+                            ([colStr, colDataTable]) => {
+                                const col = Number(colStr);
+                                const { bindingPath, tag, formula } =
+                                    colDataTable;
+                                if (bindingPath?.includes?.('.')) {
+                                    const [tableCode, fieldCode] =
+                                        bindingPath.split('.');
+                                    delete colDataTable.bindingPath;
+                                    const { type, value: newVlaue } =
+                                        unionDatasource.getValue(
+                                            tableCode,
+                                            fieldCode,
+                                            i
+                                        );
+                                    if (type === 'text') {
+                                        colDataTable.value = newVlaue;
                                     }
-                                    return ['cellSubTotal'].includes(type);
-                                });
+                                }
 
-                                const pageIndex = pageInfos.pageIndex;
-                                function pluginHandler() {
-                                    //汇总
+                                const tool = new Tool();
+
+                                if (tag) {
+                                    const tagObj = JSON.parse(tag);
+
+                                    const instanceId = tagObj.instanceId;
+                                    //当前单元格在当前页中的起始行，记录数等信息
+                                    page[pageInfos.pageIndex] =
+                                        page[pageInfos.pageIndex] || {};
+                                    page[pageInfos.pageIndex][instanceId] =
+                                        page[pageInfos.pageIndex][instanceId] ||
+                                        {};
                                     const targetCell =
-                                        page?.[pageIndex]?.[targetInstanceId];
-                                    tool.setFieldIndexHandler(() => {
-                                        return {
-                                            row: targetCell?.['row'],
-                                            col: targetCell?.['col'],
-                                        };
-                                    });
+                                        page[pageInfos.pageIndex][instanceId];
+                                    targetCell['row'] = startRow;
+                                    targetCell['col'] = col;
+                                    targetCell['count'] =
+                                        targetCell['count'] || 0;
+                                    targetCell['count'] += 1;
+                                    targetCell['dataIndex'] = dataIndex;
+                                    targetCell['unionDatasource'] =
+                                        unionDatasource;
 
-                                    tool.setDataCountHandler(() => {
-                                        return targetCell?.['count'];
-                                    });
+                                    //处理超链接信息
+                                    const hyperlinkInfo =
+                                        tagObj.hyperlinkInfo || {};
+                                    if (
+                                        hyperlinkInfo?.type === 'document' &&
+                                        hyperlinkInfo?.isAutoDoc
+                                    ) {
+                                        colDataTable.hyperlink.url = `sjs://${colDataTable.value}!A1`;
+                                        if (colDataTable.hyperlink.tooltip) {
+                                            colDataTable.hyperlink.tooltip =
+                                                colDataTable.value;
+                                        }
+                                    }
 
-                                    tool.setDataIndex(() => {
-                                        return targetCell?.['dataIndex'];
-                                    });
+                                    //执行插件
+                                    const plugins = tagObj.plugins;
+                                    if (Array.isArray(plugins)) {
+                                        let targetInstanceId = '';
+                                        const isDelay = plugins.some(function ({
+                                            type,
+                                            config,
+                                        }) {
+                                            if (type === 'cellSubTotal') {
+                                                targetInstanceId =
+                                                    config?.instanceId;
+                                            }
+                                            return ['cellSubTotal'].includes(
+                                                type
+                                            );
+                                        });
 
-                                    tool.setUnionDatasourceHandler(() => {
-                                        return targetCell?.['unionDatasource'];
-                                    });
+                                        const pageIndex = pageInfos.pageIndex;
+                                        function pluginHandler() {
+                                            //汇总
+                                            const targetCell =
+                                                page?.[pageIndex]?.[
+                                                    targetInstanceId
+                                                ];
+                                            tool.setFieldIndexHandler(() => {
+                                                return {
+                                                    row: targetCell?.['row'],
+                                                    col: targetCell?.['col'],
+                                                };
+                                            });
 
-                                    const { type, value } = exePlugins(
+                                            tool.setDataCountHandler(() => {
+                                                return targetCell?.['count'];
+                                            });
+
+                                            tool.setDataIndex(() => {
+                                                return targetCell?.[
+                                                    'dataIndex'
+                                                ];
+                                            });
+
+                                            tool.setUnionDatasourceHandler(
+                                                () => {
+                                                    return targetCell?.[
+                                                        'unionDatasource'
+                                                    ];
+                                                }
+                                            );
+
+                                            const { type, value } = exePlugins(
+                                                {
+                                                    type: 'text',
+                                                    value: colDataTable.value,
+                                                },
+                                                plugins,
+                                                tool
+                                            );
+                                            const key =
+                                                type === 'formula'
+                                                    ? type
+                                                    : 'value';
+                                            colDataTable[key] = value;
+                                        }
+
+                                        if (isDelay) {
+                                            pageInfos.delayPlugins.push(
+                                                pluginHandler
+                                            );
+                                        } else {
+                                            pluginHandler();
+                                        }
+                                    }
+                                }
+
+                                //先执行插件，后执行函数
+                                if (formula) {
+                                    const formulaHandler = () => {
+                                        //当前页
+                                        tool.setPageHandler(
+                                            genPageIndexHandler(
+                                                pageInfos.pageIndex
+                                            )
+                                        );
+                                        //总页数
+                                        tool.setTotalPagesHandler(
+                                            () => pageInfos.pageTotal
+                                        );
+
+                                        tool.setValueHandler((...args) => {
+                                            if (args.length === 1) {
+                                                return this.datas[args[0]];
+                                            } else {
+                                                return unionDatasource.getValue(
+                                                    args[0],
+                                                    args[1],
+                                                    i
+                                                );
+                                            }
+                                        });
+
+                                        const { type, value } = enhanceFormula(
+                                            {
+                                                type: 'formula',
+                                                value: formula,
+                                            },
+                                            tool
+                                        );
+                                        const key =
+                                            type === 'formula' ? type : 'value';
+                                        colDataTable[key] = value;
+                                    };
+                                    pageInfos.delayFormula.push(formulaHandler);
+                                }
+                            }
+                        );
+
+                        if (pageInfos) {
+                            const { rowCount } = pageInfos;
+                            pageInfos.dataTable[rowCount] = dataTable;
+                            //合并信息
+                            spans.forEach(function (span) {
+                                pageInfos.spans.push({
+                                    ...span,
+                                    row: rowCount,
+                                });
+                            });
+
+                            //条件规则
+                            rules.forEach(function (rule) {
+                                pageInfos.rules.push({
+                                    ...rule,
+                                    ranges: [
                                         {
-                                            type: 'text',
-                                            value: colDataTable.value,
+                                            ...rule.ranges[0],
+                                            row: rowCount,
                                         },
-                                        plugins,
-                                        tool
-                                    );
-                                    const key =
-                                        type === 'formula' ? type : 'value';
-                                    colDataTable[key] = value;
-                                }
-
-                                if (isDelay) {
-                                    pageInfos.delayPlugins.push(pluginHandler);
-                                } else {
-                                    pluginHandler();
-                                }
-                            }
-                        }
-
-                        //先执行插件，后执行函数
-                        if (formula) {
-                            function formulaHandler() {
-                                //当前页
-                                tool.setPageHandler(
-                                    genPageIndexHandler(pageInfos.pageIndex)
-                                );
-                                //总页数
-                                tool.setTotalPagesHandler(
-                                    () => pageInfos.pageTotal
-                                );
-
-                                const { type, value } = enhanceFormula(
-                                    {
-                                        type: 'formula',
-                                        value: formula,
-                                    },
-                                    tool
-                                );
-                                const key = type === 'formula' ? type : 'value';
-                                colDataTable[key] = value;
-                            }
-                            pageInfos.delayFormula.push(formulaHandler);
-                        }
-                    });
-
-                    if (pageInfos) {
-                        const { rowCount } = pageInfos;
-                        pageInfos.dataTable[rowCount] = dataTable;
-                        //合并信息
-                        spans.forEach(function (span) {
-                            pageInfos.spans.push({
-                                ...span,
-                                row: rowCount,
+                                    ],
+                                });
                             });
-                        });
 
-                        //条件规则
-                        rules.forEach(function (rule) {
-                            pageInfos.rules.push({
-                                ...rule,
-                                ranges: [
-                                    {
-                                        ...rule.ranges[0],
-                                        row: rowCount,
-                                    },
-                                ],
+                            //行高
+                            pageInfos.rows[rowCount] = rows;
+
+                            //自动合并区域
+                            autoMergeRanges.forEach(function (item) {
+                                const cobyItem = Copy(item);
+                                cobyItem.range.row = rowCount;
+                                pageInfos.autoMergeRanges.push(cobyItem);
                             });
-                        });
 
-                        //行高
-                        pageInfos.rows[rowCount] = rows;
-
-                        //自动合并区域
-                        autoMergeRanges.forEach(function (item) {
-                            const cobyItem = Copy(item);
-                            cobyItem.range.row = rowCount;
-                            pageInfos.autoMergeRanges.push(cobyItem);
-                        });
-
-                        pageInfos.rowCount += 1;
+                            pageInfos.rowCount += 1;
+                        }
                     }
-                });
+                );
             }
             verticalAutoMergeRanges.forEach(function (item) {
                 item.range.rowCount = pageInfos.rowCount - item.range.row;
