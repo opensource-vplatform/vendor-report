@@ -1,4 +1,7 @@
-import { toAST } from '../../utils';
+import {
+  formulaToAST,
+  toAST,
+} from '../../utils';
 
 export function execute(ast, tool) {
     const args = ast.arguments;
@@ -9,6 +12,10 @@ export function execute(ast, tool) {
         fieldCode = undefined;
     code = args[0].value;
     fieldCode = args[1]?.value;
-    const value = tool.getValue(code, fieldCode);
-    return toAST(value);
+    const result = tool.getValue(code, fieldCode);
+    if(result.type=='text'){
+        return toAST(result.value);
+    }else{
+        return formulaToAST(result.value);
+    }
 }

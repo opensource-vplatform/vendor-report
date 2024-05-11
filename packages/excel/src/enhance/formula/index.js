@@ -1,16 +1,6 @@
-import { getNamespace } from '../../utils/spreadUtil';
 import { parse } from './parser/index';
 import Visitor from './parser/Visitor';
-
-/**
- * 将公式解析成语法树
- * @param {*} formula
- * @returns
- */
-const formulaToAST = function (formula) {
-    const GC = getNamespace();
-    return GC.Spread.Sheets.CalcEngine.formulaToExpression(null, formula, 0, 0);
-};
+import { formulaToAST } from './utils';
 
 /**
  * 处理公式
