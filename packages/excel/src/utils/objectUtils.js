@@ -9,3 +9,7 @@ export const isObject = function(obj){
 export const isFunction = function(obj){
     return typeof obj == 'function';
 }
+
+export const isNotBlank = function(obj){
+    return typeof obj == 'string' && obj.trim().length>0;
+}
