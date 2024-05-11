@@ -1,7 +1,8 @@
 import {
-  execute,
-  PluginTool,
-} from '../plugin';
+  enhanceFormula,
+  exePlugins,
+} from '../enhance/index';
+import Tool from '../enhance/Tool';
 import { getNamespace } from '../utils/spreadUtil';
 import UnionDatasource from './UnionDatasource';
 
@@ -276,6 +277,11 @@ export default class Render {
         while (pageInfos.delayPlugins.length) {
             const pluginHandler = pageInfos.delayPlugins.pop();
             pluginHandler();
+        }
+        //总页数需延后渲染
+        while (pageInfos.delayFormula.length) {
+            const formulaHandler = pageInfos.delayFormula.pop();
+            formulaHandler();
         }
         resetSheet(pageInfos);
     }
@@ -654,6 +660,7 @@ export default class Render {
                 pageHeight: 0,
 
                 delayPlugins: [],
+                delayFormula: [],
                 isFillData,
                 isCurrentSheet: templateInfo?.isCurrentSheet,
                 isTemplate,
@@ -667,6 +674,7 @@ export default class Render {
     getSheetCount() {
         return this.reportJson.sheetCount + Object.keys(this.newSheets).length;
     }
+
     genPageDataTables(params) {
         const { templates, pageInfos, startIndex = 0, endIndex = 0 } = params;
         templates.forEach((temp) => {
@@ -709,7 +717,7 @@ export default class Render {
                         colDataTable,
                     ]) {
                         const col = Number(colStr);
-                        const { bindingPath, tag } = colDataTable;
+                        const { bindingPath, tag, formula } = colDataTable;
                         if (bindingPath?.includes?.('.')) {
                             const [tableCode, fieldCode] =
                                 bindingPath.split('.');
@@ -725,6 +733,8 @@ export default class Render {
                             }
                         }
 
+                        const tool = new Tool();
+
                         if (tag) {
                             const tagObj = JSON.parse(tag);
 
@@ -734,26 +744,20 @@ export default class Render {
                                 page[pageInfos.pageIndex] || {};
                             page[pageInfos.pageIndex][instanceId] =
                                 page[pageInfos.pageIndex][instanceId] || {};
-                            page[pageInfos.pageIndex][instanceId]['row'] =
-                                startRow;
-                            page[pageInfos.pageIndex][instanceId]['col'] = col;
-                            page[pageInfos.pageIndex][instanceId]['count'] =
-                                page[pageInfos.pageIndex][instanceId][
-                                    'count'
-                                ] || 0;
-                            page[pageInfos.pageIndex][instanceId]['count'] += 1;
-                            page[pageInfos.pageIndex][instanceId]['dataIndex'] =
-                                dataIndex;
-                            page[pageInfos.pageIndex][instanceId][
-                                'unionDatasource'
-                            ] = unionDatasource;
+                            const targetCell =
+                                page[pageInfos.pageIndex][instanceId];
+                            targetCell['row'] = startRow;
+                            targetCell['col'] = col;
+                            targetCell['count'] = targetCell['count'] || 0;
+                            targetCell['count'] += 1;
+                            targetCell['dataIndex'] = dataIndex;
+                            targetCell['unionDatasource'] = unionDatasource;
 
                             //处理超链接信息
-                            const hyperlinkInfo = tagObj.hyperlinkInfo;
+                            const hyperlinkInfo = tagObj.hyperlinkInfo || {};
                             if (
-                                hyperlinkInfo &&
-                                hyperlinkInfo.type === 'document' &&
-                                hyperlinkInfo.isAutoDoc
+                                hyperlinkInfo?.type === 'document' &&
+                                hyperlinkInfo?.isAutoDoc
                             ) {
                                 colDataTable.hyperlink.url = `sjs://${colDataTable.value}!A1`;
                                 if (colDataTable.hyperlink.tooltip) {
@@ -773,54 +777,40 @@ export default class Render {
                                     if (type === 'cellSubTotal') {
                                         targetInstanceId = config?.instanceId;
                                     }
-
-                                    return [
-                                        'totalPagesCellType',
-                                        'cellSubTotal',
-                                    ].includes(type);
+                                    return ['cellSubTotal'].includes(type);
                                 });
 
                                 const pageIndex = pageInfos.pageIndex;
                                 function pluginHandler() {
-                                    const pluginTool = new PluginTool();
-
-                                    const pageHander = genPageIndexHandler(
-                                        pageInfos.pageIndex
-                                    );
-                                    pluginTool.setPageHandler(pageHander);
-                                    pluginTool.setTotalPagesHandler(
-                                        () => pageInfos.pageTotal
-                                    );
-
                                     //汇总
                                     const targetCell =
                                         page?.[pageIndex]?.[targetInstanceId];
-                                    pluginTool.setFieldIndexHandler(() => {
+                                    tool.setFieldIndexHandler(() => {
                                         return {
                                             row: targetCell?.['row'],
                                             col: targetCell?.['col'],
                                         };
                                     });
 
-                                    pluginTool.setDataCountHandler(() => {
+                                    tool.setDataCountHandler(() => {
                                         return targetCell?.['count'];
                                     });
 
-                                    pluginTool.setDataIndex(() => {
+                                    tool.setDataIndex(() => {
                                         return targetCell?.['dataIndex'];
                                     });
 
-                                    pluginTool.setUnionDatasourceHandler(() => {
+                                    tool.setUnionDatasourceHandler(() => {
                                         return targetCell?.['unionDatasource'];
                                     });
 
-                                    const { type, value } = execute(
+                                    const { type, value } = exePlugins(
                                         {
                                             type: 'text',
                                             value: colDataTable.value,
                                         },
                                         plugins,
-                                        pluginTool
+                                        tool
                                     );
                                     const key =
                                         type === 'formula' ? type : 'value';
@@ -833,6 +823,31 @@ export default class Render {
                                     pluginHandler();
                                 }
                             }
+                        }
+
+                        //先执行插件，后执行函数
+                        if (formula) {
+                            function formulaHandler() {
+                                //当前页
+                                tool.setPageHandler(
+                                    genPageIndexHandler(pageInfos.pageIndex)
+                                );
+                                //总页数
+                                tool.setTotalPagesHandler(
+                                    () => pageInfos.pageTotal
+                                );
+
+                                const { type, value } = enhanceFormula(
+                                    {
+                                        type: 'formula',
+                                        value: formula,
+                                    },
+                                    tool
+                                );
+                                const key = type === 'formula' ? type : 'value';
+                                colDataTable[key] = value;
+                            }
+                            pageInfos.delayFormula.push(formulaHandler);
                         }
                     });
 
