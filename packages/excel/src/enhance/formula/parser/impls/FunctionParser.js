@@ -22,6 +22,16 @@ class FunctionParser extends Parser{
         }
     }
 
+    _getVisitHandlerName(){
+        return 'visitFunction';
+    }
+
+    _getVisitChildren(){
+        const ast = this.getAST();
+        const args = ast.arguments;
+        return Array.isArray(args) ? args:[];
+    }
+
 }
 
 export default FunctionParser;

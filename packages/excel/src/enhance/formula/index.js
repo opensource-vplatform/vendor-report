@@ -1,5 +1,6 @@
 import { getNamespace } from '../../utils/spreadUtil';
 import { parse } from './parser/index';
+import Visitor from './parser/Visitor';
 
 /**
  * 将公式解析成语法树
@@ -34,5 +35,22 @@ export const enhance = function (formula, tool) {
 };
 
 export const getTableCodes = function(formula){
-
+    let ast = formulaToAST(formula);
+    const parser = parse(ast);
+    const tableCodes = [];
+    const visitor = new Visitor({
+        function:(parser)=>{
+            const ast = parser.getAST();
+            const functionName = ast.functionName; 
+            if(functionName=="TOONE.GET"){
+                const args = ast.arguments;
+                if(args.length == 2){
+                    tableCodes.push(args[0].value);
+                }
+                return false;
+            }
+        }
+    });
+    parser.visit(visitor);
+    return tableCodes;
 }
