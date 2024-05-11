@@ -1,5 +1,5 @@
 import { enhance } from './formula/index';
-import { exePlugins } from './plugin/index';
+import { exePlugins as executePlugins } from './plugin/index';
 
 /**
  * 执行插件
@@ -9,7 +9,7 @@ import { exePlugins } from './plugin/index';
  * @returns {type:'formula'|'text',value:string}
  */
 export const exePlugins = function (value, plugins, tool) {
-    return exePlugins(value,plugins,tool);
+    return executePlugins(value,plugins,tool);
 };
 
 /**
