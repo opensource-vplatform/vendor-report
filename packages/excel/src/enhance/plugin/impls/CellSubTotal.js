@@ -1,4 +1,4 @@
-import { getNamespace } from '../../utils/spreadUtil';
+import { getNamespace } from '../../../utils/spreadUtil';
 import Plugin from '../Plugin';
 
 class CellSubTotal extends Plugin {

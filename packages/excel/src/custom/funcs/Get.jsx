@@ -9,11 +9,8 @@ function Get() {
 }
 
 Get.prototype = new GC.Spread.CalcEngine.Functions.Function();
-Get.prototype.isContextSensitive = function(){
-    return true;
-}
 Get.prototype.evaluate = function (arg) {
-    const sheet = arg?.source?.getSheet();
+    /*const sheet = arg?.source?.getSheet();
     const args = arg?.Whe?.arguments;
     if(args&&sheet){
         if(args.length==1){
@@ -34,7 +31,7 @@ Get.prototype.evaluate = function (arg) {
                 }
             }
         }
-    }
+    }*/
     return '';
 };
 

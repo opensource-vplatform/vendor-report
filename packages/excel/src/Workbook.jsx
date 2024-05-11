@@ -275,9 +275,6 @@ export default function (props) {
                 tabStripVisible,
             });
             data.spread = spread;
-            spread.suspendEvent();
-            register(spread);
-            spread.resumeEvent();
             return true;
         }
         return false;
@@ -408,6 +405,10 @@ export default function (props) {
                 handleSheets(json);
                 handleDatas();
                 handlePrint();
+                //注册信息必须放置json填充后，否则会导致自定义函数注册被清空
+                data.spread.suspendEvent();
+                register(data.spread);
+                data.spread.resumeEvent();
                 if (onInited) {
                     const promise = onInited(data.spread);
                     if (promise && promise.then) {
