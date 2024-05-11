@@ -27,6 +27,7 @@ import {
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
+  initWizardSlice,
   toggleBooleanValue,
   updateTemplateName,
 } from '@store/wizardSlice';
@@ -136,15 +137,24 @@ export default function () {
                 dispatch,
                 '正在初始化设计器，请稍候...',
                 EVENTS.onDesignerInited
-            ).then(({ excelJson, tableMetadata, datasourceSetting }) => {
-                excelJson && resolve(excelJson);
-                dispatch(
-                    initDatasource({
-                        datasource: tableMetadata,
-                    })
-                );
-                datasourceSetting && dispatch(setSetting(datasourceSetting));
-            });
+            ).then(
+                ({
+                    excelJson,
+                    tableMetadata,
+                    datasourceSetting,
+                    wizardSlice,
+                }) => {
+                    excelJson && resolve(excelJson);
+                    dispatch(
+                        initDatasource({
+                            datasource: tableMetadata,
+                        })
+                    );
+                    datasourceSetting &&
+                        dispatch(setSetting(datasourceSetting));
+                    wizardSlice && dispatch(initWizardSlice(wizardSlice));
+                }
+            );
         });
     });
     const handleSelectionChanged = useCallback((type, data) => {

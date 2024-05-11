@@ -39,14 +39,6 @@ class Report {
         this.conf = conf;
     }
 
-    replacer(key, value) {
-        //删除角标信息
-        if (key === 'cornerFold' && value?.markType === 'table') {
-            return undefined;
-        }
-        return value;
-    }
-
     /**
      * 报表挂载
      * @param {DOMElement} el 挂载dom对象
@@ -68,7 +60,7 @@ class Report {
         };
         let json = this.conf?.json?.reportJson;
         if (json) {
-            json = JSON.parse(JSON.stringify(json, this.replacer));
+            json = JSON.parse(JSON.stringify(json));
         }
 
         const { rowMerge, columnMerge } =
@@ -87,7 +79,7 @@ class Report {
                 onPrintHandler: (handler) => {
                     this.printHandler = handler;
                 },
-                baseUrl:this.conf?.baseUrl,
+                baseUrl: this.conf?.baseUrl,
                 onFetchData,
                 rowMerge,
                 columnMerge,

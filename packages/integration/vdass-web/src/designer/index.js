@@ -196,7 +196,10 @@ const designer = new Designer({
                                         excelJson: excelJson
                                             ? excelJson.reportJson
                                             : null,
-                                        datasourceSetting:excelJson.datasourceSetting||{},
+                                        datasourceSetting:
+                                            excelJson.datasourceSetting || {},
+                                        wizardSlice:
+                                            excelJson.context.wizardSlice,
                                     });
                                 })
                                 .catch(reject);
@@ -206,7 +209,9 @@ const designer = new Designer({
                                 excelJson: excelJson
                                     ? excelJson.reportJson
                                     : null,
-                                datasourceSetting:excelJson.datasourceSetting||{},
+                                datasourceSetting:
+                                    excelJson.datasourceSetting || {},
+                                wizardSlice: excelJson.context.wizardSlice,
                             });
                         }
                     })

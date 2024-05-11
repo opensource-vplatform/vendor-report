@@ -47,17 +47,6 @@ const ExcelWrap = styled.div`
     height: 100%;
 `;
 
-function replacer(key, value) {
-    //删除角标信息
-    /*  if (key === 'cornerFold' && value?.markType === 'table') {
-        return undefined;
-    } */
-    if (key === 'decoration') {
-        return undefined;
-    }
-    return value;
-}
-
 //如果表格允许行合并或者列合并(相邻单元格数据相同会自动合并成一个单元格)，则对数据进行处理
 function handleDatas(params) {
     const { rowMerge, columnMerge, dataSource, originalDatasourceCodes } =
@@ -106,8 +95,7 @@ export default function () {
     });
     const { spread: sourceSpread } = useSelector(({ appSlice }) => appSlice);
     const sourceJson = JSON.stringify(
-        sourceSpread ? sourceSpread?.toJSON?.() : '',
-        replacer
+        sourceSpread ? sourceSpread?.toJSON?.() : ''
     );
     const json = JSON.parse(sourceJson);
     //许可证

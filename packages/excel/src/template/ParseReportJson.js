@@ -460,7 +460,7 @@ export default class Render {
 
         let maxRowCount = 1;
         Object.entries(rowDataTable).forEach(
-            ([colStr, { bindingPath, tag, formula }]) => {
+            ([colStr, { bindingPath, tag, formula, style = {} }]) => {
                 const col = Number(colStr);
                 let isBindEntity = bindingPath?.includes?.('.');
 
@@ -497,6 +497,10 @@ export default class Render {
                             this.setTemplateDatas(result, tableCode, sheetName);
                         });
                     }
+                }
+
+                if (style?.decoration) {
+                    delete style?.decoration;
                 }
 
                 getColRules({
@@ -861,14 +865,14 @@ export default class Render {
                                 }
 
                                 //先执行插件，后执行函数
+                                const pageHandler = genPageIndexHandler(
+                                    pageInfos.pageIndex
+                                );
+
                                 if (formula) {
                                     const formulaHandler = () => {
                                         //当前页
-                                        tool.setPageHandler(
-                                            genPageIndexHandler(
-                                                pageInfos.pageIndex
-                                            )
-                                        );
+                                        tool.setPageHandler(pageHandler);
                                         //总页数
                                         tool.setTotalPagesHandler(
                                             () => pageInfos.pageTotal
