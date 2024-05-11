@@ -1,6 +1,6 @@
+import PluginTool from '../Tool';
 import { create } from './factory';
 import { enhance as dealFormula } from './formula/index';
-import PluginTool from './Tool';
 
 export const execute = function (value, plugins, tool) {
     plugins.forEach((plugin) => {
