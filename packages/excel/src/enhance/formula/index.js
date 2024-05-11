@@ -32,3 +32,7 @@ export const enhance = function (formula, tool) {
         return { type: 'formula', value: formula };
     }
 };
+
+export const getTableCodes = function(formula){
+
+}

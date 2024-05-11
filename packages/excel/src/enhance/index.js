@@ -1,4 +1,7 @@
-import { enhance } from './formula/index';
+import {
+  enhance,
+  getTableCodes,
+} from './formula/index';
 import { execute } from './plugin/index';
 
 /**
@@ -25,3 +28,16 @@ export const enhanceFormula = function (formula, tool) {
         return formula;
     }
 };
+
+/**
+ * 从公式中获取绑定的实体编号信息
+ * @param string formula 公式
+ * @returns Array<string>
+ */
+export const getTableCodesFromFormula = function(formula){
+    if(formula){
+        return getTableCodes(formula);
+    }else{
+        return [];
+    }
+}
