@@ -36,6 +36,7 @@ const Toolbar = styled.div`
     padding: 0px;
     display: flex;
     height: 35px;
+    flex-shrink: 0;
     justify-content: flex-end;
     align-items: center;
 `;
