@@ -8,7 +8,7 @@ class Parser {
         this.ast = ast;
     }
 
-    getAST(){
+    getAST() {
         return this.ast;
     }
 
@@ -16,16 +16,16 @@ class Parser {
         return this.ast;
     }
 
-    toParser(value){
-        if(value&&typeof value.type == 'number'){
+    toParser(value) {
+        if (value && typeof value.type == 'number') {
             return parse(value);
         }
         return null;
     }
 
-    parseValue(value,tool){
+    parseValue(value, tool) {
         const parser = this.toParser(value);
-        if(parser){
+        if (parser) {
             return parser.parse(tool);
         }
         return value;
@@ -33,38 +33,37 @@ class Parser {
 
     /**
      * 获取需要访问的子元素，如函数的参数
-     * @returns 
+     * @returns
      */
-    _getVisitChildren(){
+    _getVisitChildren() {
         return [];
     }
 
     /**
      * 获取访问函数名称
-     * @returns 
+     * @returns
      */
-    _getVisitHandlerName(){
+    _getVisitHandlerName() {
         return null;
     }
 
-    visit(visitor){
+    visit(visitor) {
         const handlerName = this._getVisitHandlerName();
         const handler = visitor[handlerName];
         let visitChildren = true;
-        if(typeof handler == 'function'){
-            visitChildren = handler(this)!==false; 
+        if (typeof handler == 'function') {
+            visitChildren = handler.call(visitor, this) !== false;
         }
-        if(visitChildren){
+        if (visitChildren) {
             const children = this._getVisitChildren();
-            children.forEach(child=>{
+            children.forEach((child) => {
                 const parser = this.toParser(child);
-                if(parser){
+                if (parser) {
                     parser.visit(visitor);
                 }
             });
         }
     }
-    
 }
 
 export default Parser;
