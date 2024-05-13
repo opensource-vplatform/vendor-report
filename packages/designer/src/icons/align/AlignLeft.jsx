@@ -1,4 +1,5 @@
 import BaseIcon from '../base/BaseIcon';
+import { getBaseUrl } from '@utils/environmentUtil';
 
 /**
  * 水平居左
@@ -10,7 +11,7 @@ export default function (props) {
         <BaseIcon
             {...props}
             type='toone'
-            icon='url(./css/icons/align/alignLeft.png)'
+            icon={`url(${getBaseUrl()}/css/icons/align/alignLeft.png)`}
         ></BaseIcon>
     );
 };

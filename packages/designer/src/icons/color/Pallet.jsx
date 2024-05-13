@@ -1,3 +1,5 @@
+import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../base/BaseIcon';
 
 /**
@@ -11,7 +13,7 @@ export default function (props) {
             style={{ margin: 'auto 0', width: 16 }}
             iconStyle={{ margin: '4px 2px' }}
             {...props}
-            icon='url(./css/icons/color/pallet.svg)'
+            icon={`url(${getBaseUrl()}/css/icons/color/pallet.svg)`}
         ></BaseIcon>
     );
 }

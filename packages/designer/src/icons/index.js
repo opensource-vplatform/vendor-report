@@ -24,8 +24,14 @@ const REG = /url\(["']?(data:image.+?)["']?\)/
 
 function parseFile(filePath){
     const buffer = fs.readFileSync(filePath);
-    const content = new String(buffer).toString();
-    const match = content.match(REG);
+    let content = new String(buffer).toString();
+    if(content.indexOf("${getBaseUrl()}")!=-1){
+        if(content.indexOf("import { getBaseUrl }")==-1){
+            content = `import { getBaseUrl } from '@utils/environmentUtil';\n`+content;
+            fs.writeFileSync(filePath,content);
+        }
+    }
+    /*const match = content.match(REG);
     if(match){
         const urlData = match[0];
         const base64Data = match[1];
@@ -52,14 +58,11 @@ function parseFile(filePath){
         let urlPath = "./css/icons/"+relativePath;
         urlPath = urlPath.replace(/\\/g,'/');
         const iconContent = content.replace(urlData,`url(${urlPath})`);
-        //console.log("iconDefPath:"+filePath);
-        //console.log("iconPath:"+iconPath);
-        //console.log("urlPath:"+urlPath);
-        //console.log("iconContent:"+iconContent);
         fs.mkdirSync(path.resolve(iconPath,'..'),{recursive:true});
         fs.writeFileSync(iconPath,imgData);
         fs.writeFileSync(filePath,iconContent);
-    }
+    }*/
+    
 }
 
 files.forEach(file=>{

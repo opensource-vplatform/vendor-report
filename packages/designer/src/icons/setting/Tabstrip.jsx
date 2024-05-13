@@ -1,3 +1,4 @@
+import { getBaseUrl } from '@utils/environmentUtil';
 import BaseIcon from '../base/BaseIcon';
 
 /**
@@ -9,7 +10,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon='url(./css/icons/setting/tabstrip.svg)'
+            icon={`url(${getBaseUrl()}/css/icons/setting/tabstrip.svg)`}
         ></BaseIcon>
     );
 }

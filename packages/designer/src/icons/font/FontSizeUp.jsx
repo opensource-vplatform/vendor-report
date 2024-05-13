@@ -1,3 +1,5 @@
+import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../base/BaseIcon';
 import WithSvgIcon from '../base/WithSvgIcon';
 
@@ -19,7 +21,7 @@ export default function (props) {
         <BaseIcon
             {...props}
             type='toone-md'
-            icon='url(./css/icons/font/fontSizeUp.png)'
+            icon={`url(${getBaseUrl()}/css/icons/font/fontSizeUp.png)`}
         ></BaseIcon>
     );
 }

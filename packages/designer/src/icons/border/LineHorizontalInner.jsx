@@ -1,3 +1,5 @@
+import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../base/BaseIcon';
 
 /**
@@ -8,7 +10,7 @@ import BaseIcon from '../base/BaseIcon';
 export default function (props) {
     return (
         <BaseIcon
-            icon='url(./css/icons/border/lineHorizontalInner.svg)'
+            icon={`url(${getBaseUrl()}/css/icons/border/lineHorizontalInner.svg)`}
             {...props}
         ></BaseIcon>
     );

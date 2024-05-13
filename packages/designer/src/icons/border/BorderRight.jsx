@@ -1,3 +1,5 @@
+import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../base/BaseIcon';
 
 /**
@@ -10,7 +12,7 @@ export default function (props) {
         <BaseIcon
             {...props}
             type='toone'
-            icon='url(./css/icons/border/borderRight.png)'
+            icon={`url(${getBaseUrl()}/css/icons/border/borderRight.png)`}
         ></BaseIcon>
     );
 }

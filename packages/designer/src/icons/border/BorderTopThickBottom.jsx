@@ -1,3 +1,5 @@
+import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../base/BaseIcon';
 
 /**
@@ -9,7 +11,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon='url(./css/icons/border/borderTopThickBottom.svg)'
+            icon={`url(${getBaseUrl()}/css/icons/border/borderTopThickBottom.svg)`}
         ></BaseIcon>
     );
 }
