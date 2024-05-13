@@ -1,8 +1,4 @@
-import {
-  createRef,
-  useEffect,
-  useState,
-} from 'react';
+import { createRef, useEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -24,11 +20,11 @@ const Wrap = styled.div`
         color: inherit;
     }
     &[data-type='h'] {
-        cursor: e-resize;
+        cursor: ew-resize;
         align-items: center;
     }
     &[data-type='v'] {
-        cursor: n-resize;
+        cursor: ns-resize;
         justify-content: center;
     }
 `;
@@ -135,11 +131,11 @@ export default function (props) {
                 targetHeight = rect.height;
             }
             document.addEventListener('mousemove', mouseMoveHandler);
-            const handler = ()=>{
-                document.removeEventListener('mousemove', mouseMoveHandler)
-                document.removeEventListener('mouseup',handler);
+            const handler = () => {
+                document.removeEventListener('mousemove', mouseMoveHandler);
+                document.removeEventListener('mouseup', handler);
             };
-            document.addEventListener('mouseup',handler);
+            document.addEventListener('mouseup', handler);
             evt.nativeEvent.preventDefault();
             return false;
         }
@@ -179,7 +175,9 @@ export default function (props) {
                                     cursor: collapsable
                                         ? 'pointer'
                                         : 'e-resize',
-                                    pointerEvents: collapsable ? 'unset' : 'none',
+                                    pointerEvents: collapsable
+                                        ? 'unset'
+                                        : 'none',
                                 }}
                                 hoverable={false}
                                 onClick={handleIconClick}
@@ -201,7 +199,9 @@ export default function (props) {
                                     cursor: collapsable
                                         ? 'pointer'
                                         : 'n-resize',
-                                    pointerEvents: collapsable ? 'unset' : 'none',
+                                    pointerEvents: collapsable
+                                        ? 'unset'
+                                        : 'none',
                                 }}
                                 onClick={handleIconClick}
                             ></DotHorizIcon>
