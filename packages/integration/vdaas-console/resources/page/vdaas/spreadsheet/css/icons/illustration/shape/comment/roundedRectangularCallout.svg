@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>callout-rounded rectangular callout</title>
+    <desc>Created with Sketch.</desc>
+    <g id="callout-rounded-rectangular-callout" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="8.2" transform="translate(1.000000, 1.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M7.38196601,10 L10,10 C11.6568542,10 13,8.65685425 13,7 L13,4 C13,2.34314575 11.6568542,1 10,1 L4,1 C2.34314575,1 1,2.34314575 1,4 L1,7 C1,8.65685425 2.34314575,10 4,10 L5.61803399,10 L6.5,11.763932 L7.38196601,10 Z M8,11 L6.5,14 L5,11 L4,11 C1.790861,11 2.705415e-16,9.209139 0,7 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 L10,0 C12.209139,-4.05812251e-16 14,1.790861 14,4 L14,7 C14,9.209139 12.209139,11 10,11 L8,11 Z" id="Combined-Shape-Copy-4"></path>
+        </g>
+    </g>
+</svg>

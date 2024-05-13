@@ -12,7 +12,7 @@ const designerHtmlPath = path.resolve(distPath, 'designer/index.html');
 
 const importPath = path.resolve(__dirname, '../../../designer/dist/designer-import.xml');
 
-const spreadsheetPath = path.resolve(__dirname,"../resources/static/spreadsheet")
+const spreadsheetPath = path.resolve(__dirname,"../resources/page/vdaas/spreadsheet")
 
 const INDEX_SCRIPT_REG = /^integration\-vdaas\-designer\-[\w\d]+\.umd\.js$/;
 

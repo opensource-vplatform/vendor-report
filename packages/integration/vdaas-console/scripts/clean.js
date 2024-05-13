@@ -1,3 +1,3 @@
 const del = require("del");
 
-del.sync(["resources/page/spreadsheet/**"])
+del.sync(["resources/page/vdaas/spreadsheet/**"])

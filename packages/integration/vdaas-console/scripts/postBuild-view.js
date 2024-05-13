@@ -10,7 +10,7 @@ const distPath = path.resolve(__dirname, '../reportDist');
 
 const reportHtmlPath = path.resolve(distPath, 'view/index.html');
 
-const spreadsheetPath = path.resolve(__dirname,"../resources/static/spreadsheet")
+const spreadsheetPath = path.resolve(__dirname,"../resources/page/vdaas/spreadsheet")
 
 const importPath = path.resolve(__dirname, '../../../excel/dist/report-import.xml');
 

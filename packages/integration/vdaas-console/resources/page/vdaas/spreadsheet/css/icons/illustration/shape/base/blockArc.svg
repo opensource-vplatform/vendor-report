@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>basic shapes-block arc</title>
+    <desc>Created with Sketch.</desc>
+    <g id="basic-shapes-block-arc" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="3.26" transform="translate(0.000000, 3.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M15,8 C15,4.13400675 11.8659932,1 8,1 C4.13400675,1 1,4.13400675 1,8 L3,8 C3,5.23857625 5.23857625,3 8,3 C10.7614237,3 13,5.23857625 13,8 L15,8 Z M16,8 L16,9 L12,9 L12,8 C12,5.790861 10.209139,4 8,4 C5.790861,4 4,5.790861 4,8 L4,9 L0,9 L0,8 C0,3.581722 3.581722,0 8,0 C12.418278,0 16,3.581722 16,8 Z" id="合并形状"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>basic shapes-cube</title>
+    <desc>Created with Sketch.</desc>
+    <g id="basic-shapes-cube" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="3.22" transform="translate(-1.000000, 0.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M11.9994031,14.5864389 L14.9994031,11.5866031 L14.9994031,2.68455843 L11.9994031,5.66797405 L11.9994031,14.5864389 Z M11.9965854,15.996619 L0.999403103,15.996619 L0.999403103,4.996619 L4.9994031,0.996619 L15.9994031,0.996619 L15.9994031,11.996619 L15.9963648,11.996619 L16,12.0002184 L12,16 L11.9965854,15.996619 Z M11.2563459,4.996619 L14.2730224,1.996619 L5.41358317,1.996619 L2.4134194,4.996619 L11.2563459,4.996619 Z M1.9994031,5.996619 L1.9994031,14.996619 L10.9994031,14.996619 L10.9994031,5.996619 L1.9994031,5.996619 Z" id="形状"></path>
+        </g>
+    </g>
+</svg>

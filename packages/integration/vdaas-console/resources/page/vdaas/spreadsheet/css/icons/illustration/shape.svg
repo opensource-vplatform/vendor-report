@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>shapes</title>
+    <desc>Created with Sketch.</desc>
+    <g id="shapes" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Shapes" transform="translate(2.000000, 2.000000)">
+            <g id="Group-3" transform="translate(11.000000, 0.000000)">
+                <circle id="Oval" fill="#FFFFFF" cx="8" cy="8" r="8"></circle>
+                <path d="M8,14.8571429 C11.7870954,14.8571429 14.8571429,11.7870954 14.8571429,8 C14.8571429,4.21290457 11.7870954,1.14285714 8,1.14285714 C4.21290457,1.14285714 1.14285714,4.21290457 1.14285714,8 C1.14285714,11.7870954 4.21290457,14.8571429 8,14.8571429 Z M8,16 C3.581722,16 0,12.418278 0,8 C0,3.581722 3.581722,0 8,0 C12.418278,0 16,3.581722 16,8 C16,12.418278 12.418278,16 8,16 Z" id="Oval" fill="#367FC9" fill-rule="nonzero"></path>
+            </g>
+            <g id="Group-2" transform="translate(0.000000, 5.000000)">
+                <rect id="Rectangle" fill="#FFFFFF" x="0" y="0" width="16" height="16"></rect>
+                <path d="M1,1 L1,15 L15,15 L15,1 L1,1 Z M0,0 L16,0 L16,16 L0,16 L0,0 Z" id="Rectangle" fill="#367FC9" fill-rule="nonzero"></path>
+            </g>
+            <g id="Group" transform="translate(9.000000, 9.000000)">
+                <polygon id="Rectangle" fill="#FFFFFF" transform="translate(9.483550, 9.483550) rotate(-315.000000) translate(-9.483550, -9.483550) " points="2.77766742 2.77766742 16.1894321 2.77766742 16.1894321 16.1894321 2.77766742 16.1894321"></polygon>
+                <path d="M3.89531448,15.0717851 L15.0717851,15.0717851 L15.0717851,3.89531448 L3.89531448,3.89531448 L3.89531448,15.0717851 Z M2.77766742,2.77766742 L16.1894321,2.77766742 L16.1894321,16.1894321 L2.77766742,16.1894321 L2.77766742,2.77766742 Z" id="Rectangle" fill="#367FC9" fill-rule="nonzero" transform="translate(9.483550, 9.483550) rotate(-315.000000) translate(-9.483550, -9.483550) "></path>
+            </g>
+        </g>
+    </g>
+</svg>

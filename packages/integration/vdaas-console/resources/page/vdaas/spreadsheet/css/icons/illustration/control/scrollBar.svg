@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Scroll Bar Form Control</title>
+    <g id="Scroll-Bar-Form-Control" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形备份-15" fill="#666666" x="4" y="1" width="11" height="7"></rect>
+        <rect id="矩形备份-17" fill="#666666" x="4" y="10" width="11" height="7"></rect>
+        <rect id="矩形备份-16" fill="#FFFFFF" x="5" y="2" width="9" height="5"></rect>
+        <rect id="矩形备份-18" fill="#FFFFFF" x="5" y="11" width="9" height="5"></rect>
+        <polygon id="路径-41备份-7" fill="#666666" transform="translate(9.500000, 4.428571) scale(1, -1) translate(-9.500000, -4.428571) " points="7 3 12 3 9.50034213 5.85714286"></polygon>
+        <polygon id="路径-41备份-8" fill="#666666" points="7 12 12 12 9.50034213 14.8571429"></polygon>
+    </g>
+</svg>

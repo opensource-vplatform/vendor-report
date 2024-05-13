@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>basic shapes-right triangle</title>
+    <desc>Created with Sketch.</desc>
+    <g id="basic-shapes-right-triangle" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="3.3" transform="translate(1.000000, 1.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M1,13 L11.5857864,13 L1,2.41421356 L1,13 Z M11.5857864,13 L13,13 L13.7071068,13.7071068 L13.5857864,14 L12.5857864,14 L11.5857864,13 Z M0,1.41421356 L7.10542736e-13,0.414213562 L0.292893219,0.292893219 L1,1 L1,2.41421356 L0,1.41421356 Z M0,0 L14,14 L0,14 L0,0 Z"></path>
+        </g>
+    </g>
+</svg>

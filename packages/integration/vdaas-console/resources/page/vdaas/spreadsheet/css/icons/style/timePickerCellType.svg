@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>time picker</title>
+    <desc>Created with Sketch.</desc>
+    <g id="time-picker" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(1.000000, 1.000000)">
+            <circle id="椭圆形" fill="#FFFFFF" cx="7" cy="7" r="7"></circle>
+            <path d="M7,14 C3.13400675,14 0,10.8659932 0,7 C0,3.13400675 3.13400675,0 7,0 C10.8659932,0 14,3.13400675 14,7 C14,10.8659932 10.8659932,14 7,14 Z M7,13 C10.3137085,13 13,10.3137085 13,7 C13,3.6862915 10.3137085,1 7,1 C3.6862915,1 1,3.6862915 1,7 C1,10.3137085 3.6862915,13 7,13 Z M7.5,3 L7.5,6.79289322 L9.35355339,8.64644661 L8.64644661,9.35355339 L6.5,7.20710678 L6.5,3 L7.5,3 Z" id="形状结合" fill="#367FC9" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>

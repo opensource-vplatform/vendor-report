@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>basic shapes-trapezoid</title>
+    <desc>Created with Sketch.</desc>
+    <g id="basic-shapes-trapezoid" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="3.5" transform="translate(0.000000, 1.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M4,0 L12,0 L16,13 L0,13 L4,0 Z M4.79223633,1 L1.49291992,12 L14.503418,12 L11.1865234,1 L4.79223633,1 Z" id="3.1"></path>
+        </g>
+    </g>
+</svg>

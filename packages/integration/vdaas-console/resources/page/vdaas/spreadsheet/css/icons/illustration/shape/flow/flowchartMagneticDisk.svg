@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>flowchart-magnetic disk</title>
+    <desc>Created with Sketch.</desc>
+    <g id="flowchart-magnetic-disk" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="6.23" transform="translate(0.000000, 2.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M1,3 L1,9 C1,9.83702029 4.10127922,11 8,11 C11.8987208,11 15,9.83702029 15,9 L15,3 L16,3 L16,9 C16,10.6568542 12.418278,12 8,12 C3.581722,12 -4.03052718e-13,10.6568542 -4.54747351e-13,9 L-4.54747351e-13,3 L1,3 Z M8,5 C11.8987208,5 15,3.83702029 15,3 C15,2.16297971 11.8987208,1 8,1 C4.10127922,1 1,2.16297971 1,3 C1,3.83702029 4.10127922,5 8,5 Z M8,6 C3.581722,6 -3.97903932e-13,4.65685425 -3.97903932e-13,3 C-3.97903932e-13,1.34314575 3.581722,0 8,0 C12.418278,0 16,1.34314575 16,3 C16,4.65685425 12.418278,6 8,6 Z" id="合并形状"></path>
+        </g>
+    </g>
+</svg>

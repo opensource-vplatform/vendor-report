@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>basic shapes-corner tabs</title>
+    <desc>Created with Sketch.</desc>
+    <g id="basic-shapes-corner-tabs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="3.67" fill="#767676" fill-rule="nonzero">
+            <path d="M1,12 L3.9888916,14.9958496 L3.98474121,15 L4,15 L4,16 L-4.4408921e-16,16 L-4.4408921e-16,12 L1,12 Z M1,13.4158597 L1,15 L2.58046108,15 L1,13.4158597 Z M4,1 L1.00415039,3.9888916 L1,3.98474121 L1,4 L-2.22044605e-15,4 L-2.22044605e-15,2.79776202e-14 L4,2.79776202e-14 L4,1 Z M2.58414032,1 L1,1 L1,2.58046108 L2.58414032,1 Z M15,4 L12.0111084,1.00415039 L12.0152588,1 L12,1 L12,2.70894418e-14 L16,2.70894418e-14 L16,4 L15,4 Z M15,2.58414032 L15,1 L13.4195389,1 L15,2.58414032 Z M12,15 L14.9958496,12.0111084 L15,12.0152588 L15,12 L16,12 L16,16 L12,16 L12,15 Z M13.4158597,15 L15,15 L15,13.4195389 L13.4158597,15 Z" id="合并形状"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>stars and banners-5 point star</title>
+    <desc>Created with Sketch.</desc>
+    <g id="stars-and-banners-5-point-star" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="7.4" transform="translate(0.000000, 0.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M8,11.311386 L11.6132603,13.1839121 L10.9236308,9.22037736 L13.8289838,6.42872614 L9.81225744,5.85338129 L8,2.23368842 L6.18774256,5.85338129 L2.17101617,6.42872614 L5.07636922,9.22037736 L4.3867397,13.1839121 L8,11.311386 Z M8,12.4376941 L3.05572809,15 L4,9.57294902 L-5.55111512e-17,5.72949017 L5.52786405,4.9376941 L8,0 L10.472136,4.9376941 L16,5.72949017 L12,9.57294902 L12.9442719,15 L8,12.4376941 Z" id="Star"></path>
+        </g>
+    </g>
+</svg>

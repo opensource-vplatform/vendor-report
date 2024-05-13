@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>List Box Form Control</title>
+    <g id="List-Box-Form-Control" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="矩形备份-13" fill="#666666" x="0" y="2" width="18" height="13"></rect>
+        <rect id="矩形备份-14" fill="#367FC9" x="11" y="2" width="7" height="13"></rect>
+        <rect id="矩形备份-19" fill="#FFFFFF" x="1" y="3" width="10" height="11"></rect>
+        <rect id="矩形备份-20" fill="#FFFFFF" x="12" y="3" width="5" height="5"></rect>
+        <rect id="矩形备份-24" fill="#FFFFFF" x="12" y="9" width="5" height="5"></rect>
+        <rect id="矩形备份-21" fill="#666666" x="2" y="5" width="8" height="1"></rect>
+        <rect id="矩形备份-22" fill="#666666" x="2" y="8" width="8" height="1"></rect>
+        <rect id="矩形备份-23" fill="#666666" x="2" y="11" width="8" height="1"></rect>
+        <polygon id="路径-41备份-6" fill="#666666" points="13 11 16 11 14.5002053 13"></polygon>
+        <polygon id="路径-41备份-7" fill="#666666" transform="translate(14.500000, 5.000000) scale(1, -1) translate(-14.500000, -5.000000) " points="13 4 16 4 14.5002053 6"></polygon>
+    </g>
+</svg>

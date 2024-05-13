@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>block arrows-bent arrow</title>
+    <desc>Created with Sketch.</desc>
+    <g id="block-arrows-bent-arrow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="4.10" transform="translate(1.000000, 1.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M11,4 L4,4 C2.34314575,4 1,5.34314575 1,7 L1,14 L2.836645,14 L2.836645,7.95311525 C2.836645,6.84854575 3.7320755,5.95311525 4.836645,5.95311525 L11,5.95311525 L11,7.58578644 L13.5857864,5 L11,2.41421356 L11,4 Z M10,6.95311525 L4.836645,6.95311525 C4.28436025,6.95311525 3.836645,7.4008305 3.836645,7.95311525 L3.836645,15 L0,15 L0,7 C-2.705415e-16,4.790861 1.790861,3 4,3 L10,3 L10,0 L15,5 L10,10 L10,6.95311525 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>
