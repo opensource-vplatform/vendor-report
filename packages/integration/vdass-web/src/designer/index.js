@@ -193,25 +193,21 @@ const designer = new Designer({
                                         tableMetadata: enhanceMetadata(
                                             metadata?.data?.data?.define || []
                                         ),
-                                        excelJson: excelJson
-                                            ? excelJson.reportJson
-                                            : null,
+                                        excelJson: excelJson?.reportJson||null,
                                         datasourceSetting:
-                                            excelJson.datasourceSetting || {},
+                                            excelJson?.datasourceSetting || {},
                                         wizardSlice:
-                                            excelJson.context.wizardSlice,
+                                            excelJson?.context?.wizardSlice,
                                     });
                                 })
                                 .catch(reject);
                         } else {
                             resolve({
                                 tableMetadata: [],
-                                excelJson: excelJson
-                                    ? excelJson.reportJson
-                                    : null,
+                                excelJson: excelJson?.reportJson||null,
                                 datasourceSetting:
-                                    excelJson.datasourceSetting || {},
-                                wizardSlice: excelJson.context.wizardSlice,
+                                    excelJson?.datasourceSetting || {},
+                                wizardSlice: excelJson?.context?.wizardSlice,
                             });
                         }
                     })

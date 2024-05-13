@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>basic shapes-tear</title>
+    <desc>Created with Sketch.</desc>
+    <g id="basic-shapes-tear" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="3.14" fill="#767676" fill-rule="nonzero">
+            <path d="M7,0.0618937549 L7,0 L15,0 L16,0 L16,8 C16,12.418278 12.418278,16 8,16 C3.581722,16 0,12.418278 0,8 C0,3.92038235 3.05368842,0.553991843 7,0.0618937549 Z M7,1 L7,1.07088886 C3.60770586,1.55611852 1,4.47352809 1,8 C1,11.8659932 4.13400675,15 8,15 C11.8659932,15 15,11.8659932 15,8 L15,1 L7,1 Z"></path>
+        </g>
+    </g>
+</svg>

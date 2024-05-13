@@ -1,3 +1,5 @@
+import { getNamespace } from '@utils/spreadUtil';
+
 const CATALOGS = [
     {
         code: 'financial',
@@ -553,7 +555,7 @@ const CATALOG_FORMULA_MAP = {
     ],
 };
 
-const FORMULA_METADATAS = {
+/*const FORMULA_METADATAS = {
     ABS: {
         desc: '该函数返回指定数字的绝对值。',
         args: [
@@ -8067,7 +8069,11 @@ const FORMULA_METADATAS = {
             }
         ],
     }
-};
+};*/
+
+
+let FORMULA_METADATAS = null;
+
 
 export const getFormulasByCatalog = function (catalog) {
     return CATALOG_FORMULA_MAP[catalog];
@@ -8078,10 +8084,36 @@ export const getCatalogFormulaMap = function () {
 };
 
 export const getFormulaMetadata = function (code) {
-    return FORMULA_METADATAS[code];
+    const metadatas = getFormulaMetadatas();
+    return metadatas[code];
 };
 
 export const getFormulaMetadatas = function () {
+    if(FORMULA_METADATAS==null){
+        FORMULA_METADATAS = {};
+        const GC = getNamespace();
+        const metadatas = GC.Spread.CalcEngine.SR.zh.wmt;
+        for(let [formulaCode,metadata] of Object.entries(metadatas)){
+            const desc = metadata.description;
+            const parameters = metadata.parameters;
+            const args = [];
+            if(parameters&&parameters.length>0){
+                parameters.forEach(({name,repeatable})=>{
+                    const arg = {
+                        name
+                    };
+                    if(repeatable === true){
+                        arg.dynamic = true;
+                    }
+                    args.push();
+                });
+            }
+            FORMULA_METADATAS[formulaCode] = {
+                desc,
+                args,
+            }
+        }
+    }
     return FORMULA_METADATAS;
 };
 

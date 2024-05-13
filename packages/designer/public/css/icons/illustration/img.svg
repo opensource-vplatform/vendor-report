@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57 (83077) - https://sketch.com -->
+    <title>Image</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Image" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="编组" transform="translate(2.000000, 4.000000)">
+            <path d="M28,0 L28,24 L0,24 L0,0 L28,0 Z M27,1 L1,1 L1,23 L27,23 L27,1 Z" id="形状结合" fill="#666666"></path>
+            <polygon id="矩形" fill="#FFFFFF" points="1 1 27 1 27 23 1 23"></polygon>
+            <path d="M1,23 L1,15.3621478 L8.09179687,7.98718262 L17.389,18.2471826 L17.3896484,18 L21.9697266,12.999987 L27,17.3780518 L27,22.999974 L21.6962891,23 L17.3896484,22.999974 L1,23 Z" id="形状结合" fill="#D1EBFF"></path>
+            <path d="M8.12063572,7.2829865 L17.338,17.3219865 L22.2121253,12.1062518 L27,17.026001 L27,18.3413556 L22.1775231,13.6080339 L18.017,18.0599865 L22.5535889,23 L21.2828369,23 L8.13717678,8.71707022 L1,16.2 L1,14.7514648 L8.12063572,7.2829865 Z" id="形状结合" fill="#367FC9" fill-rule="nonzero"></path>
+            <circle id="椭圆形" fill="#FA7541" cx="21" cy="6" r="2"></circle>
+        </g>
+    </g>
+</svg>

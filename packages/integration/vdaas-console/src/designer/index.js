@@ -194,20 +194,16 @@ const designer = new Designer({
                                         tableMetadata: enhanceMetadata(
                                             metadata?.data?.data?.data?.define || []
                                         ),
-                                        excelJson: excelJson
-                                            ? excelJson.reportJson
-                                            : null,
-                                        datasourceSetting:excelJson.datasourceSetting||{},
+                                        excelJson: excelJson?.reportJson||null,
+                                        datasourceSetting:excelJson?.datasourceSetting||{},
                                     });
                                 })
                                 .catch(reject);
                         } else {
                             resolve({
                                 tableMetadata: [],
-                                excelJson: excelJson
-                                    ? excelJson.reportJson
-                                    : null,
-                                datasourceSetting:excelJson.datasourceSetting||{},
+                                excelJson: excelJson?.reportJson||null,
+                                datasourceSetting:excelJson?.datasourceSetting||{},
                             });
                         }
                     })

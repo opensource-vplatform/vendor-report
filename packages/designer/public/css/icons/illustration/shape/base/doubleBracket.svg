@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>basic shapes-double bracket</title>
+    <desc>Created with Sketch.</desc>
+    <g id="basic-shapes-double-bracket" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="3.35" transform="translate(0.000000, 1.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M5,0 L5,1 L4,1 C2.34314575,1 1,2.34314575 1,4 L1,11 C1,12.6568542 2.34314575,14 4,14 L5,14 L5,15 L4,15 C1.790861,15 2.705415e-16,13.209139 0,11 L0,4 C-2.705415e-16,1.790861 1.790861,4.05812251e-16 4,0 L5,0 Z M10,0 L11,0 C13.209139,-4.05812251e-16 15,1.790861 15,4 L15,11 C15,13.209139 13.209139,15 11,15 L10,15 L10,14 L11,14 C12.6568542,14 14,12.6568542 14,11 L14,4 C14,2.34314575 12.6568542,1 11,1 L10,1 L10,0 Z" id="3.38"></path>
+        </g>
+    </g>
+</svg>
