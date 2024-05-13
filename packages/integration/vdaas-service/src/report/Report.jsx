@@ -14,10 +14,8 @@ import {
 import { license } from '../utils/license';
 import {
   getParameter,
-  getTitle,
   registerServerFont,
 } from '../utils/utils';
-import Button from './components/button/Index';
 import Error from './components/error/Index';
 import WaitMsg from './components/loading/Index';
 
@@ -138,13 +136,14 @@ export default function () {
               console.log('导出PDF')
               Promise.all(requestFontFamily).then(()=>{
                 report.exportPdf('a.pdf', {
+                  persistence:false,
                   author: '',
                   creator: '',
                   keywords: '',
                   subject: '',
                   title: '',
                   sheetIndex: null,
-                }, false).then(blob => {
+                }).then(blob => {
                   const render = new FileReader(blob)
                   render.onload = function (e) {
                     const base64 = e.target.result

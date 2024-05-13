@@ -152,6 +152,8 @@ class Report {
     exportPdf(
         filename,
         options = {
+            //是否持久化(下载pdf)
+            persistence: true,
             author: '',
             creator: '',
             keywords: '',
@@ -165,27 +167,46 @@ class Report {
                 filename = filename.endsWith('.pdf')
                     ? filename
                     : filename + '.pdf';
-                resourceManager.loadScript(getPluginSrc('pdf')).then(() => {
+                const exportHandler = () => {
+                    const {
+                        persistence,
+                        author,
+                        creator,
+                        keywords,
+                        subject,
+                        title,
+                        sheetIndex,
+                    } = options;
                     this.spread.savePDF(
                         (data) => {
-                            download(data, filename);
-                            resolve();
+                            if (persistence) {
+                                download(data, filename);
+                            }
+                            resolve(data);
                         },
                         (err) => {
                             reject(err);
                         },
                         {
-                            author: options.auther,
-                            creator: options.application,
-                            keywords: options.keyword,
-                            subject: options.subject,
-                            title: options.title,
+                            author,
+                            creator,
+                            keywords,
+                            subject,
+                            title,
                         },
-                        options.sheetIndex == null
-                            ? undefined
-                            : options.sheetIndex
+                        sheetIndex == null ? undefined : sheetIndex
                     );
-                });
+                };
+                const GC = getNamespace();
+                if (GC.Spread.Sheets.PDF) {
+                    //已经加载了pdf插件,直接执行导出逻辑
+                    exportHandler();
+                } else {
+                    //先加载pdf插件，再进行导出
+                    resourceManager
+                        .loadScript(getPluginSrc('pdf'))
+                        .then(exportHandler);
+                }
             } else {
                 reject(Error('导出pdf失败，原因:没有传递导出文件名'));
             }
