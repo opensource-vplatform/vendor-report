@@ -101,11 +101,11 @@ const designer = new Designer({
     //datasPath: 'data/data',
     baseUrl:'../',
     nav: {
-        file: true, //隐藏文件页签页，
+        //file: true, //隐藏文件页签页，
         table: {
             tableOptions: false,
         },
-        preview: false,//禁用预览
+        //preview: false,//禁用预览
     },
     dataSource: {
         //allowToView: false, //不允许查看数据源
