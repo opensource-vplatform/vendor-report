@@ -152,7 +152,7 @@ export default function () {
                     );
                     datasourceSetting &&
                         dispatch(setSetting(datasourceSetting));
-                    wizardSlice && dispatch(initWizardSlice(wizardSlice));
+                    wizardSlice && dispatch(initWizardSlice({ wizardSlice }));
                 }
             );
         });

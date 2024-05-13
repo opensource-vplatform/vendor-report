@@ -21,7 +21,9 @@ import {
   addTemplate,
   toggleBooleanValue as _toggleBooleanValue,
 } from '@store/wizardSlice';
+import { genUUID } from '@utils/commonUtil';
 import { getNamespace } from '@utils/spreadUtil';
+import { setSheetTag } from '@utils/worksheetUtil';
 
 const GC = getNamespace();
 
@@ -64,7 +66,7 @@ const PageDisplayTypeWrapItem = styled.div`
 `;
 
 const Label = styled.span`
-    width: 220px;
+    width: 160px;
 `;
 
 const PageShowWrap = styled.div`
@@ -83,6 +85,8 @@ const Wrap = styled.div`
     overflow: hidden;
     background-color: #fff;
     user-select: none;
+    padding: 20px;
+    box-sizing: border-box;
 `;
 
 const TableWrap = styled.div`
@@ -122,17 +126,23 @@ const Clear = styled.div`
 `;
 
 function Header(props) {
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+    const sheetName = spread.getActiveSheet().name();
     const {
+        isEdit,
         onChange,
         datas = {
             isCurrentSheet: true,
             isShowHeaderAndFootor: true,
+            isCopySheet: false,
         },
     } = props;
     const [isCurrentSheet, setIsCurrentSheet] = useState(datas.isCurrentSheet);
     const [isShowHeaderAndFootor, setIsShowHeaderAndFootor] = useState(
         datas.isShowHeaderAndFootor
     );
+    const [isCopySheet, setIsCopySheet] = useState(datas.isCopySheet);
+
     const handleOnChange = function (isCurrentSheet, isShowHeaderAndFootor) {
         if (typeof onChange !== 'function') {
             return;
@@ -145,7 +155,23 @@ function Header(props) {
 
     return (
         <>
-            <PageDisplayTypeWrap>
+            {!isEdit && (
+                <PageDisplayTypeWrap>
+                    <Label>{`是否复用【${sheetName}】`}：</Label>
+                    <CheckBox
+                        value={isCopySheet}
+                        onChange={(val) => {
+                            setIsCopySheet(val);
+                            onChange({
+                                isCurrentSheet,
+                                isShowHeaderAndFootor,
+                                isCopySheet: val,
+                            });
+                        }}
+                    ></CheckBox>
+                </PageDisplayTypeWrap>
+            )}
+            <PageDisplayTypeWrap style={{ borderTop: 'none' }}>
                 <Label>分页显示方式：</Label>
                 <PageDisplayTypeWrapItem
                     onClick={function () {
@@ -154,7 +180,7 @@ function Header(props) {
                     }}
                 >
                     <CheckBox value={isCurrentSheet}></CheckBox>
-                    <span>当前工作表</span>
+                    <span>当前页签</span>
                 </PageDisplayTypeWrapItem>
                 <PageDisplayTypeWrapItem
                     onClick={function () {
@@ -163,9 +189,10 @@ function Header(props) {
                     }}
                 >
                     <CheckBox value={!isCurrentSheet}></CheckBox>
-                    <span>新的工作表</span>
+                    <span>新页签</span>
                 </PageDisplayTypeWrapItem>
             </PageDisplayTypeWrap>
+
             {/*  <PageShowWrap>
                 <Label>分页后是否显示头部与尾部：</Label>
                 <CheckBox
@@ -205,6 +232,7 @@ export default function Template(props) {
     const options = useRef({
         isCurrentSheet,
         isShowHeaderAndFootor,
+        isCopySheet: false,
     }).current;
 
     //已选数据源
@@ -249,16 +277,38 @@ export default function Template(props) {
         <Dialog
             title='模板配置'
             open={true}
-            width='50%'
-            height='50%'
+            width='600px'
             onClose={function () {
                 typeof onClose === 'function' && onClose();
             }}
         >
             <Wrap>
                 <Header
+                    isEdit={isEdit}
                     datas={options}
                     onChange={function (datas) {
+                        if (datas.isCopySheet && !options.isCopySheet) {
+                            const dsName =
+                                Object.keys(
+                                    template?.[activeSheetName]?.groups || {}
+                                )?.[0] || '';
+                            setDsName(dsName);
+                            let res = [];
+                            if (dsName) {
+                                const item = finalDsList.find(function (item) {
+                                    return item?.code === dsName;
+                                });
+                                res = Array.isArray(item?.children)
+                                    ? item?.children
+                                    : [];
+                            }
+                            setFields(res);
+                            const fieldCode =
+                                template?.[activeSheetName]?.groups?.[
+                                    dsName
+                                ]?.[0]?.code || '';
+                            setFieldCode(fieldCode);
+                        }
                         Object.assign(options, datas);
                     }}
                 ></Header>
@@ -320,14 +370,16 @@ export default function Template(props) {
                         ></Select>
                     </TableHeaderWrap>
                 </TableWrap>
-                <FooterWrap style={{ marginTop: 'auto' }}>
+                <FooterWrap style={{ marginTop: '20px' }}>
                     <Button
                         type='primary'
                         style={{ height: '30px' }}
                         onClick={function () {
-                            const activeSheetName = spread
-                                .getActiveSheet()
-                                .name();
+                            const activeSheet = spread.getActiveSheet();
+                            const activeSheetName = activeSheet.name();
+                            const cobySheet = JSON.parse(
+                                JSON.stringify(activeSheet)
+                            );
                             let sheetName = '';
                             if (isEdit) {
                                 sheetName = activeSheetName;
@@ -337,7 +389,20 @@ export default function Template(props) {
                                     spread.sheets.length,
                                     new GC.Spread.Sheets.Worksheet(sheetName)
                                 );
+                                cobySheet.name = sheetName;
                                 spread.setActiveSheet(sheetName);
+                                const activeSheet = spread.getActiveSheet();
+                                if (options.isCopySheet) {
+                                    activeSheet.fromJSON(cobySheet);
+                                    setSheetTag(
+                                        activeSheet,
+                                        'instanceId',
+                                        genUUID()
+                                    );
+                                } else {
+                                    activeSheet.setRowCount(20);
+                                    activeSheet.setColumnCount(20);
+                                }
                             }
                             const field = fields.find(function (item) {
                                 return item?.code === fieldCode;
