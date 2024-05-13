@@ -172,6 +172,9 @@ export default class Render {
         this.tempConfig = tempConfig;
         this.newSheets = {};
         this.setting = setting;
+        this.templatesPageInfos = {};
+        this.delayPlugins = [];
+        this.delayFormula = [];
 
         //如果有模板，则对数据进行分组，每个组一个sheet
         this.groupTemplate();
@@ -189,6 +192,17 @@ export default class Render {
             newSheets[sheet.name] = sheet;
         });
         reportJson.sheets = newSheets;
+
+        //总页数需延后渲染
+        while (this.delayPlugins.length) {
+            const pluginHandler = this.delayPlugins.pop();
+            pluginHandler();
+        }
+        //总页数需延后渲染
+        while (this.delayFormula.length) {
+            const formulaHandler = this.delayFormula.pop();
+            formulaHandler();
+        }
     }
     render(pageInfos) {
         const { headerTemplates, footerTemplates, contentTemplates } = this;
@@ -272,17 +286,6 @@ export default class Render {
                 templates: headerTemplates,
                 pageInfos,
             });
-        }
-        debugger;
-        //总页数需延后渲染
-        while (pageInfos.delayPlugins.length) {
-            const pluginHandler = pageInfos.delayPlugins.pop();
-            pluginHandler();
-        }
-        //总页数需延后渲染
-        while (pageInfos.delayFormula.length) {
-            const formulaHandler = pageInfos.delayFormula.pop();
-            formulaHandler();
         }
         resetSheet(pageInfos);
     }
@@ -536,6 +539,7 @@ export default class Render {
                 return;
             }
             const templateInfo = template[sheetName];
+
             const currentSheetDatas = {};
             //对数据进行分组，分组的名称就是sheet的名称
             Object.entries(groups).some(function ([dsName, group]) {
@@ -605,7 +609,11 @@ export default class Render {
                         reportJson.sheets[newSheetName] = sheet;
                         reportJson.sheetCount += 1;
                     }
-                    template[newSheetName] = templateInfo;
+
+                    template[newSheetName] = {
+                        ...templateInfo,
+                        fromTempSheet: sheetName,
+                    };
                 });
             }
             //只支持一个实体进行分组
@@ -623,7 +631,8 @@ export default class Render {
                 visible = 1,
                 data,
                 printInfo: {
-                    paperSize: { height = 1100 },
+                    paperSize: { height = 1100, width = 850 },
+                    orientation,
                     margin = {
                         bottom: 75,
                         footer: 30,
@@ -639,12 +648,13 @@ export default class Render {
             if (visible === 0) {
                 return;
             }
-
             const {
                 bottom: marginBottom,
                 footer: marginFooter,
                 header: marginHeader,
                 top: marginTop,
+                left: marginLeft,
+                right: marginRight,
             } = margin;
 
             const templateInfo = this.template[name];
@@ -660,9 +670,35 @@ export default class Render {
 
             this.splitTemplate(sheet, pageArea);
 
-            const pageTotalHeight =
-                height - marginBottom - marginFooter - marginHeader - marginTop;
+            let pageTotalHeight = 0;
+            if (orientation === 2) {
+                pageTotalHeight =
+                    width -
+                    marginLeft -
+                    marginFooter -
+                    marginHeader -
+                    marginRight;
+            } else {
+                pageTotalHeight =
+                    height -
+                    marginBottom -
+                    marginFooter -
+                    marginHeader -
+                    marginTop;
+            }
+
             const isTemplate = templateInfo ? true : false;
+            const fromTempSheet = templateInfo?.fromTempSheet;
+            if (isTemplate && !this.templatesPageInfos[fromTempSheet]) {
+                this.templatesPageInfos[fromTempSheet] = {
+                    pageIndex: 0,
+                    pageTotal: 0,
+                };
+            }
+
+            this.templatesPageInfos[fromTempSheet].pageIndex += 1;
+            this.templatesPageInfos[fromTempSheet].pageTotal += 1;
+
             const pageInfos = {
                 sheet,
 
@@ -679,13 +715,12 @@ export default class Render {
                 pageTotalHeight,
                 pageHeight: 0,
 
-                delayPlugins: [],
-                delayFormula: [],
                 isFillData,
                 isCurrentSheet: templateInfo?.isCurrentSheet,
                 isTemplate,
                 cobySheet: JSON.stringify(sheet),
                 page: {},
+                fromTempSheet,
             };
 
             this.render(pageInfos);
@@ -855,7 +890,7 @@ export default class Render {
                                         }
 
                                         if (isDelay) {
-                                            pageInfos.delayPlugins.push(
+                                            this.delayPlugins.push(
                                                 pluginHandler
                                             );
                                         } else {
@@ -864,19 +899,36 @@ export default class Render {
                                     }
                                 }
 
+                                let pageIndex = pageInfos.pageIndex;
+                                const { fromTempSheet } = pageInfos;
+                                if (this.templatesPageInfos[fromTempSheet]) {
+                                    pageIndex =
+                                        this.templatesPageInfos[fromTempSheet]
+                                            .pageIndex;
+                                }
+
                                 //先执行插件，后执行函数
-                                const pageHandler = genPageIndexHandler(
-                                    pageInfos.pageIndex
-                                );
+                                const pageHandler =
+                                    genPageIndexHandler(pageIndex);
 
                                 if (formula) {
                                     const formulaHandler = () => {
                                         //当前页
                                         tool.setPageHandler(pageHandler);
                                         //总页数
-                                        tool.setTotalPagesHandler(
-                                            () => pageInfos.pageTotal
-                                        );
+                                        tool.setTotalPagesHandler(() => {
+                                            if (
+                                                this.templatesPageInfos[
+                                                    fromTempSheet
+                                                ]
+                                            ) {
+                                                return this.templatesPageInfos[
+                                                    fromTempSheet
+                                                ].pageTotal;
+                                            } else {
+                                                return pageInfos.pageTotal;
+                                            }
+                                        });
 
                                         tool.setValueHandler((...args) => {
                                             if (args.length === 1) {
@@ -904,7 +956,7 @@ export default class Render {
                                             type === 'formula' ? type : 'value';
                                         colDataTable[key] = value;
                                     };
-                                    pageInfos.delayFormula.push(formulaHandler);
+                                    this.delayFormula.push(formulaHandler);
                                 }
                             }
                         );
@@ -985,5 +1037,9 @@ export default class Render {
         pageInfos.pageHeight = initHeight;
         pageInfos.pageIndex += 1;
         pageInfos.pageTotal += 1;
+        if (pageInfos?.fromTempSheet) {
+            this.templatesPageInfos[pageInfos?.fromTempSheet].pageIndex += 1;
+            this.templatesPageInfos[pageInfos?.fromTempSheet].pageTotal += 1;
+        }
     }
 }
