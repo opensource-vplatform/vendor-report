@@ -19,6 +19,11 @@ export default function Index(props) {
     const sheet = spread.getActiveSheet();
     const range = getSheetTag(sheet, 'pageArea');
     const isFillData = getSheetTag(sheet, 'isFillData');
+    const groupSumRange = getSheetTag(sheet, 'groupSumArea');
+
+    const { template } = useSelector(({ wizardSlice }) => wizardSlice);
+    const activeSheetName = spread.getActiveSheet().name();
+    const isTemplate = !!template?.[activeSheetName];
 
     const clickHandler = function (datas) {
         setShow(!show);
@@ -27,6 +32,8 @@ export default function Index(props) {
     const onConfirmHandler = function (datas) {
         setSheetTag(sheet, 'pageArea', datas.range);
         setSheetTag(sheet, 'isFillData', datas.isFillData);
+        setSheetTag(sheet, 'groupSumArea', datas.groupSumRange);
+
         setShow(false);
     };
 
@@ -38,6 +45,8 @@ export default function Index(props) {
                     onCancel={clickHandler}
                     range={range}
                     isFillData={isFillData}
+                    isTemplate={isTemplate}
+                    groupSumRange={groupSumRange}
                 ></PageSettings>
             )}
             <GroupItem title='分页设置'>

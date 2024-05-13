@@ -18,6 +18,7 @@ const Wrap = styled.div`
 
 const Text = styled.div`
     font-size: 12px;
+    width: 85px;
 `;
 
 const HLayout = styled.div`
@@ -27,6 +28,7 @@ const HLayout = styled.div`
 `;
 
 const Default_Info = '选择需要分页的区域';
+const Default_Group_Sum_Range_Info = '选择分组汇总区域';
 const REG = /^\d+:\d+$/;
 
 export default function (props) {
@@ -36,6 +38,8 @@ export default function (props) {
         onCancel,
         range,
         isFillData = false,
+        groupSumRange,
+        isTemplate = false,
     } = props;
 
     const [data, setData] = useState(() => {
@@ -44,34 +48,89 @@ export default function (props) {
             range,
             domId: genUUID(),
             visible: true,
-            error: false,
-            message: Default_Info,
+            rangeError: false,
+            rangeMessage: Default_Info,
             isFillData,
+            groupSumRange,
+            groupSumRangeError: false,
+            groupSumRangeMessage: Default_Group_Sum_Range_Info,
         };
     });
 
+    debugger;
     const handleConfirm = () => {
+        let isError = false;
+        let checkedResult = {};
+        debugger;
+        //校验分页区域正确性
         const rangeStr = data.range;
-        if (rangeStr) {
-            if (typeof onConfirm === 'function') {
-                onConfirm({
-                    range: rangeStr,
-                    isFillData: data.isFillData,
-                });
-            }
-        } else {
+        if (rangeStr && !REG.test(rangeStr)) {
+            checkedResult.rangeError = true;
+            isError = true;
+        }
+
+        //校验分组汇总区域正确性
+        const groupSumRangeStr = data.groupSumRange;
+        if (groupSumRangeStr && !REG.test(groupSumRangeStr)) {
+            checkedResult.groupSumRangeError = true;
+            isError = true;
+        }
+
+        if (isError) {
             setData((data) => {
                 return {
                     ...data,
-                    message: Default_Info,
-                    error: true,
+                    ...checkedResult,
                 };
+            });
+            return;
+        }
+
+        if (typeof onConfirm === 'function') {
+            onConfirm({
+                range: rangeStr,
+                groupSumRange: groupSumRangeStr,
+                isFillData: data.isFillData,
             });
         }
     };
     const handleCancel = () => {
         onCancel && onCancel();
     };
+
+    const handleRangeOnChange = function (key, val) {
+        if (isString(val)) {
+            val = val.trim();
+            val = val.startsWith('=') ? val.substring(1) : val;
+            let isError = REG.test(val);
+            setData((data) => {
+                return {
+                    ...data,
+                    [`${key}Error`]: !isError,
+                    [key]: val,
+                };
+            });
+        }
+    };
+
+    const onRangeEndSelect = function (a, b, c) {
+        setData((data) => {
+            return {
+                ...data,
+                visible: true,
+            };
+        });
+    };
+
+    const onRangeStartSelect = function () {
+        setData((data) => {
+            return {
+                ...data,
+                visible: false,
+            };
+        });
+    };
+
     return data.visible ? (
         <OperationDialog
             title='分页设置'
@@ -100,54 +159,50 @@ export default function (props) {
                     ></InfoIcon>
                 </HLayout>
                 <HLayout>
-                    <Text>分页范围：</Text>
+                    <Text>分页区域：</Text>
                     <Range
                         value={data.range}
                         hostId={data.domId}
-                        error={data.error}
+                        error={data.rangeError}
                         selectionType='row'
-                        onStartSelect={() =>
-                            setData((data) => {
-                                return {
-                                    ...data,
-                                    visible: false,
-                                };
-                            })
-                        }
-                        onEndSelect={() =>
-                            setData((data) => {
-                                return {
-                                    ...data,
-                                    visible: true,
-                                };
-                            })
-                        }
+                        onStartSelect={onRangeStartSelect}
+                        onEndSelect={onRangeEndSelect}
                         onChange={(val) => {
-                            if (isString(val)) {
-                                val = val.trim();
-                                val = val.startsWith('=')
-                                    ? val.substring(1)
-                                    : val;
-                                let range = '';
-                                const matchs = val.match(REG);
-                                if (matchs && matchs.length > 0) {
-                                    range = matchs[0];
-                                }
-                                setData((data) => {
-                                    return {
-                                        ...data,
-                                        error: !range,
-                                        range,
-                                    };
-                                });
-                            }
+                            handleRangeOnChange('range', val);
                         }}
                     ></Range>
                     <InfoIcon
-                        iconStyle={{ color: data.error ? 'red' : '#228ee5' }}
-                        tips={data.message}
+                        iconStyle={{
+                            color: data.rangeError ? 'red' : '#228ee5',
+                        }}
+                        tips={data.rangeMessage}
                     ></InfoIcon>
                 </HLayout>
+
+                {isTemplate && false && (
+                    <HLayout>
+                        <Text>分组汇总区域：</Text>
+                        <Range
+                            value={data.groupSumRange}
+                            hostId={data.domId}
+                            error={data.groupSumRangeError}
+                            selectionType='row'
+                            onStartSelect={onRangeStartSelect}
+                            onEndSelect={onRangeEndSelect}
+                            onChange={(val) => {
+                                handleRangeOnChange('groupSumRange', val);
+                            }}
+                        ></Range>
+                        <InfoIcon
+                            iconStyle={{
+                                color: data.groupSumRangeError
+                                    ? 'red'
+                                    : '#228ee5',
+                            }}
+                            tips={data.groupSumRangeMessage}
+                        ></InfoIcon>
+                    </HLayout>
+                )}
             </Wrap>
         </OperationDialog>
     ) : null;

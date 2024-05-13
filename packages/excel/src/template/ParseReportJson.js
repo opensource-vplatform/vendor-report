@@ -290,7 +290,7 @@ export default class Render {
         resetSheet(pageInfos);
     }
 
-    splitTemplate(sheet, pageArea) {
+    splitTemplate({ sheet, pageArea, groupSumArea }) {
         const { rowCount = 200 } = sheet;
 
         //头部区域模板
@@ -300,15 +300,25 @@ export default class Render {
         //表格区域模板
         const contentTemplates = [];
 
+        const REG = /^\d+:\d+$/;
         //分页区域范围
         let pageAreaStartRow = rowCount;
         let pageAreaEndRow = rowCount;
-        const REG = /^\d+:\d+$/;
-        const isSetPageArea = pageArea && REG.test(pageArea);
-        if (isSetPageArea) {
+
+        if (pageArea && REG.test(pageArea)) {
             const res = pageArea.split(':');
             pageAreaStartRow = Number(res[0]) - 1;
             pageAreaEndRow = Number(res[1]);
+        }
+
+        //分组汇总区域范围
+        let groupSumAreaStartRow = rowCount;
+        let groupSumAreaEndRow = rowCount;
+
+        if (groupSumArea && REG.test(groupSumArea)) {
+            const res = groupSumArea.split(':');
+            groupSumAreaStartRow = Number(res[0]) - 1;
+            groupSumAreaEndRow = Number(res[1]);
         }
 
         let template = null;
@@ -318,6 +328,11 @@ export default class Render {
                 row,
                 sheet,
             });
+
+            //判断当前行是否属于分组汇总区域
+            if (row >= groupSumAreaStartRow && row < groupSumAreaEndRow) {
+                rowTemplate.isGroupSumArea = true;
+            }
 
             //当前行与上一行存在合并关系，这两行作为一个模板
             if (template && row < template.endRow) {
@@ -334,6 +349,10 @@ export default class Render {
                     }
                     template.datas.set(tableCode, value);
                 });
+
+                if (rowTemplate.isGroupSumArea) {
+                    template.isGroupSumArea = rowTemplate.isGroupSumArea;
+                }
             } else {
                 template = rowTemplate;
             }
@@ -404,6 +423,7 @@ export default class Render {
         this.headerTemplates = headerTemplates;
         this.footerTemplates = footerTemplates;
         this.contentTemplates = contentTemplates;
+        debugger;
     }
     setTemplateDatas(template, tableCode, sheetName) {
         let ds = this.datas?.[tableCode] || [];
@@ -451,6 +471,7 @@ export default class Render {
             dataTables: [dataTableInfos],
             dataLen: 0,
             height: 0,
+            isGroupSumArea: false,
         };
 
         //当前行的合并信息
@@ -660,15 +681,21 @@ export default class Render {
             const templateInfo = this.template[name];
             let pageArea = '';
             let isFillData = false;
+            let groupSumArea = '';
             const sheetTag = data?.defaultDataNode?.tag;
             if (sheetTag) {
                 const res = JSON.parse(sheetTag);
                 pageArea = res?.pageArea || '';
                 isFillData = res?.isFillData;
+                groupSumArea = res?.groupSumArea || '';
             }
             //以分页区域为边界，对模板进行拆分成头部区模板，内容区模板，底部区模板
 
-            this.splitTemplate(sheet, pageArea);
+            this.splitTemplate({
+                sheet,
+                pageArea,
+                groupSumArea,
+            });
 
             let pageTotalHeight = 0;
             if (orientation === 2) {
@@ -689,15 +716,17 @@ export default class Render {
 
             const isTemplate = templateInfo ? true : false;
             const fromTempSheet = templateInfo?.fromTempSheet;
-            if (isTemplate && !this.templatesPageInfos[fromTempSheet]) {
-                this.templatesPageInfos[fromTempSheet] = {
-                    pageIndex: 0,
-                    pageTotal: 0,
-                };
-            }
+            if (isTemplate) {
+                if (!this.templatesPageInfos[fromTempSheet]) {
+                    this.templatesPageInfos[fromTempSheet] = {
+                        pageIndex: 0,
+                        pageTotal: 0,
+                    };
+                }
 
-            this.templatesPageInfos[fromTempSheet].pageIndex += 1;
-            this.templatesPageInfos[fromTempSheet].pageTotal += 1;
+                this.templatesPageInfos[fromTempSheet].pageIndex += 1;
+                this.templatesPageInfos[fromTempSheet].pageTotal += 1;
+            }
 
             const pageInfos = {
                 sheet,
