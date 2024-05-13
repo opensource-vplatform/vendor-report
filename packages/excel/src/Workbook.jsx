@@ -393,6 +393,13 @@ export default function (props) {
         }
     };
 
+    const customRegister = ()=>{
+        //必须每次都注册，否则spread填充json后，自定义函数注册被清空
+        data.spread.suspendEvent();
+        register(data.spread);
+        data.spread.resumeEvent();
+    }
+
     useEffect(() => {
         (async () => {
             const inited = await initSpread();
@@ -410,14 +417,15 @@ export default function (props) {
                     if (promise && promise.then) {
                         promise.then((json) => {
                             handleSheets(json);
+                            customRegister();
                         });
                     }
+                }else{
+                    customRegister();
                 }
+            }else{
+                customRegister();
             }
-            //必须每次都注册，否则spread填充json后，自定义函数注册被清空
-            data.spread.suspendEvent();
-            register(data.spread);
-            data.spread.resumeEvent();
         })();
     }, [
         json,
