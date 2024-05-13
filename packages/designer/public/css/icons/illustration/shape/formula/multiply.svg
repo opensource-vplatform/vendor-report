@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>equation shapes-multiply</title>
+    <desc>Created with Sketch.</desc>
+    <g id="equation-shapes-multiply" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="5.3" transform="translate(2.000000, 2.000000)" fill="#767676" fill-rule="nonzero">
+            <path d="M2.88888889,1.41421356 L1.41421356,2.88888889 L5.02532467,6.5 L1.41421356,10.1111111 L2.88888889,11.5857864 L6.5,7.97467533 L10.1111111,11.5857864 L11.5857864,10.1111111 L7.97467533,6.5 L11.5857864,2.88888889 L10.1111111,1.41421356 L6.5,5.02532467 L2.88888889,1.41421356 Z M6.5,3.61111111 L10.1111111,1.3607468e-15 L13,2.88888889 L9.38888889,6.5 L13,10.1111111 L10.1111111,13 L6.5,9.38888889 L2.88888889,13 L0,10.1111111 L3.61111111,6.5 L0,2.88888889 L2.88888889,0 L6.5,3.61111111 Z" id="Combined-Shape"></path>
+        </g>
+    </g>
+</svg>

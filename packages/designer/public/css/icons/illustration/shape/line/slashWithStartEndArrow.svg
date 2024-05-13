@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>lines-line double arrow</title>
+    <desc>Created with Sketch.</desc>
+    <g id="lines-line-double-arrow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="1.3" transform="translate(1.000000, 1.000000)" fill="#707070" fill-rule="nonzero">
+            <path d="M1.56847212,1 L13,12.4315279 L13,10 L14,10 L14,14 L13,14 L10,14 L10,13 L12.4315279,13 L1,1.56847212 L1,4 L-7.83751785e-16,4 L-7.83751785e-16,0 L1,0 L4,0 L4,1 L1.56847212,1 Z" id="合并形状"></path>
+        </g>
+    </g>
+</svg>

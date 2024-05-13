@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>No Cell Icon13</title>
+    <desc>Created with Sketch.</desc>
+    <g id="No-Cell-Icon13" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Yellow-Down-Right" transform="translate(8.000000, 8.000000) rotate(-270.000000) translate(-8.000000, -8.000000) ">
+            <path d="m3.68470413 0-3.68470413 3.68393628 6.26274656.3689147-5.89385932 5.89429804 3.68470413 3.68497838 5.89385932-5.89429801.36888721 6.26217061 3.6836621-3.6839363v-10.3160637z" id="Combined-Shape-Copy-21" stroke="#EE8815" fill="#EAC282"></path>
+            <path d="m14 0v10.3160637l-3.6836621 3.6839363-.36888721-6.26217061-5.89385932 5.89429801-3.68470413-3.68497838 5.89385932-5.89429804-6.26274656-.3689147 3.68470413-3.68393628zm-1 1h-8.902l-1.816 1.816 6.26218547.36950844-6.76118547 6.76149156 2.27 2.271 6.761778-6.7618287.368222 6.2618287 1.817-1.818z" id="Combined-Shape-Copy-21" fill="#B89851" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>

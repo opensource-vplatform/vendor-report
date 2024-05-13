@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>calculation</title>
+    <desc>Created with Sketch.</desc>
+    <g id="calculation" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Calculation" transform="translate(1.000000, 1.000000)">
+            <g id="分组-5">
+                <path d="M4,13 L1,13 L1,11 L0,11 L0,-8.8817842e-16 L14,-8.8817842e-16 L14,3 L4,3 L4,13 Z" id="合并形状" fill="#FFFFFF"></path>
+                <path d="M4,12 L4,13 L1,13 L1,11 L0,11 L0,0 L14,0 L14,3 L13,3 L13,1 L1,1 L1,10 L2,10 L2,12 L4,12 Z" id="合并形状" fill="#666666" fill-rule="nonzero"></path>
+                <path d="M4,9 L1,9 L1,8 L4,8 L4,9 Z M4,6 L1,6 L1,5 L4,5 L4,6 Z M4,3 L1,3 L1,2 L4,2 L4,1 L5,1 L5,2 L9,2 L9,1 L10,1 L10,2 L13,2 L13,3 L10,3 L9,3 L5,3 L4,3 Z" id="合并形状" fill="#BBBBBB"></path>
+            </g>
+            <g id="分组-4" transform="translate(5.000000, 4.000000)">
+                <rect id="矩形" fill="#FFFFFF" x="0" y="0" width="9" height="10"></rect>
+                <path d="M1,1 L1,9 L8,9 L8,1 L1,1 Z M0,0 L9,0 L9,10 L0,10 L0,0 Z" id="矩形" fill="#367FC9" fill-rule="nonzero"></path>
+            </g>
+            <g id="分组-2" transform="translate(7.000000, 6.000000)">
+                <rect id="矩形" fill="#367FC9" x="0" y="0" width="5" height="2"></rect>
+                <rect id="矩形-copy-6" fill="#888888" x="0" y="3" width="1" height="1"></rect>
+                <rect id="矩形-copy-10" fill="#888888" x="0" y="5" width="1" height="1"></rect>
+                <rect id="矩形-copy-8" fill="#888888" x="2" y="3" width="1" height="1"></rect>
+                <rect id="矩形-copy-11" fill="#888888" x="2" y="5" width="1" height="1"></rect>
+                <rect id="矩形-copy-9" fill="#FA7541" x="4" y="3" width="1" height="1"></rect>
+                <rect id="矩形-copy-12" fill="#FA7541" x="4" y="5" width="1" height="1"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

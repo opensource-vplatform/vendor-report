@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="32" height="32" fill="rgb(0,0,0,0)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2 30H13V20H17V15H24V7.5L16.5 0H2V30Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M16 0.9375V8H23V15H24V7.5L16.5 0H2V30H13V29.0625H3V0.9375H16ZM17 2L22 7H17V2Z" fill="#666666"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M4 28L4 27V3V2H5H16V3L5 3L5 27H13V28H5H4ZM22 15V8H21V15H22Z" fill="#367FC9"/>
+<path d="M18 16H26V22H18V16Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M25 17H19V21H25V17ZM18 16V22H26V16H18Z" fill="#666666"/>
+<path d="M14 21H30V28H14V21Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M29 22H15V27H29V22ZM14 21V28H30V21H14Z" fill="#666666"/>
+<path d="M18 26H26V32H18V26Z" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M25 27H19V31H25V27ZM18 26V32H26V26H18Z" fill="#666666"/>
+<rect x="16" y="23" width="1" height="1" fill="#666666"/>
+</svg>
