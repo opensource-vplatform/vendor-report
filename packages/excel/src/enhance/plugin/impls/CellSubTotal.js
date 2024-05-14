@@ -28,33 +28,33 @@ class CellSubTotal extends Plugin {
             });
             return result;
         };
-        let value = null;
+        let rest = null;
         switch (functionNum) {
             case 101:
                 //平均值
-                value = div(sum(filter()), values.length);
+                rest = div(sum(filter()), values.length);
                 break;
             case 103:
                 //计数
-                value = values.length;
+                rest = values.length;
                 break;
             case 102:
                 //数值计数
-                value = filter().length;
+                rest = filter().length;
                 break;
             case 104:
                 //最大值
-                value = max(filter());
+                rest = max(filter());
                 break;
             case 105:
                 //最小值
-                value = min(filter());
+                rest = min(filter());
                 break;
             case 109:
                 //求和
-                value = sum(filter());
+                rest = sum(filter());
         }
-        return { type: 'text', value };
+        return { type: 'text', value:rest };
     }
 
     /**
