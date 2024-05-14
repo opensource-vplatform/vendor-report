@@ -41,20 +41,21 @@ export default function () {
             {opened ? (
                 <SortSetting
                     onConfirm={({ sortType, conditions }) => {
-                        const sorts = conditions.map(({index,sortBy,sort,color}) => {
-                            debugger;
-                            const data = {index};
-                            if(sortBy=='foreColor'){
-                                data.fontColor = rgbStrToHex(color);
-                                data.order = sort;
-                            }else if(sortBy=='backColor'){
-                                data.backColor = rgbStrToHex(color);
-                                data.order = sort;
-                            }else if(sortBy=='value'){
-                                data.ascending = sort=='asc';
+                        const sorts = conditions.map(
+                            ({ index, sortBy, sort, color }) => {
+                                const data = { index };
+                                if (sortBy == 'foreColor') {
+                                    data.fontColor = rgbStrToHex(color);
+                                    data.order = sort;
+                                } else if (sortBy == 'backColor') {
+                                    data.backColor = rgbStrToHex(color);
+                                    data.order = sort;
+                                } else if (sortBy == 'value') {
+                                    data.ascending = sort == 'asc';
+                                }
+                                return data;
                             }
-                            return data;
-                        });
+                        );
                         sortSelection(spread, sortType == 'sortByCol', sorts);
                         setOpened(false);
                     }}

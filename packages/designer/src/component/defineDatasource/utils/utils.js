@@ -7,6 +7,7 @@ import {
   showTab,
 } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
+import { BindingPathCellType } from '@utils/cellUtil';
 import {
   findTreeNodeById,
   genUUID,
@@ -22,73 +23,9 @@ import {
   setCellTag,
 } from '@utils/worksheetUtil.js';
 
+const bindingPathCellType = new BindingPathCellType();
+
 const GC = getNamespace();
-
-export function newTable(params) {
-    const {
-        columnsTemp,
-        sheet,
-        dispatch,
-        row,
-        col,
-        dataPath,
-        addingMode = 'drag',
-        groups = [],
-        sumColumns = [],
-        rowMergeColumns = [],
-        colMergeColumns = [],
-        dsName = '',
-    } = params;
-
-    const sheetJson = sheet.toJSON();
-    sheetJson.data = sheetJson.data || {};
-    sheetJson.data.dataTable = sheetJson.data.dataTable || {};
-    const dataTable = sheetJson.data.dataTable;
-    const rowDataTable = (dataTable[row] = dataTable[row]
-        ? dataTable[row]
-        : {});
-
-    debugger;
-    const spans = sheetJson.spans || [];
-    const currentRowSpans =
-        spans.filter(function ({ row: _row }) {
-            return _row === row;
-        }) || [];
-
-    const sheetInstanceId = getSheetInstanceId(sheet);
-    const tableName = `tableName_${genUUID()}`;
-
-    let index = 0;
-    columnsTemp.forEach(function ({ code, name }) {
-        const newCol = col + index;
-        rowDataTable[newCol] = rowDataTable[newCol] ? rowDataTable[newCol] : {};
-        rowDataTable[newCol].bindingPath = `${dataPath}.${code}`;
-        rowDataTable[newCol].value = `[${dsName}.${name}]`;
-        rowDataTable[newCol].tag = JSON.stringify({
-            instanceId: sheetInstanceId,
-            tableInfo: {
-                tableName,
-                dsName,
-                dsCode: dataPath,
-                fieldCode: code,
-            },
-        });
-
-        const currentColSpan = currentRowSpans.find(function ({ col }) {
-            return newCol === col;
-        }) || { colCount: 1 };
-
-        index += currentColSpan.colCount;
-    });
-
-    const diff = col + columnsTemp.length - sheetJson.columnCount;
-    if (diff > 0) {
-        sheetJson.columnCount += diff;
-    }
-    sheet.fromJSON(sheetJson);
-    formatBindingPathCellType(sheet);
-    debugger;
-}
 
 export function addTable(params) {
     /*  test(params);
@@ -539,49 +476,6 @@ export function getCellInfo(params) {
     return { cell, col, row, rowCount, colCount };
 }
 
-export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
-    constructor() {
-        super();
-    }
-
-    paint(ctx, value, x, y, w, h, style, context) {
-        if (value === null || value === undefined) {
-            let sheet = context.sheet,
-                row = context.row,
-                col = context.col;
-            if (sheet && (row === 0 || !!row) && (col === 0 || !!col)) {
-                let bindingPath = sheet.getBindingPath(
-                    context.row,
-                    context.col
-                );
-                if (bindingPath) {
-                    value = '[' + bindingPath + ']';
-                }
-            }
-        }
-        super.paint(ctx, value, x, y, w, h, style, context);
-    }
-}
-
-export function formatBindingPathCellType(sheet) {
-    const dataTable = sheet.toJSON().data.dataTable;
-    if (!dataTable) {
-        return;
-    }
-    sheet.suspendPaint();
-    const bindingPathCellType = new BindingPathCellType();
-    Object.entries(dataTable).forEach(([rowStr, colValue]) => {
-        const row = Number(rowStr);
-        Object.entries(colValue).forEach(([colStr, { bindingPath }]) => {
-            if (bindingPath) {
-                const col = Number(colStr);
-                sheet.getCell(row, col).cellType(bindingPathCellType);
-            }
-        });
-    });
-    sheet.resumePaint();
-}
-
 const decorationContainerClass = 'decorationContainer';
 const decorationContainerSelector = '.decorationContainer';
 const decorationSelector = '.decoration';
@@ -730,4 +624,55 @@ function _createHighlightOneBlock() {
 export function removeHighlightOneBlock() {
     const container = document.querySelector(decorationContainerSelector);
     container && container.remove();
+}
+
+export function bindingPath(params) {
+    const { sheet, value, path, row, col } = params;
+    const cell = sheet.getCell(row, col);
+    cell.value(value);
+    cell.bindingPath(path).cellType(bindingPathCellType);
+
+    let style = sheet.getStyle(row, col);
+    if (!style) {
+        style = new GC.Spread.Sheets.Style();
+    }
+
+    style.decoration = {
+        cornerFold: {
+            size: 8,
+            position: 8,
+            color: 'blue',
+        },
+    };
+    sheet.setStyle(row, col, style);
+}
+
+export function bindingTablePathHandler(params) {
+    const { columnsTemp, row, col, dataPath, dsName = '', sheet } = params;
+
+    let columnCount = sheet.getColumnCount();
+    const diff = col + columnsTemp.length - columnCount;
+    if (diff > 0) {
+        columnCount += diff;
+        sheet.setColumnCount(columnCount);
+    }
+
+    let index = 0;
+    sheet.suspendPaint();
+    columnsTemp.forEach(function ({ code, name }) {
+        const newCol = col + index;
+        bindingPath({
+            sheet,
+            row,
+            col: newCol,
+            value: `[${dsName}.${name}]`,
+            path: `${dataPath}.${code}`,
+        });
+
+        const span = sheet.getSpan(row, newCol) || {
+            colCount: 1,
+        };
+        index += span.colCount;
+    });
+    sheet.resumePaint();
 }

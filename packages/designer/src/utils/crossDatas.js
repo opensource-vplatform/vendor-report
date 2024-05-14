@@ -199,8 +199,6 @@ export default class Main {
                 colCount: this.rowFields.length,
             });
         }
-
-        debugger;
     }
 
     handleGroupedDatas(groupedDatas, result = []) {

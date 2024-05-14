@@ -204,7 +204,7 @@ export default function (props) {
             id: genUUID(),
             field: '',
             operator: '=',
-            value: '李四',
+            value: '',
             fillQuantity: 15,
             isStopWhileTrue: false,
         });
@@ -292,7 +292,6 @@ export default function (props) {
                                 };
                             })}
                             onChange={(val) => {
-                                debugger;
                                 const conditions = updateCondition(
                                     row.id,
                                     'field',

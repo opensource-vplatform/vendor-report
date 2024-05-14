@@ -51,7 +51,7 @@ const FooterWrap = styled.div`
 `;
 
 const PageDisplayTypeWrap = styled.div`
-    height: 50px;
+    height: 40px;
     border-top: 1px solid #ddd;
     display: flex;
     align-items: center;
@@ -87,6 +87,7 @@ const Wrap = styled.div`
     user-select: none;
     padding: 20px;
     box-sizing: border-box;
+    font-size: 14px;
 `;
 
 const TableWrap = styled.div`
@@ -218,7 +219,6 @@ export default function Template(props) {
 
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const activeSheetName = spread.getActiveSheet().name();
-    debugger;
 
     //分页后是在当前sheet中显示还是在新的sheet中显示
     const isCurrentSheet = isEdit
@@ -314,7 +314,7 @@ export default function Template(props) {
                 ></Header>
                 <TableWrap>
                     <TableHeaderWrap>
-                        <Label>请选择数据源：</Label>
+                        <Label>请选择数据集：</Label>
                         <Select
                             datas={datas.map(function (item) {
                                 return {

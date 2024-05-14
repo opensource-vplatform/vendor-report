@@ -1,4 +1,9 @@
-import { withBatchUpdate } from './spreadUtil';
+import {
+  getNamespace,
+  withBatchUpdate,
+} from './spreadUtil';
+
+const GC = getNamespace();
 
 export const insertRows = function (spread) {
     withBatchUpdate(spread, (sheet) => {
@@ -76,4 +81,47 @@ export function getSortedRowSelections(selections) {
         }
     }
     return selections;
+}
+
+export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
+    constructor() {
+        super();
+    }
+
+    paint(ctx, value, x, y, w, h, style, context) {
+        if (value === null || value === undefined) {
+            let sheet = context.sheet,
+                row = context.row,
+                col = context.col;
+            if (sheet && (row === 0 || !!row) && (col === 0 || !!col)) {
+                let bindingPath = sheet.getBindingPath(
+                    context.row,
+                    context.col
+                );
+                if (bindingPath) {
+                    value = '[' + bindingPath + ']';
+                }
+            }
+        }
+        super.paint(ctx, value, x, y, w, h, style, context);
+    }
+}
+
+export function formatBindingPathCellType(sheet) {
+    const dataTable = sheet.toJSON().data.dataTable;
+    if (!dataTable) {
+        return;
+    }
+    sheet.suspendPaint();
+    const bindingPathCellType = new BindingPathCellType();
+    Object.entries(dataTable).forEach(([rowStr, colValue]) => {
+        const row = Number(rowStr);
+        Object.entries(colValue).forEach(([colStr, { bindingPath }]) => {
+            if (bindingPath) {
+                const col = Number(colStr);
+                sheet.getCell(row, col).cellType(bindingPathCellType);
+            }
+        });
+    });
+    sheet.resumePaint();
 }

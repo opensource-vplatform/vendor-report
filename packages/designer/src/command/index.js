@@ -1,5 +1,6 @@
 import ImageCellTypeCommand from './impls/cellType/image';
 import SubTotalCellTypeCommand from './impls/cellType/subTotal';
+import BindingPathCellTypeCommand from './impls/cellType/table';
 import ApplyConditionStyleCommand from './impls/conditionStyle/apply';
 import ClearConditionStyleCommand from './impls/conditionStyle/clear';
 import ResetConditionStyleCommand from './impls/conditionStyle/reset';
@@ -37,6 +38,7 @@ export const Commands = {
          * 汇总
          */
         SubTotal: SubTotalCellTypeCommand.Command,
+        BindingPath: BindingPathCellTypeCommand.Command,
     },
     /**
      * 条件格式
@@ -207,6 +209,7 @@ export const registerCommand = function (spread) {
             StyleStyleCommand,
             BorderStyleCommand,
             SetFormulaCommand,
+            BindingPathCellTypeCommand,
         ],
         commandManager
     );

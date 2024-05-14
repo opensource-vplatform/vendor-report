@@ -35,6 +35,7 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
+import { formatBindingPathCellType } from '@utils/cellUtil';
 import {
   findTreeNodeById,
   genUUID,
@@ -50,9 +51,6 @@ import {
   setSheetTag,
 } from '@utils/worksheetUtil';
 
-import {
-  formatBindingPathCellType,
-} from './component/defineDatasource/utils/utils';
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
 import { handleEventPrmiseResult } from './utils/eventUtil';

@@ -10,6 +10,7 @@ import {
   useSelector,
 } from 'react-redux';
 
+import { Commands } from '@commands/index';
 import Hyperlink from '@components/hyperlink';
 import DatasourceIcon from '@icons/data/datasource';
 import {
@@ -19,6 +20,7 @@ import {
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
+import { BindingPathCellType } from '@utils/cellUtil';
 import {
   findTreeNodeById,
   getActiveSheetTablesPath,
@@ -27,10 +29,12 @@ import {
   getDataSourceConfig,
   getNavConfig,
 } from '@utils/configUtil';
-import { getNamespace } from '@utils/spreadUtil';
+import {
+  exeCommand,
+  getNamespace,
+} from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
-import { setCellTag } from '@utils/worksheetUtil.js';
 
 import DesignerContext from '../../DesignerContext.jsx';
 import DownIcon from '../../icons/arrow/Down';
@@ -46,13 +50,15 @@ import {
   DraggableDatasourcesHeander,
 } from './ui.jsx';
 import {
-  BindingPathCellType,
+  bindingPath,
+  bindingTablePathHandler,
   getCellInfo,
   getPath,
   highlightBlock,
-  newTable,
   removeHighlightOneBlock,
 } from './utils/utils.js';
+
+const bindingPathCellType = new BindingPathCellType();
 
 //删除表格
 function removeTable(params) {
@@ -134,18 +140,9 @@ function clearContents(params) {
                                 rowIndex,
                                 colIndex
                             );
-                            if (style) {
-                                if (
-                                    style?.decoration?.cornerFold?.markType ===
-                                    'table'
-                                ) {
-                                    delete style.decoration.cornerFold;
-                                    activeSheet.setStyle(
-                                        rowIndex,
-                                        colIndex,
-                                        style
-                                    );
-                                }
+                            if (style?.decoration) {
+                                delete style.decoration;
+                                activeSheet.setStyle(rowIndex, colIndex, style);
                             }
                         }
                     }
@@ -303,15 +300,15 @@ function subContextMenuActions(params) {
 //可拖拽树形数据源列表
 export default function Index() {
     const { spread } = useSelector(({ appSlice }) => appSlice);
-    const { dsList, showHyperlink,datasourceSelectorVisible } = useSelector(
+    const { dsList, showHyperlink, datasourceSelectorVisible } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
 
     const context = useContext(DesignerContext);
     //是否允许查看数据源
-    const isAllowToView = !getDataSourceConfig(context,'allowToView');
+    const isAllowToView = !getDataSourceConfig(context, 'allowToView');
 
-    const isAllowSelect = !getDataSourceConfig(context,'allowToSelect');
+    const isAllowSelect = !getDataSourceConfig(context, 'allowToSelect');
 
     const dispatch = useDispatch();
     const cacheDatasRef = useRef({
@@ -357,9 +354,7 @@ export default function Index() {
         },
         [spread]
     );
-    const setCellBindPath = ()=>{
-
-    }
+    const setCellBindPath = () => {};
     useEffect(function () {
         if (!cacheDatasRef.current.hasBindEvent) {
             cacheDatasRef.current.hasBindEvent = true;
@@ -367,7 +362,6 @@ export default function Index() {
             document.addEventListener(
                 'dragstart',
                 function (ev) {
-                    console.log(ev.target, '目标元素');
                     if (ev?.target) {
                         // 存储相关的拖拽元素
                         dragged = ev.target;
@@ -432,7 +426,6 @@ export default function Index() {
                 'dragenter',
                 function (event) {
                     // 当拖拽元素进入潜在放置区域时可以在这做优化提示。例如高亮处理
-                    console.log('dragenter');
                 },
                 false
             );
@@ -480,46 +473,40 @@ export default function Index() {
                         current = findTreeNodeById(itemId, dsList);
                     }
 
-                    const dataPath = getPath(current, dsList);
-                    const GC = getNamespace();
-                    const spreadNS = GC.Spread.Sheets;
-                    if (current.type === 'table') {
-                        /*  addTable({
-                            columnsTemp: current.children,
-                            sheet,
-                            spreadNS,
-                            dispatch,
-                            row,
-                            col,
-                            dataPath,
-                            filterButtonVisible,
-                        }); */
+                    let dataPath = getPath(current, dsList);
 
-                        newTable({
-                            columnsTemp: current.children,
-                            sheet,
-                            dispatch,
-                            row,
-                            col,
-                            dataPath,
-                            dsName: current.name,
+                    if (current.type === 'table' || parent?.type === 'table') {
+                        let columnsTemp = current.children;
+                        let dsName = current.name;
+                        if (parent?.type === 'table') {
+                            columnsTemp = [current];
+                            dsName = parent.name;
+                            dataPath = parent.code;
+                        }
+                        exeCommand(spread, Commands.CellType.BindingPath, {
+                            handler() {
+                                bindingTablePathHandler({
+                                    columnsTemp,
+                                    sheet,
+                                    dispatch,
+                                    row,
+                                    col,
+                                    dataPath,
+                                    dsName,
+                                });
+                            },
                         });
                     } else {
-                        const bindingPathCellType = new BindingPathCellType();
-                        cell.bindingPath(dataPath).cellType(
-                            bindingPathCellType
-                        );
-                        cell.value(`[${current.name}]`);
-                        if (dataPath.includes('.')) {
-                            const parent = findTreeNodeById(
-                                current.parentId,
-                                dsList
-                            );
-                            cell.value(`[${parent?.name}.${current?.name}]`);
-                        }
-                        setCellTag(sheet, row, col, 'bindInfo', {
-                            bindType: 'cell',
-                            bindDsInstanceId: itemId,
+                        exeCommand(spread, Commands.CellType.BindingPath, {
+                            handler() {
+                                bindingPath({
+                                    row,
+                                    col,
+                                    sheet,
+                                    value: `[${current.name}]`,
+                                    path: dataPath,
+                                });
+                            },
                         });
                     }
                 } catch (error) {
@@ -532,59 +519,62 @@ export default function Index() {
             });
         }
     }, []);
-    const handleDbClick = (node,parent)=>{
-        if(!node||node.children&&node.children.length>0){
+    const handleDbClick = (node, parent) => {
+        if (!node || (node.children && node.children.length > 0)) {
             //双击实体节点不做任何处理
             return;
         }
         //数据源双击，对选中单元格进行字段绑定，如果当前单元格有函数，则作为函数参数
         const sheet = spread.getActiveSheet();
-        if(sheet){
-            const {row,col} = getActiveIndexBySheet(sheet);
-            const cell = sheet.getCell(row,col);
+        if (sheet) {
+            const { row, col } = getActiveIndexBySheet(sheet);
+            const cell = sheet.getCell(row, col);
             let formula = cell.formula();
-            if(formula){
-                const txt = parent ? `TOONE.GET("${parent.code}","${node.code}")`:`TOONE.GET("${node.code}")`;
-                const handleFormula = (formula,flag)=>{
+            if (formula) {
+                const txt = parent
+                    ? `TOONE.GET("${parent.code}","${node.code}")`
+                    : `TOONE.GET("${node.code}")`;
+                const handleFormula = (formula, flag) => {
                     formula = formula.trim();
-                    const lastIndex = formula.length-1;
+                    const lastIndex = formula.length - 1;
                     const char = formula.charAt(lastIndex);
-                    if(char == ')'&&!flag){
-                        formula = formula.substring(0,lastIndex)
-                        formula = handleFormula(formula,true)+')'
-                    }else if(char == '('){
+                    if (char == ')' && !flag) {
+                        formula = formula.substring(0, lastIndex);
+                        formula = handleFormula(formula, true) + ')';
+                    } else if (char == '(') {
                         formula += txt;
-                    }else{
-                        formula += ','+ txt;
+                    } else {
+                        formula += ',' + txt;
                     }
                     return formula;
-                }
+                };
                 formula = handleFormula(formula);
                 cell.formula(formula);
-            }else{
+            } else {
                 //单元格整个进行数据源绑定
                 let dataPath = node.code;
-                if(parent){
-                    dataPath = parent.code +'.' + dataPath;
+                if (parent) {
+                    dataPath = parent.code + '.' + dataPath;
                 }
-                const bindingPathCellType = new BindingPathCellType();
-                cell.bindingPath(dataPath).cellType(
-                    bindingPathCellType
-                );
-                let value =  parent ? `[${parent.name}.${node.name}]`:`[${node.name}]`;
-                cell.value(value);
-                setCellTag(sheet, row, col, 'bindInfo', {
-                    bindType: 'cell',
-                    bindDsInstanceId: node.id,
+                let value = parent
+                    ? `[${parent.name}.${node.name}]`
+                    : `[${node.name}]`;
+
+                exeCommand(spread, Commands.CellType.BindingPath, {
+                    handler() {
+                        bindingPath({ row, col, sheet, value, path: dataPath });
+                    },
                 });
             }
         }
-    }
+    };
     return (
         <>
             {showHyperlink && <Hyperlink></Hyperlink>}
             <DialogDatasourcesEdit></DialogDatasourcesEdit>
-            {datasourceSelectorVisible && <DatasourceSelector></DatasourceSelector>}
+            {datasourceSelectorVisible && (
+                <DatasourceSelector></DatasourceSelector>
+            )}
             <DraggableDatasourcesBox>
                 <DraggableDatasourcesHeander>
                     {isOpenAll ? (
@@ -601,13 +591,17 @@ export default function Index() {
                     >
                         数据集
                     </div>
-                    {isAllowSelect && (<AddIcon onClick={()=>{
-                        dispatch(setDatasourceSelectorVisible(true));
-                    }}></AddIcon>)}
+                    {isAllowSelect && (
+                        <AddIcon
+                            onClick={() => {
+                                dispatch(setDatasourceSelectorVisible(true));
+                            }}
+                        ></AddIcon>
+                    )}
                     {isAllowToView && (
                         <DatasourceIcon
                             onClick={function () {
-                                !getNavConfig(context,'data') &&
+                                !getNavConfig(context, 'data') &&
                                     dispatch(setActive({ code: 'data' }));
                                 dispatch(setIsShowDatasource());
                             }}

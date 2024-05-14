@@ -26,7 +26,6 @@ const GC = getNamespace();
 const spreadNS = GC.Spread.Sheets;
 
 function preview(params) {
-    debugger;
     const {
         value,
         field = [],

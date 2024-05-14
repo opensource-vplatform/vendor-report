@@ -57,11 +57,9 @@ export default function (props) {
         };
     });
 
-    debugger;
     const handleConfirm = () => {
         let isError = false;
         let checkedResult = {};
-        debugger;
         //校验分页区域正确性
         const rangeStr = data.range;
         if (rangeStr && !REG.test(rangeStr)) {
