@@ -244,6 +244,13 @@ const SearchWrap = styled.div`
     height: 100%;
 `;
 
+const Empty = styled.div`
+    height: 200px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+`;
+
 const match = function (str, filter) {
     const type = typeof str;
     if (type == 'string') {
@@ -352,7 +359,6 @@ export default function (props) {
             );
         }
     };
-    //const context = useContext(DesignerContext);
     useEffect(() => {
         const result = fire({
             event:EVENTS.onDatasourceSelectVisible,
@@ -372,28 +378,11 @@ export default function (props) {
                 }
             });
         });
-        /*if (context?.conf?.events?.onDatasourceSelectVisible) {
-            const promise = context.conf.events.onDatasourceSelectVisible();
-            if (promise instanceof Promise) {
-                showLoadingMessage(dispatch, '获取数据集定义中，请稍候...');
-                promise
-                    .then((data) => {
-                        hideLoadingMessage(dispatch);
-                        dispatch(setDatasources(data));
-                    })
-                    .catch((err) => {
-                        showErrorMessage(
-                            dispatch,
-                            typeof err == 'string' ? err : err.message
-                        );
-                    });
-            }
-        }*/
     }, []);
     return (
         <OperationDialog
             title='选择数据集'
-            width='1358px'
+            style={{maxWidth:1358,minWidth:600}}
             onCancel={handleCancel}
             onConfirm={handleConfirm}
         >
@@ -410,7 +399,7 @@ export default function (props) {
             </Toolbar>
             <DialogWrap>
                 <DatasourceItemWrap>
-                    {data.datasources.map((ds) => {
+                    {data.datasources.length>0 ? data.datasources.map((ds) => {
                         return (
                             <DatasourceItem
                                 key={ds.code}
@@ -439,7 +428,7 @@ export default function (props) {
                                 }}
                             ></DatasourceItem>
                         );
-                    })}
+                    }):<Empty>没有可用的数据集！</Empty>}
                 </DatasourceItemWrap>
             </DialogWrap>
         </OperationDialog>
