@@ -175,6 +175,9 @@ export default class Render {
         this.templatesPageInfos = {};
         this.delayPlugins = [];
         this.delayFormula = [];
+        this.groupSumFooterTemplates = [];
+        this.groupSumHeaderTemplates = [];
+        this.hasGroupSumArea = false;
 
         //如果有模板，则对数据进行分组，每个组一个sheet
         this.groupTemplate();
@@ -208,79 +211,125 @@ export default class Render {
         const { headerTemplates, footerTemplates, contentTemplates } = this;
         //需要分页
         if (pageInfos.pageArea) {
-            //头部
-            const { height: headerHeight } = calcTempHeight({
-                templates: headerTemplates,
-            });
-            //底部
-            const { height: footerHeight } = calcTempHeight({
-                templates: footerTemplates,
-            });
-
-            //内容模板高度
-            const { height: contentTempHeight } = calcTempHeight({
-                templates: contentTemplates,
-                isCalcTemp: true,
-            });
-
-            const _height = headerHeight + footerHeight;
-
-            let contentHeight = pageInfos.pageTotalHeight;
-            if (_height > pageInfos.pageTotalHeight) {
-                const diff = _height % pageInfos.pageTotalHeight;
-                if (diff >= contentTempHeight) {
-                    contentHeight = diff;
-                }
-            } else if (_height < pageInfos.pageTotalHeight) {
-                const diff = pageInfos.pageTotalHeight - _height;
-                if (diff >= contentTempHeight) {
-                    contentHeight = diff;
-                }
-            }
-
-            //当前页可以渲染多少个内容模板
-            const contentTempCount = Math.floor(
-                contentHeight / contentTempHeight
-            );
-
-            //分页小计。分页小计不等于总页数
-            const pageSubtotal = Math.ceil(
-                (contentTemplates?.[0]?.dataLen || 1) / contentTempCount
-            );
-            const lastContentTempCount =
-                (contentTemplates?.[0]?.dataLen || 1) % contentTempCount;
-
-            let index = 0;
-            let startIndex = 0;
-            while (index < pageSubtotal) {
-                this.genPageDataTables({
+            const calculate = (
+                headerTemplates,
+                footerTemplates,
+                contentDatasLen = 1
+            ) => {
+                //头部
+                const { height: headerHeight } = calcTempHeight({
                     templates: headerTemplates,
-                    pageInfos,
                 });
-                let endIndex = startIndex + contentTempCount;
-                //最后一页
-                if (index + 1 >= pageSubtotal && !pageInfos.isFillData) {
-                    endIndex = startIndex + lastContentTempCount;
-                }
-                this.genPageDataTables({
-                    templates: contentTemplates,
-                    pageInfos,
-                    startIndex,
-                    endIndex,
-                });
-                this.genPageDataTables({
+                //底部
+                const { height: footerHeight } = calcTempHeight({
                     templates: footerTemplates,
-                    pageInfos,
                 });
 
-                if (index + 1 < pageSubtotal) {
-                    this.onAfterPage(pageInfos);
-                }
-                pageInfos.pageHeight = 0;
+                //内容模板高度
+                const { height: contentTempHeight } = calcTempHeight({
+                    templates: contentTemplates,
+                    isCalcTemp: true,
+                });
 
-                startIndex += contentTempCount;
-                index++;
-            }
+                const _height = headerHeight + footerHeight;
+
+                let contentHeight = pageInfos.pageTotalHeight;
+                if (_height > pageInfos.pageTotalHeight) {
+                    const diff = _height % pageInfos.pageTotalHeight;
+                    if (diff >= contentTempHeight) {
+                        contentHeight = diff;
+                    }
+                } else if (_height < pageInfos.pageTotalHeight) {
+                    const diff = pageInfos.pageTotalHeight - _height;
+                    if (diff >= contentTempHeight) {
+                        contentHeight = diff;
+                    }
+                }
+
+                //当前页可以渲染多少个内容模板
+                const contentTempCount = Math.floor(
+                    contentHeight / contentTempHeight
+                );
+
+                //分页小计。分页小计不等于总页数
+                const pageSubtotal = Math.ceil(
+                    contentDatasLen / contentTempCount
+                );
+                const lastContentTempCount = contentDatasLen % contentTempCount;
+
+                return {
+                    pageSubtotal,
+                    lastContentTempCount,
+                    contentTempCount,
+                };
+            };
+
+            const recursionRender = (
+                headerTemplates,
+                footerTemplates,
+                isInterrupt
+            ) => {
+                let { pageSubtotal, lastContentTempCount, contentTempCount } =
+                    calculate(
+                        headerTemplates,
+                        footerTemplates,
+                        contentTemplates?.[0]?.dataLen || 1
+                    );
+
+                let index = 0;
+                let startIndex = 0;
+                while (index < pageSubtotal) {
+                    const isLastPage = index + 1 >= pageSubtotal;
+                    if (isLastPage) {
+                        const {
+                            pageSubtotal: _pageSubtotal,
+                            lastContentTempCount: _lastContentTempCount,
+                            contentTempCount: _contentTempCount,
+                        } = calculate(
+                            this.groupSumHeaderTemplates,
+                            this.groupSumFooterTemplates,
+                            lastContentTempCount
+                        );
+                        if (_pageSubtotal === 1) {
+                            headerTemplates = this.groupSumHeaderTemplates;
+                            footerTemplates = this.groupSumFooterTemplates;
+                            lastContentTempCount = _lastContentTempCount;
+                            contentTempCount = _lastContentTempCount;
+                        } else {
+                            pageSubtotal += 1;
+                        }
+                    }
+
+                    this.genPageDataTables({
+                        templates: headerTemplates,
+                        pageInfos,
+                    });
+                    let endIndex = startIndex + contentTempCount;
+                    //最后一页
+                    if (isLastPage && !pageInfos.isFillData) {
+                        endIndex = startIndex + lastContentTempCount;
+                    }
+                    this.genPageDataTables({
+                        templates: contentTemplates,
+                        pageInfos,
+                        startIndex,
+                        endIndex,
+                    });
+                    this.genPageDataTables({
+                        templates: footerTemplates,
+                        pageInfos,
+                    });
+
+                    if (index + 1 < pageSubtotal) {
+                        this.onAfterPage(pageInfos);
+                    }
+                    pageInfos.pageHeight = 0;
+
+                    startIndex += contentTempCount;
+                    index++;
+                }
+            };
+            recursionRender(headerTemplates, footerTemplates, false);
         } else {
             this.genPageDataTables({
                 templates: headerTemplates,
@@ -299,6 +348,9 @@ export default class Render {
         const footerTemplates = [];
         //表格区域模板
         const contentTemplates = [];
+
+        this.groupSumHeaderTemplates = [];
+        this.groupSumFooterTemplates = [];
 
         const REG = /^\d+:\d+$/;
         //分页区域范围
@@ -409,9 +461,20 @@ export default class Render {
                 });
 
                 if (template.row < pageAreaStartRow) {
-                    headerTemplates.push(template);
+                    this.groupSumHeaderTemplates.push(template);
+                    if (template.isGroupSumArea) {
+                        this.hasGroupSumArea = true;
+                    } else {
+                        headerTemplates.push(template);
+                    }
                 } else if (template.row >= pageAreaEndRow) {
-                    footerTemplates.push(template);
+                    this.groupSumFooterTemplates.push(template);
+
+                    if (template.isGroupSumArea) {
+                        this.hasGroupSumArea = true;
+                    } else {
+                        footerTemplates.push(template);
+                    }
                 } else {
                     contentTemplates.push(template);
                 }
@@ -423,7 +486,6 @@ export default class Render {
         this.headerTemplates = headerTemplates;
         this.footerTemplates = footerTemplates;
         this.contentTemplates = contentTemplates;
-        debugger;
     }
     setTemplateDatas(template, tableCode, sheetName) {
         let ds = this.datas?.[tableCode] || [];
@@ -762,7 +824,12 @@ export default class Render {
     genPageDataTables(params) {
         const { templates, pageInfos, startIndex = 0, endIndex = 0 } = params;
         templates.forEach((temp) => {
-            const { datas, dataTables, height: tempHeight } = temp;
+            const {
+                datas,
+                dataTables,
+                height: tempHeight,
+                isGroupSumArea,
+            } = temp;
             let { verticalAutoMergeRanges } = temp;
             const unionDatasource = getUnionDatasource(datas, this.setting);
             const dataLen = endIndex || unionDatasource.getCount() || 1;
@@ -819,6 +886,13 @@ export default class Render {
 
                                 const tool = new Tool();
 
+                                tool.setGroupNameHandler(
+                                    () => pageInfos.sheet.name
+                                );
+
+                                tool.setIsGroupSumAreaHandler(
+                                    () => isGroupSumArea
+                                );
                                 if (tag) {
                                     const tagObj = JSON.parse(tag);
 

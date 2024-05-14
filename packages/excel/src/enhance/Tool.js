@@ -15,26 +15,33 @@ export default class Tool {
         this.totalPagesHandler = handler;
     }
 
-    setUnionDatasourceHandler(handler){
+    setUnionDatasourceHandler(handler) {
         this.unionDatasourceHandler = handler;
     }
 
-    setDataIndex(handler){
+    setDataIndex(handler) {
         this.dataIndexHandler = handler;
     }
 
-    setValueHandler(handler){
+    setValueHandler(handler) {
         this.valueHandler = handler;
     }
 
-    setSettingHandler(handler){
+    setSettingHandler(handler) {
         this.settingHandler = handler;
+    }
+    setGroupNameHandler(handler) {
+        this.groupNameHandler = handler;
+    }
+
+    setIsGroupSumAreaHandler(handler) {
+        this.isGroupSumAreaHandler = handler;
     }
 
     /**
      * 获取字段下标（在工作表中的起始位置）
-     * @param {*} tableCode 
-     * @param {*} fieldCode 
+     * @param {*} tableCode
+     * @param {*} fieldCode
      * @returns {row,col}
      */
     getFieldIndex(tableCode, fieldCode) {
@@ -43,11 +50,11 @@ export default class Tool {
 
     /**
      * 获取字段下标（在联合数据源中的起始位置）
-     * @param {*} tableCode 
-     * @param {*} fieldCode 
+     * @param {*} tableCode
+     * @param {*} fieldCode
      * @return Integer
      */
-    getDataIndex(tableCode, fieldCode){
+    getDataIndex(tableCode, fieldCode) {
         return this.dataIndexHandler(tableCode, fieldCode);
     }
 
@@ -55,7 +62,7 @@ export default class Tool {
         return this.dataCountHandler(tableCode);
     }
 
-    getUnionDatasource(){
+    getUnionDatasource() {
         return this.unionDatasourceHandler();
     }
 
@@ -69,34 +76,48 @@ export default class Tool {
 
     /**
      * 获取当前页下标
-     * @returns 
+     * @returns
      */
-    getPageIndex(){
+    getPageIndex() {
         return this.pageHandler();
     }
 
     /**
      * 获取总页数
-     * @returns 
+     * @returns
      */
-    getPageCount(){
+    getPageCount() {
         return this.totalPagesHandler();
     }
 
     /**
      * 获取值
-     * @param {*} code 
-     * @param {*} fieldCode 
+     * @param {*} code
+     * @param {*} fieldCode
      */
-    getValue(code,fieldCode){
-        return this.valueHandler(code,fieldCode);
+    getValue(code, fieldCode) {
+        return this.valueHandler(code, fieldCode);
+    }
+
+    /**
+     * 获取分组
+     */
+    getGroupName() {
+        return this.groupNameHandler();
+    }
+
+    /**
+     * 获取配置
+     */
+    getIsGroupSumArea() {
+        return this.isGroupSumAreaHandler();
     }
 
     /**
      * 获取设置信息
-     * @returns 
+     * @returns
      */
-    getSetting(){
+    getSetting() {
         return this.settingHandler();
     }
 }
