@@ -8,10 +8,13 @@ import {
 } from '@components/group/Index';
 import PageSettings from '@components/pageSettings/Index';
 import PagingSettingsIcon from '@icons/report/pagingSettings';
+import { getNamespace } from '@utils/spreadUtil';
 import {
   getSheetTag,
   setSheetTag,
 } from '@utils/worksheetUtil';
+
+const GC = getNamespace();
 
 export default function Index(props) {
     const [show, setShow] = useState(false);
@@ -33,6 +36,23 @@ export default function Index(props) {
         setSheetTag(sheet, 'pageArea', datas.range);
         setSheetTag(sheet, 'isFillData', datas.isFillData);
         setSheetTag(sheet, 'groupSumArea', datas.groupSumRange);
+        if (datas.range) {
+            const rangeArr = datas.range.split(':');
+            const row = Number(rangeArr[0]) - 1;
+            const endRow = Number(rangeArr[1]);
+            for (let i = row; i < endRow; i++) {
+                sheet.setValue(i, 0, 'C', GC.Spread.Sheets.SheetArea.rowHeader);
+            }
+        }
+
+        if (datas.groupSumRange) {
+            const rangeArr = datas.groupSumRange.split(':');
+            const row = Number(rangeArr[0]) - 1;
+            const endRow = Number(rangeArr[1]);
+            for (let i = row; i < endRow; i++) {
+                sheet.setValue(i, 0, 'G', GC.Spread.Sheets.SheetArea.rowHeader);
+            }
+        }
 
         setShow(false);
     };

@@ -483,6 +483,7 @@ export default class Render {
 
             row++;
         } while (row < rowCount);
+
         this.headerTemplates = headerTemplates;
         this.footerTemplates = footerTemplates;
         this.contentTemplates = contentTemplates;
@@ -536,15 +537,23 @@ export default class Render {
             isGroupSumArea: false,
         };
 
+        let maxRowCount = 1;
         //当前行的合并信息
-        const rowSpans = spans.filter((span) => span.row === row);
+        const rowSpans = spans.filter((span) => {
+            if (span.row === row) {
+                if (span.rowCount > maxRowCount) {
+                    maxRowCount = span.rowCount;
+                }
+                return true;
+            }
+            return false;
+        });
         dataTableInfos.spans.push(...rowSpans);
 
         //行高等信息
         dataTableInfos.rows = getOldRowHeight(rows, row);
         result.height = dataTableInfos?.rows?.size;
 
-        let maxRowCount = 1;
         Object.entries(rowDataTable).forEach(
             ([colStr, { bindingPath, tag, formula, style = {} }]) => {
                 const col = Number(colStr);
@@ -557,9 +566,6 @@ export default class Render {
                         rowCount: 1,
                         colCount: 1,
                     };
-                    if (span.rowCount > maxRowCount) {
-                        maxRowCount = span.rowCount;
-                    }
                     if (tag) {
                         //收集当前单元格是否已经设置了行合并或列合并
                         const jsonTag = JSON.parse(tag);
@@ -751,8 +757,12 @@ export default class Render {
                 isFillData = res?.isFillData;
                 groupSumArea = res?.groupSumArea || '';
             }
-            //以分页区域为边界，对模板进行拆分成头部区模板，内容区模板，底部区模板
 
+            if (sheet?.rowHeaderData?.dataTable) {
+                sheet.rowHeaderData.dataTable = {};
+            }
+
+            //以分页区域为边界，对模板进行拆分成头部区模板，内容区模板，底部区模板
             this.splitTemplate({
                 sheet,
                 pageArea,

@@ -43,6 +43,7 @@ import {
 import { getLicense } from '@utils/configUtil';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
+import { getNamespace } from '@utils/spreadUtil';
 import {
   getCellTag,
   getSheetTag,
@@ -55,6 +56,50 @@ import {
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
 import { handleEventPrmiseResult } from './utils/eventUtil';
+
+const GC = getNamespace();
+
+function RowChanged(params) {
+    const { sheet, row, newValue, propertyName, type = 'pageArea' } = params;
+    if (['deleteRows', 'addRows'].includes(propertyName)) {
+        const range = getSheetTag(sheet, type);
+        if (!range) {
+            return;
+        }
+        const REG = /^\d+:\d+$/;
+        if (!REG.test(range)) {
+            return;
+        }
+
+        const ranges = range.split(':');
+        let newStartRow = Number(ranges[0]);
+        let newEndRow = Number(ranges[1]);
+        let startRow = newStartRow - 1;
+        let count = newValue;
+        if (propertyName !== 'addRows') {
+            count = 0 - count;
+            if (row === startRow) {
+                startRow += 1;
+            }
+        }
+
+        if (row <= startRow) {
+            newStartRow = startRow + count + 1;
+            newEndRow = newEndRow + count;
+        } else if (row > startRow && row < newEndRow) {
+            newEndRow = newEndRow + count;
+        }
+        for (let i = newStartRow; i < newEndRow; i++) {
+            sheet.setValue(
+                i,
+                0,
+                type === 'pageArea' ? 'C' : 'G',
+                GC.Spread.Sheets.SheetArea.rowHeader
+            );
+        }
+        setSheetTag(sheet, type, `${newStartRow}:${newEndRow}`);
+    }
+}
 
 export default function () {
     const dispatch = useDispatch();
@@ -232,36 +277,9 @@ export default function () {
         return bind({
             id,
             event: EVENTS.RowChanged,
-            handler: (event, { sheet, row, newValue, propertyName }) => {
-                const range = getSheetTag(sheet, 'pageArea');
-                if (!range) {
-                    return;
-                }
-                const REG = /^\d+:\d+$/;
-                if (!REG.test(range)) {
-                    return;
-                }
-
-                const ranges = range.split(':');
-                let newStartRow = Number(ranges[0]);
-                let newEndRow = Number(ranges[1]);
-                let startRow = newStartRow - 1;
-                let count = newValue;
-                if (propertyName !== 'addRows') {
-                    count = 0 - count;
-                    if (row === startRow) {
-                        startRow += 1;
-                    }
-                }
-
-                if (row <= startRow) {
-                    newStartRow = startRow + count + 1;
-                    newEndRow = newEndRow + count;
-                } else if (row > startRow && row < newEndRow) {
-                    newEndRow = newEndRow + count;
-                }
-
-                setSheetTag(sheet, 'pageArea', `${newStartRow}:${newEndRow}`);
+            handler: (event, datas) => {
+                RowChanged({ ...datas, type: 'pageArea' });
+                RowChanged({ ...datas, type: 'groupSumArea' });
             },
         });
     }, []);

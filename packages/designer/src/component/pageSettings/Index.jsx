@@ -179,7 +179,7 @@ export default function (props) {
                     ></InfoIcon>
                 </HLayout>
 
-                {isTemplate && false && (
+                {isTemplate && (
                     <HLayout>
                         <Text>分组汇总区域：</Text>
                         <Range
