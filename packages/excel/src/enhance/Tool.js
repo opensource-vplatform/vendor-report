@@ -27,6 +27,10 @@ export default class Tool {
         this.valueHandler = handler;
     }
 
+    setSettingHandler(handler){
+        this.settingHandler = handler;
+    }
+
     /**
      * 获取字段下标（在工作表中的起始位置）
      * @param {*} tableCode 
@@ -86,5 +90,13 @@ export default class Tool {
      */
     getValue(code,fieldCode){
         return this.valueHandler(code,fieldCode);
+    }
+
+    /**
+     * 获取设置信息
+     * @returns 
+     */
+    getSetting(){
+        return this.settingHandler();
     }
 }
