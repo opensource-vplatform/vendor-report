@@ -277,6 +277,7 @@ class UnionDatasource {
         }
         return false;
     }
+
     /**
      * 获取叶子节点范围
      * @param {*} start
@@ -337,6 +338,55 @@ class UnionDatasource {
         }
         return { type: 'text', value };
     }
+
+    /**
+     * 获取字段值
+     * @param {*} dsCode 
+     * @param {*} fieldCode 
+     */
+    getFieldValues(dsCode,fieldCode){
+        const result = [];
+        const count = this.getCount();
+        let index = 0;
+        while(index<count){
+            result.push(this.getValue(dsCode,fieldCode,index));
+            index++;
+        }
+        return result;
+    }
+
+    /**
+     * 获取叶子节点字段值
+     * @param {*} dsCode 
+     * @param {*} fieldCode 
+     */
+    getLeafFieldValues(dsCode,fieldCode){
+        const treeStruct = this.setting.treeStruct[dsCode];
+        if(treeStruct&&treeStruct.idField&&treeStruct.pidField){
+            const result = [];
+            const dataIndexMap = this.treeDataIndexMap[dsCode];
+            const idField = treeStruct.idField;
+            const count = this.getCount();
+            for (let index = 0; index < count; index++) {
+                const data = this.datas[index];
+                if (data&&data[dsCode]) {
+                    const record = data[dsCode];
+                    const id = record[idField];
+                    const node = dataIndexMap[id];
+                    if(this._isLeaf(node)){
+                        const data = node.data;
+                        const value = data ? data[fieldCode]:null;
+                        result.push(value)
+                    }
+                }
+            }
+            return result;
+        }else{
+            return this.getFieldValues(dsCode,fieldCode);
+        }
+        
+    }
+
 }
 
 export default UnionDatasource;

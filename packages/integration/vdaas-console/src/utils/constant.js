@@ -37,5 +37,5 @@ export const getSaveReportUrl = function(){
  * @returns 
  */
 export const getTableDataUrl = function(requestTables){
-    return `${getHost()}/webapi/innersysapi/VDassDbmsConsole/report?operate=getTableData${appendParam()}&requestTables=${requestTables}`;
+    return `${getHost()}/webapi/innersysapi/VDassDbmsConsole/report?operate=queryData${appendParam()}&requestTables=${requestTables}`;
 }

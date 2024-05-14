@@ -52,7 +52,7 @@ const Function_Options = [
     {
         value: 109,
         text: '求和',
-    },
+    }/*,
     {
         value: 107,
         text: '标准偏差',
@@ -60,7 +60,7 @@ const Function_Options = [
     {
         value: 110,
         text: '方差',
-    },
+    },*/
 ];
 
 const REG = /(\w+\d+?)/;
