@@ -109,7 +109,7 @@ export default class Tool {
     /**
      * 获取配置
      */
-    getIsGroupSumArea() {
+    isInGroupSumArea() {
         return this.isGroupSumAreaHandler();
     }
 
