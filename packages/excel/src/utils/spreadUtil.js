@@ -10,13 +10,13 @@ export const getNamespace = function () {
 export const withBatchCalcUpdate = function (spread, updateHandler) {
     if (spread) {
         spread.suspendPaint();
-        spread.suspendCalcService();
+        spread.suspendEvent();
         const sheet = spread.getActiveSheet();
         try {
             updateHandler(sheet);
         } finally {
-            spread.resumeCalcService(false);
             spread.resumePaint();
+            spread.resumeEvent();
         }
     }
 };

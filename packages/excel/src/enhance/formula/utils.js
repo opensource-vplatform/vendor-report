@@ -1,3 +1,4 @@
+import { isNullOrUndef } from '../../utils/objectUtils';
 import { getNamespace } from '../../utils/spreadUtil';
 
 function _getType(type) {
@@ -49,7 +50,7 @@ export function toAST(value){
         case "boolean":
             return toBooleanAST(value);
         default:
-            return toStringAST(value);
+            return toStringAST(isNullOrUndef(value) ? '':value);
     }
 }
 

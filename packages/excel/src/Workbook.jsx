@@ -306,6 +306,7 @@ export default function (props) {
         if (json) {
             withBatchCalcUpdate(spread, () => {
                 spread.fromJSON(json);
+                customRegister();
                 const sheets = spread.sheets;
                 if (sheets && sheets.length > 0) {
                     sheets.forEach((sheet) => {
@@ -395,9 +396,12 @@ export default function (props) {
 
     const customRegister = ()=>{
         //必须每次都注册，否则spread填充json后，自定义函数注册被清空
-        data.spread.suspendEvent();
+        const spread = data.spread;
+        spread.suspendEvent();
+        spread.suspendCalcService(false);
         register(data.spread);
-        data.spread.resumeEvent();
+        spread.resumeEvent();
+        spread.resumeCalcService(true);
     }
 
     useEffect(() => {
