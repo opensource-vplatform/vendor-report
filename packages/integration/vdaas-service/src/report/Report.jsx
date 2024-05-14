@@ -85,6 +85,9 @@ export default function () {
       loadMsg: null,
       errorMsg: typeof err == 'string' ? err : err.message,
     });
+    if (typeof exportPDFError !== 'undefined') {
+      exportPDFError(typeof err == 'string' ? err : err.message);
+    }
   };
   const setLoadMsg = (msg) => {
     setData({
@@ -134,9 +137,9 @@ export default function () {
 
             if (typeof exportPDF !== 'undefined') {
               console.log('导出PDF')
-              Promise.all(requestFontFamily).then(()=>{
+              Promise.all(requestFontFamily).then(() => {
                 report.exportPdf('a.pdf', {
-                  persistence:false,
+                  persistence: false,
                   author: '',
                   creator: '',
                   keywords: '',

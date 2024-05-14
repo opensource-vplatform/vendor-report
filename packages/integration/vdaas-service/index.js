@@ -8,13 +8,39 @@ const fs = require('fs');
 const querystring = require('querystring');
 
 const app = express();
-const port = process.env.PORT || 3000;
+let port = 8080;
+
+
+// 公开本地端口环境变量的值
+// const exposePort = process.env.ExposePort || 3000;
+// 公开API读取数据的端口环境变量的值
+const exposeAPIUrl = process.env.ExposeAPIUrl || 'http://dev.service.vdaas.t.vtoone.com';
+
+// 打印环境变量的值
+// console.log("exposePort 的值是：", exposePort);
+console.log("exposeAPIUrl 的值是：", exposeAPIUrl);
+
+// 获取命令行参数
+const args = process.argv.slice(2);
+
+// 解析命令行参数
+const portArgIndex = args.findIndex(arg => arg.startsWith('--port='));
+if (portArgIndex !== -1) {
+  port = args[portArgIndex].split('=')[1];
+  console.log('修改运行端口Port:', port);
+}
+
 
 let browser;
 
 // 设置 Express 使用静态文件目录
 app.use(express.static(path.join(__dirname, 'resources/static/vdaasservice/spreadsheet')));
 
+app.get('/test', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.end("我的一家人")
+
+})
 
 /**
  * Middleware function that serves font files for the application.
@@ -66,10 +92,6 @@ app.get('*', (req, res, next) => {
   next();
 })
 
-app.get('/test', (req, res) => {
-  res.end("测试接口")
-})
-
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'resources/static/vdaasservice/spreadsheet', 'view.html'));
@@ -103,11 +125,14 @@ app.get('/api/exportPDF', async (req, res) => {
         resolve(data);
       };
 
+
+
       //   添加方法
       await page.exposeFunction("exportPDF", (path) => exportPDF(path));
+      await page.exposeFunction("exportPDFError", (err) => reject(err));
 
       // 访问指定的网址
-      await page.goto(`${req.protocol}://${req.hostname}:${port}/?${queryParams}`);
+      await page.goto(`${req.protocol}://localhost:${port}/?${queryParams}`);
 
       // Set screen size
       // await page.setViewport({ width: 1080, height: 1024 });
@@ -133,6 +158,7 @@ app.get('/api/exportPDF', async (req, res) => {
       // 计算二进制数据的 MD5 哈希值
       const md5Hash = crypto.createHash('md5').update(binaryData).digest('hex');
       res.setHeader('Content-MD5', md5Hash);
+      res.setHeader('Content-Length', binaryData.length);
       console.log('MD5 哈希值:', md5Hash);
       // 将流管道连接到响应
       stream.pipe(res);
@@ -142,11 +168,16 @@ app.get('/api/exportPDF', async (req, res) => {
         // 在 'end' 事件触发后关闭可读流
         page.close();
         stream.destroy();
-      });;
+      });
+    }).catch((err) => {
+      res.json({
+        message: '导出PDF失败,请检查参数是否正确',
+        success: false
+      })
     })
   } catch (e) {
     console.log("导出PDF失败", e);
-    res.status(500).end();
+    // res.status(500).end();
   }
 })
 
@@ -165,7 +196,7 @@ function base64ToStream(base64String) {
 
 app.listen(port, async () => {
   console.log(`Server is running on port ${port}`);
-  browser = await puppeteer.launch({ headless: true })
+  browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
 });
 
 app.on('close', async () => {
@@ -177,12 +208,12 @@ app.on('close', async () => {
 // 本地测试需要跨域中间件代理
 const proxyMiddleware = createProxyMiddleware({
   // 目标服务器地址
-  target: 'http://test.service.vdaas.t.vtoone.com/sysapi',
+  target: `${exposeAPIUrl}/sysapi`,
   // 修改响应头，确保只允许来自指定来源的请求
   changeOrigin: true,
   // 重写响应头，只允许一个 Origin
   onProxyRes: function (proxyRes) {
-    proxyRes.headers['Access-Control-Allow-Origin'] = 'http://localhost:3000';
+    proxyRes.headers['Access-Control-Allow-Origin'] = `http://localhost:${exposePort}`;
   }
 });
 

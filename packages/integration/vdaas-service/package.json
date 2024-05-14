@@ -4,15 +4,14 @@
   "description": "报表服务端接口",
   "main": "src/index.ts",
   "scripts": {
-    "server": "node index.js",
+    "server": "node index.js --port=3000",
+    "start" : "node index.js",
     "postBuild-view": "node scripts/postBuild-view.js",
     "clean": "node scripts/clean.js",
     "build-view": "vite build -c=vite.config.build-view.js && npm run postBuild-view",
     "build": "npm run clean && npm run build-view"
   },
   "dependencies": {
-    "@toone/report-excel": "workspace:^",
-    "FileReader": "^0.10.2",
     "axios": "^1.6.8",
     "bufferjs": "1.0.0",
     "express": "^4.19.2",
