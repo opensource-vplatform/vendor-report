@@ -16,7 +16,7 @@ PageCount.prototype.description = function () {
     }
 }
 PageCount.prototype.evaluate = function (arg) {
-    return '';
+    return '[函数(Fx)]';
 };
 
 export default PageCount;

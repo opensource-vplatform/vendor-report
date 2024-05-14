@@ -16,7 +16,7 @@ PageIndex.prototype.description = function () {
     }
 }
 PageIndex.prototype.evaluate = function (arg) {
-    return '';
+    return '[函数(Fx)]';
 };
 
 export default PageIndex;

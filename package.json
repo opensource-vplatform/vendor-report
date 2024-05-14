@@ -14,6 +14,7 @@
     "build-vdaas-tenant":"npm run build-designer && npm run build-report && pnpm -F integration-vdaas-web build && npm run postBuild-vdaas-tenant",
     "build-vdaas-console":"npm run build-designer && npm run build-report && pnpm -F integration-vdaas-console build && npm run postBuild-vdaas-console",
     "build-vdaas-service":"npm run build-report && pnpm -F integration-vdaas-service build && npm run postBuild-vdaas-service",
+    "build-vdaas":"npm run build-designer && npm run build-report && pnpm -F integration-vdaas-web build && npm run postBuild-vdaas-tenant && pnpm -F integration-vdaas-console build && npm run postBuild-vdaas-console",
     "build-docs":"pnpm -F report-docs build",
     "build": "npm run build-designer && npm run build-report && npm run build-jasperreport && npm run build-docs && npm run postBuild",
     "build-vdata":"npm run build && npm run postBuild-vdata",

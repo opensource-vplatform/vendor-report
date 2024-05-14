@@ -16,7 +16,7 @@ GroupName.prototype.description = function () {
     };
 };
 GroupName.prototype.evaluate = function (arg) {
-    return '';
+    return '[函数(Fx)]';
 };
 
 export default GroupName;
