@@ -54,6 +54,18 @@ export const EVENTS = {
      * 数据源双击事件
      */
     onDatasourceDBClick:"onDatasourceDBClick",
+
+    SheetChanged:"SheetChanged",
+
+    ColumnWidthChanged:"ColumnWidthChanged",
+
+    RowHeightChanged:"RowHeightChanged",
+
+    LeftColumnChanged:"LeftColumnChanged",
+
+    TopRowChanged:"TopRowChanged",
+
+    ViewZoomed:"ViewZoomed"
 };
 
 const check = function (params) {

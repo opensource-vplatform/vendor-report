@@ -1,3 +1,6 @@
+import DefaultCell from '../spread/DefaultCell';
+import { getBaseUrl } from './environmentUtil';
+import { isNullOrUndef } from './objectUtil';
 import {
   getNamespace,
   withBatchUpdate,
@@ -88,7 +91,34 @@ export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
         super();
     }
 
+    /**
+     * 是否为绑定数据单元格
+     * @param {*} context 
+     */
+    isBindPathCell(context){
+        const {sheet,row,col} = context;
+        if (sheet && (row === 0 || !!row) && (col === 0 || !!col)) {
+            let bindingPath = sheet.getBindingPath(row,col);
+            return !!bindingPath;
+        }
+        return false;
+    }
+
     paint(ctx, value, x, y, w, h, style, context) {
+        const bindCell = this.isBindPathCell(context);
+        if(bindCell){
+            //添加角标
+            style.decoration = {
+                cornerFold: {
+                    size: 8,
+                    position: GC.Spread.Sheets.CornerPosition.leftTop,
+                    color: 'green',
+                },
+            };
+        }
+        if(bindCell&&!isNullOrUndef(value)){
+            value = '[' + bindingPath + ']';
+        }
         if (value === null || value === undefined) {
             let sheet = context.sheet,
                 row = context.row,
@@ -103,7 +133,85 @@ export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
                 }
             }
         }
+        
         super.paint(ctx, value, x, y, w, h, style, context);
+    }
+
+    getHitInfo(x, y, cellStyle, cellRect, context) {
+        return {
+            x: cellRect.x,
+            y: cellRect.y,
+            width: cellRect.width,
+            height: cellRect.height,
+            row: context.row,
+            col: context.col,
+            cellStyle: cellStyle,
+            cellRect: cellRect,
+            sheetArea: context.sheetArea,
+            sheet: context.sheet,
+            value: context.sheet.getValue(context.row, context.col),
+        };
+    }
+
+    _initIcon(){
+        if(!this._iconEle){
+            let iconEle = document.createElement('div');
+            const basePath = getBaseUrl();
+            iconEle.innerHTML = `<img src="${basePath}/css/icons/cell/config.svg" style="width:14px;height:14px;cursor:pointer;">`;
+            document.body.append(iconEle);
+            const style = iconEle.style;
+            style.position = 'absolute';
+            style.width = '16px';
+            style.height = '16px';
+            style.display = 'flex';
+            style.backgroundColor ='white';
+            style.alignItems = 'center';
+            style.justifyContent = 'center';
+            this._iconEle = iconEle;
+        }
+        return this._iconEle;
+    }
+
+    _showIcon(hitinfo){
+        const iconEle = this._initIcon();
+        const { x, y, sheet, width} = hitinfo;
+        const style = iconEle.style;
+        const spread = sheet.getParent();
+        const host = spread.getHost();
+        const rect = host.getBoundingClientRect();
+        style.left = `${rect.left+x+width}px`;
+        style.top = `${rect.top+y}px`;
+        style.display = 'flex';
+    }
+
+    _hideIcon(){
+        const iconEle = this._initIcon();
+        iconEle.style.display = 'none';
+    }
+
+    processMouseDown(hitinfo) {
+        const { x, y, value, sheet, width,row, col } = hitinfo;
+        if(!this._iconEle){
+            let iconEle = document.createElement('div');
+            const basePath = getBaseUrl();
+            iconEle.innerHTML = `<img src="${basePath}/css/icons/cell/config.svg" style="width:14px;height:14px;cursor:pointer;">`;
+            document.body.append(iconEle);
+            const style = iconEle.style;
+            style.position = 'absolute';
+            style.width = '16px';
+            style.height = '16px';
+            style.display = 'flex';
+            style.backgroundColor ='white';
+            style.alignItems = 'center';
+            style.justifyContent = 'center';
+            this._iconEle = iconEle;
+        }
+        const style = this._iconEle.style;
+        const spread = sheet.getParent();
+        const host = spread.getHost();
+        const rect = host.getBoundingClientRect();
+        style.left = `${rect.left+x+width}px`;
+        style.top = `${rect.top+y}px`;
     }
 }
 
@@ -113,7 +221,7 @@ export function formatBindingPathCellType(sheet) {
         return;
     }
     sheet.suspendPaint();
-    const bindingPathCellType = new BindingPathCellType();
+    const bindingPathCellType = new DefaultCell();
     Object.entries(dataTable).forEach(([rowStr, colValue]) => {
         const row = Number(rowStr);
         Object.entries(colValue).forEach(([colStr, { bindingPath }]) => {

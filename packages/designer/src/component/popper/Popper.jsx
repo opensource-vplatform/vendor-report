@@ -8,6 +8,8 @@ import { createPortal } from 'react-dom';
 
 import styled from 'styled-components';
 
+import { genUUID } from '@utils/commonUtil';
+import { isBoolean } from '@utils/objectUtil';
 import { getNext } from '@utils/zIndexUtil';
 
 const Mask = styled.div`
@@ -45,7 +47,10 @@ export default function (props) {
         content = null,
         contentStyle = {},
         onVisibleChange,
+        //点击遮罩层才关闭
+        maskClose = false,
         disabled = false,
+        open,
     } = props;
     const ref = useRef(null);
     const contentRef = useRef(null);
@@ -54,7 +59,16 @@ export default function (props) {
         top: 0,
         width: 0,
         contentVisible: false,
+        contentWrapClassName: 'popper-content-wrap-'+genUUID()
     });
+    useEffect(()=>{
+        if(isBoolean(open)){
+            setData({
+                ...data,
+                contentVisible:open
+            });
+        }
+    },[open]);
     const handleVisibleChange = (visible)=>{
         onVisibleChange && onVisibleChange(visible);
     }
@@ -97,8 +111,8 @@ export default function (props) {
             <Wrap
                 ref={ref}
                 onClick={(evt) => {
-                    if (disabled) return;
-                    if (!evt.target.closest('.popper-content-wrap')) {
+                    if (disabled||(data.contentVisible&&maskClose)) return;
+                    if (!evt.target.closest('.'+data.contentWrapClassName)) {
                         let el = ref.current;
                         el =
                             el.childNodes && el.childNodes.length == 1
@@ -129,7 +143,7 @@ export default function (props) {
                     ? createPortal(
                           <PopperContentWrap
                               ref={contentRef}
-                              className='popper-content-wrap'
+                              className={data.contentWrapClassName}
                               style={{
                                   left: data.left,
                                   top: data.top,

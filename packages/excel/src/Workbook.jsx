@@ -203,6 +203,7 @@ export default function (props) {
         onSheetNameChanged,
         onSheetNameChanging,
         onActiveSheetChanging,
+        onSheetChanged,
         onFetchData,
         onRowChanged,
         onUndo,
@@ -222,6 +223,11 @@ export default function (props) {
         colMergeColumns = {},
         template,
         setting,
+        onColumnWidthChanged,
+        onRowHeightChanged,
+        onLeftColumnChanged,
+        onTopRowChanged,
+        onViewZoomed,
     } = props;
     if (license) {
         setLicense(license);
@@ -297,6 +303,12 @@ export default function (props) {
             WorkbookUndo: onUndo,
             WorkbookRedo: onRedo,
             RowChanged: onRowChanged,
+            SheetChanged: onSheetChanged,
+            ColumnWidthChanged:onColumnWidthChanged,
+            RowHeightChanged:onRowHeightChanged,
+            LeftColumnChanged:onLeftColumnChanged,
+            TopRowChanged:onTopRowChanged,
+            ViewZoomed:onViewZoomed,
         });
     };
     //处理工作表生成，优先使用json
@@ -315,6 +327,7 @@ export default function (props) {
                             top: 1,
                         };
                         sheet.recalcAll(true);
+                        onSheetChanged&&onSheetChanged('SheetChanged',{sheet});
                     });
                 }
             });

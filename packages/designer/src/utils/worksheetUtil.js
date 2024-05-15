@@ -63,7 +63,7 @@ export function getSheetInstanceId(sheetInstance) {
     return setSheetTag(sheetInstance)['instanceId'];
 }
 
-function getCellTagPlugins(sheet, row, col) {
+export function getCellTagPlugins(sheet, row, col) {
     return getCellTag(sheet, row, col, 'plugins');
 }
 

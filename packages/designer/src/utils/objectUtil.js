@@ -30,6 +30,10 @@ export const isObject = function (obj) {
     return '[object Object]' === Object.prototype.toString.call(obj);
 };
 
+export const isBoolean = function(obj){
+    return is(obj,'boolean');
+}
+
 export const deepClone = function (obj) {
     if (isArray(obj)) {
         const list = [];

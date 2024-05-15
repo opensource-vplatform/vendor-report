@@ -38,7 +38,6 @@ import {
 import { formatBindingPathCellType } from '@utils/cellUtil';
 import {
   findTreeNodeById,
-  genUUID,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil';
 import { getLicense } from '@utils/configUtil';
@@ -53,6 +52,7 @@ import {
 
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
+import { enhanceSheet } from './spread/index';
 import { handleEventPrmiseResult } from './utils/eventUtil';
 
 const GC = getNamespace();
@@ -115,7 +115,7 @@ export default function () {
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
     const cacheDatas = useRef({ template }).current;
     cacheDatas.template = template;
-    const sheetName = 'Person Address';
+    const sheetName = 'Sheet1';
     const handleValueChanged = useCallback((type, args) => {
         const { sheet, row, col, newValue } = args;
         const bindInfo = getCellTag(sheet, row, col, 'bindInfo');
@@ -132,13 +132,17 @@ export default function () {
             );
         }
     });
-    const handleEnterCell = useCallback((type, args) => {
-        context.handleSelectionChange();
-        fire({
-            event: EVENTS.EnterCell,
-            args: [args],
-        });
-    });
+    const genEventHandler = (eventType,observers,before,after)=>{
+        return useCallback((type, args) => {
+            before&&before(type,args);
+            fire({
+                event: EVENTS[eventType],
+                args: [args],
+            });
+            after&&after(type,args);
+        },observers||[]);
+    }
+    const handleEnterCell = genEventHandler('EnterCell',[],()=>context.handleSelectionChange());
     const handleActiveSheetChanged = useCallback(
         (type, args) => {
             const sheet = args.newSheet;
@@ -208,48 +212,13 @@ export default function () {
             );
         });
     });
-    const handleSelectionChanged = useCallback((type, data) => {
-        fire({
-            event: EVENTS.SelectionChanged,
-            args: [data],
-        });
-    });
-    const handleSelectionChanging = useCallback((type, data) => {
-        fire({
-            event: EVENTS.SelectionChanging,
-            args: [data],
-        });
-    });
-    const handleSheetChanged = useCallback((type, data) => {
-        fire({
-            event: EVENTS.SheetChanged,
-            args: [data],
-        });
-    });
-    const handleEditorStatusChanged = useCallback((type, data) => {
-        fire({
-            event: EVENTS.EditorStatusChanged,
-            args: [data],
-        });
-    });
-    const handleRendered = useCallback((data) => {
-        fire({
-            event: EVENTS.Rendered,
-            args: [data],
-        });
-    });
-    const handleUndo = useCallback((data) => {
-        fire({
-            event: EVENTS.Undo,
-            args: [data],
-        });
-    });
-    const handleRedo = useCallback((data) => {
-        fire({
-            event: EVENTS.Redo,
-            args: [data],
-        });
-    });
+    const handleSelectionChanged = genEventHandler('SelectionChanged');
+    const handleSelectionChanging = genEventHandler('SelectionChanging');
+    const handleSheetChanged = genEventHandler('SheetChanged');
+    const handleEditorStatusChanged = genEventHandler('EditorStatusChanged');
+    const handleRendered = genEventHandler('Rendered');
+    const handleUndo = genEventHandler('Undo');
+    const handleRedo = genEventHandler('Redo');
 
     const handleSheetNameChanged = useCallback((aciton, datas) => {
         const { newValue, oldValue } = datas;
@@ -261,12 +230,7 @@ export default function () {
         );
     });
 
-    const handleRowChanged = useCallback((event, data) => {
-        fire({
-            event: EVENTS.RowChanged,
-            args: [event, data],
-        });
-    });
+    const handleRowChanged = genEventHandler('RowChanged');
 
     const sheetsConf = context?.conf?.sheets || {};
     //是否显示添加选项卡按钮
@@ -279,9 +243,7 @@ export default function () {
     const license = getLicense(context);
 
     useEffect(() => {
-        const id = genUUID();
-        return bind({
-            id,
+        const unbind = bind({
             event: EVENTS.RowChanged,
             handler: (event, datas) => {
                 RowChanged({ ...datas, type: 'pageArea' });
@@ -289,6 +251,22 @@ export default function () {
                 RowChanged({ ...datas, type: 'totalArea' });
             },
         });
+        const unEnhance = bind({
+            event: EVENTS.SheetChanged,
+            handler: (params)=>{
+                if(params){
+                    let {sheet,newValue,sheetIndex} = params;
+                    if(!sheet&&newValue){
+                        sheet = spread.getSheet(sheetIndex);
+                    }
+                    enhanceSheet(sheet);
+                }
+            }
+        });
+        return ()=>{
+            unbind();
+            unEnhance();
+        }
     }, []);
 
     return (
@@ -314,6 +292,11 @@ export default function () {
                 onUndo={handleUndo}
                 onRedo={handleRedo}
                 onRowChanged={handleRowChanged}
+                onColumnWidthChanged={genEventHandler('ColumnWidthChanged')}
+                onRowHeightChanged={genEventHandler('RowHeightChanged')}
+                onLeftColumnChanged={genEventHandler('LeftColumnChanged')}
+                onTopRowChanged={genEventHandler('TopRowChanged')}
+                onViewZoomed={genEventHandler('ViewZoomed')}
             >
                 <Worksheet
                     name={sheetName}

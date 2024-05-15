@@ -7,7 +7,6 @@ import {
   showTab,
 } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
-import { BindingPathCellType } from '@utils/cellUtil';
 import {
   findTreeNodeById,
   genUUID,
@@ -22,8 +21,6 @@ import {
   getSheetInstanceId,
   setCellTag,
 } from '@utils/worksheetUtil.js';
-
-const bindingPathCellType = new BindingPathCellType();
 
 const GC = getNamespace();
 
@@ -630,8 +627,10 @@ export function bindingPath(params) {
     const { sheet, value, path, row, col } = params;
     const cell = sheet.getCell(row, col);
     cell.value(value);
-    cell.bindingPath(path).cellType(bindingPathCellType);
-
+    //const bindingPathCellType = new BindingPathCellType();
+    //bindingPathCellType.setBasePath(getBaseUrl());
+    //cell.bindingPath(path).cellType(bindingPathCellType);
+    cell.bindingPath(path);
     let style = sheet.getStyle(row, col);
     if (!style) {
         style = new GC.Spread.Sheets.Style();

@@ -18,3 +18,18 @@ export function scrollIntoView(element, noCheck = false) {
         }
     }
 }
+
+export function getOffsetFromBody(el) {
+    let dom = el;
+    let offsetLeft = 0;
+    let offsetTop = 0;
+    while (dom) {
+        offsetLeft += dom.offsetLeft;
+        offsetTop += dom.offsetTop;
+        dom = dom.offsetParent;
+    }
+    return {
+        offsetLeft,
+        offsetTop,
+    };
+}

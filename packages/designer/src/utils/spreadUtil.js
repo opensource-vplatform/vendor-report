@@ -1,3 +1,6 @@
+import { getOffsetFromBody } from './domUtil';
+import { isObject } from './objectUtil';
+
 /**
  * 批量更新数据到spread
  * @param {*} spread
@@ -17,13 +20,7 @@ export const withBatchUpdate = function (spread, updateHandler) {
     }
 };
 
-const withTransaction = function (
-    handler,
-    cmd,
-    context,
-    options,
-    isUndo
-) {
+const withTransaction = function (handler, cmd, context, options, isUndo) {
     const GC = getNamespace();
     const Commands = GC.Spread.Sheets.Commands;
     if (isUndo) {
@@ -53,7 +50,7 @@ export const withBatchSettingInTransaction = function (
     );
 };
 
-export const exeCommandImpl = function(handler,context, options, isUndo){
+export const exeCommandImpl = function (handler, context, options, isUndo) {
     const GC = getNamespace();
     var Commands = GC.Spread.Sheets.Commands;
     //options.cmd = cmdName;
@@ -63,18 +60,18 @@ export const exeCommandImpl = function(handler,context, options, isUndo){
     } else {
         Commands.startTransaction(context, options);
         const sheet = options.sheet;
-        if(sheet){
-            const config = options.options
+        if (sheet) {
+            const config = options.options;
             sheet.suspendPaint();
             sheet.suspendCalcService();
-            handler(sheet,config);
+            handler(sheet, config);
             sheet.resumeCalcService();
             sheet.resumePaint();
             Commands.endTransaction(context, options);
             return true;
         }
     }
-}
+};
 
 /**
  * 执行命令
@@ -85,7 +82,7 @@ export const exeCommandImpl = function(handler,context, options, isUndo){
 export const exeCommand = function (spread, cmd, options) {
     const commandManager = spread.commandManager();
     const sheet = spread.getActiveSheet();
-    if(sheet){
+    if (sheet) {
         const sheetName = sheet.name();
         commandManager.execute({ cmd, sheetName, sheet, options });
     }
@@ -333,4 +330,53 @@ export function setTableSheetFreeHeader(sheet, json) {
 export function getExcelVersion() {
     const GC = getNamespace();
     return GC.Spread.Sheets.productInfo.productVersion;
+}
+
+export function getSpecifiedRect(spread, range, position, sheet) {
+    let pos;
+    if (position) {
+        if (isObject(position)) {
+            pos = position;
+        }
+    } else {
+        let el = spread.getHost().querySelector('canvas[gcuielement]');
+        const offset = getOffsetFromBody(el);
+        pos = {
+            left: offset.offsetLeft,
+            top: offset.offsetTop,
+        };
+    }
+    const result = [];
+    const GC = getNamespace();
+    for (let i = 0; i <= 2; i++)
+        for (let j = 0; j <= 2; j++) {
+            const leftCol = sheet.getViewportLeftColumn(j);
+            const rightCol = sheet.getViewportRightColumn(j);
+            const topRow = sheet.getViewportTopRow(i);
+            const rowCount = sheet.getViewportBottomRow(i) - topRow + 1;
+            const colCount = rightCol - leftCol + 1;
+            if (!(rowCount <= 0 || colCount <= 0)) {
+                const rg = new GC.Spread.Sheets.Range(
+                    topRow,
+                    leftCol,
+                    rowCount,
+                    colCount
+                );
+                const rang = range.getIntersect(
+                    rg,
+                    Math.max(rg.rowCount, range.rowCount),
+                    Math.max(rg.colCount, range.colCount)
+                );
+                if (rang) {
+                    const rect = new GC.Spread.Sheets.Rect(0, 0, 0, 0);
+                    const rangeRect = sheet.getRangeRect(i, j, rang);
+                    (rect.x = rangeRect.x + ((pos && pos.left) || 0)),
+                        (rect.y = rangeRect.y + ((pos && pos.top) || 0)),
+                        (rect.width = rangeRect.width - 2),
+                        (rect.height = rangeRect.height - 2),
+                        result.push(rect);
+                }
+            }
+        }
+    return result;
 }
