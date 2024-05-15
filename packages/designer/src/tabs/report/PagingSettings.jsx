@@ -23,6 +23,7 @@ export default function Index(props) {
     const range = getSheetTag(sheet, 'pageArea');
     const isFillData = getSheetTag(sheet, 'isFillData');
     const groupSumRange = getSheetTag(sheet, 'groupSumArea');
+    const totalRange = getSheetTag(sheet, 'totalArea');
 
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
     const activeSheetName = spread.getActiveSheet().name();
@@ -36,6 +37,8 @@ export default function Index(props) {
         setSheetTag(sheet, 'pageArea', datas.range);
         setSheetTag(sheet, 'isFillData', datas.isFillData);
         setSheetTag(sheet, 'groupSumArea', datas.groupSumRange);
+        setSheetTag(sheet, 'totalArea', datas.totalRange);
+
         if (datas.range) {
             const rangeArr = datas.range.split(':');
             const row = Number(rangeArr[0]) - 1;
@@ -54,6 +57,15 @@ export default function Index(props) {
             }
         }
 
+        if (datas.totalRange) {
+            const rangeArr = datas.totalRange.split(':');
+            const row = Number(rangeArr[0]) - 1;
+            const endRow = Number(rangeArr[1]);
+            for (let i = row; i < endRow; i++) {
+                sheet.setValue(i, 0, 'T', GC.Spread.Sheets.SheetArea.rowHeader);
+            }
+        }
+
         setShow(false);
     };
 
@@ -67,6 +79,7 @@ export default function Index(props) {
                     isFillData={isFillData}
                     isTemplate={isTemplate}
                     groupSumRange={groupSumRange}
+                    totalRange={totalRange}
                 ></PageSettings>
             )}
             <GroupItem title='分页设置'>

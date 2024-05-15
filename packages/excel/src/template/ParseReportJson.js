@@ -175,9 +175,6 @@ export default class Render {
         this.templatesPageInfos = {};
         this.delayPlugins = [];
         this.delayFormula = [];
-        this.groupSumFooterTemplates = [];
-        this.groupSumHeaderTemplates = [];
-        this.hasGroupSumArea = false;
 
         //如果有模板，则对数据进行分组，每个组一个sheet
         this.groupTemplate();
@@ -208,7 +205,11 @@ export default class Render {
         }
     }
     render(pageInfos) {
-        const { headerTemplates, footerTemplates, contentTemplates } = this;
+        const {
+            headerTemplates: allHeaderTemplates,
+            footerTemplates: allFooterTemplates,
+            contentTemplates,
+        } = this;
         //需要分页
         if (pageInfos.pageArea) {
             const calculate = (
@@ -264,11 +265,25 @@ export default class Render {
                 };
             };
 
-            const recursionRender = (
-                headerTemplates,
-                footerTemplates,
-                isInterrupt
-            ) => {
+            const headerTemplates = [];
+            const groupSumHeaderTemplates = [];
+            allHeaderTemplates.forEach(function (temp) {
+                if (!temp.isTotalArea) {
+                    groupSumHeaderTemplates.push(temp);
+                    !temp.isGroupSumArea && headerTemplates.push(temp);
+                }
+            });
+
+            const footerTemplates = [];
+            const groupSumFooterTemplates = [];
+            allFooterTemplates.forEach(function (temp) {
+                if (!temp.isTotalArea) {
+                    groupSumFooterTemplates.push(temp);
+                    !temp.isGroupSumArea && footerTemplates.push(temp);
+                }
+            });
+
+            const recursionRender = (headerTemplates, footerTemplates) => {
                 let { pageSubtotal, lastContentTempCount, contentTempCount } =
                     calculate(
                         headerTemplates,
@@ -281,20 +296,49 @@ export default class Render {
                 while (index < pageSubtotal) {
                     const isLastPage = index + 1 >= pageSubtotal;
                     if (isLastPage) {
-                        const {
+                        let header = groupSumHeaderTemplates;
+                        let footer = groupSumFooterTemplates;
+
+                        let {
                             pageSubtotal: _pageSubtotal,
                             lastContentTempCount: _lastContentTempCount,
                             contentTempCount: _contentTempCount,
-                        } = calculate(
-                            this.groupSumHeaderTemplates,
-                            this.groupSumFooterTemplates,
-                            lastContentTempCount
-                        );
+                        } = calculate(header, footer, lastContentTempCount);
+
                         if (_pageSubtotal === 1) {
-                            headerTemplates = this.groupSumHeaderTemplates;
-                            footerTemplates = this.groupSumFooterTemplates;
-                            lastContentTempCount = _lastContentTempCount;
-                            contentTempCount = _lastContentTempCount;
+                            if (
+                                pageInfos.groups.indexOf(
+                                    pageInfos.sheet.name
+                                ) ===
+                                pageInfos.groups.length - 1
+                            ) {
+                                const {
+                                    pageSubtotal: _pageSubtotal,
+                                    lastContentTempCount:
+                                        _lastContentTempCount_,
+                                    contentTempCount: _contentTempCount,
+                                } = calculate(
+                                    header,
+                                    footer,
+                                    _lastContentTempCount
+                                );
+                                if (_pageSubtotal === 1) {
+                                    header = allHeaderTemplates;
+                                    footer = allFooterTemplates;
+                                    headerTemplates = header;
+                                    footerTemplates = footer;
+                                    lastContentTempCount =
+                                        _lastContentTempCount_;
+                                    contentTempCount = _lastContentTempCount_;
+                                } else {
+                                    pageSubtotal += 1;
+                                }
+                            } else {
+                                headerTemplates = header;
+                                footerTemplates = footer;
+                                lastContentTempCount = _lastContentTempCount;
+                                contentTempCount = _lastContentTempCount;
+                            }
                         } else {
                             pageSubtotal += 1;
                         }
@@ -332,14 +376,14 @@ export default class Render {
             recursionRender(headerTemplates, footerTemplates, false);
         } else {
             this.genPageDataTables({
-                templates: headerTemplates,
+                templates: allHeaderTemplates,
                 pageInfos,
             });
         }
         resetSheet(pageInfos);
     }
 
-    splitTemplate({ sheet, pageArea, groupSumArea }) {
+    splitTemplate({ sheet, tag = {} }) {
         const { rowCount = 200 } = sheet;
 
         //头部区域模板
@@ -349,10 +393,8 @@ export default class Render {
         //表格区域模板
         const contentTemplates = [];
 
-        this.groupSumHeaderTemplates = [];
-        this.groupSumFooterTemplates = [];
-
         const REG = /^\d+:\d+$/;
+        const { pageArea = '', groupSumArea = '', totalArea = '' } = tag;
         //分页区域范围
         let pageAreaStartRow = rowCount;
         let pageAreaEndRow = rowCount;
@@ -373,6 +415,15 @@ export default class Render {
             groupSumAreaEndRow = Number(res[1]);
         }
 
+        //统计区域范围
+        let totalAreaStartRow = rowCount;
+        let totalAreaEndRow = rowCount;
+        if (totalArea && REG.test(totalArea)) {
+            const res = totalArea.split(':');
+            totalAreaStartRow = Number(res[0]) - 1;
+            totalAreaEndRow = Number(res[1]);
+        }
+
         let template = null;
         let row = 0;
         do {
@@ -384,6 +435,11 @@ export default class Render {
             //判断当前行是否属于分组汇总区域
             if (row >= groupSumAreaStartRow && row < groupSumAreaEndRow) {
                 rowTemplate.isGroupSumArea = true;
+            }
+
+            //判断当前行是否属于总计区域
+            if (row >= totalAreaStartRow && row < totalAreaEndRow) {
+                rowTemplate.isTotalArea = true;
             }
 
             //当前行与上一行存在合并关系，这两行作为一个模板
@@ -400,6 +456,10 @@ export default class Render {
                         template.dataLen = value.length;
                     }
                     template.datas.set(tableCode, value);
+                });
+
+                rowTemplate.allDatas.forEach(function (value, tableCode) {
+                    template.allDatas.set(tableCode, value);
                 });
 
                 if (rowTemplate.isGroupSumArea) {
@@ -461,20 +521,9 @@ export default class Render {
                 });
 
                 if (template.row < pageAreaStartRow) {
-                    this.groupSumHeaderTemplates.push(template);
-                    if (template.isGroupSumArea) {
-                        this.hasGroupSumArea = true;
-                    } else {
-                        headerTemplates.push(template);
-                    }
+                    headerTemplates.push(template);
                 } else if (template.row >= pageAreaEndRow) {
-                    this.groupSumFooterTemplates.push(template);
-
-                    if (template.isGroupSumArea) {
-                        this.hasGroupSumArea = true;
-                    } else {
-                        footerTemplates.push(template);
-                    }
+                    footerTemplates.push(template);
                 } else {
                     contentTemplates.push(template);
                 }
@@ -490,6 +539,10 @@ export default class Render {
     }
     setTemplateDatas(template, tableCode, sheetName) {
         let ds = this.datas?.[tableCode] || [];
+        if (!template.allDatas.has(tableCode)) {
+            template.allDatas.set(tableCode, Copy(ds));
+        }
+
         const groupName = this.nameMaps[sheetName];
         const groupedDs =
             this.groupsDatas?.[sheetName]?.[tableCode]?.[groupName];
@@ -531,10 +584,12 @@ export default class Render {
             endRow: row + 1,
             rowCount: 1,
             datas: new Map(),
+            allDatas: new Map(),
             dataTables: [dataTableInfos],
             dataLen: 0,
             height: 0,
             isGroupSumArea: false,
+            isTotalArea: false,
         };
 
         let maxRowCount = 1;
@@ -660,6 +715,7 @@ export default class Render {
                 //根据分组名称创建sheet，Object.values(groupsDatas)[0]，只支持一个实体进行分组
                 const grouedData = Object.values(currentSheetDatas)[0];
                 const groupNames = Object.keys(grouedData);
+                const newGroupNames = [];
                 groupNames.forEach(function (_newSheetName, index) {
                     let newSheetName = _newSheetName;
                     //处理同名的sheet
@@ -698,10 +754,11 @@ export default class Render {
                         reportJson.sheets[newSheetName] = sheet;
                         reportJson.sheetCount += 1;
                     }
-
+                    newGroupNames.push(newSheetName);
                     template[newSheetName] = {
                         ...templateInfo,
                         fromTempSheet: sheetName,
+                        groups: newGroupNames,
                     };
                 });
             }
@@ -747,15 +804,13 @@ export default class Render {
             } = margin;
 
             const templateInfo = this.template[name];
-            let pageArea = '';
             let isFillData = false;
-            let groupSumArea = '';
             const sheetTag = data?.defaultDataNode?.tag;
+            let tag = {};
             if (sheetTag) {
                 const res = JSON.parse(sheetTag);
-                pageArea = res?.pageArea || '';
                 isFillData = res?.isFillData;
-                groupSumArea = res?.groupSumArea || '';
+                tag = res;
             }
 
             if (sheet?.rowHeaderData?.dataTable) {
@@ -765,18 +820,16 @@ export default class Render {
             //以分页区域为边界，对模板进行拆分成头部区模板，内容区模板，底部区模板
             this.splitTemplate({
                 sheet,
-                pageArea,
-                groupSumArea,
+                tag,
             });
-
             let pageTotalHeight = 0;
             if (orientation === 2) {
                 pageTotalHeight =
                     width -
-                    marginLeft -
+                    marginBottom -
                     marginFooter -
                     marginHeader -
-                    marginRight;
+                    marginTop;
             } else {
                 pageTotalHeight =
                     height -
@@ -788,6 +841,7 @@ export default class Render {
 
             const isTemplate = templateInfo ? true : false;
             const fromTempSheet = templateInfo?.fromTempSheet;
+            const groups = templateInfo?.groups || [];
             if (isTemplate) {
                 if (!this.templatesPageInfos[fromTempSheet]) {
                     this.templatesPageInfos[fromTempSheet] = {
@@ -812,7 +866,7 @@ export default class Render {
                 rowCount: 0,
                 pageIndex: 1,
                 pageTotal: 1,
-                pageArea,
+                pageArea: tag?.pageArea,
                 pageTotalHeight,
                 pageHeight: 0,
 
@@ -822,6 +876,7 @@ export default class Render {
                 cobySheet: JSON.stringify(sheet),
                 page: {},
                 fromTempSheet,
+                groups,
             };
 
             this.render(pageInfos);
@@ -836,12 +891,18 @@ export default class Render {
         templates.forEach((temp) => {
             const {
                 datas,
+                allDatas,
                 dataTables,
                 height: tempHeight,
                 isGroupSumArea,
+                isTotalArea,
             } = temp;
             let { verticalAutoMergeRanges } = temp;
             const unionDatasource = getUnionDatasource(datas, this.setting);
+            const unionDatasourceAll = getUnionDatasource(
+                allDatas,
+                this.setting
+            );
             const dataLen = endIndex || unionDatasource.getCount() || 1;
             verticalAutoMergeRanges = Copy(verticalAutoMergeRanges);
             verticalAutoMergeRanges.forEach(function (item) {
@@ -901,7 +962,7 @@ export default class Render {
                                 );
 
                                 tool.setIsGroupSumAreaHandler(
-                                    () => isGroupSumArea
+                                    () => isGroupSumArea || isTotalArea
                                 );
                                 if (tag) {
                                     const tagObj = JSON.parse(tag);
@@ -923,6 +984,8 @@ export default class Render {
                                     targetCell['dataIndex'] = dataIndex;
                                     targetCell['unionDatasource'] =
                                         unionDatasource;
+                                    targetCell['unionDatasourceAll'] =
+                                        unionDatasourceAll;
 
                                     //处理超链接信息
                                     const hyperlinkInfo =
@@ -981,12 +1044,19 @@ export default class Render {
 
                                             tool.setUnionDatasourceHandler(
                                                 () => {
+                                                    if (isTotalArea) {
+                                                        return targetCell?.[
+                                                            'unionDatasourceAll'
+                                                        ];
+                                                    }
+
                                                     return targetCell?.[
                                                         'unionDatasource'
                                                     ];
                                                 }
                                             );
 
+                                            debugger;
                                             const { type, value } = exePlugins(
                                                 {
                                                     type: 'text',
@@ -1138,11 +1208,11 @@ export default class Render {
         } else {
             //在当前页签中显示下一页
             let diff = pageInfos.pageTotalHeight - pageInfos.pageHeight;
-            if (diff > 0) {
+            if (diff > 10) {
                 const { rowCount } = pageInfos;
                 pageInfos.dataTable[rowCount] = {};
                 pageInfos.rows[rowCount] = {
-                    size: diff,
+                    size: Math.floor(diff),
                 };
                 pageInfos.rowCount += 1;
             }

@@ -21,7 +21,7 @@ class CellSubTotal extends Plugin {
             : unionDatasource.getFieldValues(tableCode, fieldCode);
         const filter = () => {
             const result = [];
-            values.forEach((value) => {
+            values.forEach(({ value }) => {
                 if (!isNaN(value)) {
                     result.push(parseFloat(value));
                 }
@@ -54,7 +54,7 @@ class CellSubTotal extends Plugin {
                 //求和
                 rest = sum(filter());
         }
-        return { type: 'text', value:rest };
+        return { type: 'text', value: rest };
     }
 
     /**
