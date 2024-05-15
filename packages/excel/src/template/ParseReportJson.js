@@ -316,7 +316,7 @@ export default class Render {
                                     pageSubtotal: _pageSubtotal,
                                     lastContentTempCount:
                                         _lastContentTempCount_,
-                                    contentTempCount: _contentTempCount,
+                                    contentTempCount: _contentTempCount_,
                                 } = calculate(
                                     header,
                                     footer,
@@ -329,7 +329,7 @@ export default class Render {
                                     footerTemplates = footer;
                                     lastContentTempCount =
                                         _lastContentTempCount_;
-                                    contentTempCount = _lastContentTempCount_;
+                                    contentTempCount = _contentTempCount_;
                                 } else {
                                     pageSubtotal += 1;
                                 }
@@ -337,7 +337,7 @@ export default class Render {
                                 headerTemplates = header;
                                 footerTemplates = footer;
                                 lastContentTempCount = _lastContentTempCount;
-                                contentTempCount = _lastContentTempCount;
+                                contentTempCount = _contentTempCount;
                             }
                         } else {
                             pageSubtotal += 1;
