@@ -87,11 +87,19 @@ function RowChanged(params) {
         } else if (row > startRow && row < newEndRow) {
             newEndRow = newEndRow + count;
         }
+
+        let rowHeaderType = 'C';
+        if (type === 'pageArea') {
+            rowHeaderType = 'G';
+        } else if (type === 'totalArea') {
+            rowHeaderType = 'T';
+        }
+
         for (let i = newStartRow; i < newEndRow; i++) {
             sheet.setValue(
                 i,
                 0,
-                type === 'pageArea' ? 'C' : 'G',
+                rowHeaderType,
                 GC.Spread.Sheets.SheetArea.rowHeader
             );
         }
@@ -278,6 +286,7 @@ export default function () {
             handler: (event, datas) => {
                 RowChanged({ ...datas, type: 'pageArea' });
                 RowChanged({ ...datas, type: 'groupSumArea' });
+                RowChanged({ ...datas, type: 'totalArea' });
             },
         });
     }, []);

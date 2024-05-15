@@ -29,6 +29,7 @@ const HLayout = styled.div`
 
 const Default_Info = '选择需要分页的区域';
 const Default_Group_Sum_Range_Info = '选择分组汇总区域';
+const Default_Total_Range_Info = '选择总计区域';
 const REG = /^\d+:\d+$/;
 
 export default function (props) {
@@ -40,6 +41,7 @@ export default function (props) {
         isFillData = false,
         groupSumRange,
         isTemplate = false,
+        totalRange,
     } = props;
 
     const [data, setData] = useState(() => {
@@ -54,6 +56,9 @@ export default function (props) {
             groupSumRange,
             groupSumRangeError: false,
             groupSumRangeMessage: Default_Group_Sum_Range_Info,
+            totalRange,
+            totalRangeError: false,
+            totalRangeMessage: Default_Total_Range_Info,
         };
     });
 
@@ -74,6 +79,13 @@ export default function (props) {
             isError = true;
         }
 
+        //校验总计区域正确性
+        const totalRangeStr = data.totalRange;
+        if (totalRangeStr && !REG.test(totalRangeStr)) {
+            checkedResult.totalRangeError = true;
+            isError = true;
+        }
+
         if (isError) {
             setData((data) => {
                 return {
@@ -88,6 +100,7 @@ export default function (props) {
             onConfirm({
                 range: rangeStr,
                 groupSumRange: groupSumRangeStr,
+                totalRange: totalRangeStr,
                 isFillData: data.isFillData,
             });
         }
@@ -178,28 +191,52 @@ export default function (props) {
                 </HLayout>
 
                 {isTemplate && (
-                    <HLayout>
-                        <Text>分组汇总区域：</Text>
-                        <Range
-                            value={data.groupSumRange}
-                            hostId={data.domId}
-                            error={data.groupSumRangeError}
-                            selectionType='row'
-                            onStartSelect={onRangeStartSelect}
-                            onEndSelect={onRangeEndSelect}
-                            onChange={(val) => {
-                                handleRangeOnChange('groupSumRange', val);
-                            }}
-                        ></Range>
-                        <InfoIcon
-                            iconStyle={{
-                                color: data.groupSumRangeError
-                                    ? 'red'
-                                    : '#228ee5',
-                            }}
-                            tips={data.groupSumRangeMessage}
-                        ></InfoIcon>
-                    </HLayout>
+                    <>
+                        <HLayout>
+                            <Text>分组汇总区域：</Text>
+                            <Range
+                                value={data.groupSumRange}
+                                hostId={data.domId}
+                                error={data.groupSumRangeError}
+                                selectionType='row'
+                                onStartSelect={onRangeStartSelect}
+                                onEndSelect={onRangeEndSelect}
+                                onChange={(val) => {
+                                    handleRangeOnChange('groupSumRange', val);
+                                }}
+                            ></Range>
+                            <InfoIcon
+                                iconStyle={{
+                                    color: data.groupSumRangeError
+                                        ? 'red'
+                                        : '#228ee5',
+                                }}
+                                tips={data.groupSumRangeMessage}
+                            ></InfoIcon>
+                        </HLayout>
+                        <HLayout>
+                            <Text>总计区域：</Text>
+                            <Range
+                                value={data.totalRange}
+                                hostId={data.domId}
+                                error={data.totalRangeError}
+                                selectionType='row'
+                                onStartSelect={onRangeStartSelect}
+                                onEndSelect={onRangeEndSelect}
+                                onChange={(val) => {
+                                    handleRangeOnChange('totalRange', val);
+                                }}
+                            ></Range>
+                            <InfoIcon
+                                iconStyle={{
+                                    color: data.totalRangeError
+                                        ? 'red'
+                                        : '#228ee5',
+                                }}
+                                tips={data.totalRangeMessage}
+                            ></InfoIcon>
+                        </HLayout>
+                    </>
                 )}
             </Wrap>
         </OperationDialog>
