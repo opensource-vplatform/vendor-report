@@ -115,12 +115,7 @@ export default function () {
                 >
                     打印
                 </Button>
-                <Button
-                    style={{ marginRight: 8 }}
-                    onClick={() => {
-                        dispatch(setMode({ mode: 'edit' }));
-                    }}
-                >
+                <Button style={{ marginRight: 8 }} onClick={handleEdit}>
                     编辑
                 </Button>
                 {toolbar.map(function ({ title, type, onClick, desc }, index) {

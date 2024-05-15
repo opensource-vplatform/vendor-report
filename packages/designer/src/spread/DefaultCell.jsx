@@ -88,7 +88,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             },
         });
         bind({
-            event: EVENTS.onDesignerEdit,
+            event: EVENTS.Inited,
             handler: () => {
                 this._initIcon();
                 this._refreshIconPosition();
@@ -267,6 +267,14 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         } else {
             this._hideIcon();
         }
+    }
+
+    toJSON() {
+        const json = { ...super.toJSON() };
+        delete json.sheet;
+        delete json.root;
+        delete json._iconEle;
+        return json;
     }
 }
 
