@@ -41,6 +41,13 @@ class UnionDatasource {
          *          tableCode:string,//主表编号
          *          fieldCode:string,//主表字段编号
          *      },
+         *   }>,
+         *   cellPlugins:Array<{
+         *     bindingPath:string,
+         *     plugins:Array<{
+         *       type: string,//插件类型
+         *       [code:string]:any,//插件配置信息
+         *     }>
          *   }>
          * }
          */
