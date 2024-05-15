@@ -1,10 +1,7 @@
 import { Select } from '@components/form/Index';
 
-import {
-  Item,
-  ItemList,
-  Title,
-} from '../Component';
+import { Item, ItemList, Title, Toolbar } from '../Component';
+import { Fragment, useState } from 'react';
 
 const Sum_Types = [
     {
@@ -34,14 +31,29 @@ const Sum_Types = [
 ];
 
 export default function (props) {
+    const { onConfirm, onCancel, plugin } = props;
+    const [data, setData] = useState(plugin);
+    const handleConfirm = () => {
+        onConfirm(data);
+    };
     return (
-        <ItemList>
-            <Item>
-                <Title>汇总方式</Title>
-            </Item>
-            <Item>
-                <Select datas={Sum_Types}></Select>
-            </Item>
-        </ItemList>
+        <Fragment>
+            <ItemList>
+                <Item>
+                    <Title>汇总方式</Title>
+                </Item>
+                <Item>
+                    <Select
+                        wrapStyle={{ height: 26, width: '100%' }}
+                        datas={Sum_Types}
+                        value={data.functionNum}
+                        onChange={(val) =>
+                            setData({ ...data, functionNum: val })
+                        }
+                    ></Select>
+                </Item>
+            </ItemList>
+            <Toolbar onCancel={onCancel} onConfirm={handleConfirm}></Toolbar>
+        </Fragment>
     );
 }

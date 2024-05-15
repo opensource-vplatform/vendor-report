@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import resourceManager from 'resource-manager-js';
 
@@ -13,21 +8,13 @@ import LicenseWarn from './LicenseWarn';
 import ParseReportJson from './template/ParseReportJson';
 import { withDivStyled } from './utils/componentUtil';
 import { setBaseUrl } from './utils/environmentUtil';
-import {
-  checkLicense,
-  getLicense,
-  setLicense,
-} from './utils/licenseUtil';
-import {
-  genAutoMergeRangeInfos,
-  genSpans,
-  sortData,
-} from './utils/other';
+import { checkLicense, getLicense, setLicense } from './utils/licenseUtil';
+import { genAutoMergeRangeInfos, genSpans, sortData } from './utils/other';
 import { setPrintInfo } from './utils/printUtil';
 import {
-  getNamespace,
-  getPluginSrc,
-  withBatchCalcUpdate,
+    getNamespace,
+    getPluginSrc,
+    withBatchCalcUpdate,
 } from './utils/spreadUtil';
 
 const GC = getNamespace();
@@ -304,11 +291,11 @@ export default function (props) {
             WorkbookRedo: onRedo,
             RowChanged: onRowChanged,
             SheetChanged: onSheetChanged,
-            ColumnWidthChanged:onColumnWidthChanged,
-            RowHeightChanged:onRowHeightChanged,
-            LeftColumnChanged:onLeftColumnChanged,
-            TopRowChanged:onTopRowChanged,
-            ViewZoomed:onViewZoomed,
+            ColumnWidthChanged: onColumnWidthChanged,
+            RowHeightChanged: onRowHeightChanged,
+            LeftColumnChanged: onLeftColumnChanged,
+            TopRowChanged: onTopRowChanged,
+            ViewZoomed: onViewZoomed,
         });
     };
     //处理工作表生成，优先使用json
@@ -327,7 +314,8 @@ export default function (props) {
                             top: 1,
                         };
                         sheet.recalcAll(true);
-                        onSheetChanged&&onSheetChanged('SheetChanged',{sheet});
+                        onSheetChanged &&
+                            onSheetChanged('SheetChanged', { sheet });
                     });
                 }
             });
@@ -356,6 +344,8 @@ export default function (props) {
                     workSheet.setRowCount(rowCount);
                     workSheet.setColumnCount(colCount);
                     spread.addSheet(index, workSheet);
+                    onSheetChanged &&
+                        onSheetChanged('SheetChanged', { sheet: workSheet });
                 });
             });
         }
@@ -407,7 +397,7 @@ export default function (props) {
         }
     };
 
-    const customRegister = ()=>{
+    const customRegister = () => {
         //必须每次都注册，否则spread填充json后，自定义函数注册被清空
         const spread = data.spread;
         spread.suspendEvent();
@@ -415,7 +405,7 @@ export default function (props) {
         register(data.spread);
         spread.resumeEvent();
         spread.resumeCalcService(true);
-    }
+    };
 
     useEffect(() => {
         (async () => {
@@ -437,10 +427,10 @@ export default function (props) {
                             customRegister();
                         });
                     }
-                }else{
+                } else {
                     customRegister();
                 }
-            }else{
+            } else {
                 customRegister();
             }
         })();

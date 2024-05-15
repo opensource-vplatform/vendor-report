@@ -1,19 +1,24 @@
-import {
-  Item,
-  ItemList,
-  Text,
-  Title,
-} from '../Component';
+import { Fragment } from 'react';
+import { Item, ItemList, Text, Title, Toolbar } from '../Component';
 
-export default function () {
+export default function (props) {
+    const { onConfirm, onCancel } = props;
+    const handleConfirm = () => {
+        onConfirm({
+            type: 'cellGroupType',
+        });
+    };
     return (
-        <ItemList>
-            <Item>
-                <Title>扩展方向</Title>
-            </Item>
-            <Item>
-                <Text>纵向</Text>
-            </Item>
-        </ItemList>
+        <Fragment>
+            <ItemList>
+                <Item>
+                    <Title>扩展方向</Title>
+                </Item>
+                <Item>
+                    <Text>纵向</Text>
+                </Item>
+            </ItemList>
+            <Toolbar onCancel={onCancel} onConfirm={handleConfirm}></Toolbar>
+        </Fragment>
     );
 }

@@ -1,27 +1,12 @@
-import {
-  Fragment,
-  useContext,
-  useEffect,
-} from 'react';
+import { Fragment, useContext, useEffect } from 'react';
 
 import axios from 'axios';
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
-import {
-  bind,
-  EVENTS,
-  fire,
-  hasBind,
-} from '@event/EventManager';
+import { Tab, Tabs } from '@components/tabs/Index';
+import { bind, EVENTS, fire, hasBind } from '@event/EventManager';
 import { setMode } from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
@@ -41,19 +26,12 @@ import DesignerContext from './DesignerContext';
 import { GlobalComponent } from './Global';
 import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
 import VerticalAlignTop from './icons/arrow/VerticalAlignTop';
-import {
-  listenRedo,
-  listenSave,
-  listenUndo,
-} from './Listener';
+import { listenRedo, listenSave, listenUndo } from './Listener';
 import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
 import Formula from './tabs/formula/Index';
 import { saveAsImg } from './utils/canvas2image';
-import {
-  getNavConfig,
-  getToolbar,
-} from './utils/configUtil';
+import { getNavConfig, getToolbar } from './utils/configUtil';
 import { handleEventPrmiseResult } from './utils/eventUtil';
 import { parseStyle } from './utils/styleUtil';
 
@@ -162,7 +140,7 @@ export default function () {
                     {
                         dsList: finalDsList,
                         define,
-                        datasourceSetting:datasourceSlice.setting,
+                        datasourceSetting: datasourceSlice.setting,
                         toImage: (width, height) => {
                             return saveAsImg(spread, width, height);
                         },
@@ -178,11 +156,11 @@ export default function () {
         }
     };
 
-    const handlePreview = async ()=>{
+    const handlePreview = async () => {
         const flag = hasBind({
-            event:EVENTS.onPreview
+            event: EVENTS.onPreview,
         });
-        if(flag){
+        if (flag) {
             const define = parseUsedDatasource(spread, finalDsList);
             const result = fire({
                 event: EVENTS.onPreview,
@@ -201,16 +179,16 @@ export default function () {
             );
             dispatch(genPreviewDatas({ datas }));
             dispatch(setMode({ mode: 'preview' }));
-        }else{
+            fire({
+                event: EVENTS.onDesignerPreview,
+                args: [],
+            });
+        } else {
             let datas = null;
-            const { batchGetDatasURL, datasPath } =
-                context?.conf || {};
+            const { batchGetDatasURL, datasPath } = context?.conf || {};
             if (batchGetDatasURL && datasPath) {
                 try {
-                    let define = parseUsedDatasource(
-                        spread,
-                        finalDsList
-                    );
+                    let define = parseUsedDatasource(spread, finalDsList);
                     define = define.map(function (item) {
                         return {
                             type: item.type,
@@ -218,15 +196,11 @@ export default function () {
                         };
                     });
 
-                    const response = await axios.post(
-                        batchGetDatasURL,
-                        {
-                            datasource: define,
-                        }
-                    );
+                    const response = await axios.post(batchGetDatasURL, {
+                        datasource: define,
+                    });
 
-                    const datasPathArr =
-                        datasPath.split('/');
+                    const datasPathArr = datasPath.split('/');
                     datas = response?.data;
                     while (datasPathArr.length) {
                         datas = datas[datasPathArr.shift()];
@@ -235,32 +209,36 @@ export default function () {
             }
             dispatch(genPreviewDatas({ datas }));
             dispatch(setMode({ mode: 'preview' }));
+            fire({
+                event: EVENTS.onDesignerPreview,
+                args: [],
+            });
         }
-    }
+    };
 
     const context = useContext(DesignerContext);
     //是否隐藏文件导航
-    const isHiddenFile = getNavConfig(context,"file");
+    const isHiddenFile = getNavConfig(context, 'file');
     //是否隐藏开始导航
-    const isHiddenStart = getNavConfig(context,"start");
+    const isHiddenStart = getNavConfig(context, 'start');
     //是否隐藏公式导航
-    const isHiddenFormula = getNavConfig(context,"formula");
+    const isHiddenFormula = getNavConfig(context, 'formula');
     //是否隐藏数据导航
-    const isHiddenData = getNavConfig(context,"data");
+    const isHiddenData = getNavConfig(context, 'data');
     //是否隐藏视图导航
-    const isHiddenView = getNavConfig(context,"view");
+    const isHiddenView = getNavConfig(context, 'view');
     //是否隐藏表设计导航
-    const isHiddenTable = getNavConfig(context,"table");
+    const isHiddenTable = getNavConfig(context, 'table');
     //是否隐藏设置导航
-    const isHiddenSetting = getNavConfig(context,"setting");
+    const isHiddenSetting = getNavConfig(context, 'setting');
     //是否隐藏插入导航
-    const isHiddenInsert = getNavConfig(context,"insert");
+    const isHiddenInsert = getNavConfig(context, 'insert');
     //是否隐藏迷你图导航
-    const isHiddenSparklines = getNavConfig(context,"sparklines");
+    const isHiddenSparklines = getNavConfig(context, 'sparklines');
     //是否隐藏页面布局
-    const isHiddenLayout = getNavConfig(context,"layout");
+    const isHiddenLayout = getNavConfig(context, 'layout');
     //是否可以预览
-    const isPreview = !getNavConfig(context,"preview");
+    const isPreview = !getNavConfig(context, 'preview');
     const toolbar = getToolbar(context);
     useEffect(() => {
         if (spread) {
@@ -359,12 +337,14 @@ export default function () {
                         >
                             保存
                         </Button>
-                        {isPreview && <Button
-                            style={{ marginRight: 8 }}
-                            onClick={handlePreview}
-                        >
-                            预览
-                        </Button>}
+                        {isPreview && (
+                            <Button
+                                style={{ marginRight: 8 }}
+                                onClick={handlePreview}
+                            >
+                                预览
+                            </Button>
+                        )}
                         {toolbar.map(function (
                             { title, type, onClick, desc },
                             index

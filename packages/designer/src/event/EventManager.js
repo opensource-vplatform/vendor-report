@@ -25,6 +25,16 @@ export const EVENTS = {
      * 预览事件
      */
     onPreview: 'onPreview',
+
+    /**
+     * 设计器预览事件
+     */
+    onDesignerPreview: 'onDesignerPreview',
+
+    /**
+     * 设计器编辑事件
+     */
+    onDesignerEdit: 'onDesignerEdit',
     /**
      * 激活工作表变更事件
      */
@@ -53,19 +63,19 @@ export const EVENTS = {
     /**
      * 数据源双击事件
      */
-    onDatasourceDBClick:"onDatasourceDBClick",
+    onDatasourceDBClick: 'onDatasourceDBClick',
 
-    SheetChanged:"SheetChanged",
+    SheetChanged: 'SheetChanged',
 
-    ColumnWidthChanged:"ColumnWidthChanged",
+    ColumnWidthChanged: 'ColumnWidthChanged',
 
-    RowHeightChanged:"RowHeightChanged",
+    RowHeightChanged: 'RowHeightChanged',
 
-    LeftColumnChanged:"LeftColumnChanged",
+    LeftColumnChanged: 'LeftColumnChanged',
 
-    TopRowChanged:"TopRowChanged",
+    TopRowChanged: 'TopRowChanged',
 
-    ViewZoomed:"ViewZoomed"
+    ViewZoomed: 'ViewZoomed',
 };
 
 const check = function (params) {
@@ -171,5 +181,5 @@ export const hasBind = function (params) {
     check(params);
     const { event } = params;
     const handlers = EVENT_HANDLER_MAP[event];
-    return handlers&&Object.values(handlers).length>0;
+    return handlers && Object.values(handlers).length > 0;
 };

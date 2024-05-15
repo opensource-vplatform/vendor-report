@@ -1,54 +1,31 @@
-import {
-  Fragment,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react';
+import { Fragment, useCallback, useContext, useEffect, useRef } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { registerCommand } from '@commands/index';
-import {
-  bind,
-  EVENTS,
-  fire,
-} from '@event/EventManager';
+import { bind, EVENTS, fire } from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
-  initDatasource,
-  setSetting,
-  updateActiveSheetTablePath,
-  updateDslist,
+    initDatasource,
+    setSetting,
+    updateActiveSheetTablePath,
+    updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
-  initWizardSlice,
-  toggleBooleanValue,
-  updateTemplateName,
+    initWizardSlice,
+    toggleBooleanValue,
+    updateTemplateName,
 } from '@store/wizardSlice';
-import {
-  Workbook,
-  Worksheet,
-} from '@toone/report-excel';
+import { Workbook, Worksheet } from '@toone/report-excel';
 import { formatBindingPathCellType } from '@utils/cellUtil';
-import {
-  findTreeNodeById,
-  getActiveSheetTablesPath,
-} from '@utils/commonUtil';
+import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
 import { getLicense } from '@utils/configUtil';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import { getNamespace } from '@utils/spreadUtil';
-import {
-  getCellTag,
-  getSheetTag,
-  setSheetTag,
-} from '@utils/worksheetUtil';
+import { getCellTag, getSheetTag, setSheetTag } from '@utils/worksheetUtil';
 
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
@@ -112,6 +89,13 @@ export default function () {
     const context = useContext(DesignerContext);
     const json = context?.conf?.json?.reportJson;
     const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
+    const { spread } = useSelector(({ appSlice }) => appSlice);
+    if (spread) {
+        //添加自定义方法，供DefaultCell中使用（根据绑定路径，后期绑定名称）
+        spread.getDesignerDatasources = () => {
+            return dsList;
+        };
+    }
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
     const cacheDatas = useRef({ template }).current;
     cacheDatas.template = template;
@@ -132,17 +116,19 @@ export default function () {
             );
         }
     });
-    const genEventHandler = (eventType,observers,before,after)=>{
+    const genEventHandler = (eventType, observers, before, after) => {
         return useCallback((type, args) => {
-            before&&before(type,args);
+            before && before(type, args);
             fire({
                 event: EVENTS[eventType],
                 args: [args],
             });
-            after&&after(type,args);
-        },observers||[]);
-    }
-    const handleEnterCell = genEventHandler('EnterCell',[],()=>context.handleSelectionChange());
+            after && after(type, args);
+        }, observers || []);
+    };
+    const handleEnterCell = genEventHandler('EnterCell', [], () =>
+        context.handleSelectionChange()
+    );
     const handleActiveSheetChanged = useCallback(
         (type, args) => {
             const sheet = args.newSheet;
@@ -253,20 +239,20 @@ export default function () {
         });
         const unEnhance = bind({
             event: EVENTS.SheetChanged,
-            handler: (params)=>{
-                if(params){
-                    let {sheet,newValue,sheetIndex} = params;
-                    if(!sheet&&newValue){
+            handler: (params) => {
+                if (params) {
+                    let { sheet, newValue, sheetIndex } = params;
+                    if (!sheet && newValue) {
                         sheet = spread.getSheet(sheetIndex);
                     }
                     enhanceSheet(sheet);
                 }
-            }
+            },
         });
-        return ()=>{
+        return () => {
             unbind();
             unEnhance();
-        }
+        };
     }, []);
 
     return (

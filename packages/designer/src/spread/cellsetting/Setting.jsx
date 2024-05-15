@@ -3,16 +3,9 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { Divider } from '@components/divider/Index';
-import {
-  Button,
-  Select,
-} from '@components/form/Index';
+import { Button, Select } from '@components/form/Index';
 
-import {
-  Item,
-  ItemList,
-  Title,
-} from './Component';
+import { Item, ItemList, Title } from './Component';
 import Group from './types/Group';
 import Image from './types/Image';
 import List from './types/List';
@@ -49,12 +42,9 @@ const btnStyle = {
 export default function (props) {
     const { value, onConfirm, onCancel } = props;
     let plugin = null;
-    try {
-        const plugins = JSON.parse(value);
-        if (plugins && plugins.length > 0) {
-            plugin = plugins[0];
-        }
-    } catch (e) {
+    if (value && value.length > 0) {
+        plugin = value[0];
+    } else {
         plugin = {
             type: 'cellListType',
         };
@@ -65,27 +55,45 @@ export default function (props) {
         };
     });
     let children = null;
-    const type = plugin.type;
+    const type = data.plugin.type;
     const handleSetting = () => {
         onConfirm([data.plugin]);
     };
     switch (type) {
         case 'cellListType':
             children = (
-                <List plugin={data.plugin} onConfirm={handleChange} onCancel={onCancel}></List>
+                <List
+                    plugin={data.plugin}
+                    onConfirm={handleSetting}
+                    onCancel={onCancel}
+                ></List>
             );
             break;
         case 'cellGroupType':
             children = (
-                <Group plugin={data.plugin} onChange={handleChange}></Group>
+                <Group
+                    plugin={data.plugin}
+                    onConfirm={handleSetting}
+                    onCancel={onCancel}
+                ></Group>
             );
             break;
         case 'cellSubTotal':
-            children = <Sum plugin={data.plugin} onChange={handleChange}></Sum>;
+            children = (
+                <Sum
+                    plugin={data.plugin}
+                    onConfirm={handleSetting}
+                    onCancel={onCancel}
+                ></Sum>
+            );
             break;
         case 'imageCellType':
             children = (
-                <Image plugin={data.plugin} onChange={handleChange}></Image>
+                <Image
+                    plugin={data.plugin}
+                    onConfirm={handleSetting}
+                    onCancel={onCancel}
+                ></Image>
             );
     }
 
@@ -108,31 +116,19 @@ export default function (props) {
                                     plugin = { type: val };
                                     break;
                                 case 'cellSubTotal':
-                                    plugin = { type: val };
+                                    plugin = { type: val, functionNum: 109 };
                                     break;
                                 case 'imageCellType':
-                                    plugin = { type: val };
+                                    plugin = { type: val, mode: 1 };
                                     break;
                             }
-                            setData({...data,plugin});
+                            setData({ ...data, plugin });
                         }}
                     ></Select>
                 </Item>
             </ItemList>
             <Divider type='horizontal'></Divider>
             {children}
-            <ItemList>
-                <Item></Item>
-                <Button
-                    style={{ ...btnStyle, marginRight: 8 }}
-                    onClick={handleSetting}
-                >
-                    确定
-                </Button>
-                <Button style={btnStyle} onClick={onCancel}>
-                    取消
-                </Button>
-            </ItemList>
         </Wrap>
     );
 }

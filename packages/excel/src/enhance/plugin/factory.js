@@ -15,6 +15,6 @@ export const create = function (plugin) {
         case 'totalPagesCellType':
             return new CellTotalPages(plugin);
         default:
-            throw Error('未识别插件类型【' + type + '】，请检查！');
+            return null;
     }
 };
