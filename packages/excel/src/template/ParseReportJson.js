@@ -318,15 +318,13 @@ export default class Render {
                                         _lastContentTempCount_,
                                     contentTempCount: _contentTempCount_,
                                 } = calculate(
-                                    header,
-                                    footer,
+                                    allHeaderTemplates,
+                                    allFooterTemplates,
                                     _lastContentTempCount
                                 );
                                 if (_pageSubtotal === 1) {
-                                    header = allHeaderTemplates;
-                                    footer = allFooterTemplates;
-                                    headerTemplates = header;
-                                    footerTemplates = footer;
+                                    headerTemplates = allHeaderTemplates;
+                                    footerTemplates = allFooterTemplates;
                                     lastContentTempCount =
                                         _lastContentTempCount_;
                                     contentTempCount = _contentTempCount_;
