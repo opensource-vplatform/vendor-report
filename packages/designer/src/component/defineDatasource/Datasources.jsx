@@ -18,7 +18,12 @@ const Wrap = styled.div`
 
 //数据源列表
 export default function Index(props) {
-    const { draggable, isEditData = true, isCanAdd = true, onDoubleClick } = props;
+    const {
+        draggable,
+        isEditData = true,
+        isCanAdd = true,
+        onDoubleClick,
+    } = props;
     let { dsList, activeDs, finalDsList, activeSheetTablePath } = useSelector(
         ({ datasourceSlice }) => datasourceSlice
     );
@@ -29,6 +34,19 @@ export default function Index(props) {
 
     const [searchKey, setSearchKey] = useState({
         dsSearchKey: '',
+    });
+
+    const datas = JSON.parse(JSON.stringify(dsList));
+
+    datas.forEach(function (item) {
+        if (Array.isArray(item.children)) {
+            item.children.sort(function (cur, next) {
+                return cur.name.localeCompare(next.name, 'zh');
+            });
+        }
+    });
+    datas.sort(function (cur, next) {
+        return cur.name.localeCompare(next.name, 'zh');
     });
 
     return (
@@ -50,7 +68,7 @@ export default function Index(props) {
             ></Search>
             <Tree
                 {...props}
-                datas={dsList}
+                datas={datas}
                 isNotAllow={!isCanAdd}
                 onDoubleClick={onDoubleClick}
                 activeSheetTablePath={activeSheetTablePath}
