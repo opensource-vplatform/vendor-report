@@ -1,12 +1,27 @@
-import { Fragment, useContext, useEffect } from 'react';
+import {
+  Fragment,
+  useContext,
+  useEffect,
+} from 'react';
 
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import { Tab, Tabs } from '@components/tabs/Index';
-import { bind, EVENTS, fire, hasBind } from '@event/EventManager';
+import {
+  Tab,
+  Tabs,
+} from '@components/tabs/Index';
+import {
+  bind,
+  EVENTS,
+  fire,
+  hasBind,
+} from '@event/EventManager';
 import { setMode } from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
@@ -26,12 +41,19 @@ import DesignerContext from './DesignerContext';
 import { GlobalComponent } from './Global';
 import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
 import VerticalAlignTop from './icons/arrow/VerticalAlignTop';
-import { listenRedo, listenSave, listenUndo } from './Listener';
+import {
+  listenRedo,
+  listenSave,
+  listenUndo,
+} from './Listener';
 import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
 import Formula from './tabs/formula/Index';
 import { saveAsImg } from './utils/canvas2image';
-import { getNavConfig, getToolbar } from './utils/configUtil';
+import {
+  getNavConfig,
+  getToolbar,
+} from './utils/configUtil';
 import { handleEventPrmiseResult } from './utils/eventUtil';
 import { parseStyle } from './utils/styleUtil';
 
@@ -180,7 +202,7 @@ export default function () {
             dispatch(genPreviewDatas({ datas }));
             dispatch(setMode({ mode: 'preview' }));
             fire({
-                event: EVENTS.onDesignerPreview,
+                event: EVENTS.onPreviewVisible,
                 args: [],
             });
         } else {
@@ -210,7 +232,7 @@ export default function () {
             dispatch(genPreviewDatas({ datas }));
             dispatch(setMode({ mode: 'preview' }));
             fire({
-                event: EVENTS.onDesignerPreview,
+                event: EVENTS.onPreviewVisible,
                 args: [],
             });
         }

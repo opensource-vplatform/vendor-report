@@ -626,12 +626,12 @@ export function removeHighlightOneBlock() {
 export function bindingPath(params) {
     const { sheet, value, path, row, col } = params;
     const cell = sheet.getCell(row, col);
-    cell.value(value);
     //const bindingPathCellType = new BindingPathCellType();
     //bindingPathCellType.setBasePath(getBaseUrl());
     //cell.bindingPath(path).cellType(bindingPathCellType);
-    cell.bindingPath(path);
-    let style = sheet.getStyle(row, col);
+    cell.bindingPath(path);//绑定字段要放在设置单元格之前，否则造成DefaultCell中获取绑定字段获取不到问题  add by xiedh;
+    cell.value(value);
+    /*let style = sheet.getStyle(row, col);
     if (!style) {
         style = new GC.Spread.Sheets.Style();
     }
@@ -643,7 +643,7 @@ export function bindingPath(params) {
             color: 'blue',
         },
     };
-    sheet.setStyle(row, col, style);
+    sheet.setStyle(row, col, style);*/
 }
 
 export function bindingTablePathHandler(params) {

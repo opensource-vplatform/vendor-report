@@ -1,19 +1,22 @@
 import { createRoot } from 'react-dom/client';
 
-import { bind, EVENTS } from '@event/EventManager';
+import {
+  bind,
+  EVENTS,
+} from '@event/EventManager';
 import { genUUID } from '@utils/commonUtil';
 import { getOffsetFromBody } from '@utils/domUtil';
 import { isFunction } from '@utils/objectUtil';
 import {
-    applyToSelectedCell,
-    getNamespace,
-    getSpecifiedRect,
+  applyToSelectedCell,
+  getNamespace,
+  getSpecifiedRect,
 } from '@utils/spreadUtil';
 import {
-    clearAllCellTagPlugin,
-    getActiveIndexBySheet,
-    getCellTagPlugins,
-    setCellTagPlugin,
+  clearAllCellTagPlugin,
+  getActiveIndexBySheet,
+  getCellTagPlugins,
+  setCellTagPlugin,
 } from '@utils/worksheetUtil';
 
 import Setting from './cellsetting/index';
@@ -69,31 +72,40 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         }
     }
 
+    _bindEvents(events, handler) {
+        events.forEach((evt) => {
+            bind({ event: evt, handler });
+        });
+    }
+
     _bindEvent() {
-        const handler = () => {
+        const refreshIconPosition = () => {
             this._refreshIconPosition();
         };
-        bind({ event: EVENTS.ColumnWidthChanged, handler });
-        bind({ event: EVENTS.RowHeightChanged, handler });
-        bind({ event: EVENTS.LeftColumnChanged, handler });
-        bind({ event: EVENTS.TopRowChanged, handler });
-        bind({ event: EVENTS.ViewZoomed, handler });
-        bind({ event: EVENTS.SheetChanged, handler });
-        bind({ event: EVENTS.ActiveSheetChanged, handler });
+        const showIcon = () => {
+            this._initIcon();
+            refreshIconPosition();
+        };
+        this._bindEvents(
+            [
+                EVENTS.ColumnWidthChanged,
+                EVENTS.RowHeightChanged,
+                EVENTS.LeftColumnChanged,
+                EVENTS.TopRowChanged,
+                EVENTS.ViewZoomed,
+                EVENTS.SheetChanged,
+                EVENTS.ActiveSheetChanged,
+            ],
+            refreshIconPosition
+        );
         bind({
-            event: EVENTS.onDesignerPreview,
+            event: EVENTS.onPreviewVisible,
             handler: () => {
                 //预览时隐藏设置图标
                 this._hideIcon();
             },
         });
-        bind({
-            event: EVENTS.Inited,
-            handler: () => {
-                this._initIcon();
-                this._refreshIconPosition();
-            },
-        });
+        this._bindEvents([EVENTS.Inited, EVENTS.onEditorVisible], showIcon);
     }
 
     /**
@@ -190,6 +202,8 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             this._showBindingStyle(style);
             value = this._showBindingText(value, context);
             this._showIconDuringPaint(x, y, w, h, context);
+        }else{
+            this._hideIcon();
         }
         super.paint(ctx, value, x, y, w, h, style, context);
     }
@@ -233,7 +247,6 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         style.left = `${rect.left + x + width}px`;
         style.top = `${rect.top + y}px`;
         style.display = 'flex';
-        console.log(`row:${row},col:${col}`);
         this.root = createRoot(iconEle);
         this.root.render(
             <Setting

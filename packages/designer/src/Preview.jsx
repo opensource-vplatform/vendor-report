@@ -1,16 +1,28 @@
 import { useContext } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import { Workbook, Worksheet } from '@toone/report-excel';
-import { getLicense, getToolbar } from '@utils/configUtil';
+import {
+  EVENTS,
+  fire,
+} from '@event/EventManager';
+import {
+  Workbook,
+  Worksheet,
+} from '@toone/report-excel';
+import {
+  getLicense,
+  getToolbar,
+} from '@utils/configUtil';
 
 import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
 import { getBaseUrl } from './utils/environmentUtil';
-import { EVENTS, fire } from '@event/EventManager';
 
 const Wrap = styled.div`
     display: flex;
@@ -101,7 +113,7 @@ export default function () {
     const handleEdit = () => {
         dispatch(setMode({ mode: 'edit' }));
         fire({
-            event: EVENTS.onDesignerEdit,
+            event: EVENTS.onEditorVisible,
             args: [],
         });
     };

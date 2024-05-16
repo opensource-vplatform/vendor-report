@@ -29,12 +29,12 @@ export const EVENTS = {
     /**
      * 设计器预览事件
      */
-    onDesignerPreview: 'onDesignerPreview',
+    onPreviewVisible: 'onPreviewVisible',
 
     /**
      * 设计器编辑事件
      */
-    onDesignerEdit: 'onDesignerEdit',
+    onEditorVisible: 'onEditorVisible',
     /**
      * 激活工作表变更事件
      */

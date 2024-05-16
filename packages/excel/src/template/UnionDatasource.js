@@ -12,12 +12,18 @@ class UnionDatasource {
 
     treeDataIndexMap = {};
 
-    constructor(datasources, setting) {
-        /**
-         * 表编号集合
-         * Array<string>
-         */
-        this.datasources = datasources;
+    /**
+     * {
+     *   [code:string]:{
+     *     type:"param"|"field",
+     *     fields?:Array<string>
+     *   }
+     * }
+     */
+    datasources = {};
+
+    constructor(bindingPaths, setting) {
+        this._parseBindingPaths(bindingPaths);
         /**
          * 结构
          * {
@@ -55,8 +61,31 @@ class UnionDatasource {
         this._anslysisSetting();
     }
 
+    _parseBindingPaths(bindingPaths){
+        if(bindingPaths&&bindingPaths.length>0){
+            bindingPaths.forEach(bindingPath=>{
+                const paths = bindingPath.split('.');
+                const len = paths.length;
+                if(len==1){
+                    const code = paths[0];
+                    this.datasources[code] = {type:"param"};
+                }else if(len==2){
+                    const code = paths[0];
+                    const fieldCode = paths[1];
+                    const ds = this.datasources[code]||{type:"field",fields:[]};
+                    const fields = ds.fields;
+                    if(fields.indexOf(fieldCode)==-1){
+                        fields.push(fieldCode);
+                    }
+                    this.datasources[code] = ds;
+                }
+            });
+        }
+    }
+
     _containsTable(tableCode) {
-        return this.datasources.indexOf(tableCode) != -1;
+        const ds = this.datasources[tableCode];
+        return ds&&ds.type=="field";
     }
 
     /**
@@ -91,12 +120,24 @@ class UnionDatasource {
     }
 
     /**
+     * 分析插件设置
+     */
+    _analysisPluginSetting(){
+        const cellPlugins = this.setting.cellPlugins;
+        if(cellPlugins&&cellPlugins.length>0){
+            //只处理分组
+            this.cellPlugins= cellPlugins.filter(plugin=>plugin.type=="cellGroupType");
+        }
+    }
+
+    /**
      * 分析数据源设置
      */
     _anslysisSetting() {
         if (this.setting) {
             this._analysisTreeStructSetting();
             this._analysisReferenceSetting();
+            this._analysisPluginSetting();
         }
     }
 
@@ -273,6 +314,61 @@ class UnionDatasource {
     }
 
     /**
+     * 根据分组信息联合数据
+     * @param {*} datasetMap 
+     * @param {*} result 
+     * @param {*} except 
+     */
+    _unitDataByGroup(datasetMap, result, except){
+        if(this.cellPlugins&&this.cellPlugins.length>0){
+            const dataset = [];
+            const indexs={};
+            const notGroupPaths = [];
+            for(let [tableCode,cfg] of Object.entries(this.datasources)){
+                if(cfg.type=='field'){
+                    const fields = cfg.fields;
+                    fields.forEach(fieldCode=>{
+                        if(!this.cellPlugins.find(plugin=>plugin.bindingPath==`${tableCode}.${fieldCode}`)){
+                            notGroupPaths.push({
+                                tableCode,
+                                fieldCode,
+                            });
+                        }
+                    });
+                }
+            }
+            const concat_char = '_@_#_$_%_^_&_*_(_)_';
+            result.forEach(item=>{
+                const values = [];
+                const get = (tableCode,fieldCode)=>{
+                    const data = item[tableCode];
+                    let value = null;
+                    if(data){
+                        value = data[fieldCode];
+                    }
+                    return value;
+                }
+                this.cellPlugins.forEach(plugin=>{
+                    const bindingPath = plugin.bindingPath;
+                    const [tableCode,fieldCode] = bindingPath.split('.');
+                    values.push(get(tableCode,fieldCode));
+                });
+                notGroupPaths.forEach(path=>{
+                    const {tableCode,fieldCode} = path;
+                    values.push(get(tableCode,fieldCode));
+                });
+                const key = values.join(concat_char);
+                if(!indexs[key]){
+                    dataset.push(item);
+                    indexs[key] = true;
+                }
+            });
+            return dataset;
+        }
+        return result;
+    }
+
+    /**
      * 是否为树形汇总字段
      * @param {*} tableCode
      * @param {*} fieldCode
@@ -319,8 +415,9 @@ class UnionDatasource {
         const datasetMap = { ...datas };
         let except = [];
         this._treeStructDataEnhance(datasetMap);
-        const result = this._unitDataByReferences(datasetMap, except);
-        this.datas = this._unitDataByIndex(datasetMap, result, except);
+        let result = this._unitDataByReferences(datasetMap, except);
+        result = this._unitDataByIndex(datasetMap, result, except);
+        this.datas = this._unitDataByGroup(datasetMap, result, except);
     }
 
     /**
