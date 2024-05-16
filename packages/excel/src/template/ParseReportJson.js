@@ -319,7 +319,7 @@ export default class Render {
                             contentTempCount: _contentTempCount,
                         } = calculate(header, footer, lastContentTempCount);
 
-                        if (_pageSubtotal === 1) {
+                        if (_pageSubtotal <= 1) {
                             if (
                                 pageInfos.groups.indexOf(
                                     pageInfos.sheet.name
@@ -336,7 +336,7 @@ export default class Render {
                                     allFooterTemplates,
                                     _lastContentTempCount
                                 );
-                                if (_pageSubtotal === 1) {
+                                if (_pageSubtotal <= 1) {
                                     headerTemplates = allHeaderTemplates;
                                     footerTemplates = allFooterTemplates;
                                     lastContentTempCount =
@@ -813,7 +813,7 @@ export default class Render {
             if (visible === 0) {
                 return;
             }
-            const {
+            let {
                 bottom: marginBottom,
                 footer: marginFooter,
                 header: marginHeader,
@@ -842,8 +842,14 @@ export default class Render {
                 tag,
             });
             let pageTotalHeight = 0;
+
             const _width = (printConversionUnits * (width || 850)) / 100;
             const _height = (printConversionUnits * (height || 1100)) / 100;
+            marginBottom = (printConversionUnits * marginBottom) / 100;
+            marginFooter = (printConversionUnits * marginFooter) / 100;
+            marginHeader = (printConversionUnits * marginHeader) / 100;
+            marginTop = (printConversionUnits * marginTop) / 100;
+            debugger;
 
             if (orientation === 2) {
                 pageTotalHeight =
