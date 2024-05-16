@@ -177,7 +177,7 @@ export default function () {
                 >
                     导出到excel
                 </Button>
-                <Button
+                {/* <Button
                     type='primary'
                     style={{ height: 26 }}
                     disabled={!data.report}
@@ -195,7 +195,7 @@ export default function () {
                     }}
                 >
                     导出到pdf
-                </Button>
+                </Button> */}
                 {isPrint ? (
                     <Button
                         type='primary'

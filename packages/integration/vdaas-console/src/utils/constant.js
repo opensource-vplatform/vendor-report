@@ -1,5 +1,6 @@
 import {
   getHost,
+  getParameter,
   parameterToUrl,
 } from './utils';
 
@@ -7,6 +8,10 @@ const appendParam = function () {
     const paramUrl = parameterToUrl();
     return paramUrl != '' ? '&' + paramUrl : '';
 };
+
+const getAppCode = function(){
+  return getParameter('appcode') || getParameter('appCode');
+}
 
 /**
  * 获取数据源元信息url
