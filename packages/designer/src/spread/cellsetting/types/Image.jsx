@@ -1,6 +1,19 @@
-import { Fragment, useState } from 'react';
-import { Item, ItemList, Title, Toolbar } from '../Component';
-import { Integer, Select } from '@components/form/Index';
+import {
+  Fragment,
+  useState,
+} from 'react';
+
+import {
+  Integer,
+  Select,
+} from '@components/form/Index';
+
+import {
+  Item,
+  ItemList,
+  Title,
+  Toolbar,
+} from '../Component';
 
 const ImageSparklineModeItems = [
     {
@@ -47,7 +60,12 @@ export default function (props) {
                         wrapStyle={{ height: 26, width: '100%' }}
                         value={data.mode}
                         datas={ImageSparklineModeItems}
-                        onChange={(val) => setData({ ...data, mode: val })}
+                        onChange={(val) =>
+                            setData({
+                                ...data,
+                                config: { ...data.config, mode: val },
+                            })
+                        }
                     ></Select>
                 </Item>
             </ItemList>
@@ -60,7 +78,12 @@ export default function (props) {
                         style={{ height: 26, width: '100%' }}
                         value={data.width}
                         disabled={rectDisabled}
-                        onChange={(val) => setData({ ...data, width: val })}
+                        onChange={(val) =>
+                            setData({
+                                ...data,
+                                config: { ...data.config, width: val },
+                            })
+                        }
                     ></Integer>
                 </Item>
             </ItemList>
@@ -73,7 +96,12 @@ export default function (props) {
                         style={{ height: 26, width: '100%' }}
                         disabled={rectDisabled}
                         value={data.height}
-                        onChange={(val) => setData({ ...data, height: val })}
+                        onChange={(val) =>
+                            setData({
+                                ...data,
+                                config: { ...data.config, height: val },
+                            })
+                        }
                     ></Integer>
                 </Item>
             </ItemList>

@@ -15,6 +15,7 @@ import {
 import {
   clearAllCellTagPlugin,
   getActiveIndexBySheet,
+  getCellInstanceId,
   getCellTagPlugins,
   setCellTagPlugin,
 } from '@utils/worksheetUtil';
@@ -38,7 +39,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             const height = style.height;
             if ('0px' !== width && '0px' !== height && this.sheet) {
                 const spread = this.sheet.getParent();
-                if (spread&&spread.getActiveSheet() === this.sheet) {
+                if (spread && spread.getActiveSheet() === this.sheet) {
                     const { row, col } = getActiveIndexBySheet(this.sheet);
                     const span = this.sheet.getSpan(row, col);
                     const rowIndex = span ? span.row + span.rowCount : row;
@@ -126,7 +127,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
      */
     isBindCell(context) {
         const bindPath = this.getBindPath(context);
-        return !!bindPath;
+        return bindPath&&bindPath.split('.').length==2;
     }
 
     /**
@@ -149,31 +150,37 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
      */
     _showBindingStyle(style) {
         //绑定字段，添加角标
+        const posType = GC.Spread.Sheets.CornerPosition;
         style.decoration = {
             cornerFold: {
                 size: 8,
-                position: GC.Spread.Sheets.CornerPosition.leftTop,
+                position: posType.rightBottom,
                 color: 'green',
             },
         };
     }
 
-    _showBindingText(value, context) {
-        const bindPath = this.getBindPath(context);
-        const sheet = context.sheet;
-        const spread = sheet.getParent();
-        if (isFunction(spread.getDesignerDatasources)) {
-            const datasources = spread.getDesignerDatasources();
+    _showFormulaStyle(style) {
+        const posType = GC.Spread.Sheets.CornerPosition;
+        style.decoration = {
+            cornerFold: {
+                size: 8,
+                position: posType.rightBottom,
+                color: 'blue',
+            },
+        };
+    }
+
+    _getField(bindingPath) {
+        if (this.spread && isFunction(this.spread.getDesignerDatasources)) {
+            const datasources = this.spread.getDesignerDatasources();
             if (datasources && datasources.length > 0) {
-                const paths = bindPath.split('.');
+                const paths = bindingPath.split('.');
                 const code = paths[0];
                 const datasource = datasources.find(
                     (datasource) => datasource.code == code
                 );
                 if (datasource) {
-                    const datasourceName = datasource.name
-                        ? datasource.name
-                        : datasource.code;
                     if (paths.length == 2) {
                         const children = datasource.children;
                         if (children && children.length > 0) {
@@ -181,28 +188,47 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                                 (field) => field.code == paths[1]
                             );
                             if (field) {
-                                return `[${datasourceName}.${
-                                    field.name ? field.name : field.code
-                                }]`;
+                                return { datasource, field };
                             }
                         }
-                    } else {
-                        return `[${datasourceName}]`;
                     }
                 }
             }
         }
+        return null;
+    }
+
+    _showBindingText(value, context) {
+        const bindPath = this.getBindPath(context);
+        const define = this._getField(bindPath);
+        if (define) {
+            const { datasource, field } = define;
+            const datasourceName = datasource.name
+                ? datasource.name
+                : datasource.code;
+            return `[${datasourceName}.${
+                field.name ? field.name : field.code
+            }]`;
+        }
         return value;
-        '[' + bindPath + ']';
+    }
+
+    _hasFormula(context) {
+        const { sheet, row, col } = context;
+        return !!sheet.getFormula(row, col);
     }
 
     paint(ctx, value, x, y, w, h, style, context) {
+        const sheet = context.sheet;
+        this.spread = sheet.getParent();
         const bindPath = this.getBindPath(context);
         if (bindPath) {
             this._showBindingStyle(style);
             value = this._showBindingText(value, context);
             this._showIconDuringPaint(x, y, w, h, context);
-        }else{
+        } else if (this._hasFormula(context)) {
+            this._showFormulaStyle(style);
+        } else {
             this._hideIcon();
         }
         super.paint(ctx, value, x, y, w, h, style, context);
@@ -254,10 +280,22 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                 onChange={(plugins) => {
                     applyToSelectedCell(sheet, (sheet, row, col) => {
                         clearAllCellTagPlugin(sheet, row, col);
-                        plugins = plugins ? plugins : [];
-                        plugins.forEach((plugin) => {
-                            setCellTagPlugin(sheet, row, col, plugin);
-                        });
+                        const bindingPath = sheet.getBindingPath(row, col);
+                        if (bindingPath) {
+                            const paths = bindingPath.split('.');
+                            const instanceId = getCellInstanceId(sheet,row,col);
+                            const tableCode = paths[0];
+                            const fieldCode = paths[1];
+                            plugins = plugins ? plugins : [];
+                            plugins.forEach((plugin) => {
+                                const config = plugin.config || {};
+                                config.tableCode = tableCode;
+                                config.fieldCode = fieldCode;
+                                config.instanceId = instanceId
+                                plugin.config = config;
+                                setCellTagPlugin(sheet, row, col, plugin);
+                            });
+                        }
                     });
                 }}
             ></Setting>
@@ -287,6 +325,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         delete json.sheet;
         delete json.root;
         delete json._iconEle;
+        delete json.spread;
         return json;
     }
 }

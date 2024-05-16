@@ -1,7 +1,16 @@
+import {
+  Fragment,
+  useState,
+} from 'react';
+
 import { Select } from '@components/form/Index';
 
-import { Item, ItemList, Title, Toolbar } from '../Component';
-import { Fragment, useState } from 'react';
+import {
+  Item,
+  ItemList,
+  Title,
+  Toolbar,
+} from '../Component';
 
 const Sum_Types = [
     {
@@ -46,9 +55,12 @@ export default function (props) {
                     <Select
                         wrapStyle={{ height: 26, width: '100%' }}
                         datas={Sum_Types}
-                        value={data.functionNum}
+                        value={data.config.functionNum}
                         onChange={(val) =>
-                            setData({ ...data, functionNum: val })
+                            setData({
+                                ...data,
+                                config: { ...data.config, functionNum: val },
+                            })
                         }
                     ></Select>
                 </Item>

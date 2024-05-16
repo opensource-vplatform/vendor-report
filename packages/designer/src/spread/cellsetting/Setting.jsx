@@ -3,9 +3,13 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { Divider } from '@components/divider/Index';
-import { Button, Select } from '@components/form/Index';
+import { Select } from '@components/form/Index';
 
-import { Item, ItemList, Title } from './Component';
+import {
+  Item,
+  ItemList,
+  Title,
+} from './Component';
 import Group from './types/Group';
 import Image from './types/Image';
 import List from './types/List';
@@ -25,14 +29,14 @@ const CellTypes = [
         value: 'cellGroupType',
         text: '分组',
     },
-    {
+    /*{
         value: 'cellSubTotal',
         text: '汇总',
     },
     {
         value: 'imageCellType',
         text: '图片',
-    },
+    },*/
 ];
 
 const btnStyle = {
@@ -116,10 +120,13 @@ export default function (props) {
                                     plugin = { type: val };
                                     break;
                                 case 'cellSubTotal':
-                                    plugin = { type: val, functionNum: 109 };
+                                    plugin = {
+                                        type: val,
+                                        config: { functionNum: 109 },
+                                    };
                                     break;
                                 case 'imageCellType':
-                                    plugin = { type: val, mode: 1 };
+                                    plugin = { type: val, config: { mode: 1 } };
                                     break;
                             }
                             setData({ ...data, plugin });
