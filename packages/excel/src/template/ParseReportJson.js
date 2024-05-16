@@ -808,6 +808,7 @@ export default class Render {
                         top: 75,
                     },
                 },
+                colHeaderVisible = true,
             } = sheet;
             //当前sheet不可见，直接跳过解析
             if (visible === 0) {
@@ -846,25 +847,15 @@ export default class Render {
             const _width = (printConversionUnits * (width || 850)) / 100;
             const _height = (printConversionUnits * (height || 1100)) / 100;
             marginBottom = (printConversionUnits * marginBottom) / 100;
-            marginFooter = (printConversionUnits * marginFooter) / 100;
-            marginHeader = (printConversionUnits * marginHeader) / 100;
             marginTop = (printConversionUnits * marginTop) / 100;
-            debugger;
 
+            const colHeaderHeight = colHeaderVisible ? 20 : 0;
             if (orientation === 2) {
                 pageTotalHeight =
-                    _width -
-                    marginBottom -
-                    marginFooter -
-                    marginHeader -
-                    marginTop;
+                    _width - marginBottom - marginTop - colHeaderHeight;
             } else {
                 pageTotalHeight =
-                    _height -
-                    marginBottom -
-                    marginFooter -
-                    marginHeader -
-                    marginTop;
+                    _height - marginBottom - marginTop - colHeaderHeight;
             }
             const isTemplate = templateInfo ? true : false;
             const fromTempSheet = templateInfo?.fromTempSheet;
@@ -885,7 +876,7 @@ export default class Render {
                 sheet,
 
                 spans: [],
-                rows: {},
+                rows: [],
                 rules: [],
                 dataTable: {},
                 autoMergeRanges: [],
@@ -1235,12 +1226,17 @@ export default class Render {
             //在当前页签中显示下一页
             let diff = pageInfos.pageTotalHeight - pageInfos.pageHeight;
             if (diff > 0) {
+                //强制换页
                 const { rowCount } = pageInfos;
-                pageInfos.dataTable[rowCount] = {};
+                const rows = pageInfos.rows?.[rowCount] || {};
+                rows.pageBreak = true;
+                pageInfos.rows[rowCount] = rows;
+                /*   const { rowCount } = pageInfos;
+                pageInfos.dataTable[rowCount] = { 0: { value: '1' } };
                 pageInfos.rows[rowCount] = {
                     size: Math.floor(diff),
                 };
-                pageInfos.rowCount += 1;
+                pageInfos.rowCount += 1; */
             }
         }
         pageInfos.pageHeight = initHeight;
