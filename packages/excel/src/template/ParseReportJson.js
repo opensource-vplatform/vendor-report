@@ -1211,7 +1211,10 @@ export default class Render {
                             });
 
                             //行高
-                            pageInfos.rows[rowCount] = rows;
+                            pageInfos.rows[rowCount] = {
+                                ...(pageInfos.rows[rowCount] || {}),
+                                ...rows,
+                            };
 
                             //自动合并区域
                             autoMergeRanges.forEach(function (item) {
@@ -1248,21 +1251,11 @@ export default class Render {
             pageInfos.autoMergeRanges = [];
             pageInfos.rowCount = 0;
         } else {
-            //在当前页签中显示下一页
-            let diff = pageInfos.pageTotalHeight - pageInfos.pageHeight;
-            if (diff > 0) {
-                //强制换页
-                const { rowCount } = pageInfos;
-                const rows = pageInfos.rows?.[rowCount] || {};
-                rows.pageBreak = true;
-                pageInfos.rows[rowCount] = rows;
-                /*   const { rowCount } = pageInfos;
-                pageInfos.dataTable[rowCount] = { 0: { value: '1' } };
-                pageInfos.rows[rowCount] = {
-                    size: Math.floor(diff),
-                };
-                pageInfos.rowCount += 1; */
-            }
+            //强制打印时在当前行换页
+            const { rowCount } = pageInfos;
+            const rows = pageInfos.rows?.[rowCount] || {};
+            rows.pageBreak = true;
+            pageInfos.rows[rowCount] = rows;
         }
         pageInfos.pageHeight = initHeight;
         pageInfos.pageIndex += 1;
