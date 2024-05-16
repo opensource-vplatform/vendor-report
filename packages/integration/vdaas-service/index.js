@@ -6,19 +6,27 @@ const crypto = require('crypto');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const fs = require('fs');
 const querystring = require('querystring');
+const NacosNamingClient = require('nacos').NacosNamingClient;
+const logger = console;
 
 const app = express();
 let port = 8080;
+let client;
+let serverUrl = '';
 
 
-// 公开本地端口环境变量的值
-// const exposePort = process.env.ExposePort || 3000;
-// 公开API读取数据的端口环境变量的值
-const exposeAPIUrl = process.env.ExposeAPIUrl || 'http://dev.service.vdaas.t.vtoone.com';
+// 读取数据环境变量的值
 
-// 打印环境变量的值
-// console.log("exposePort 的值是：", exposePort);
-console.log("exposeAPIUrl 的值是：", exposeAPIUrl);
+const UserData_MyselfResourceId = process.env.UserData_MyselfResourceId || "vdaasReportService"
+const UserData_MyselfIp = process.env.UserData_MyselfIp || '10.1.39.119'
+const UserData_MyselfWebPort = process.env.UserData_MyselfWebPort || 9095
+const UserData_RegisterCenterUrl = process.env.UserData_RegisterCenterUrl || '10.1.39.119:7747'
+
+console.log("UserData_MyselfResourceId 的值是：", UserData_MyselfResourceId);
+console.log("UserData_MyselfIp 的值是：", UserData_MyselfIp);
+console.log("UserData_MyselfWebPort 的值是：", UserData_MyselfWebPort);
+console.log("UserData_RegisterCenterUrl 的值是：", UserData_RegisterCenterUrl);
+
 
 // 获取命令行参数
 const args = process.argv.slice(2);
@@ -105,11 +113,15 @@ app.get('/', (req, res) => {
  * @param {Object} res - The Express.js response object.
  * @returns {Promise<void>} - A Promise that resolves when the PDF file has been exported.
  */
-app.get('/api/exportPDF', async (req, res) => {
-  const fileName = req.query.fileName || 'a';
+app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
+  let fileName = req.query.fileName;
+  const appCode = req.params.appCode;
   const queryParams = querystring.stringify(req.query);
-  //  console.log("queryParams",queryParams);
-  // return
+  // console.log("queryParams", queryParams);
+  if (!fileName && !!req.query.reportTitle) // 不传fileName 则取reportTitle
+    fileName = decodeURIComponent(req.query.reportTitle)
+  else if (!fileName)
+    fileName = 'a'
   let page;
   try {
     return new Promise(async (resolve, reject) => {
@@ -125,14 +137,12 @@ app.get('/api/exportPDF', async (req, res) => {
         resolve(data);
       };
 
-
-
       //   添加方法
       await page.exposeFunction("exportPDF", (path) => exportPDF(path));
       await page.exposeFunction("exportPDFError", (err) => reject(err));
 
       // 访问指定的网址
-      await page.goto(`${req.protocol}://localhost:${port}/?${queryParams}`);
+      await page.goto(`${req.protocol}://localhost:${port}/?${queryParams}&appcode=${appCode}`);
 
       // Set screen size
       // await page.setViewport({ width: 1080, height: 1024 });
@@ -172,11 +182,17 @@ app.get('/api/exportPDF', async (req, res) => {
     }).catch((err) => {
       res.json({
         message: '导出PDF失败,请检查参数是否正确',
+        errDesc: err,
         success: false
       })
     })
   } catch (e) {
     console.log("导出PDF失败", e);
+    res.json({
+      message: '导出PDF失败,请检查参数是否正确',
+      errDesc: e,
+      success: false
+    })
     // res.status(500).end();
   }
 })
@@ -197,25 +213,67 @@ function base64ToStream(base64String) {
 app.listen(port, async () => {
   console.log(`Server is running on port ${port}`);
   browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+  registerNacos().then(() => {
+    console.log("注册成功");
+    // client.getAllInstances('v3gateway').then(service => {
+    //   console.log(service);
+    // });
+  }).catch((err) => {
+    console.log("注册失败", err);
+  })
 });
 
 app.on('close', async () => {
   console.log(`Server close`);
   await browser.close();
+  // deregister instance
+  await client.deregisterInstance(serviceName, {
+    ip: UserData_MyselfIp,
+    port,
+  });
 })
 
+/**
+ * 注册到 Nacos
+ */
+const registerNacos = async () => {
+  client = new NacosNamingClient({
+    logger,
+    serverList: UserData_RegisterCenterUrl, // replace to real nacos serverList
+    namespace: 'public',
+  });
+  await client.ready();
 
-// 本地测试需要跨域中间件代理
-const proxyMiddleware = createProxyMiddleware({
-  // 目标服务器地址
-  target: `${exposeAPIUrl}/sysapi`,
-  // 修改响应头，确保只允许来自指定来源的请求
-  changeOrigin: true,
-  // 重写响应头，只允许一个 Origin
-  onProxyRes: function (proxyRes) {
-    proxyRes.headers['Access-Control-Allow-Origin'] = `http://localhost:${exposePort}`;
-  }
-});
+  const serviceName = UserData_MyselfResourceId;
 
-// 使用代理中间件
-app.use('/sysapi', proxyMiddleware);
+  // registry instance
+  await client.registerInstance(serviceName, {
+    ip: UserData_MyselfIp,
+    port: UserData_MyselfWebPort,
+  });
+
+  // subscribe instance
+  // client.subscribe(serviceName, hosts => {
+  //   console.log(`${serviceName}服务节点参数:${JSON.stringify(hosts)}`);
+  // });
+  client.subscribe('v3gateway', hosts => {
+    console.log(`v3gateway服务节点参数:${JSON.stringify(hosts)}`);
+    serverUrl = 'http://' + hosts[0].ip + ":" + hosts[0].port;
+    console.log("==============================", serverUrl);
+
+    // 本地测试需要跨域中间件代理
+    const proxyMiddleware = createProxyMiddleware({
+      // 目标服务器地址
+      target: `${serverUrl}/sysapi`,
+      // 修改响应头，确保只允许来自指定来源的请求
+      changeOrigin: true,
+      // 重写响应头，只允许一个 Origin
+      onProxyRes: function (proxyRes) {
+        proxyRes.headers['Access-Control-Allow-Origin'] = `http://localhost:${exposePort}`;
+      }
+    });
+
+    // 使用代理中间件
+    app.use('/sysapi', proxyMiddleware);
+  });
+}

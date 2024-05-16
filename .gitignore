@@ -4,6 +4,6 @@ demo
 .svn/
 dist/
 pnpm-lock.yaml
-packages/integration/vdaas-console/resources/page/spreadsheet/
-packages/integration/vdass-web/resources/static/vdaasweb/spreadsheet/
-packages/integration/vdass-service/resources/
+packages/integration/vdaas-console/resources/page/spreadsheet/**
+packages/integration/vdass-web/resources/static/vdaasweb/spreadsheet/**
+packages/integration/vdaas-service/resources/**
