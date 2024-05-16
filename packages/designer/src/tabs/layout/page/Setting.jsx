@@ -284,7 +284,6 @@ const PAPER_STYLE = {
     9: {
         width: 28,
         height: 40,
-        warpStyle: { border: '1px solid black', backgroundColor: '#ddd' },
     },
     11: { width: 21, height: 30 },
     12: { width: 26, height: 36 },
