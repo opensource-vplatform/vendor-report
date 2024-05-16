@@ -15,6 +15,8 @@ import { license } from '../utils/license';
 import {
   getParameter,
   getTitle,
+  exportPdf,
+  download,
 } from '../utils/utils';
 import Button from './components/button/Index';
 import Error from './components/error/Index';
@@ -181,10 +183,13 @@ export default function () {
                     disabled={!data.report}
                     onClick={() => {
                         setLoadMsg('导出到pdf中，请稍候...');
-                        data.report
-                            .exportPdf(getTitle('未命名'))
-                            .then(() => {
-                                setLoadMsg(null);
+                            exportPdf()
+                            .then((data) => {
+                              setLoadMsg(null);
+                              if (Object.prototype.toString.call(data) === '[object Blob]')
+                                download(data, getTitle('未命名') + '.pdf');
+                              else
+                                handleError(data?.message)
                             })
                             .catch(handleError);
                     }}

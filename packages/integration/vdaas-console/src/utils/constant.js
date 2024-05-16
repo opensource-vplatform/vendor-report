@@ -39,3 +39,11 @@ export const getSaveReportUrl = function(){
 export const getTableDataUrl = function(requestTables){
     return `${getHost()}/webapi/innersysapi/VDassDbmsConsole/report?operate=queryData${appendParam()}&requestTables=${requestTables}`;
 }
+
+/**
+ * 导出pdf
+ * @returns 
+ */
+export const getExportPdfUrl = function(){
+  return `${getHost()}/reportapi/${getAppCode()}/report/exportPdf/${window.location.search}`;
+}
