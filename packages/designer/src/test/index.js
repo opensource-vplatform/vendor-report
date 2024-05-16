@@ -11,8 +11,11 @@ let json = JSON.parse(jsonStr);
 
 salesData.data.length = 150 || 21;
 /* salesData.data = salesData.data.filter(function (item) {
-    return ['华北'].includes(item.sales_area);
+    return ['西北'].includes(item.sales_area);
 }); */
+tourismData.data = tourismData.data.filter(function (item) {
+    return item.pay_method === '支付宝';
+});
 
 const datasourceDefines = [
     {
@@ -186,7 +189,7 @@ const datasourceDefines = [
     },
 ];
 
-tourismData.data.length = 1 || 21;
+tourismData.data.length = 2 || 21;
 export default {
     json,
     /* json: { reportJson: json }, */
@@ -339,10 +342,10 @@ export default {
                 }, 0);
             });
         },
-        onDatasourceSelectVisible:function(){
-            return new Promise((resolve,reject)=>{
+        onDatasourceSelectVisible: function () {
+            return new Promise((resolve, reject) => {
                 resolve(datasourceDefines);
             });
-        }
+        },
     },
 };

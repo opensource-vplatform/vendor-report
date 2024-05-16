@@ -98,9 +98,9 @@ function calcTempHeight(params) {
     };
 }
 
-function getUnionDatasource(datas, setting) {
+function getUnionDatasource(datas, setting, dataPath) {
     const _datas = Object.fromEntries(datas);
-    const unionDatasource = new UnionDatasource(Object.keys(_datas), setting);
+    const unionDatasource = new UnionDatasource(dataPath, setting);
     unionDatasource.load(_datas);
     return unionDatasource;
 }
@@ -477,6 +477,9 @@ export default class Render {
                 if (rowTemplate.isGroupSumArea) {
                     template.isGroupSumArea = rowTemplate.isGroupSumArea;
                 }
+
+                template.dataPath.push(...rowTemplate.dataPath);
+                template.dataPath.push(...rowTemplate.cellPlugins);
             } else {
                 template = rowTemplate;
             }
@@ -602,6 +605,8 @@ export default class Render {
             height: 0,
             isGroupSumArea: false,
             isTotalArea: false,
+            dataPath: [],
+            cellPlugins: [],
         };
 
         let maxRowCount = 1;
@@ -627,6 +632,7 @@ export default class Render {
                 let isBindEntity = bindingPath?.includes?.('.');
 
                 if (isBindEntity) {
+                    result.dataPath.push(bindingPath);
                     const tableCode = bindingPath.split('.')[0];
                     this.setTemplateDatas(result, tableCode, sheetName);
                     const span = rowSpans.find((span) => span.col === col) || {
@@ -645,6 +651,13 @@ export default class Render {
                                 col,
                                 columnMerge,
                                 rowMerge,
+                            });
+                        }
+                        const plugins = jsonTag.plugins;
+                        if (Array.isArray(plugins)) {
+                            result.cellPlugins.push({
+                                plugins,
+                                bindingPath,
                             });
                         }
                     }
@@ -914,12 +927,24 @@ export default class Render {
                 height: tempHeight,
                 isGroupSumArea,
                 isTotalArea,
+                dataPath,
+                cellPlugins,
             } = temp;
             let { verticalAutoMergeRanges } = temp;
-            const unionDatasource = getUnionDatasource(datas, this.setting);
+            const setting = {
+                ...this.setting,
+                cellPlugins,
+            };
+            debugger;
+            const unionDatasource = getUnionDatasource(
+                datas,
+                setting,
+                dataPath
+            );
             const unionDatasourceAll = getUnionDatasource(
                 allDatas,
-                this.setting
+                setting,
+                dataPath
             );
             const dataLen = endIndex || unionDatasource.getCount() || 1;
             verticalAutoMergeRanges = Copy(verticalAutoMergeRanges);
