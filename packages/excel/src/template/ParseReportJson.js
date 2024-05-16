@@ -769,7 +769,11 @@ export default class Render {
         this.nameMaps = nameMaps;
     }
     analysisTemplate() {
-        Object.values(this.reportJson.sheets).forEach((sheet) => {
+        const sheets = Object.values(this.reportJson.sheets);
+        sheets.sort(function (current, next) {
+            return current.order - next.order;
+        });
+        sheets.forEach((sheet) => {
             const {
                 name,
                 visible = 1,
@@ -787,7 +791,6 @@ export default class Render {
                     },
                 },
             } = sheet;
-
             //当前sheet不可见，直接跳过解析
             if (visible === 0) {
                 return;
@@ -836,7 +839,6 @@ export default class Render {
                     marginHeader -
                     marginTop;
             }
-
             const isTemplate = templateInfo ? true : false;
             const fromTempSheet = templateInfo?.fromTempSheet;
             const groups = templateInfo?.groups || [];
@@ -1054,7 +1056,6 @@ export default class Render {
                                                 }
                                             );
 
-                                            debugger;
                                             const { type, value } = exePlugins(
                                                 {
                                                     type: 'text',
@@ -1206,7 +1207,7 @@ export default class Render {
         } else {
             //在当前页签中显示下一页
             let diff = pageInfos.pageTotalHeight - pageInfos.pageHeight;
-            if (diff > 10) {
+            if (diff > 0) {
                 const { rowCount } = pageInfos;
                 pageInfos.dataTable[rowCount] = {};
                 pageInfos.rows[rowCount] = {
