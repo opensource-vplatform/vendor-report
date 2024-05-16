@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
 
 import { isFunction } from '@utils/objectUtil';
 
@@ -29,21 +32,25 @@ export default function (props) {
         overflowX: 'visible',
         overflowY: 'visible',
     };
+    const [data,setData] = useState(()=>{
+        return isFunction(value) ? null:value;
+    })
     const handleNodeClick = (val, item) => {
         if (cancelAble && val === value) {
             val = cancelValue;
         }
+        setData(val);
         onNodeClick(val, item);
     };
-    const [data,setData] = useState(()=>{
-        return isFunction(value) ? null:value;
-    })
     const handleVisibleChange = isFunction(value) ? (visible) => {
         if(visible){
             const data = value();
             setData(data);
         }
     } : undefined;
+    useEffect(()=>{
+        setData(value);
+    },[value]);
     return (
         <Popper
             style={style}

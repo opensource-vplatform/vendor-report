@@ -6,7 +6,7 @@ import {
 
 import styled from 'styled-components';
 
-import Menu from '@components/Menu/Index';
+import Menu from '@components/menu/Index';
 import ArrowDown from '@icons/arrow/ArrowDown';
 import { isReactNode } from '@utils/reactUtil';
 
@@ -108,7 +108,7 @@ export default function (props) {
             setData(valueToData(val, node, datas));
             onChange && onChange(val);
         }
-    });
+    },[value]);
     return (
         <Menu
             datas={datas}
