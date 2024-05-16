@@ -126,7 +126,22 @@ class UnionDatasource {
         const cellPlugins = this.setting.cellPlugins;
         if(cellPlugins&&cellPlugins.length>0){
             //只处理分组
-            this.cellPlugins= cellPlugins.filter(plugin=>plugin.type=="cellGroupType");
+            this.cellPlugins = [];
+            cellPlugins.forEach(plugin=>{
+                const bindingPath = plugin.bindingPath;
+                const plugins = plugin.plugins;
+                if(plugins&&plugins.length>0){
+                    for (let i = 0; i < plugins.length; i++) {
+                        const plugin = plugins[i];
+                        if(plugin.type=="cellGroupType"){
+                            this.cellPlugins.push({
+                                bindingPath,
+                                type:"cellGroupType"
+                            })
+                        }
+                    }
+                }
+            });
         }
     }
 

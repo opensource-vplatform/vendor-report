@@ -23,8 +23,8 @@ export default function () {
         const result = [];
         errors.forEach((err, index) => {
             const { title, source, test } = err;
-            const sourceStr = JSON.stringify(sortObj(source), null, '\t');
-            const testStr = JSON.stringify(sortObj(test), null, '\t');
+            const sourceStr = JSON.stringify(sortObj(source), null, '  ');
+            const testStr = JSON.stringify(sortObj(test), null, '  ');
             const diff = Diff.diffChars(sourceStr, testStr);
             const script = [];
             diff.forEach(function (part) {
