@@ -38,7 +38,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             const height = style.height;
             if ('0px' !== width && '0px' !== height && this.sheet) {
                 const spread = this.sheet.getParent();
-                if (spread.getActiveSheet() === this.sheet) {
+                if (spread&&spread.getActiveSheet() === this.sheet) {
                     const { row, col } = getActiveIndexBySheet(this.sheet);
                     const span = this.sheet.getSpan(row, col);
                     const rowIndex = span ? span.row + span.rowCount : row;
