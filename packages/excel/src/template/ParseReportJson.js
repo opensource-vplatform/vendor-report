@@ -10,6 +10,20 @@ import UnionDatasource from './UnionDatasource';
 const GC = getNamespace();
 const spreadNS = GC.Spread.Sheets;
 
+function getPrintConversionUnits() {
+    //打印换算单位
+    const divId = 'wd2mn37k18jf19j8yw1q8d4pt2jpzx35xlw8nzjbj';
+    let div = document.getElementById(divId);
+    if (!div) {
+        div = document.createElement('div');
+        div.id = divId;
+        document.body.append(div);
+    }
+    div.style.width = '1in';
+    const divWidth = getComputedStyle(div).width;
+    return Number(divWidth.slice(0, -2));
+}
+
 function resetSheet({
     sheet,
     dataTable,
@@ -773,6 +787,10 @@ export default class Render {
         sheets.sort(function (current, next) {
             return current.order - next.order;
         });
+
+        //打印换算单位
+        const printConversionUnits = getPrintConversionUnits();
+
         sheets.forEach((sheet) => {
             const {
                 name,
@@ -824,16 +842,19 @@ export default class Render {
                 tag,
             });
             let pageTotalHeight = 0;
+            const _width = (printConversionUnits * (width || 850)) / 100;
+            const _height = (printConversionUnits * (height || 1100)) / 100;
+
             if (orientation === 2) {
                 pageTotalHeight =
-                    width -
+                    _width -
                     marginBottom -
                     marginFooter -
                     marginHeader -
                     marginTop;
             } else {
                 pageTotalHeight =
-                    height -
+                    _height -
                     marginBottom -
                     marginFooter -
                     marginHeader -

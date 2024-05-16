@@ -27,9 +27,12 @@ import { setSheetTag } from '@utils/worksheetUtil';
 
 const GC = getNamespace();
 
-function genTemplateName(template) {
+function genTemplateName(template, sheetNames = []) {
     let index = 1;
-    Object.keys(template).forEach(function (key) {
+    const names = Object.keys(template);
+    names.push(...sheetNames);
+    names.sort();
+    names.forEach(function (key) {
         if (key.startsWith('模板')) {
             let num = Number(key.slice(2));
             if (Number.isInteger(num) && num >= index) {
@@ -37,6 +40,7 @@ function genTemplateName(template) {
             }
         }
     });
+
     return `模板${index}`;
 }
 
@@ -384,7 +388,15 @@ export default function Template(props) {
                             if (isEdit) {
                                 sheetName = activeSheetName;
                             } else {
-                                sheetName = genTemplateName(template);
+                                const sheetNams = Object.values(
+                                    spread.toJSON().sheets
+                                ).map(function name(params) {
+                                    return params.name;
+                                });
+                                sheetName = genTemplateName(
+                                    template,
+                                    sheetNams
+                                );
                                 spread.addSheet(
                                     spread.sheets.length,
                                     new GC.Spread.Sheets.Worksheet(sheetName)
