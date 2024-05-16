@@ -100,5 +100,9 @@ export const setPrintInfo = function (sheet, printInfo) {
             ? sheet.getColumnCount()
             : columnEnd;
     print.columnEnd(columnEnd);
+    print.repeatRowStart(-1);
+    print.repeatRowEnd(-1);
+    print.repeatColumnStart(-1);
+    print.repeatColumnEnd(-1);
     sheet.printInfo(print);
 };
