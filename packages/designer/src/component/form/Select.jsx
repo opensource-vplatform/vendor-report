@@ -1,5 +1,4 @@
 import {
-  useCallback,
   useEffect,
   useState,
 } from 'react';
@@ -103,12 +102,12 @@ export default function (props) {
     useEffect(() => {
         setData(valueToData(value, null, datas));
     }, [value]);
-    const handleChange = useCallback((val, node) => {
+    const handleChange = (val, node) => {
         if (val !== value) {
             setData(valueToData(val, node, datas));
             onChange && onChange(val);
         }
-    },[value]);
+    };
     return (
         <Menu
             datas={datas}

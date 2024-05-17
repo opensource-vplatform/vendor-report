@@ -4,8 +4,15 @@ import styled from 'styled-components';
 
 import Popper from '@components/popper/Index';
 import { getBaseUrl } from '@utils/environmentUtil';
+import { isFunction } from '@utils/objectUtil';
 
 import Setting from './Setting';
+import bindingPath from './types/BindingPath';
+import formula from './types/Formula';
+import group from './types/Group';
+import image from './types/Image';
+import list from './types/List';
+import sum from './types/Sum';
 
 const Wrap = styled.div`
     display: flex;
@@ -21,8 +28,43 @@ const Img = styled.img`
     cursor: pointer;
 `;
 
+const plugins = [bindingPath, formula, group, image, list, sum];
+
+/**
+ * 是否显示设置图标
+ */
+export const isShowIcon = function (sheet, row, col) {
+    for (let i = 0; i < plugins.length; i++) {
+        const plugin = plugins[i];
+        const handler = plugin.isShowIcon;
+        if (isFunction(handler)) {
+            const rest = handler(sheet, row, col);
+            if (rest === true) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+/**
+ * 绘制单元格
+ * @param {*} context
+ * @param {*} style
+ * @param {*} value
+ */
+export const paintCell = function (context, style, value) {
+    plugins.forEach((plugin) => {
+        const handler = plugin.paintCell;
+        if (isFunction(handler)) {
+            value = handler(context, style, value);
+        }
+    });
+    return value;
+};
+
 export default function (props) {
-    const { value, onChange } = props;
+    const {sheet} = props;
     const [visible, setVisible] = useState(false);
     return (
         <Popper
@@ -35,9 +77,8 @@ export default function (props) {
             onVisibleChange={setVisible}
             content={
                 <Setting
-                    value={value}
+                    sheet={sheet}
                     onConfirm={(val) => {
-                        onChange(val);
                         setVisible(false);
                     }}
                     onCancel={() => {

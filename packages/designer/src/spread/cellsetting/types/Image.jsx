@@ -42,7 +42,7 @@ const isRectDisabled = function (data) {
     return data.mode !== 4;
 };
 
-export default function (props) {
+const Component = function (props) {
     const { onConfirm, onCancel, plugin } = props;
     const [data, setData] = useState(plugin);
     const rectDisabled = isRectDisabled(data);
@@ -108,4 +108,8 @@ export default function (props) {
             <Toolbar onConfirm={handleConfirm} onCancel={onCancel}></Toolbar>
         </Fragment>
     );
+}
+
+export default {
+    Component,
 }

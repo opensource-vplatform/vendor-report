@@ -4,6 +4,18 @@ import {
 } from 'react';
 
 import { Select } from '@components/form/Index';
+import { isUndefined } from '@utils/objectUtil';
+import {
+  applyToSelectedCell,
+  getNamespace,
+} from '@utils/spreadUtil';
+import {
+  clearAllCellTagPlugin,
+  getCellInstanceId,
+  getCellTagPlugin,
+  hasCellTagPluginByIndex,
+  setCellTagPlugin,
+} from '@utils/worksheetUtil';
 
 import {
   Item,
@@ -11,6 +23,7 @@ import {
   Title,
   Toolbar,
 } from '../Component';
+import { getBindText } from '../utils';
 
 const Sum_Types = [
     {
@@ -39,10 +52,27 @@ const Sum_Types = [
     },
 ];
 
-export default function (props) {
-    const { onConfirm, onCancel, plugin } = props;
+const Component = function (props) {
+    const { onConfirm, onCancel, plugin,sheet, } = props;
     const [data, setData] = useState(plugin);
     const handleConfirm = () => {
+        applyToSelectedCell(sheet, (sheet, row, col) => {
+            clearAllCellTagPlugin(sheet, row, col);
+            const bindingPath = sheet.getBindingPath(row, col);
+            if (bindingPath) {
+                const paths = bindingPath.split('.');
+                const instanceId = getCellInstanceId(sheet,row,col);
+                const tableCode = paths[0];
+                const fieldCode = paths[1];
+                const config = plugin.config || {};
+                config.tableCode = tableCode;
+                config.fieldCode = fieldCode;
+                config.instanceId = instanceId
+                plugin.config = config;
+                setCellTagPlugin(sheet, row, col, plugin);
+                sheet.setBindingPath(row,col,undefined);
+            }
+        });
         onConfirm(data);
     };
     return (
@@ -68,4 +98,41 @@ export default function (props) {
             <Toolbar onCancel={onCancel} onConfirm={handleConfirm}></Toolbar>
         </Fragment>
     );
-}
+};
+
+export const isShowIcon = function (sheet, row, col) {
+    return hasCellTagPluginByIndex(sheet, row, col, 'cellSubTotal');
+};
+
+export const paintCell = function (context, style, value) {
+    const { sheet, row, col } = context;
+    const has = hasCellTagPluginByIndex(sheet, row, col, 'cellSubTotal');
+    if (has) {
+        const GC = getNamespace();
+        const posType = GC.Spread.Sheets.CornerPosition;
+        style.decoration = {
+            cornerFold: {
+                size: 8,
+                position: posType.rightBottom,
+                color: 'blue',
+            },
+        };
+        const plugin = getCellTagPlugin(sheet, row, col, 'cellSubTotal');
+        const { tableCode, fieldCode, functionNum } = plugin.config;
+        const text = getBindText(
+            `${tableCode}.${fieldCode}`,
+            sheet.getParent()
+        );
+        if (!isUndefined(text)) {
+            const type = Sum_Types.find((type) => type.value == functionNum);
+            return `[${type.text}(${text})]`;
+        }
+    }
+    return value;
+};
+
+export default {
+    isShowIcon,
+    paintCell,
+    Component,
+};

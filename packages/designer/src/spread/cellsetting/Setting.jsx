@@ -1,9 +1,16 @@
-import { useState } from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
 import { Divider } from '@components/divider/Index';
 import { Select } from '@components/form/Index';
+import {
+  getActiveIndexBySheet,
+  getCellTagPlugins,
+} from '@utils/worksheetUtil';
 
 import {
   Item,
@@ -44,18 +51,12 @@ const btnStyle = {
 };
 
 export default function (props) {
-    const { value, onConfirm, onCancel } = props;
-    let plugin = null;
-    if (value && value.length > 0) {
-        plugin = value[0];
-    } else {
-        plugin = {
-            type: 'cellListType',
-        };
-    }
+    const { sheet, onConfirm, onCancel } = props;
     const [data, setData] = useState(() => {
         return {
-            plugin: plugin,
+            plugin: {
+                type: 'cellListType',
+            },
         };
     });
     let children = null;
@@ -66,41 +67,61 @@ export default function (props) {
     switch (type) {
         case 'cellListType':
             children = (
-                <List
+                <List.Component
                     plugin={data.plugin}
+                    sheet={sheet}
                     onConfirm={handleSetting}
                     onCancel={onCancel}
-                ></List>
+                ></List.Component>
             );
             break;
         case 'cellGroupType':
             children = (
-                <Group
+                <Group.Component
                     plugin={data.plugin}
+                    sheet={sheet}
                     onConfirm={handleSetting}
                     onCancel={onCancel}
-                ></Group>
+                ></Group.Component>
             );
             break;
         case 'cellSubTotal':
             children = (
-                <Sum
+                <Sum.Component
                     plugin={data.plugin}
+                    sheet={sheet}
                     onConfirm={handleSetting}
                     onCancel={onCancel}
-                ></Sum>
+                ></Sum.Component>
             );
             break;
         case 'imageCellType':
             children = (
-                <Image
+                <Image.Component
                     plugin={data.plugin}
+                    sheet={sheet}
                     onConfirm={handleSetting}
                     onCancel={onCancel}
-                ></Image>
+                ></Image.Component>
             );
     }
-
+    useEffect(() => {
+        const { row, col } = getActiveIndexBySheet(sheet);
+        const plugins = getCellTagPlugins(sheet, row, col);
+        if (plugins && plugins.length > 0) {
+            setData({
+                ...data,
+                plugin: plugins[0],
+            });
+        } else {
+            setData({
+                ...data,
+                plugin: {
+                    type: 'cellListType',
+                },
+            });
+        }
+    }, []);
     return (
         <Wrap>
             <ItemList>

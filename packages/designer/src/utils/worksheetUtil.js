@@ -67,14 +67,18 @@ export function getCellTagPlugins(sheet, row, col) {
     return getCellTag(sheet, row, col, 'plugins');
 }
 
-export function hasCellTagPlugin(sheet, pluginType) {
-    const { row, col } = getActiveIndexBySheet(sheet);
+export function hasCellTagPluginByIndex(sheet, row, col,pluginType){
     const plugins = getCellTagPlugins(sheet, row, col);
     if (plugins) {
         const pl = plugins.find((pl) => pl.type == pluginType);
         return !!pl;
     }
     return false;
+}
+
+export function hasCellTagPlugin(sheet, pluginType) {
+    const { row, col } = getActiveIndexBySheet(sheet);
+    return hasCellTagPluginByIndex(sheet,row,col,pluginType);
 }
 
 /**

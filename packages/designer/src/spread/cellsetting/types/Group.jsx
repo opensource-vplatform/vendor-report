@@ -1,7 +1,14 @@
 import { Fragment } from 'react';
-import { Item, ItemList, Text, Title, Toolbar } from '../Component';
 
-export default function (props) {
+import {
+  Item,
+  ItemList,
+  Text,
+  Title,
+  Toolbar,
+} from '../Component';
+
+const Component = function (props) {
     const { onConfirm, onCancel } = props;
     const handleConfirm = () => {
         onConfirm({
@@ -21,4 +28,6 @@ export default function (props) {
             <Toolbar onConfirm={handleConfirm} onCancel={onCancel}></Toolbar>
         </Fragment>
     );
-}
+};
+
+export default { Component };
