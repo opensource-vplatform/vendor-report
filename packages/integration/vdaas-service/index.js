@@ -121,13 +121,14 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
   if (!fileName && !!req.query.reportTitle) // 不传fileName 则取reportTitle
     fileName = decodeURIComponent(req.query.reportTitle)
   else if (!fileName)
-    fileName = 'a'
+    fileName = '未命名'
+
   let page;
   try {
     return new Promise(async (resolve, reject) => {
-      // const browser = await puppeteer.launch({ headless: true })
-      // 打开一个新页面
+
       if (!browser) return;
+      // 打开一个新页面
       page = await browser.newPage();
       //  const pages =  await browser.pages()
       //   console.log("打开一个新页面",pages);
@@ -162,7 +163,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       const stream = base64ToStream(base64Data);
       // 设置响应头，指定内容类型和文件名
       res.setHeader('Content-Type', 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${fileName}.pdf"`); // 文件名为file.dat，可自定义
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}.pdf"`); // 文件名
 
       const binaryData = Buffer.from(base64Data, 'base64');
       // 计算二进制数据的 MD5 哈希值
@@ -180,6 +181,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
         stream.destroy();
       });
     }).catch((err) => {
+      res.setHeader('Content-Type', 'application/json');
       res.json({
         message: '导出PDF失败,请检查参数是否正确',
         errDesc: err,
@@ -188,6 +190,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
     })
   } catch (e) {
     console.log("导出PDF失败", e);
+    res.setHeader('Content-Type', 'application/json');
     res.json({
       message: '导出PDF失败,请检查参数是否正确',
       errDesc: e,
@@ -269,7 +272,7 @@ const registerNacos = async () => {
       changeOrigin: true,
       // 重写响应头，只允许一个 Origin
       onProxyRes: function (proxyRes) {
-        proxyRes.headers['Access-Control-Allow-Origin'] = `http://localhost:${exposePort}`;
+        proxyRes.headers['Access-Control-Allow-Origin'] = `http://localhost:${port}`;
       }
     });
 
