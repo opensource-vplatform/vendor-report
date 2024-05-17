@@ -61,20 +61,23 @@ class UnionDatasource {
         this._anslysisSetting();
     }
 
-    _parseBindingPaths(bindingPaths){
-        if(bindingPaths&&bindingPaths.length>0){
-            bindingPaths.forEach(bindingPath=>{
+    _parseBindingPaths(bindingPaths) {
+        if (bindingPaths && bindingPaths.length > 0) {
+            bindingPaths.forEach((bindingPath) => {
                 const paths = bindingPath.split('.');
                 const len = paths.length;
-                if(len==1){
+                if (len == 1) {
                     const code = paths[0];
-                    this.datasources[code] = {type:"param"};
-                }else if(len==2){
+                    this.datasources[code] = { type: 'param' };
+                } else if (len == 2) {
                     const code = paths[0];
                     const fieldCode = paths[1];
-                    const ds = this.datasources[code]||{type:"field",fields:[]};
+                    const ds = this.datasources[code] || {
+                        type: 'field',
+                        fields: [],
+                    };
                     const fields = ds.fields;
-                    if(fields.indexOf(fieldCode)==-1){
+                    if (fields.indexOf(fieldCode) == -1) {
                         fields.push(fieldCode);
                     }
                     this.datasources[code] = ds;
@@ -85,7 +88,7 @@ class UnionDatasource {
 
     _containsTable(tableCode) {
         const ds = this.datasources[tableCode];
-        return ds&&ds.type=="field";
+        return ds && ds.type == 'field';
     }
 
     /**
@@ -122,22 +125,22 @@ class UnionDatasource {
     /**
      * 分析插件设置
      */
-    _analysisPluginSetting(){
+    _analysisPluginSetting() {
         const cellPlugins = this.setting.cellPlugins;
-        if(cellPlugins&&cellPlugins.length>0){
+        if (cellPlugins && cellPlugins.length > 0) {
             //只处理分组
             this.cellPlugins = [];
-            cellPlugins.forEach(plugin=>{
+            cellPlugins.forEach((plugin) => {
                 const bindingPath = plugin.bindingPath;
                 const plugins = plugin.plugins;
-                if(plugins&&plugins.length>0){
+                if (plugins && plugins.length > 0) {
                     for (let i = 0; i < plugins.length; i++) {
                         const plugin = plugins[i];
-                        if(plugin.type=="cellGroupType"){
+                        if (plugin.type == 'cellGroupType') {
                             this.cellPlugins.push({
                                 bindingPath,
-                                type:"cellGroupType"
-                            })
+                                type: 'cellGroupType',
+                            });
                         }
                     }
                 }
@@ -214,7 +217,7 @@ class UnionDatasource {
                 });
                 if (sumFields && sumFields.length > 0) {
                     //开始进行树形汇总
-                    const treeSum =  (node)=> {
+                    const treeSum = (node) => {
                         const isLeaf = this._isLeaf(node);
                         if (!isLeaf) {
                             //非叶子节点需要先对子节点进行汇总
@@ -330,20 +333,26 @@ class UnionDatasource {
 
     /**
      * 根据分组信息联合数据
-     * @param {*} datasetMap 
-     * @param {*} result 
-     * @param {*} except 
+     * @param {*} datasetMap
+     * @param {*} result
+     * @param {*} except
      */
-    _unitDataByGroup(datasetMap, result, except){
-        if(this.cellPlugins&&this.cellPlugins.length>0){
+    _unitDataByGroup(datasetMap, result, except) {
+        if (this.cellPlugins && this.cellPlugins.length > 0) {
             const dataset = [];
-            const indexs={};
+            const indexs = {};
             const notGroupPaths = [];
-            for(let [tableCode,cfg] of Object.entries(this.datasources)){
-                if(cfg.type=='field'){
+            for (let [tableCode, cfg] of Object.entries(this.datasources)) {
+                if (cfg.type == 'field') {
                     const fields = cfg.fields;
-                    fields.forEach(fieldCode=>{
-                        if(!this.cellPlugins.find(plugin=>plugin.bindingPath==`${tableCode}.${fieldCode}`)){
+                    fields.forEach((fieldCode) => {
+                        if (
+                            !this.cellPlugins.find(
+                                (plugin) =>
+                                    plugin.bindingPath ==
+                                    `${tableCode}.${fieldCode}`
+                            )
+                        ) {
                             notGroupPaths.push({
                                 tableCode,
                                 fieldCode,
@@ -353,27 +362,27 @@ class UnionDatasource {
                 }
             }
             const concat_char = '_@_#_$_%_^_&_*_(_)_';
-            result.forEach(item=>{
+            result.forEach((item) => {
                 const values = [];
-                const get = (tableCode,fieldCode)=>{
+                const get = (tableCode, fieldCode) => {
                     const data = item[tableCode];
                     let value = null;
-                    if(data){
+                    if (data) {
                         value = data[fieldCode];
                     }
                     return value;
-                }
-                this.cellPlugins.forEach(plugin=>{
+                };
+                this.cellPlugins.forEach((plugin) => {
                     const bindingPath = plugin.bindingPath;
-                    const [tableCode,fieldCode] = bindingPath.split('.');
-                    values.push(get(tableCode,fieldCode));
+                    const [tableCode, fieldCode] = bindingPath.split('.');
+                    values.push(get(tableCode, fieldCode));
                 });
-                notGroupPaths.forEach(path=>{
-                    const {tableCode,fieldCode} = path;
-                    values.push(get(tableCode,fieldCode));
+                notGroupPaths.forEach((path) => {
+                    const { tableCode, fieldCode } = path;
+                    values.push(get(tableCode, fieldCode));
                 });
                 const key = values.join(concat_char);
-                if(!indexs[key]){
+                if (!indexs[key]) {
                     dataset.push(item);
                     indexs[key] = true;
                 }
@@ -407,11 +416,11 @@ class UnionDatasource {
         const idField = this.setting.treeStruct[tableCode].idField;
         for (let index = start; index <= end; index++) {
             const data = this.datas[index];
-            if (data&&data[tableCode]) {
+            if (data && data[tableCode]) {
                 const record = data[tableCode];
                 const id = record[idField];
                 const node = dataIndexMap[id];
-                if(this._isLeaf(node)){
+                if (this._isLeaf(node)) {
                     ranges.push(index);
                 }
             }
@@ -460,15 +469,15 @@ class UnionDatasource {
 
     /**
      * 获取字段值
-     * @param {*} dsCode 
-     * @param {*} fieldCode 
+     * @param {*} dsCode
+     * @param {*} fieldCode
      */
-    getFieldValues(dsCode,fieldCode){
+    getFieldValues(dsCode, fieldCode) {
         const result = [];
         const count = this.getCount();
         let index = 0;
-        while(index<count){
-            result.push(this.getValue(dsCode,fieldCode,index));
+        while (index < count) {
+            result.push(this.getValue(dsCode, fieldCode, index));
             index++;
         }
         return result;
@@ -476,36 +485,34 @@ class UnionDatasource {
 
     /**
      * 获取叶子节点字段值
-     * @param {*} dsCode 
-     * @param {*} fieldCode 
+     * @param {*} dsCode
+     * @param {*} fieldCode
      */
-    getLeafFieldValues(dsCode,fieldCode){
+    getLeafFieldValues(dsCode, fieldCode) {
         const treeStruct = this.setting.treeStruct[dsCode];
-        if(treeStruct&&treeStruct.idField&&treeStruct.pidField){
+        if (treeStruct && treeStruct.idField && treeStruct.pidField) {
             const result = [];
             const dataIndexMap = this.treeDataIndexMap[dsCode];
             const idField = treeStruct.idField;
             const count = this.getCount();
             for (let index = 0; index < count; index++) {
                 const data = this.datas[index];
-                if (data&&data[dsCode]) {
+                if (data && data[dsCode]) {
                     const record = data[dsCode];
                     const id = record[idField];
                     const node = dataIndexMap[id];
-                    if(this._isLeaf(node)){
+                    if (this._isLeaf(node)) {
                         const data = node.data;
-                        const value = data ? data[fieldCode]:null;
-                        result.push(value)
+                        const value = data ? data[fieldCode] : null;
+                        result.push({ value });
                     }
                 }
             }
             return result;
-        }else{
-            return this.getFieldValues(dsCode,fieldCode);
+        } else {
+            return this.getFieldValues(dsCode, fieldCode);
         }
-        
     }
-
 }
 
 export default UnionDatasource;

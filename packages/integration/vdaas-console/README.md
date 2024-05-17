@@ -3,6 +3,7 @@
 ## 本地vite打包
 
 在根目录上执行以下命令：
+
 ```sh
 npm run build-vdaas-console
 ```
