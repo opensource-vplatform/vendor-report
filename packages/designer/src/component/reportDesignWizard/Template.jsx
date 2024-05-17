@@ -36,7 +36,7 @@ function genTemplateName(template, sheetNames = []) {
         if (key.startsWith('模板')) {
             let num = Number(key.slice(2));
             if (Number.isInteger(num) && num >= index) {
-                index = num === index ? index + 1 : num;
+                index = num === index ? num + 1 : num;
             }
         }
     });
@@ -71,6 +71,10 @@ const PageDisplayTypeWrapItem = styled.div`
 
 const Label = styled.span`
     width: 160px;
+    height: 22px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 `;
 
 const PageShowWrap = styled.div`
@@ -162,7 +166,9 @@ function Header(props) {
         <>
             {!isEdit && (
                 <PageDisplayTypeWrap>
-                    <Label>{`是否复用【${sheetName}】`}：</Label>
+                    <Label title={sheetName}>
+                        {`是否复用【${sheetName}】`}：
+                    </Label>
                     <CheckBox
                         value={isCopySheet}
                         onChange={(val) => {
