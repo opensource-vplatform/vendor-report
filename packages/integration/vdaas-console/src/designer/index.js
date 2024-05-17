@@ -100,7 +100,7 @@ const designer = new Designer({
     //配置详情参考README.md
     //batchGetDatasURL,
     //datasPath: 'data/data',
-    baseUrl:'../',
+    baseUrl: '../',
     nav: {
         //file: true, //隐藏文件页签页，
         table: {
@@ -153,7 +153,9 @@ const designer = new Designer({
                             return reject(Error(error));
                         }
                         resolve(
-                            enhanceMetadata(metadata?.data?.data?.data?.define || [])
+                            enhanceMetadata(
+                                metadata?.data?.data?.data?.define || []
+                            )
                         );
                     })
                     .catch(reject);
@@ -193,18 +195,25 @@ const designer = new Designer({
                                     }
                                     resolve({
                                         tableMetadata: enhanceMetadata(
-                                            metadata?.data?.data?.data?.define || []
+                                            metadata?.data?.data?.data
+                                                ?.define || []
                                         ),
-                                        excelJson: excelJson?.reportJson||null,
-                                        datasourceSetting:excelJson?.datasourceSetting||{},
+                                        excelJson:
+                                            excelJson?.reportJson || null,
+                                        datasourceSetting:
+                                            excelJson?.datasourceSetting || {},
+                                        wizardSlice:
+                                            excelJson?.context?.wizardSlice,
                                     });
                                 })
                                 .catch(reject);
                         } else {
                             resolve({
                                 tableMetadata: [],
-                                excelJson: excelJson?.reportJson||null,
-                                datasourceSetting:excelJson?.datasourceSetting||{},
+                                excelJson: excelJson?.reportJson || null,
+                                datasourceSetting:
+                                    excelJson?.datasourceSetting || {},
+                                wizardSlice: excelJson?.context?.wizardSlice,
                             });
                         }
                     })
