@@ -55,23 +55,15 @@ function resetSheet({
     sheet.spans = spans;
 
     //行高
-    setSheetRows(sheet, rows);
+    if (sheet.rows) {
+        sheet.rows.length = 0;
+    } else {
+        sheet.rows = [];
+    }
+    sheet.rows.push(...rows);
 
     //自动合并区域
     sheet.autoMergeRangeInfos = autoMergeRanges;
-}
-
-function setSheetRows(sheet, rows) {
-    if (sheet.rows) {
-        Object.keys(sheet.rows).forEach(function (key) {
-            delete sheet.rows[key];
-        });
-        Object.entries(rows).forEach(function ([key, value]) {
-            sheet.rows[key] = value;
-        });
-        return;
-    }
-    sheet.rows = rows;
 }
 
 function calcTempHeight(params) {
@@ -822,6 +814,7 @@ export default class Render {
                     },
                 },
                 colHeaderVisible = true,
+                colHeaderRowInfos = [],
             } = sheet;
             //当前sheet不可见，直接跳过解析
             if (visible === 0) {
@@ -846,10 +839,6 @@ export default class Render {
                 tag = res;
             }
 
-            if (sheet?.rowHeaderData?.dataTable) {
-                sheet.rowHeaderData.dataTable = {};
-            }
-
             //以分页区域为边界，对模板进行拆分成头部区模板，内容区模板，底部区模板
             this.splitTemplate({
                 sheet,
@@ -862,7 +851,19 @@ export default class Render {
             marginBottom = (printConversionUnits * marginBottom) / 100;
             marginTop = (printConversionUnits * marginTop) / 100;
 
-            const colHeaderHeight = colHeaderVisible ? 20 : 0;
+            let defaultHeaderHeight = 20;
+            if (colHeaderRowInfos.length > 0) {
+                const height = colHeaderRowInfos.reduce((res, cur) => {
+                    let size = 20;
+                    if (cur.hasOwnProperty('size')) {
+                        size = cur.size;
+                    }
+                    return res + size;
+                }, 0);
+                defaultHeaderHeight = height;
+            }
+
+            const colHeaderHeight = colHeaderVisible ? defaultHeaderHeight : 0;
             if (orientation === 2) {
                 pageTotalHeight =
                     _width - marginBottom - marginTop - colHeaderHeight;
@@ -935,7 +936,6 @@ export default class Render {
                 ...this.setting,
                 cellPlugins,
             };
-            debugger;
             const unionDatasource = getUnionDatasource(
                 datas,
                 setting,
@@ -1246,7 +1246,7 @@ export default class Render {
 
             pageInfos.dataTable = {};
             pageInfos.spans = [];
-            pageInfos.rows = {};
+            pageInfos.rows = [];
             pageInfos.rules = [];
             pageInfos.autoMergeRanges = [];
             pageInfos.rowCount = 0;
