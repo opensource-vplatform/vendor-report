@@ -1,22 +1,13 @@
 import { createRoot } from 'react-dom/client';
 
-import {
-  bind,
-  EVENTS,
-} from '@event/EventManager';
+import { bind, EVENTS } from '@event/EventManager';
 import { genUUID } from '@utils/commonUtil';
 import { getOffsetFromBody } from '@utils/domUtil';
 import { isUndefined } from '@utils/objectUtil';
-import {
-  getNamespace,
-  getSpecifiedRect,
-} from '@utils/spreadUtil';
+import { getNamespace, getSpecifiedRect } from '@utils/spreadUtil';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
-import Setting, {
-  isShowIcon,
-  paintCell,
-} from './cellsetting/index';
+import Setting, { isShowIcon, paintCell } from './cellsetting/index';
 
 const GC = getNamespace();
 
@@ -28,15 +19,20 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         this._bindEvent();
     }
 
-    _refreshIconPosition(row,col) {
+    _refreshIconPosition(row, col) {
         if (this._iconEle) {
             const style = getComputedStyle(this._iconEle);
             const width = style.width;
             const height = style.height;
-            if ('0px' !== width && '0px' !== height && style.display!='none' && this.sheet) {
+            if (
+                '0px' !== width &&
+                '0px' !== height &&
+                style.display != 'none' &&
+                this.sheet
+            ) {
                 const spread = this.sheet.getParent();
                 if (spread && spread.getActiveSheet() === this.sheet) {
-                    if(isUndefined(row)||isUndefined(col)){
+                    if (isUndefined(row) || isUndefined(col)) {
                         const index = getActiveIndexBySheet(this.sheet);
                         row = index.row;
                         col = index.col;
@@ -84,7 +80,8 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             this._refreshIconPosition();
         };
         const showIcon = () => {
-            this._initIcon();
+            const icon = this._initIcon();
+            icon.style.display = 'flex';
             refreshIconPosition();
         };
         this._bindEvents(
@@ -106,7 +103,13 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                 this._hideIcon();
             },
         });
-        //this._bindEvents([EVENTS.onEditorVisible], showIcon);
+        this._bindEvents([EVENTS.onEditorVisible], () => {
+            const { sheet, row, col } = getActiveIndexBySheet(this.sheet);
+            if (this._couldShowIcon(sheet, row, col)) {
+                const icon = this._initIcon();
+                icon.style.display = 'flex';
+            }
+        });
     }
 
     /**
@@ -123,9 +126,16 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         }
     }
 
+    _isDesignMode(sheet) {
+        return sheet.getParent().getHost().dataset.type !== 'preview';
+    }
+
+    _couldShowIcon(sheet, row, col) {
+        return this._isDesignMode(sheet) && isShowIcon(sheet, row, col);
+    }
+
     _paintSettingIcon(sheet, row, col) {
-        const visible = isShowIcon(sheet, row, col);
-        if (visible) {
+        if (this._couldShowIcon(sheet, row, col)) {
             this._showIcon(row, col);
         } else {
             this._hideIcon();
@@ -171,9 +181,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                 style.justifyContent = 'center';
                 this._iconEle = iconEle;
                 this.root = createRoot(iconEle);
-                this.root.render(
-                    <Setting sheet={this.sheet}></Setting>
-                );
+                this.root.render(<Setting sheet={this.sheet}></Setting>);
             }
         }
         return this._iconEle;
@@ -183,7 +191,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         const iconEle = this._initIcon();
         const style = iconEle.style;
         style.display = 'flex';
-        this._refreshIconPosition(row,col);
+        this._refreshIconPosition(row, col);
     }
 
     _hideIcon() {
@@ -199,12 +207,12 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         this._paintSettingIcon(sheet, row, col);
     }
 
-    destory(){
+    destory() {
         this.sheet = null;
         const root = this.root;
-        if(root){
+        if (root) {
             root.unmount();
-        }   
+        }
         this.root = null;
         document.body.removeChild(this._iconEle);
         this._iconEle = null;

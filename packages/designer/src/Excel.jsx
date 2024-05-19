@@ -1,54 +1,31 @@
-import {
-  Fragment,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react';
+import { Fragment, useCallback, useContext, useEffect, useRef } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { registerCommand } from '@commands/index';
-import {
-  bind,
-  EVENTS,
-  fire,
-} from '@event/EventManager';
+import { bind, EVENTS, fire } from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
-  initDatasource,
-  setSetting,
-  updateActiveSheetTablePath,
-  updateDslist,
+    initDatasource,
+    setSetting,
+    updateActiveSheetTablePath,
+    updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
-  initWizardSlice,
-  toggleBooleanValue,
-  updateTemplateName,
+    initWizardSlice,
+    toggleBooleanValue,
+    updateTemplateName,
 } from '@store/wizardSlice';
-import {
-  Workbook,
-  Worksheet,
-} from '@toone/report-excel';
+import { Workbook, Worksheet } from '@toone/report-excel';
 import { formatBindingPathCellType } from '@utils/cellUtil';
-import {
-  findTreeNodeById,
-  getActiveSheetTablesPath,
-} from '@utils/commonUtil';
+import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
 import { getLicense } from '@utils/configUtil';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import { getNamespace } from '@utils/spreadUtil';
-import {
-  getCellTag,
-  getSheetTag,
-  setSheetTag,
-} from '@utils/worksheetUtil';
+import { getCellTag, getSheetTag, setSheetTag } from '@utils/worksheetUtil';
 
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
@@ -260,7 +237,6 @@ export default function () {
                 RowChanged({ ...datas, type: 'totalArea' });
             },
         });
-
         return () => {
             unbind();
         };

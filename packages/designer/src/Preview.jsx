@@ -1,24 +1,12 @@
 import { useContext } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import {
-  EVENTS,
-  fire,
-} from '@event/EventManager';
-import {
-  Workbook,
-  Worksheet,
-} from '@toone/report-excel';
-import {
-  getLicense,
-  getToolbar,
-} from '@utils/configUtil';
+import { EVENTS, fire } from '@event/EventManager';
+import { Workbook, Worksheet } from '@toone/report-excel';
+import { getLicense, getToolbar } from '@utils/configUtil';
 
 import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
@@ -111,6 +99,10 @@ export default function () {
         printHandler && printHandler();
     };
     const handleEdit = () => {
+        if (sourceSpread) {
+            //将设计器绑定的元素类型设置为design，用途：给DefaultCell中使用，在设计器预览时，调用toJSON会引发重绘，引发单元格设置图标显示
+            sourceSpread.getHost().dataset.type = 'design';
+        }
         dispatch(setMode({ mode: 'edit' }));
         fire({
             event: EVENTS.onEditorVisible,
