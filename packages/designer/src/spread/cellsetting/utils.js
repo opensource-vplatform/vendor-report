@@ -1,6 +1,11 @@
-import { isFunction } from '@utils/objectUtil';
+import { getBaseUrl } from '@utils/environmentUtil';
+import {
+  isFunction,
+  isNullOrUndef,
+} from '@utils/objectUtil';
+import { getNamespace } from '@utils/spreadUtil';
 
-export const getBindText = function(bindingPath,spread){
+export const getBindText = function (bindingPath, spread) {
     if (spread && isFunction(spread.getDesignerDatasources)) {
         const datasources = spread.getDesignerDatasources();
         if (datasources && datasources.length > 0) {
@@ -32,4 +37,61 @@ export const getBindText = function(bindingPath,spread){
             }
         }
     }
-}
+};
+
+/**
+ * 是否绑定实体字段
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @returns
+ */
+export const hasBindField = function (sheet, row, col) {
+    const bindingPath = sheet.getBindingPath(row, col);
+    //有绑定信息，且绑定的为实体字段
+    return bindingPath && bindingPath.split('.').length == 2;
+};
+
+const setIconDecoration = function (style, type) {
+    const GC = getNamespace();
+    style.decoration = {
+        icons: [
+            {
+                src: getBaseUrl() + `/css/icons/design/${type}.png`,
+                width: 16,
+                height: 16,
+                v_i: true,
+                position: GC.Spread.Sheets.IconPosition.leftOfText,
+            },
+        ],
+    };
+    const hAlign = style.hAlign;
+    const HorizontalAlign = GC.Spread.Sheets.HorizontalAlign;
+    if (
+        hAlign == HorizontalAlign.left ||
+        hAlign == HorizontalAlign.general ||
+        isNullOrUndef(hAlign)
+    ) {
+        style.textIndent = style.textIndent || 1;
+    }
+};
+
+export const setFormulaDecoration = function (style) {
+    setIconDecoration(style, 'formula');
+};
+
+export const setListDecoration = function (style) {
+    setIconDecoration(style, 'list');
+};
+
+export const setGroupDecoration = function (style) {
+    setIconDecoration(style, 'group');
+};
+
+export const setSumDecoration = function (style) {
+    setIconDecoration(style, 'sum');
+};
+
+export const setImageDecoration = function (style) {
+    setIconDecoration(style, 'image');
+};

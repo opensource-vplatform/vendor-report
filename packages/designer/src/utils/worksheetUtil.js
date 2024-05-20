@@ -1,4 +1,5 @@
 import { genUUID } from './commonUtil';
+import { isObject } from './objectUtil';
 import {
   getNamespace,
   withBatchUpdate,
@@ -522,4 +523,24 @@ export function isFormula(text) {
         return text.startsWith('=');
     }
     return false;
+}
+
+export function setOptions(sheet,options){
+    if(isObject(options)){
+        const spread = sheet.getParent();
+        const setValues = (target,values)=>{
+            for(let [key,val] of Object.entries(values)){
+                if(isObject(val)){
+                    const tgt = target[key]||{};
+                    setValues(tgt,val);
+                    target[key] = tgt;
+                }else{
+                    target[key] = val;
+                }
+            }
+        }
+        withBatchUpdate(spread,()=>{
+            setValues(sheet.options,options);
+        });
+    }
 }

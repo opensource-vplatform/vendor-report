@@ -1,13 +1,22 @@
 import { createRoot } from 'react-dom/client';
 
-import { bind, EVENTS } from '@event/EventManager';
+import {
+  bind,
+  EVENTS,
+} from '@event/EventManager';
 import { genUUID } from '@utils/commonUtil';
 import { getOffsetFromBody } from '@utils/domUtil';
 import { isUndefined } from '@utils/objectUtil';
-import { getNamespace, getSpecifiedRect } from '@utils/spreadUtil';
+import {
+  getNamespace,
+  getSpecifiedRect,
+} from '@utils/spreadUtil';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
-import Setting, { isShowIcon, paintCell } from './cellsetting/index';
+import Setting, {
+  isShowIcon,
+  paintCell,
+} from './cellsetting/index';
 
 const GC = getNamespace();
 
@@ -78,11 +87,6 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     _bindEvent() {
         const refreshIconPosition = () => {
             this._refreshIconPosition();
-        };
-        const showIcon = () => {
-            const icon = this._initIcon();
-            icon.style.display = 'flex';
-            refreshIconPosition();
         };
         this._bindEvents(
             [

@@ -62,6 +62,7 @@ export default function (props) {
     let children = null;
     const type = data.plugin.type;
     const handleSetting = () => {
+        
         onConfirm([data.plugin]);
     };
     switch (type) {

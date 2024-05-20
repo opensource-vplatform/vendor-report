@@ -1,4 +1,3 @@
-import DefaultCell from '../spread/DefaultCell';
 import { getBaseUrl } from './environmentUtil';
 import { isNullOrUndef } from './objectUtil';
 import {
@@ -221,13 +220,18 @@ export function formatBindingPathCellType(sheet) {
         return;
     }
     sheet.suspendPaint();
-    const bindingPathCellType = new DefaultCell();
     Object.entries(dataTable).forEach(([rowStr, colValue]) => {
         const row = Number(rowStr);
-        Object.entries(colValue).forEach(([colStr, { bindingPath }]) => {
-            if (bindingPath) {
-                const col = Number(colStr);
-                sheet.getCell(row, col).cellType(bindingPathCellType);
+        Object.entries(colValue).forEach(([colStr, { style }]) => {
+            if(style){
+                const cellStyle = style.cellType;
+                if(cellStyle&&cellStyle.typeName=="1"){
+                    //移除旧版本json中绑定样式设置
+                    const col = Number(colStr);
+                    sheet.getCell(row, col).cellType(undefined);
+                    const style = sheet.getStyle(row,col);
+                    style.decoration = undefined;
+                }
             }
         });
     });

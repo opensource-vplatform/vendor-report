@@ -7,7 +7,6 @@ import { getBaseUrl } from '@utils/environmentUtil';
 import { isFunction } from '@utils/objectUtil';
 
 import Setting from './Setting';
-import bindingPath from './types/BindingPath';
 import formula from './types/Formula';
 import group from './types/Group';
 import image from './types/Image';
@@ -28,7 +27,7 @@ const Img = styled.img`
     cursor: pointer;
 `;
 
-const plugins = [bindingPath, formula, group, image, list, sum];
+const plugins = [formula, group, image, list, sum];
 
 /**
  * 是否显示设置图标

@@ -5,10 +5,7 @@ import {
 
 import { Select } from '@components/form/Index';
 import { isUndefined } from '@utils/objectUtil';
-import {
-  applyToSelectedCell,
-  getNamespace,
-} from '@utils/spreadUtil';
+import { applyToSelectedCell } from '@utils/spreadUtil';
 import {
   clearAllCellTagPlugin,
   getCellInstanceId,
@@ -23,7 +20,10 @@ import {
   Title,
   Toolbar,
 } from '../Component';
-import { getBindText } from '../utils';
+import {
+  getBindText,
+  setSumDecoration,
+} from '../utils';
 
 const Sum_Types = [
     {
@@ -100,23 +100,15 @@ const Component = function (props) {
     );
 };
 
-export const isShowIcon = function (sheet, row, col) {
+const isShowIcon = function (sheet, row, col) {
     return hasCellTagPluginByIndex(sheet, row, col, 'cellSubTotal');
 };
 
-export const paintCell = function (context, style, value) {
+const paintCell = function (context, style, value) {
     const { sheet, row, col } = context;
     const has = hasCellTagPluginByIndex(sheet, row, col, 'cellSubTotal');
     if (has) {
-        const GC = getNamespace();
-        const posType = GC.Spread.Sheets.CornerPosition;
-        style.decoration = {
-            cornerFold: {
-                size: 8,
-                position: posType.rightBottom,
-                color: 'blue',
-            },
-        };
+        setSumDecoration(style);
         const plugin = getCellTagPlugin(sheet, row, col, 'cellSubTotal');
         const { tableCode, fieldCode, functionNum } = plugin.config;
         const text = getBindText(

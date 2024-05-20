@@ -380,3 +380,22 @@ export function getSpecifiedRect(spread, range, position, sheet) {
         }
     return result;
 }
+
+export const setOptions = function(spread,options){
+    if(isObject(options)){
+        const setValues = (target,values)=>{
+            for(let [key,val] of Object.entries(values)){
+                if(isObject(val)){
+                    const tgt = target[key]||{};
+                    setValues(tgt,val);
+                    target[key] = tgt;
+                }else{
+                    target[key] = val;
+                }
+            }
+        }
+        withBatchUpdate(spread,()=>{
+            setValues(spread.options,options);
+        });
+    }
+}
