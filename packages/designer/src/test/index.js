@@ -9,7 +9,7 @@ import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
 
-salesData.data.length = 150 || 21;
+salesData.data.length = 350 || 21;
 /* salesData.data = salesData.data.filter(function (item) {
     return ['西北'].includes(item.sales_area);
 }); */
@@ -69,6 +69,15 @@ const datasourceDefines = [
                 desc: '购买数量',
                 code: 'num',
                 name: '购买数量',
+                parentId: 'zonaTree',
+            },
+            {
+                id: 'groupId',
+                type: 'text',
+                typeName: '文本',
+                desc: 'groupId',
+                code: 'groupId',
+                name: '分组',
                 parentId: 'zonaTree',
             },
         ],
@@ -308,6 +317,7 @@ export default {
                     PID: '',
                     leaf: false,
                     num: 10,
+                    groupId: 'zona',
                 },
                 {
                     code: 'B',
@@ -315,6 +325,7 @@ export default {
                     PID: 'A',
                     leaf: true,
                     num: 20,
+                    groupId: 'zona',
                 },
                 {
                     code: 'C',
@@ -322,6 +333,7 @@ export default {
                     PID: 'A',
                     leaf: true,
                     num: 30,
+                    groupId: 'zona',
                 },
             ],
         }, //数据源数据

@@ -35,8 +35,8 @@ function genTemplateName(template, sheetNames = []) {
     names.forEach(function (key) {
         if (key.startsWith('模板')) {
             let num = Number(key.slice(2));
-            if (Number.isInteger(num) && num >= index) {
-                index = num === index ? num + 1 : num;
+            if (Number.isInteger(num) && num === index) {
+                index += 1;
             }
         }
     });
@@ -182,7 +182,7 @@ function Header(props) {
                     ></CheckBox>
                 </PageDisplayTypeWrap>
             )}
-            <PageDisplayTypeWrap style={{ borderTop: 'none' }}>
+            {/* <PageDisplayTypeWrap style={{ borderTop: 'none' }}>
                 <Label>分页显示方式：</Label>
                 <PageDisplayTypeWrapItem
                     onClick={function () {
@@ -202,7 +202,7 @@ function Header(props) {
                     <CheckBox value={!isCurrentSheet}></CheckBox>
                     <span>新页签</span>
                 </PageDisplayTypeWrapItem>
-            </PageDisplayTypeWrap>
+            </PageDisplayTypeWrap> */}
 
             {/*  <PageShowWrap>
                 <Label>分页后是否显示头部与尾部：</Label>

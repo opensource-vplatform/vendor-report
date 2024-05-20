@@ -39,7 +39,9 @@ function resetSheet({
 
     const sheetCount = rowCount > 0 ? rowCount : sheet.rowCount;
 
-    sheet.data.dataTable = dataTable;
+    sheet.data.dataTable = Object.keys(dataTable).length
+        ? dataTable
+        : sheet.data.dataTable;
 
     sheet.rowCount = sheetCount;
 
@@ -140,7 +142,6 @@ function getColRules({ rules, col, colHandler }) {
 
 export default class Render {
     constructor(reportJson, datas, tempConfig = {}, setting) {
-        console.time('耗时多久');
         this.datas = datas;
         this.reportJson = reportJson;
         this.tempConfig = Copy(tempConfig);
@@ -152,7 +153,13 @@ export default class Render {
 
         //打印换算单位
         this.printConversionUnits = getPrintConversionUnits();
+        const startTime = Date.now();
+        console.time('耗时');
         this.parse();
+        const count = (Date.now() - startTime) / 1000;
+        console.log(count, '秒');
+        console.timeEnd('耗时');
+
         reportJson.sheets = {};
         reportJson.sheetCount = 0;
 
@@ -172,7 +179,6 @@ export default class Render {
             const formulaHandler = this.delayFormula.pop();
             formulaHandler();
         }
-        console.timeEnd('耗时多久');
     }
     render(pageInfos) {
         const {
@@ -314,6 +320,8 @@ export default class Render {
                 pageInfos,
             });
         }
+        resetSheet(pageInfos);
+        this.newSheets[pageInfos.sheet.name] = pageInfos.sheet;
     }
     genPageInfos({ sheet }) {
         const {
@@ -396,6 +404,7 @@ export default class Render {
     }
     parse() {
         const sheets = Object.values(this.reportJson.sheets);
+        let sheetIndex = 0;
         this.sheetNames = [];
         sheets.forEach((sheet) => {
             const { visible = 1, rowCount = 200, data, name } = sheet;
@@ -587,17 +596,23 @@ export default class Render {
             pageInfos.cobySheet = JSON.stringify(sheet);
             pageInfos.sheet = sheet;
             pageInfos.fromTempSheet = name;
+            debugger;
+            const cobyPageInfos = JSON.stringify(pageInfos);
+
             const templates = this.splitTemplate({
                 headerTemplates,
                 footerTemplates,
                 contentTemplates,
             });
 
-            pageInfos.templates = templates;
+            sheetNames.forEach((sheetName) => {
+                const pageInfos = JSON.parse(cobyPageInfos);
 
-            sheetNames.forEach((sheetName, index) => {
                 this.templatesPageInfos[name].pageIndex += 1;
                 this.templatesPageInfos[name].pageTotal += 1;
+                pageInfos.sheet.index = sheetIndex++;
+                pageInfos.sheet.order = pageInfos.sheet.index;
+                pageInfos.sheet.isSelected = false;
 
                 if (sheetDatas[sheetName]) {
                     pageInfos.groupDatas = sheetDatas[sheetName];
@@ -612,19 +627,19 @@ export default class Render {
                         }
                     );
                 }
-
-                if (index > 0) {
-                    //强制打印时在当前行换页
-                    const { rowCount } = pageInfos;
-                    const rows = pageInfos.rows?.[rowCount] || {};
-                    rows.pageBreak = true;
-                    pageInfos.rows[rowCount] = rows;
+                let newSheetName = sheetName;
+                let nameIndex = 1;
+                while (this.sheetNames.includes(newSheetName)) {
+                    newSheetName = sheetName + nameIndex;
+                    nameIndex += 1;
                 }
+
+                pageInfos.sheet.name = newSheetName;
+
+                pageInfos.templates = templates;
 
                 this.render(pageInfos);
             });
-            resetSheet(pageInfos);
-            this.newSheets[pageInfos.sheet.name] = pageInfos.sheet;
         });
     }
     parseRowDataTable(params) {
@@ -759,8 +774,10 @@ export default class Render {
             return;
         }
         const sheetDatas = {};
-        const groupNames = new Set();
+        const groupNames = [];
         let tableCode = '';
+        temp.groupNames = groupNames;
+        temp.tableCode = tableCode;
 
         //对数据进行分组，分组的名称就是sheet的名称
         Object.entries(groups).some(([dsName, group]) => {
@@ -773,7 +790,9 @@ export default class Render {
                 const groupFieldCode = group?.[0]?.code;
                 datas?.[dsName].forEach(function (item) {
                     const groupName = item[groupFieldCode];
-                    groupNames.add(groupName);
+                    if (!groupNames.includes(groupName)) {
+                        groupNames.push(groupName);
+                    }
                     sheetDatas[groupName] = sheetDatas[groupName] || [];
                     sheetDatas[groupName].push(item);
                 });
@@ -782,11 +801,8 @@ export default class Render {
             return false;
         });
 
-        temp.groupNames = [...groupNames];
-        temp.tableCode = tableCode;
-
         //只支持一个实体进行分组
-        return { sheetDatas, groupNames: temp.groupNames, tableCode };
+        return { sheetDatas, groupNames, tableCode };
     }
 
     splitTemplate({ headerTemplates, footerTemplates, contentTemplates }) {
@@ -998,11 +1014,9 @@ export default class Render {
                         rules = [],
                         autoMergeRanges = [],
                     }) => {
-                        const dataTable = { ...rowDataTable };
+                        const dataTable = Copy(rowDataTable);
                         Object.entries(dataTable).forEach(
-                            ([colStr, _colDataTable]) => {
-                                const colDataTable = { ..._colDataTable };
-                                dataTable[colStr] = colDataTable;
+                            ([colStr, colDataTable]) => {
                                 const col = Number(colStr);
                                 const { bindingPath, tag, formula } =
                                     colDataTable;
