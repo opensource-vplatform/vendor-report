@@ -153,15 +153,15 @@ export default class Render {
         //打印换算单位
         this.printConversionUnits = getPrintConversionUnits();
         this.parse();
-        reportJson.sheets = {};
+        /* reportJson.sheets = {};
         reportJson.sheetCount = 0;
-
+        debugger;
         //新增页签。分页后新增的页签
         Object.entries(this.newSheets).forEach(function ([sheetName, sheet]) {
             reportJson.sheets[sheetName] = sheet;
             reportJson.sheetCount += 1;
         });
-
+ */
         //总页数需延后渲染
         while (this.delayPlugins.length) {
             const pluginHandler = this.delayPlugins.pop();
@@ -598,6 +598,7 @@ export default class Render {
             sheetNames.forEach((sheetName, index) => {
                 this.templatesPageInfos[name].pageIndex += 1;
                 this.templatesPageInfos[name].pageTotal += 1;
+                pageInfos.groupName = sheetName;
 
                 if (sheetDatas[sheetName]) {
                     pageInfos.groupDatas = sheetDatas[sheetName];
@@ -1022,10 +1023,8 @@ export default class Render {
                                 }
 
                                 const tool = new Tool();
-
-                                tool.setGroupNameHandler(
-                                    () => pageInfos.sheet.name
-                                );
+                                const groupName = pageInfos.groupName;
+                                tool.setGroupNameHandler(() => groupName);
 
                                 tool.setIsGroupSumAreaHandler(
                                     () => isGroupSumArea || isTotalArea
