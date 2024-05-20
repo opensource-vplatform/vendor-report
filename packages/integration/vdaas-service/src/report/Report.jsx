@@ -15,9 +15,11 @@ import { license } from '../utils/license';
 import {
   getParameter,
   registerServerFont,
+  // getTitle,
 } from '../utils/utils';
 import Error from './components/error/Index';
 import WaitMsg from './components/loading/Index';
+// import Button from './components/button/Index'
 
 const Wrap = styled.div`
     display: flex;
@@ -133,8 +135,8 @@ export default function () {
                 }
               }
             }
-            const requestFontFamily = [...fontFamaly].map(item => registerServerFont(item, 'normal', `/font?fontFamilyName=${item}`))
 
+            const requestFontFamily = [...fontFamaly].map(item => registerServerFont(item, 'normal', `/font?fontFamilyName=${item}`))
             if (typeof exportPDF !== 'undefined') {
               console.log('导出PDF')
               Promise.all(requestFontFamily).then(() => {

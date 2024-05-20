@@ -89,6 +89,15 @@ export default function () {
       errorMsg: typeof err == 'string' ? err : err.message,
     });
   };
+
+  const handleRequestError = (err) => {
+    setData({
+      ...data,
+      loadMsg: null,
+      errorMsg: err?.response?.status == 404 ? '网络异常' : (err?.response?.data?.msg ?? err?.response?.data?.data?.msg ?? err.message)
+    });
+  };
+
   const setLoadMsg = (msg) => {
     setData({
       ...data,
@@ -121,6 +130,15 @@ export default function () {
             report.mount(ref.current);
             data.report = report;
             setData({ ...data, loadMsg: null, errorMsg: null });
+            window.exportPdf = () => {
+              setLoadMsg('导出到pdf中，请稍候...');
+              data.report
+                .exportPdf(getTitle('未命名'))
+                .then(() => {
+                  setLoadMsg(null);
+                })
+                .catch(handleError);
+            }
           };
           if (excelJson) {
             const usedDatasources = excelJson.usedDatasources || [];
@@ -145,7 +163,7 @@ export default function () {
             initReport();
           }
         })
-        .catch(handleError);
+        .catch(handleRequestError);
     }
   }, []);
   return (
