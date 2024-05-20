@@ -380,7 +380,6 @@ export default function (props) {
                             sheets.forEach((sheet) => {
                                 setPrintInfo(sheet, params || {});
                             });
-                            spread.print();
                             resolve();
                         } else {
                             reject(
