@@ -24,46 +24,6 @@ function getPrintConversionUnits() {
     return Number(divWidth.slice(0, -2));
 }
 
-function resetSheet({
-    sheet,
-    dataTable,
-    rules,
-    spans,
-    rows,
-    rowCount,
-    autoMergeRanges,
-}) {
-    if (!sheet) {
-        return;
-    }
-
-    const sheetCount = rowCount > 0 ? rowCount : sheet.rowCount;
-
-    sheet.data.dataTable = dataTable;
-
-    sheet.rowCount = sheetCount;
-
-    //条件格式规则
-    sheet.conditionalFormats = sheet.conditionalFormats
-        ? sheet.conditionalFormats
-        : {};
-    sheet.conditionalFormats.rules = rules;
-
-    //合并单元格
-    sheet.spans = spans;
-
-    //行高
-    if (sheet.rows) {
-        sheet.rows.length = 0;
-    } else {
-        sheet.rows = [];
-    }
-    sheet.rows.push(...rows);
-
-    //自动合并区域
-    sheet.autoMergeRangeInfos = autoMergeRanges;
-}
-
 function genAutoMergeRanges(merge, autoMergeRanges, startRow) {
     let direction = spreadNS.AutoMerge.AutoMergeDirection.column; //1
     let mode = spreadNS.AutoMerge.AutoMergeMode.free; //0
@@ -138,30 +98,21 @@ function getColRules({ rules, col, colHandler }) {
     return result;
 }
 
-export default class Render {
+export default class ParseReportJson {
     constructor(reportJson, datas, tempConfig = {}, setting) {
         console.time('耗时多久');
         this.datas = datas;
         this.reportJson = reportJson;
         this.tempConfig = Copy(tempConfig);
-        this.newSheets = {};
         this.setting = setting;
-        this.templatesPageInfos = {};
         this.delayPlugins = [];
         this.delayFormula = [];
+        this.sheetPages = {};
 
         //打印换算单位
         this.printConversionUnits = getPrintConversionUnits();
         this.parse();
-        /* reportJson.sheets = {};
-        reportJson.sheetCount = 0;
-        debugger;
-        //新增页签。分页后新增的页签
-        Object.entries(this.newSheets).forEach(function ([sheetName, sheet]) {
-            reportJson.sheets[sheetName] = sheet;
-            reportJson.sheetCount += 1;
-        });
- */
+
         //总页数需延后渲染
         while (this.delayPlugins.length) {
             const pluginHandler = this.delayPlugins.pop();
@@ -174,10 +125,8 @@ export default class Render {
         }
         console.timeEnd('耗时多久');
     }
-    render(pageInfos) {
-        const {
-            templates: { header, footer, content },
-        } = pageInfos;
+    render(pageInfos, templates) {
+        const { header, footer, content } = templates;
         //需要分页
         if (pageInfos.pageArea) {
             let index = 0;
@@ -233,6 +182,15 @@ export default class Render {
                 );
 
             while (index < pageSubtotal) {
+                const sheetPage = {
+                    sheet: pageInfos.sheet,
+                    spans: [],
+                    rows: [],
+                    rules: [],
+                    dataTable: {},
+                    autoMergeRanges: [],
+                    rowCount: 0,
+                };
                 const isLastPage = index + 1 >= pageSubtotal;
                 if (isLastPage) {
                     let {
@@ -247,10 +205,7 @@ export default class Render {
                     );
 
                     if (_pageSubtotal <= 1) {
-                        if (
-                            pageInfos.groups.indexOf(pageInfos.sheet.name) ===
-                            pageInfos.groups.length - 1
-                        ) {
+                        if (pageInfos.isLastGroup) {
                             const {
                                 pageSubtotal: _pageSubtotal,
                                 lastContentTempCount: _lastContentTempCount_,
@@ -283,6 +238,7 @@ export default class Render {
                 this.genPageDataTables({
                     templates: headerTemplates,
                     pageInfos,
+                    sheetPage,
                 });
                 let endIndex = startIndex + contentTempCount;
                 //最后一页
@@ -294,10 +250,12 @@ export default class Render {
                     pageInfos,
                     startIndex,
                     endIndex,
+                    sheetPage,
                 });
                 this.genPageDataTables({
                     templates: footerTemplates,
                     pageInfos,
+                    sheetPage,
                 });
 
                 if (index + 1 < pageSubtotal) {
@@ -307,6 +265,7 @@ export default class Render {
 
                 startIndex += contentTempCount;
                 index++;
+                this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
             }
         } else {
             this.genPageDataTables({
@@ -573,42 +532,41 @@ export default class Render {
                 sheetNames = res.groupNames;
                 tableCode = res.tableCode;
             }
-            this.templatesPageInfos[name] = {
-                pageIndex: 0,
-                pageTotal: 0,
-            };
+
             const pageInfos = this.genPageInfos({
                 sheet,
             });
 
-            pageInfos.groups = templateInfo?.groupNames || [];
-
             pageInfos.tableCode = tableCode;
-            pageInfos.cobySheet = JSON.stringify(sheet);
             pageInfos.sheet = sheet;
-            pageInfos.fromTempSheet = name;
             const templates = this.splitTemplate({
                 headerTemplates,
                 footerTemplates,
                 contentTemplates,
             });
 
-            pageInfos.templates = templates;
-
+            const groupCount = sheetNames.length;
+            this.sheetPages[name] = {
+                pageIndex: 0,
+                datas: [],
+            };
+            pageInfos.unionDatasourceDatas = {};
             sheetNames.forEach((sheetName, index) => {
-                this.templatesPageInfos[name].pageIndex += 1;
-                this.templatesPageInfos[name].pageTotal += 1;
                 pageInfos.groupName = sheetName;
+                pageInfos.isLastGroup = groupCount === index + 1;
 
                 if (sheetDatas[sheetName]) {
                     pageInfos.groupDatas = sheetDatas[sheetName];
                     this.dataSourceMap.forEach(
                         ({ tableCode, datas, unionDatasource }) => {
                             if (tableCode === pageInfos.tableCode) {
-                                unionDatasource.load({
+                                const newDatas = {
                                     ...datas,
                                     [tableCode]: pageInfos.groupDatas,
-                                });
+                                };
+                                pageInfos.unionDatasourceDatas[sheetName] =
+                                    newDatas;
+                                unionDatasource.load(newDatas);
                             }
                         }
                     );
@@ -616,16 +574,13 @@ export default class Render {
 
                 if (index > 0) {
                     //强制打印时在当前行换页
-                    const { rowCount } = pageInfos;
-                    const rows = pageInfos.rows?.[rowCount] || {};
-                    rows.pageBreak = true;
-                    pageInfos.rows[rowCount] = rows;
+                    this.onAfterPage(pageInfos);
                 }
 
-                this.render(pageInfos);
+                this.render(pageInfos, templates);
             });
-            resetSheet(pageInfos);
-            this.newSheets[pageInfos.sheet.name] = pageInfos.sheet;
+            this.resetSheet(pageInfos);
+            // this.resetSheet(this.sheetPages[name].datas[0]);
         });
     }
     parseRowDataTable(params) {
@@ -950,12 +905,15 @@ export default class Render {
         this.dataSourceMap = dataSourceMap;
         return _templates;
     }
-    getSheetCount() {
-        return this.reportJson.sheetCount + Object.keys(this.newSheets).length;
-    }
 
     genPageDataTables(params) {
-        const { templates, pageInfos, startIndex = 0, endIndex = 0 } = params;
+        const {
+            templates,
+            pageInfos,
+            startIndex = 0,
+            endIndex = 0,
+            sheetPage,
+        } = params;
         templates.forEach((temp) => {
             const {
                 dataTables,
@@ -1084,6 +1042,7 @@ export default class Render {
                                         });
 
                                         const pageIndex = pageInfos.pageIndex;
+                                        const groupName = pageInfos.groupName;
                                         function pluginHandler() {
                                             //汇总
                                             const targetCell =
@@ -1114,10 +1073,21 @@ export default class Render {
                                                             'unionDatasourceAll'
                                                         ];
                                                     }
-
-                                                    return targetCell?.[
-                                                        'unionDatasource'
-                                                    ];
+                                                    const unionDatasource =
+                                                        targetCell?.[
+                                                            'unionDatasource'
+                                                        ];
+                                                    const datas =
+                                                        pageInfos
+                                                            .unionDatasourceDatas[
+                                                            groupName
+                                                        ];
+                                                    if (datas) {
+                                                        unionDatasource.load(
+                                                            datas
+                                                        );
+                                                    }
+                                                    return unionDatasource;
                                                 }
                                             );
 
@@ -1147,12 +1117,6 @@ export default class Render {
                                 }
 
                                 let pageIndex = pageInfos.pageIndex;
-                                const { fromTempSheet } = pageInfos;
-                                if (this.templatesPageInfos[fromTempSheet]) {
-                                    pageIndex =
-                                        this.templatesPageInfos[fromTempSheet]
-                                            .pageIndex;
-                                }
 
                                 //先执行插件，后执行函数
                                 const pageHandler =
@@ -1163,19 +1127,9 @@ export default class Render {
                                         //当前页
                                         tool.setPageHandler(pageHandler);
                                         //总页数
-                                        tool.setTotalPagesHandler(() => {
-                                            if (
-                                                this.templatesPageInfos[
-                                                    fromTempSheet
-                                                ]
-                                            ) {
-                                                return this.templatesPageInfos[
-                                                    fromTempSheet
-                                                ].pageTotal;
-                                            } else {
-                                                return pageInfos.pageTotal;
-                                            }
-                                        });
+                                        tool.setTotalPagesHandler(
+                                            () => pageInfos.pageTotal
+                                        );
 
                                         tool.setValueHandler((...args) => {
                                             if (args.length === 1) {
@@ -1211,11 +1165,19 @@ export default class Render {
                         if (pageInfos) {
                             const { rowCount } = pageInfos;
                             pageInfos.dataTable[rowCount] = dataTable;
+
+                            const { rowCount: sheetPageRowCount } = sheetPage;
+                            sheetPage.dataTable[sheetPageRowCount] = dataTable;
+
                             //合并信息
                             spans.forEach(function (span) {
                                 pageInfos.spans.push({
                                     ...span,
                                     row: rowCount,
+                                });
+                                sheetPage.spans.push({
+                                    ...span,
+                                    row: sheetPageRowCount,
                                 });
                             });
 
@@ -1230,11 +1192,25 @@ export default class Render {
                                         },
                                     ],
                                 });
+
+                                sheetPage.rules.push({
+                                    ...rule,
+                                    ranges: [
+                                        {
+                                            ...rule.ranges[0],
+                                            row: sheetPageRowCount,
+                                        },
+                                    ],
+                                });
                             });
 
                             //行高
                             pageInfos.rows[rowCount] = {
                                 ...(pageInfos.rows[rowCount] || {}),
+                                ...rows,
+                            };
+                            sheetPage.rows[sheetPageRowCount] = {
+                                ...(pageInfos.rows[sheetPageRowCount] || {}),
                                 ...rows,
                             };
 
@@ -1243,9 +1219,11 @@ export default class Render {
                                 const cobyItem = Copy(item);
                                 cobyItem.range.row = rowCount;
                                 pageInfos.autoMergeRanges.push(cobyItem);
+                                sheetPage.autoMergeRanges.push(cobyItem);
                             });
 
                             pageInfos.rowCount += 1;
+                            sheetPage.rowCount += 1;
                         }
                     }
                 );
@@ -1257,34 +1235,53 @@ export default class Render {
         });
     }
     onAfterPage(pageInfos, initHeight = 0) {
-        if (pageInfos.isTemplate && !pageInfos.isCurrentSheet) {
-            //在新的页签显示下一页
-            resetSheet(pageInfos);
-            pageInfos.sheet = JSON.parse(pageInfos.cobySheet);
-            pageInfos.sheet.name += `_${pageInfos.pageIndex}`;
-            pageInfos.sheet.index = this.getSheetCount();
-            pageInfos.sheet.isSelected = false;
-            this.newSheets[pageInfos.sheet.name] = pageInfos.sheet;
-
-            pageInfos.dataTable = {};
-            pageInfos.spans = [];
-            pageInfos.rows = [];
-            pageInfos.rules = [];
-            pageInfos.autoMergeRanges = [];
-            pageInfos.rowCount = 0;
-        } else {
-            //强制打印时在当前行换页
-            const { rowCount } = pageInfos;
-            const rows = pageInfos.rows?.[rowCount] || {};
-            rows.pageBreak = true;
-            pageInfos.rows[rowCount] = rows;
-        }
+        //强制打印时在当前行换页
+        const { rowCount } = pageInfos;
+        const rows = pageInfos.rows?.[rowCount] || {};
+        rows.pageBreak = true;
+        pageInfos.rows[rowCount] = rows;
         pageInfos.pageHeight = initHeight;
         pageInfos.pageIndex += 1;
         pageInfos.pageTotal += 1;
-        if (pageInfos?.fromTempSheet) {
-            this.templatesPageInfos[pageInfos?.fromTempSheet].pageIndex += 1;
-            this.templatesPageInfos[pageInfos?.fromTempSheet].pageTotal += 1;
+    }
+
+    resetSheet({
+        sheet,
+        dataTable,
+        rules,
+        spans,
+        rows,
+        rowCount,
+        autoMergeRanges,
+    }) {
+        if (!sheet) {
+            return;
         }
+
+        const sheetCount = rowCount > 0 ? rowCount : sheet.rowCount;
+
+        sheet.data.dataTable = dataTable;
+
+        sheet.rowCount = sheetCount;
+
+        //条件格式规则
+        sheet.conditionalFormats = sheet.conditionalFormats
+            ? sheet.conditionalFormats
+            : {};
+        sheet.conditionalFormats.rules = rules;
+
+        //合并单元格
+        sheet.spans = spans;
+
+        //行高
+        if (sheet.rows) {
+            sheet.rows.length = 0;
+        } else {
+            sheet.rows = [];
+        }
+        sheet.rows.push(...rows);
+
+        //自动合并区域
+        sheet.autoMergeRangeInfos = autoMergeRanges;
     }
 }

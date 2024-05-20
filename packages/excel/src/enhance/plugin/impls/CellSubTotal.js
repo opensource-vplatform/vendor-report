@@ -16,7 +16,6 @@ class CellSubTotal extends Plugin {
         const config = this.getConfig();
         const { functionNum, tableCode, fieldCode } = config;
         const unionDatasource = tool.getUnionDatasource();
-        debugger;
         const values = this._isTreeSumField(value, tool)
             ? unionDatasource.getLeafFieldValues(tableCode, fieldCode)
             : unionDatasource.getFieldValues(tableCode, fieldCode);

@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import resourceManager from 'resource-manager-js';
 
@@ -8,13 +13,21 @@ import LicenseWarn from './LicenseWarn';
 import ParseReportJson from './template/ParseReportJson';
 import { withDivStyled } from './utils/componentUtil';
 import { setBaseUrl } from './utils/environmentUtil';
-import { checkLicense, getLicense, setLicense } from './utils/licenseUtil';
-import { genAutoMergeRangeInfos, genSpans, sortData } from './utils/other';
+import {
+  checkLicense,
+  getLicense,
+  setLicense,
+} from './utils/licenseUtil';
+import {
+  genAutoMergeRangeInfos,
+  genSpans,
+  sortData,
+} from './utils/other';
 import { setPrintInfo } from './utils/printUtil';
 import {
-    getNamespace,
-    getPluginSrc,
-    withBatchCalcUpdate,
+  getNamespace,
+  getPluginSrc,
+  withBatchCalcUpdate,
 } from './utils/spreadUtil';
 
 const GC = getNamespace();
@@ -190,6 +203,7 @@ export default function (props) {
         onSheetNameChanged,
         onSheetNameChanging,
         onActiveSheetChanging,
+        onPageCompleted,
         onSheetChanged,
         onFetchData,
         onRowChanged,
@@ -243,11 +257,49 @@ export default function (props) {
         };
     });
 
+    const [pageIndex, setPageIndex] = useState(0);
+
     const el = useRef(null);
     const { json } = useMemo(() => {
         const json = JSON.parse(JSON.stringify(_json));
         if (json && dataSource) {
-            new ParseReportJson(json, dataSource, template, setting);
+            const inst = new ParseReportJson(
+                json,
+                dataSource,
+                template,
+                setting
+            );
+
+            const goToPage = (step = 1) => {
+                const sheet = data.spread.getActiveSheet();
+                const sheetJson = sheet.toJSON();
+                const sheetPage = inst.sheetPages[sheetJson.name];
+                sheetPage.pageIndex += step;
+                if (sheetPage.pageIndex < 0) {
+                    sheetPage.pageIndex = 0;
+                }
+                if (sheetPage.pageIndex >= sheetPage.datas.length) {
+                    sheetPage.pageIndex = sheetPage.datas.length - 1;
+                }
+                const newSheet = sheetPage.datas[sheetPage.pageIndex];
+                newSheet.sheet = sheetJson;
+                inst.resetSheet(newSheet);
+                sheet.fromJSON(sheetJson);
+            };
+
+            const lastPage = () => {
+                goToPage(-1);
+            };
+
+            const nextPage = () => {
+                goToPage();
+            };
+            if (onPageCompleted) {
+                onPageCompleted({
+                    lastPage,
+                    nextPage,
+                });
+            }
         }
         return {
             json,

@@ -1,12 +1,24 @@
 import { useContext } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import { EVENTS, fire } from '@event/EventManager';
-import { Workbook, Worksheet } from '@toone/report-excel';
-import { getLicense, getToolbar } from '@utils/configUtil';
+import {
+  EVENTS,
+  fire,
+} from '@event/EventManager';
+import {
+  Workbook,
+  Worksheet,
+} from '@toone/report-excel';
+import {
+  getLicense,
+  getToolbar,
+} from '@utils/configUtil';
 
 import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
@@ -109,9 +121,35 @@ export default function () {
             args: [],
         });
     };
+
+    let lastPageHandler = null;
+
+    const handleLastPage = () => {
+        lastPageHandler && lastPageHandler();
+    };
+
+    let nextPageHandler = null;
+    const handleNextPage = () => {
+        nextPageHandler && nextPageHandler();
+    };
+
     return (
         <Wrap>
             <Toolbar>
+                <Button
+                    style={{ marginRight: 8 }}
+                    type='primary'
+                    onClick={handleLastPage}
+                >
+                    上一页
+                </Button>
+                <Button
+                    style={{ marginRight: 8 }}
+                    type='primary'
+                    onClick={handleNextPage}
+                >
+                    下一页
+                </Button>
                 <Button
                     style={{ marginRight: 8 }}
                     type='primary'
@@ -155,6 +193,10 @@ export default function () {
                     template={template}
                     onInited={function (a) {
                         window.mapTest = a;
+                    }}
+                    onPageCompleted={({ lastPage, nextPage }) => {
+                        lastPageHandler = lastPage;
+                        nextPageHandler = nextPage;
                     }}
                     setting={setting}
                 >
