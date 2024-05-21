@@ -263,12 +263,12 @@ export default function (props) {
     const { json } = useMemo(() => {
         const json = JSON.parse(JSON.stringify(_json));
         if (json && dataSource) {
-            const inst = new ParseReportJson(
-                json,
-                dataSource,
-                template,
-                setting
-            );
+            const inst = new ParseReportJson({
+                reportJson: json,
+                datas: dataSource,
+                tempConfig: template,
+                setting,
+            });
 
             const goToPage = (step = 1) => {
                 const sheet = data.spread.getActiveSheet();

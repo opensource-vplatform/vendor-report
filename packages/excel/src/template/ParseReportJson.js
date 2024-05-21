@@ -99,7 +99,8 @@ function getColRules({ rules, col, colHandler }) {
 }
 
 export default class ParseReportJson {
-    constructor(reportJson, datas, tempConfig = {}, setting) {
+    constructor(config) {
+        const { reportJson, datas, tempConfig = {}, setting } = config;
         console.time('耗时多久');
         this.datas = datas;
         this.reportJson = reportJson;
@@ -1166,8 +1167,12 @@ export default class ParseReportJson {
                             const { rowCount } = pageInfos;
                             pageInfos.dataTable[rowCount] = dataTable;
 
-                            const { rowCount: sheetPageRowCount } = sheetPage;
-                            sheetPage.dataTable[sheetPageRowCount] = dataTable;
+                            let sheetPageRowCount = 0;
+                            if (sheetPage) {
+                                sheetPageRowCount = sheetPage.rowCount;
+                                sheetPage.dataTable[sheetPageRowCount] =
+                                    dataTable;
+                            }
 
                             //合并信息
                             spans.forEach(function (span) {
@@ -1175,10 +1180,11 @@ export default class ParseReportJson {
                                     ...span,
                                     row: rowCount,
                                 });
-                                sheetPage.spans.push({
-                                    ...span,
-                                    row: sheetPageRowCount,
-                                });
+                                sheetPage &&
+                                    sheetPage.spans.push({
+                                        ...span,
+                                        row: sheetPageRowCount,
+                                    });
                             });
 
                             //条件规则
@@ -1193,15 +1199,16 @@ export default class ParseReportJson {
                                     ],
                                 });
 
-                                sheetPage.rules.push({
-                                    ...rule,
-                                    ranges: [
-                                        {
-                                            ...rule.ranges[0],
-                                            row: sheetPageRowCount,
-                                        },
-                                    ],
-                                });
+                                sheetPage &&
+                                    sheetPage.rules.push({
+                                        ...rule,
+                                        ranges: [
+                                            {
+                                                ...rule.ranges[0],
+                                                row: sheetPageRowCount,
+                                            },
+                                        ],
+                                    });
                             });
 
                             //行高
@@ -1209,21 +1216,25 @@ export default class ParseReportJson {
                                 ...(pageInfos.rows[rowCount] || {}),
                                 ...rows,
                             };
-                            sheetPage.rows[sheetPageRowCount] = {
-                                ...(pageInfos.rows[sheetPageRowCount] || {}),
-                                ...rows,
-                            };
+                            if (sheetPage) {
+                                sheetPage.rows[sheetPageRowCount] = {
+                                    ...(pageInfos.rows[sheetPageRowCount] ||
+                                        {}),
+                                    ...rows,
+                                };
+                            }
 
                             //自动合并区域
                             autoMergeRanges.forEach(function (item) {
                                 const cobyItem = Copy(item);
                                 cobyItem.range.row = rowCount;
                                 pageInfos.autoMergeRanges.push(cobyItem);
-                                sheetPage.autoMergeRanges.push(cobyItem);
+                                sheetPage &&
+                                    sheetPage.autoMergeRanges.push(cobyItem);
                             });
 
                             pageInfos.rowCount += 1;
-                            sheetPage.rowCount += 1;
+                            sheetPage && (sheetPage.rowCount += 1);
                         }
                     }
                 );
