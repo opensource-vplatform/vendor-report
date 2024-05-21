@@ -11,6 +11,7 @@ import formula from './types/Formula';
 import group from './types/Group';
 import image from './types/Image';
 import list from './types/List';
+import merge from './types/Merge';
 import sum from './types/Sum';
 
 const Wrap = styled.div`
@@ -27,7 +28,7 @@ const Img = styled.img`
     cursor: pointer;
 `;
 
-const plugins = [formula, group, image, list, sum];
+const plugins = [formula, group, image, list, sum, merge];
 
 /**
  * 是否显示设置图标

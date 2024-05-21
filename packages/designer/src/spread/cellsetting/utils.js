@@ -52,12 +52,12 @@ export const hasBindField = function (sheet, row, col) {
     return bindingPath && bindingPath.split('.').length == 2;
 };
 
-const setIconDecoration = function (style, type) {
+export const setIconDecoration = function (style, type) {
     const GC = getNamespace();
     style.decoration = {
         icons: [
             {
-                src: getBaseUrl() + `/css/icons/design/${type}.png`,
+                src: getBaseUrl() + `/css/icons/design/${type}.svg`,
                 width: 16,
                 height: 16,
                 v_i: true,
