@@ -20,7 +20,6 @@ import {
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
-import { BindingPathCellType } from '@utils/cellUtil';
 import {
   findTreeNodeById,
   getActiveSheetTablesPath,
@@ -57,8 +56,6 @@ import {
   highlightBlock,
   removeHighlightOneBlock,
 } from './utils/utils.js';
-
-const bindingPathCellType = new BindingPathCellType();
 
 //删除表格
 function removeTable(params) {
