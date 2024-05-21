@@ -73,6 +73,10 @@ class Report {
             colMergeColumns = {},
         } = this.conf?.json?.context?.datasourceSlice || {};
 
+        const template = this.conf?.json?.context?.wizardSlice?.template;
+
+        const setting = this.conf?.json?.datasourceSetting;
+
         createRoot(el).render(
             createElement(Workbook, {
                 onInited: onInitHandler,
@@ -88,6 +92,8 @@ class Report {
                 rowMergeColumns,
                 colMergeColumns,
                 dataSource,
+                template,
+                setting,
                 ...others,
                 json,
             })
@@ -162,57 +168,58 @@ class Report {
             sheetIndex: null,
         }
     ) {
-
         return new Promise((resolve, reject) => {
-          this.printHandler().then(()=>{
-            if (typeof filename == 'string' && filename.trim() !== '') {
-              filename = filename.endsWith('.pdf')
-                  ? filename
-                  : filename + '.pdf';
-              const exportHandler = () => {
-                  const {
-                      persistence,
-                      author,
-                      creator,
-                      keywords,
-                      subject,
-                      title,
-                      sheetIndex,
-                  } = options;
-                  this.spread.savePDF(
-                      (data) => {
-                          if (persistence) {
-                              download(data, filename);
-                          }
-                          resolve(data);
-                      },
-                      (err) => {
-                          reject(err);
-                      },
-                      {
-                          author,
-                          creator,
-                          keywords,
-                          subject,
-                          title,
-                      },
-                      sheetIndex == null ? undefined : sheetIndex
-                  );
-              };
-              const GC = getNamespace();
-              if (GC.Spread.Sheets.PDF) {
-                  //已经加载了pdf插件,直接执行导出逻辑
-                  exportHandler();
-              } else {
-                  //先加载pdf插件，再进行导出
-                  resourceManager
-                      .loadScript(getPluginSrc('pdf'))
-                      .then(exportHandler);
-              }
-          } else {
-              reject(Error('导出pdf失败，原因:没有传递导出文件名'));
-          }
-          }).catch(reject);
+            this.printHandler()
+                .then(() => {
+                    if (typeof filename == 'string' && filename.trim() !== '') {
+                        filename = filename.endsWith('.pdf')
+                            ? filename
+                            : filename + '.pdf';
+                        const exportHandler = () => {
+                            const {
+                                persistence,
+                                author,
+                                creator,
+                                keywords,
+                                subject,
+                                title,
+                                sheetIndex,
+                            } = options;
+                            this.spread.savePDF(
+                                (data) => {
+                                    if (persistence) {
+                                        download(data, filename);
+                                    }
+                                    resolve(data);
+                                },
+                                (err) => {
+                                    reject(err);
+                                },
+                                {
+                                    author,
+                                    creator,
+                                    keywords,
+                                    subject,
+                                    title,
+                                },
+                                sheetIndex == null ? undefined : sheetIndex
+                            );
+                        };
+                        const GC = getNamespace();
+                        if (GC.Spread.Sheets.PDF) {
+                            //已经加载了pdf插件,直接执行导出逻辑
+                            exportHandler();
+                        } else {
+                            //先加载pdf插件，再进行导出
+                            resourceManager
+                                .loadScript(getPluginSrc('pdf'))
+                                .then(exportHandler);
+                        }
+                    } else {
+                        reject(Error('导出pdf失败，原因:没有传递导出文件名'));
+                    }
+                })
+                .catch(reject);
         });
     }
     /**
@@ -239,10 +246,12 @@ class Report {
     print(params) {
         return new Promise((resolve, reject) => {
             if (this.printHandler) {
-                this.printHandler(params).then(()=>{
-                  this.spread.print();
-                  resolve();
-                }).catch(reject);
+                this.printHandler(params)
+                    .then(() => {
+                        this.spread.print();
+                        resolve();
+                    })
+                    .catch(reject);
             } else {
                 reject(Error('打印失败，原因：报表未初始化'));
             }
