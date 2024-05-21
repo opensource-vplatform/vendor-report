@@ -136,7 +136,7 @@ export default function () {
     return (
         <Wrap>
             <Toolbar>
-                <Button
+                {/* <Button
                     style={{ marginRight: 8 }}
                     type='primary'
                     onClick={handleLastPage}
@@ -149,7 +149,7 @@ export default function () {
                     onClick={handleNextPage}
                 >
                     下一页
-                </Button>
+                </Button> */}
                 <Button
                     style={{ marginRight: 8 }}
                     type='primary'
