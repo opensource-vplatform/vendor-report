@@ -1,34 +1,18 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
 import ParseReportJson from '../../src/template/ParseReportJson';
 import Tab from './tabs/Tab';
 import Tabs from './tabs/Tabs';
 import { getUnits } from './units/index';
-import {
-  equals,
-  sortObj,
-} from './utils/util';
+import { equals, sortObj, testUnits } from './utils/util';
 
 export default function () {
     const list = getUnits();
     const [data] = useState(() => {
-        const errors = [];
-        list.forEach((item) => {
-            if (!equals(item.source, item.test)) {
-                errors.push(item);
-            }
-        });
+        const errors = testUnits();
         const result = [];
         errors.forEach((err, index) => {
-            const { title, source, test, datas, setting } = err;
-            new ParseReportJson({
-                ...setting,
-                reportJson: source,
-                datas: datas,
-            });
+            const { title, source, test } = err;
             const sourceStr = JSON.stringify(sortObj(source), null, '  ');
             const testStr = JSON.stringify(sortObj(test), null, '  ');
             const diff = Diff.diffChars(sourceStr, testStr);
