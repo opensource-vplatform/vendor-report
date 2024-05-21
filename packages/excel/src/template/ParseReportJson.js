@@ -1,7 +1,7 @@
 import {
-  enhanceFormula,
-  exePlugins,
-  getTableCodesFromFormula,
+    enhanceFormula,
+    exePlugins,
+    getTableCodesFromFormula,
 } from '../enhance/index';
 import Tool from '../enhance/Tool';
 import UnionDatasource from './UnionDatasource';
@@ -177,7 +177,7 @@ export default class ParseReportJson {
                     content[3],
                     content[3].template[0].unionDatasource.getCount()
                 );
-
+            pageSubtotal = pageSubtotal || 1; //处理分页区域绑定的实体无数据时，整个报表不显示问题 add by xiedh
             while (index < pageSubtotal) {
                 const sheetPage = {
                     sheet: pageInfos.sheet,
