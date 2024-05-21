@@ -1,0 +1,51 @@
+{
+    "ds": [
+        {
+            "id": "image",
+            "type": "table",
+            "typeName": "列表",
+            "desc": "图片",
+            "code": "image",
+            "name": "图片",
+            "children": [
+                {
+                    "id": "id",
+                    "type": "text",
+                    "typeName": "记录id",
+                    "desc": "记录id",
+                    "code": "id",
+                    "name": "记录id"
+                },
+                {
+                    "id": "name",
+                    "type": "text",
+                    "typeName": "文本",
+                    "desc": "名称",
+                    "code": "name",
+                    "name": "名称"
+                },
+                {
+                    "id": "url",
+                    "type": "text",
+                    "typeName": "文本",
+                    "desc": "链接",
+                    "code": "url",
+                    "name": "链接"
+                }
+            ]
+        }
+    ],
+    "datas": {
+        "image": [
+            {
+                "id": "1",
+                "name": "超可爱的女孩",
+                "url": "http://gips0.baidu.com/it/u=3602773692,1512483864&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280"
+            },{
+                "id": "2",
+                "name": "可爱的卡通虎宝宝雷亚",
+                "url": "http://gips0.baidu.com/it/u=2298867753,3464105574&fm=3028&app=3028&f=JPEG&fmt=auto?w=960&h=1280"
+            }
+        ]
+    }
+}

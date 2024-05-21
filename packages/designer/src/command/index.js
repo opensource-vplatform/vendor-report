@@ -1,6 +1,7 @@
 import ImageCellTypeCommand from './impls/cellType/image';
 import SubTotalCellTypeCommand from './impls/cellType/subTotal';
 import BindingPathCellTypeCommand from './impls/cellType/table';
+import DeleteCommonCommand from './impls/common/delete';
 import ApplyConditionStyleCommand from './impls/conditionStyle/apply';
 import ClearConditionStyleCommand from './impls/conditionStyle/clear';
 import ResetConditionStyleCommand from './impls/conditionStyle/reset';
@@ -26,6 +27,15 @@ import ShowColVisibleCommand from './impls/visible/showCol';
 import ShowRowVisibleCommand from './impls/visible/showRow';
 
 export const Commands = {
+    /**
+     * 通用命令
+     */
+    Common:{
+        /**
+         * 删除
+         */
+        Delete: DeleteCommonCommand.Command,
+    },
     /**
      * 单元格类型
      */
@@ -210,6 +220,7 @@ export const registerCommand = function (spread) {
             BorderStyleCommand,
             SetFormulaCommand,
             BindingPathCellTypeCommand,
+            DeleteCommonCommand,
         ],
         commandManager
     );

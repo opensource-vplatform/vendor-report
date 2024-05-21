@@ -47,8 +47,8 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                         col = index.col;
                     }
                     const span = this.sheet.getSpan(row, col);
-                    const rowIndex = span ? span.row + span.rowCount : row;
-                    const colIndex = span ? span.col + span.colCount : col;
+                    const rowIndex = row;//span ? span.row + span.rowCount : row;
+                    const colIndex = col;//span ? span.col + span.colCount : col;
                     const lastRowIndex = this.sheet.getLastFullyVisibleRow();
                     const lastColIndex = this.sheet.getLastFullyVisibleColumn();
                     if (rowIndex <= lastRowIndex && colIndex <= lastColIndex) {
@@ -131,7 +131,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     }
 
     _isDesignMode(sheet) {
-        return sheet.getParent().getHost().dataset.type !== 'preview';
+        return sheet.getParent()?.getHost()?.dataset?.type !== 'preview';
     }
 
     _couldShowIcon(sheet, row, col) {

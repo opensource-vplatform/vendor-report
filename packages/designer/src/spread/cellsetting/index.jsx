@@ -28,7 +28,7 @@ const Img = styled.img`
     cursor: pointer;
 `;
 
-const plugins = [formula, group, image, list, sum, merge];
+const plugins = [formula, group, list, image, sum, merge];
 
 /**
  * 是否显示设置图标
@@ -45,6 +45,8 @@ export const isShowIcon = function (sheet, row, col) {
         }
     }
     return false;
+    //总是显示设置图标，因为汇总可以在空白单元格上设置
+    //return true;
 };
 
 /**

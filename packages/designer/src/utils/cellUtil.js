@@ -233,8 +233,8 @@ export function enhanceSpreadJson(json){
                         const cellStyle = style.cellType;
                         if(cellStyle&&cellStyle.typeName=="1"){
                             //移除旧版本json中绑定样式设置
-                            style.cellStyle = undefined;
-                            delete style.cellStyle;
+                            style.cellType = undefined;
+                            delete style.cellType;
                             style.decoration = undefined;
                             delete style.decoration;
                         }

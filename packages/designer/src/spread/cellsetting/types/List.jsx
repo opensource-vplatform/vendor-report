@@ -1,9 +1,12 @@
 import { Fragment } from 'react';
 
 import { isUndefined } from '@utils/objectUtil';
-import { applyToSelectedCell } from '@utils/spreadUtil';
 import {
-  clearAllCellTagPlugin,
+  applyToSelectedCell,
+  withBatchCalcUpdate,
+} from '@utils/spreadUtil';
+import {
+  getActiveIndexBySheet,
   hasCellTagPluginByIndex,
   setCellTagPlugin,
 } from '@utils/worksheetUtil';
@@ -20,19 +23,24 @@ import {
   hasBindField,
   setListDecoration,
 } from '../utils';
+import Group from './Group';
+
+const PLUGIN_TYPE = 'cellList';
 
 const Component = function (props) {
     const { onConfirm, onCancel, sheet, } = props;
     const handleConfirm = () => {
         const plugin = {
-            type: 'cellListType',
+            type: PLUGIN_TYPE,
         };
-        applyToSelectedCell(sheet, (sheet, row, col) => {
-            clearAllCellTagPlugin(sheet, row, col);
-            const bindingPath = sheet.getBindingPath(row, col);
-            if (bindingPath) {
-                setCellTagPlugin(sheet, row, col, plugin);
-            }
+        withBatchCalcUpdate(sheet.getParent(),()=>{
+            applyToSelectedCell(sheet, (sheet, row, col) => {
+                //clearAllCellTagPlugin(sheet, row, col);
+                const bindingPath = sheet.getBindingPath(row, col);
+                if (bindingPath) {
+                    setCellTagPlugin(sheet, row, col, plugin);
+                }
+            });
         });
         onConfirm(plugin);
     };
@@ -64,7 +72,7 @@ const isShowIcon = function (sheet, row, col) {
 
 const paintCell = function (context, style, value) {
     const { sheet, row, col } = context;
-    const has = hasCellTagPluginByIndex(sheet, row, col, 'cellGroupType');
+    const has = hasCellTagPluginByIndex(sheet, row, col, Group.PLUGIN_TYPE);
     if (hasBindField(sheet,row,col)&&!has) {//绑定实体字段，且插件类型不为分组
         setListDecoration(style);
         const bindingPath = sheet.getBindingPath(row, col);
@@ -77,8 +85,22 @@ const paintCell = function (context, style, value) {
     return value;
 };
 
+function getOptions(sheet){
+    const options = [];
+    const {row,col} = getActiveIndexBySheet(sheet);
+    if(hasBindField(sheet,row,col)){
+        options.push({
+            value: PLUGIN_TYPE,
+            text: '列表'
+        });
+    }
+    return options;
+}
+
 export default {
     Component,
     isShowIcon,
     paintCell,
+    getOptions,
+    PLUGIN_TYPE,
 }

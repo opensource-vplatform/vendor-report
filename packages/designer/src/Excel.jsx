@@ -55,6 +55,7 @@ import {
 
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
+import { register as registerShortcut } from './shortcutKey/index';
 import { enhanceSheet } from './spread/index';
 import { handleEventPrmiseResult } from './utils/eventUtil';
 
@@ -193,6 +194,7 @@ export default function () {
                 args: [spread],
             });
             registerCommand(spread);
+            registerShortcut(spread);
             enhanceContextMenu(spread, dispatch);
             const result = fire({
                 event: EVENTS.onDesignerInited,

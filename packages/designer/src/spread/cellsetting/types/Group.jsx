@@ -1,9 +1,12 @@
 import { Fragment } from 'react';
 
 import { isUndefined } from '@utils/objectUtil';
-import { applyToSelectedCell } from '@utils/spreadUtil';
 import {
-  clearAllCellTagPlugin,
+  applyToSelectedCell,
+  withBatchUpdate,
+} from '@utils/spreadUtil';
+import {
+  getActiveIndexBySheet,
   hasCellTagPluginByIndex,
   setCellTagPlugin,
 } from '@utils/worksheetUtil';
@@ -21,18 +24,22 @@ import {
   setGroupDecoration,
 } from '../utils';
 
+const PLUGIN_TYPE = 'cellGroup';
+
 const Component = function (props) {
-    const { onConfirm, onCancel, sheet, } = props;
+    const { onConfirm, onCancel, sheet } = props;
     const handleConfirm = () => {
         const plugin = {
-            type: 'cellGroupType',
+            type: PLUGIN_TYPE,
         };
-        applyToSelectedCell(sheet, (sheet, row, col) => {
-            clearAllCellTagPlugin(sheet, row, col);
-            const bindingPath = sheet.getBindingPath(row, col);
-            if (bindingPath) {
-                setCellTagPlugin(sheet, row, col, plugin);
-            }
+        withBatchUpdate(sheet.getParent(),()=>{
+            applyToSelectedCell(sheet, (sheet, row, col) => {
+                //clearAllCellTagPlugin(sheet, row, col);
+                const bindingPath = sheet.getBindingPath(row, col);
+                if (bindingPath) {
+                    setCellTagPlugin(sheet, row, col, plugin);
+                }
+            });
         });
         onConfirm(plugin);
     };
@@ -64,7 +71,7 @@ const isShowIcon = function (sheet, row, col) {
 
 const paintCell = function (context, style, value) {
     const { sheet, row, col } = context;
-    const has = hasCellTagPluginByIndex(sheet, row, col, 'cellGroupType');
+    const has = hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
     if (has) {
         setGroupDecoration(style);
         const bindingPath = sheet.getBindingPath(row, col);
@@ -77,4 +84,16 @@ const paintCell = function (context, style, value) {
     return value;
 };
 
-export default { Component, isShowIcon, paintCell };
+function getOptions(sheet){
+    const {row,col} = getActiveIndexBySheet(sheet);
+    const options = [];
+    if(hasBindField(sheet,row,col)){
+        options.push({
+            value: PLUGIN_TYPE,
+            text: '分组'
+        });
+    }   
+    return options;
+}
+
+export default { Component, isShowIcon, paintCell, PLUGIN_TYPE,getOptions };

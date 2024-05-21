@@ -59,7 +59,12 @@ export const exeCommandImpl = function (handler, context, options, isUndo) {
         return true;
     } else {
         Commands.startTransaction(context, options);
-        const sheet = options.sheet;
+        let sheet = options.sheet;
+        if(!sheet&&options.sheetName){
+            const sheetName = options.sheetName;
+            const index = context.getSheetIndex(sheetName);
+            sheet = context.getSheet(index);
+        }
         if (sheet) {
             const config = options.options;
             sheet.suspendPaint();

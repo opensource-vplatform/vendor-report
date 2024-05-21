@@ -7,6 +7,15 @@ import {
   Integer,
   Select,
 } from '@components/form/Index';
+import {
+  applyToSelectedCell,
+  withBatchUpdate,
+} from '@utils/spreadUtil';
+import {
+  getActiveIndexBySheet,
+  hasCellTagPluginByIndex,
+  setCellTagPlugin,
+} from '@utils/worksheetUtil';
 
 import {
   Item,
@@ -14,6 +23,12 @@ import {
   Title,
   Toolbar,
 } from '../Component';
+import {
+  hasBindField,
+  setIconDecoration,
+} from '../utils';
+
+const PLUGIN_TYPE = 'cellImage';
 
 const ImageSparklineModeItems = [
     {
@@ -39,15 +54,27 @@ const ImageSparklineModeItems = [
 ];
 
 const isRectDisabled = function (data) {
-    return data.mode !== 4;
+    return data.config.mode !== 4;
 };
 
 const Component = function (props) {
-    const { onConfirm, onCancel, plugin } = props;
+    const { onConfirm, onCancel, plugin, sheet } = props;
     const [data, setData] = useState(plugin);
     const rectDisabled = isRectDisabled(data);
     const handleConfirm = () => {
-        onConfirm(data);
+        const plugin = {
+            type: PLUGIN_TYPE,
+            config: { ...data.config },
+        };
+        withBatchUpdate(sheet.getParent(),()=>{
+            applyToSelectedCell(sheet, (sheet, row, col) => {
+                const bindingPath = sheet.getBindingPath(row, col);
+                if (bindingPath) {
+                    setCellTagPlugin(sheet, row, col, plugin);
+                }
+            });
+        });
+        onConfirm(plugin);
     };
     return (
         <Fragment>
@@ -58,7 +85,7 @@ const Component = function (props) {
                 <Item>
                     <Select
                         wrapStyle={{ height: 26, width: '100%' }}
-                        value={data.mode}
+                        value={data.config.mode}
                         datas={ImageSparklineModeItems}
                         onChange={(val) =>
                             setData({
@@ -108,8 +135,32 @@ const Component = function (props) {
             <Toolbar onConfirm={handleConfirm} onCancel={onCancel}></Toolbar>
         </Fragment>
     );
+};
+
+function paintCell(context, style, value) {
+    const { sheet, row, col } = context;
+    const has = hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
+    if (has) {
+        setIconDecoration(style, 'image');
+    }
+    return value;
+}
+
+function getOptions(sheet){
+    const {row,col} = getActiveIndexBySheet(sheet);
+    const options = [];
+    if(hasBindField(sheet,row,col)){
+        options.push({
+            value: PLUGIN_TYPE,
+            text: '图片',
+        });
+    }
+    return options;
 }
 
 export default {
     Component,
-}
+    paintCell,
+    PLUGIN_TYPE,
+    getOptions,
+};

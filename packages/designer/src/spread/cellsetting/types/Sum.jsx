@@ -4,11 +4,11 @@ import {
 } from 'react';
 
 import { Select } from '@components/form/Index';
+import { Range } from '@components/range/Index';
 import { isUndefined } from '@utils/objectUtil';
 import { applyToSelectedCell } from '@utils/spreadUtil';
 import {
-  clearAllCellTagPlugin,
-  getCellInstanceId,
+  getCellTag,
   getCellTagPlugin,
   hasCellTagPluginByIndex,
   setCellTagPlugin,
@@ -24,6 +24,8 @@ import {
   getBindText,
   setSumDecoration,
 } from '../utils';
+
+const PLUGIN_TYPE = 'cellSubTotal';
 
 const Sum_Types = [
     {
@@ -57,11 +59,12 @@ const Component = function (props) {
     const [data, setData] = useState(plugin);
     const handleConfirm = () => {
         applyToSelectedCell(sheet, (sheet, row, col) => {
-            clearAllCellTagPlugin(sheet, row, col);
+            //clearAllCellTagPlugin(sheet, row, col);
             const bindingPath = sheet.getBindingPath(row, col);
             if (bindingPath) {
                 const paths = bindingPath.split('.');
-                const instanceId = getCellInstanceId(sheet,row,col);
+                //const instanceId = getCellInstanceId(sheet,row,col);
+                const instanceId = getCellTag(sheet,row,col,"instanceId");
                 const tableCode = paths[0];
                 const fieldCode = paths[1];
                 const config = plugin.config || {};
@@ -95,21 +98,29 @@ const Component = function (props) {
                     ></Select>
                 </Item>
             </ItemList>
+            <ItemList>
+                <Item>
+                    <Title>汇总目标</Title>
+                </Item>
+                <Item>
+                    <Range></Range>
+                </Item>
+            </ItemList>
             <Toolbar onCancel={onCancel} onConfirm={handleConfirm}></Toolbar>
         </Fragment>
     );
 };
 
 const isShowIcon = function (sheet, row, col) {
-    return hasCellTagPluginByIndex(sheet, row, col, 'cellSubTotal');
+    return false;//hasCellTagPluginByIndex(sheet, row, col, 'cellSubTotal');
 };
 
 const paintCell = function (context, style, value) {
     const { sheet, row, col } = context;
-    const has = hasCellTagPluginByIndex(sheet, row, col, 'cellSubTotal');
+    const has = hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
     if (has) {
         setSumDecoration(style);
-        const plugin = getCellTagPlugin(sheet, row, col, 'cellSubTotal');
+        const plugin = getCellTagPlugin(sheet, row, col, PLUGIN_TYPE);
         const { tableCode, fieldCode, functionNum } = plugin.config;
         const text = getBindText(
             `${tableCode}.${fieldCode}`,
@@ -123,8 +134,17 @@ const paintCell = function (context, style, value) {
     return value;
 };
 
+function getOptions(sheet){
+    return [{
+        value: PLUGIN_TYPE,
+        text: '汇总',
+    }];
+}
+
 export default {
     isShowIcon,
     paintCell,
     Component,
+    PLUGIN_TYPE,
+    getOptions,
 };

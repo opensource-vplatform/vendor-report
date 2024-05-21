@@ -10,4 +10,8 @@ const paintCell = function (context, style, value) {
     return value;
 };
 
-export default { paintCell };
+function getOptions(sheet){
+    return [];
+}
+
+export default { paintCell,getOptions };
