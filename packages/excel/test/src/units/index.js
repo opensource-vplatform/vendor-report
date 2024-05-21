@@ -1,7 +1,7 @@
-import base from './base';
+import cover from './cover';
 
-const units = [base];
+const units = [cover];
 
-export const getUnits = function(){
+export const getUnits = function () {
     return units;
-}
+};

@@ -3,6 +3,7 @@ import {
   useState,
 } from 'react';
 
+import ParseReportJson from '../../src/template/ParseReportJson';
 import Tab from './tabs/Tab';
 import Tabs from './tabs/Tabs';
 import { getUnits } from './units/index';
@@ -22,7 +23,12 @@ export default function () {
         });
         const result = [];
         errors.forEach((err, index) => {
-            const { title, source, test } = err;
+            const { title, source, test, datas, setting } = err;
+            new ParseReportJson({
+                ...setting,
+                reportJson: source,
+                datas: datas,
+            });
             const sourceStr = JSON.stringify(sortObj(source), null, '  ');
             const testStr = JSON.stringify(sortObj(test), null, '  ');
             const diff = Diff.diffChars(sourceStr, testStr);
@@ -75,7 +81,7 @@ export default function () {
                                 gap: 16,
                                 padding: 16,
                                 flex: 1,
-                                width:0,
+                                width: 0,
                             }}
                         >
                             <div className='text'>

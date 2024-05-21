@@ -37,6 +37,7 @@ export default {
         ],
     },
     setting: {
-        //tempConfig:
+        //tempConfig:wizardSlice.template
+        //setting:datasourceSlice.setting
     },
 };

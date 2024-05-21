@@ -1,18 +1,22 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="index.css" />
-        <title>同望Web报表设计器单元测试</title>
-    </head>
 
-    <body>
-        <div id="app"></div>
-        <script
-            type="text/javascript"
-            src="diff.min.js"
-        ></script>
-        <script type="module" src="src/main.jsx"></script>
-    </body>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>同望Web报表设计器单元测试</title>
+    <script type="text/javascript" src="./src/vendor/excel/17.0.5/excel.all.min.js"></script>
+    <script type="text/javascript" src="./src/vendor/excel/17.0.5/resources/zh/excel.resources.zh.min.js"></script>
+    <script type="text/javascript" src="./src/vendor/react/react.production.min.js"></script>
+    <script type="text/javascript" src="./src/vendor/react/react-dom.production.min.js"></script>
+    <script type="text/javascript" src="./src/vendor/polyfill/polyfill.min.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="text/javascript" src="diff.min.js"></script>
+    <script type="module" src="src/main.jsx"></script>
+</body>
+
 </html>

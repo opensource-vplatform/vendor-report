@@ -4,11 +4,7 @@ import {
   getTableCodesFromFormula,
 } from '../enhance/index';
 import Tool from '../enhance/Tool';
-import { getNamespace } from '../utils/spreadUtil';
 import UnionDatasource from './UnionDatasource';
-
-const GC = getNamespace();
-const spreadNS = GC.Spread.Sheets;
 
 function getPrintConversionUnits() {
     //打印换算单位
@@ -25,15 +21,15 @@ function getPrintConversionUnits() {
 }
 
 function genAutoMergeRanges(merge, autoMergeRanges, startRow) {
-    let direction = spreadNS.AutoMerge.AutoMergeDirection.column; //1
-    let mode = spreadNS.AutoMerge.AutoMergeMode.free; //0
-    let sheetArea = spreadNS.SheetArea.viewport; //3
-    let selectionMode = spreadNS.AutoMerge.SelectionMode.merged; //0
+    let direction = 1; //在列方向上应用自动合并
+    let mode = 0; //0:在相邻单元格具有相同值时应用自动合并;1:在相邻单元格具有相同值并且自动合并前一行或前一列中的相应单元格时应用自动合并
+    let sheetArea = 3; //spreadNS.SheetArea.viewpor
+    let selectionMode = 1; //0:在应用自动合并时选择单个单元格;1:在应用自动合并时选择具有相同值的所有单元格
 
     if (merge.columnMerge && merge.rowMerge) {
-        direction = spreadNS.AutoMerge.AutoMergeDirection.rowColumn; //值等于4。在行方向上优先于列方向应用自动合并
+        direction = 4; //在行方向上优先于列方向应用自动合并
     } else if (merge.rowMerge) {
-        direction = spreadNS.AutoMerge.AutoMergeDirection.row; //值等于2.在行方向上应用自动合并
+        direction = 2; //在行方向上应用自动合并
     }
 
     let range = {
