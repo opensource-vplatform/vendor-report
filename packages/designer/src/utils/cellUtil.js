@@ -214,6 +214,37 @@ export class BindingPathCellType extends GC.Spread.Sheets.CellTypes.Text {
     }
 }
 
+/**
+ * 增强处理电子表格json数据，主要内容：
+ * 1、一段时期对绑定数据源设置了额外的单元格类型导致默认自定义单元格失效
+ * @param {*} json 
+ */
+export function enhanceSpreadJson(json){
+    const sheets = json?.sheets;
+    if(sheets){
+        Object.values(sheets).forEach(sheet=>{
+            const dataTable = sheet?.data?.dataTable;
+            if (!dataTable) {
+                return;
+            }
+            Object.entries(dataTable).forEach(([row, colValue]) => {
+                Object.entries(colValue).forEach(([col, { style }]) => {
+                    if(style){
+                        const cellStyle = style.cellType;
+                        if(cellStyle&&cellStyle.typeName=="1"){
+                            //移除旧版本json中绑定样式设置
+                            style.cellStyle = undefined;
+                            delete style.cellStyle;
+                            style.decoration = undefined;
+                            delete style.decoration;
+                        }
+                    }
+                });
+            });
+        });
+    }
+}
+
 export function formatBindingPathCellType(sheet) {
     const dataTable = sheet.toJSON().data.dataTable;
     if (!dataTable) {

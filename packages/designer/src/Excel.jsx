@@ -1,31 +1,57 @@
-import { Fragment, useCallback, useContext, useEffect, useRef } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { registerCommand } from '@commands/index';
-import { bind, EVENTS, fire } from '@event/EventManager';
+import {
+  bind,
+  EVENTS,
+  fire,
+} from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
-    initDatasource,
-    setSetting,
-    updateActiveSheetTablePath,
-    updateDslist,
+  initDatasource,
+  setSetting,
+  updateActiveSheetTablePath,
+  updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import { hideTab } from '@store/navSlice/navSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
-    initWizardSlice,
-    toggleBooleanValue,
-    updateTemplateName,
+  initWizardSlice,
+  toggleBooleanValue,
+  updateTemplateName,
 } from '@store/wizardSlice';
-import { Workbook, Worksheet } from '@toone/report-excel';
-import { formatBindingPathCellType } from '@utils/cellUtil';
-import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
+import {
+  Workbook,
+  Worksheet,
+} from '@toone/report-excel';
+import {
+  enhanceSpreadJson,
+  formatBindingPathCellType,
+} from '@utils/cellUtil';
+import {
+  findTreeNodeById,
+  getActiveSheetTablesPath,
+} from '@utils/commonUtil';
 import { getLicense } from '@utils/configUtil';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import { getNamespace } from '@utils/spreadUtil';
-import { getCellTag, getSheetTag, setSheetTag } from '@utils/worksheetUtil';
+import {
+  getCellTag,
+  getSheetTag,
+  setSheetTag,
+} from '@utils/worksheetUtil';
 
 import { enhance as enhanceContextMenu } from './contextMenu/index';
 import DesignerContext from './DesignerContext';
@@ -158,7 +184,6 @@ export default function () {
             dispatch(updateActiveSheetTablePath({ tablePaths }));
 
             dispatch(setSpread({ spread }));
-
             //对已经绑定了数据源的单元格进行类型设置，设置后就可以看到当前单元格已经绑定了哪个数据源
             spread.sheets.forEach((sheet) => {
                 formatBindingPathCellType(sheet);
@@ -185,7 +210,10 @@ export default function () {
                     datasourceSetting,
                     wizardSlice,
                 }) => {
-                    excelJson && resolve(excelJson);
+                    if(excelJson){
+                        enhanceSpreadJson(excelJson);
+                        resolve(excelJson);
+                    }
                     dispatch(
                         initDatasource({
                             datasource: tableMetadata,
