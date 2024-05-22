@@ -205,7 +205,7 @@ export default class ParseReportJson {
                         contentHeight = diff;
                     }
                 }
-
+                contentHeight -= 5;
                 //当前页可以渲染多少个内容模板
                 const contentTempCount = Math.floor(
                     contentHeight / contentTempHeight
@@ -339,8 +339,8 @@ export default class ParseReportJson {
                     bottom: 75,
                     top: 75,
                 },
+                showColumnHeader = 2,
             },
-            colHeaderVisible = true,
             colHeaderRowInfos = [],
         } = sheet;
 
@@ -375,7 +375,8 @@ export default class ParseReportJson {
             defaultHeaderHeight = height;
         }
 
-        const colHeaderHeight = colHeaderVisible ? defaultHeaderHeight : 0;
+        const colHeaderHeight =
+            showColumnHeader === 2 ? defaultHeaderHeight : 0;
         if (orientation === 2) {
             pageTotalHeight =
                 _width - marginBottom - marginTop - colHeaderHeight;
@@ -974,8 +975,7 @@ export default class ParseReportJson {
                                 const colDataTable = { ..._colDataTable };
                                 dataTable[colStr] = colDataTable;
                                 const col = Number(colStr);
-                                const { bindingPath, tag, formula } =
-                                    colDataTable;
+                                const { bindingPath, tag } = colDataTable;
                                 if (bindingPath?.includes?.('.')) {
                                     const [tableCode, fieldCode] =
                                         bindingPath.split('.');
@@ -1101,7 +1101,6 @@ export default class ParseReportJson {
                                                     return unionDatasource;
                                                 }
                                             );
-
                                             const { type, value } = exePlugins(
                                                 {
                                                     type: 'text',
@@ -1133,7 +1132,7 @@ export default class ParseReportJson {
                                 const pageHandler =
                                     genPageIndexHandler(pageIndex);
 
-                                if (formula) {
+                                if (colDataTable.formula) {
                                     const formulaHandler = () => {
                                         //当前页
                                         tool.setPageHandler(pageHandler);
@@ -1160,7 +1159,7 @@ export default class ParseReportJson {
                                         const { type, value } = enhanceFormula(
                                             {
                                                 type: 'formula',
-                                                value: formula,
+                                                value: colDataTable.formula,
                                             },
                                             tool
                                         );
