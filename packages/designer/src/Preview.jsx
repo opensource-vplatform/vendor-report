@@ -108,7 +108,11 @@ export default function () {
     const toolbar = getToolbar(context);
     let printHandler = null;
     const handlePrint = () => {
-        printHandler && printHandler();
+        if(printHandler){
+            printHandler().then((spread)=>{
+                spread.print();
+            })
+        }
     };
     const handleEdit = () => {
         if (sourceSpread) {

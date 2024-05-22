@@ -432,7 +432,7 @@ export default function (props) {
                             sheets.forEach((sheet) => {
                                 setPrintInfo(sheet, params || {});
                             });
-                            resolve();
+                            resolve(spread);
                         } else {
                             reject(
                                 Error(
