@@ -176,7 +176,8 @@ class UnionDatasource {
     _treeStructDataEnhance(datasetMap) {
         for (let [tableCode, settings] of Object.entries(this.treeStruct)) {
             const datas = datasetMap[tableCode];
-            if (datas && datas.length > 0) {
+            //有数据，且启用树形结构
+            if (datas && datas.length > 0 && settings.enable) {
                 const {
                     sumFields,
                     idField,
