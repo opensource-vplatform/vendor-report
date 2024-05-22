@@ -108,8 +108,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             },
         });
         this._bindEvents([EVENTS.onEditorVisible], () => {
-            const spread = this.sheet.getParent();
-            if(spread){
+            if(this.sheet&&this.sheet.getParent()){
                 const { sheet, row, col } = getActiveIndexBySheet(this.sheet);
                 if (this._couldShowIcon(sheet, row, col)) {
                     const icon = this._initIcon();

@@ -136,10 +136,10 @@ class UnionDatasource {
                 if (plugins && plugins.length > 0) {
                     for (let i = 0; i < plugins.length; i++) {
                         const plugin = plugins[i];
-                        if (plugin.type == 'cellGroupType') {
+                        if (plugin.type == 'cellGroup'||plugin.type == 'cellGroupType') {
                             this.cellPlugins.push({
                                 bindingPath,
-                                type: 'cellGroupType',
+                                type: 'cellGroup',
                             });
                         }
                     }
