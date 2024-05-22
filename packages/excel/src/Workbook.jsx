@@ -300,7 +300,13 @@ export default function (props) {
                     nextPage,
                 });
             }
+
+            const item = localStorage.getItem('storeSpreadJson');
+            if (item) {
+                localStorage.setItem('spreadJson', JSON.stringify(json));
+            }
         }
+
         return {
             json,
         };
