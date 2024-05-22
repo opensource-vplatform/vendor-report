@@ -183,8 +183,9 @@ export default function () {
         <Button
           type='primary'
           style={{ height: 26 }}
-          disabled={!data.report}
+          // disabled={!data.report}
           onClick={() => {
+            if(!data.report) return;
             setLoadMsg('导出到excel中，请稍候...');
             data.report
               .exportExcel(getTitle('未命名'))
@@ -199,8 +200,9 @@ export default function () {
         <Button
           type='primary'
           style={{ height: 26 }}
-          disabled={!data.report}
+          // disabled={!data.report}
           onClick={() => {
+            if(!data.report) return;
             setLoadMsg('导出到pdf中，请稍候...');
             exportPdf()
               .then((data) => {
