@@ -1,4 +1,5 @@
-import data from './reportJson/zjjlb';
+/* import data from './reportJson/zjjlb';
 
-//export default window.localStorage.getItem('spreadJSON1');
-export default data;
+export default data; */
+
+export default window.localStorage.getItem('spreadJSON1');

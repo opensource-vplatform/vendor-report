@@ -1,7 +1,7 @@
 import {
-    enhanceFormula,
-    exePlugins,
-    getTableCodesFromFormula,
+  enhanceFormula,
+  exePlugins,
+  getTableCodesFromFormula,
 } from '../enhance/index';
 import Tool from '../enhance/Tool';
 import UnionDatasource from './UnionDatasource';
@@ -121,6 +121,63 @@ export default class ParseReportJson {
             formulaHandler();
         }
         console.timeEnd('耗时多久');
+    }
+    initTempates() {
+        this.dataSourceMap = [];
+        this.templates = {
+            header: {
+                1: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+                2: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+                3: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+            },
+            footer: {
+                1: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+                2: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+                3: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+            },
+            content: {
+                1: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+                2: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+                3: {
+                    template: [],
+                    height: 0,
+                    allTableCodes: {},
+                },
+                dataLen: 0,
+            },
+        };
     }
     render(pageInfos, templates) {
         const { header, footer, content } = templates;
@@ -350,175 +407,259 @@ export default class ParseReportJson {
 
         return pageInfos;
     }
+    collectTemplate(temp, type) {
+        const {
+            tableCodes,
+            datas,
+            allDatas,
+            dataTables,
+            dataPath,
+            cellPlugins,
+        } = temp;
+
+        //生成联合数据源
+        const setting = {
+            ...this.setting,
+            cellPlugins,
+        };
+        const unionDatasource = new UnionDatasource(dataPath, setting);
+        unionDatasource.load(datas);
+        Object.keys(datas).forEach((tableCode) => {
+            this.dataSourceMap.push({
+                tableCode,
+                datas,
+                unionDatasource,
+                type,
+            });
+        });
+        temp.unionDatasource = unionDatasource;
+
+        const unionDatasourceAll = new UnionDatasource(dataPath, setting);
+        unionDatasourceAll.load(allDatas);
+        temp.unionDatasourceAll = unionDatasourceAll;
+
+        //计算高度
+        let height = 0;
+        const dataLen =
+            type === 'content' ? 1 : unionDatasource.getCount() || 1;
+
+        for (let i = 0; i < dataLen; i++) {
+            dataTables.forEach(function ({ rows = {} }) {
+                //计算高度
+                if (rows.hasOwnProperty('size')) {
+                    height += rows?.size;
+                } else {
+                    height += 20;
+                }
+            });
+        }
+
+        //所有模板
+        let tempType = 1;
+        if (type === 'content') {
+            this.templates[type].dataLen = unionDatasource.getCount() || 1;
+        }
+
+        this.templates[type][tempType].template.push(temp);
+        this.templates[type][tempType].allTableCodes = {
+            ...this.templates[type][tempType].allTableCodes,
+            tableCodes,
+        };
+        this.templates[type][tempType].height += height;
+        tempType += 1;
+
+        if (!temp.isTotalArea) {
+            //不包含总计的模板
+
+            this.templates[type][tempType].template.push(temp);
+            this.templates[type][tempType].allTableCodes = {
+                ...this.templates[type][tempType].allTableCodes,
+                tableCodes,
+            };
+            this.templates[type][tempType].height += height;
+            tempType += 1;
+
+            //不包含章合计和总计的模板
+            if (!temp.isGroupSumArea) {
+                this.templates[type][tempType].template.push(temp);
+                this.templates[type][tempType].allTableCodes = {
+                    ...this.templates[type][tempType].allTableCodes,
+                    tableCodes,
+                };
+                this.templates[type][tempType].height += height;
+            }
+        }
+    }
+    genTemplateFromSheet(sheet) {
+        const { rowCount = 200, data } = sheet;
+
+        this.initTempates();
+
+        const sheetTag = data?.defaultDataNode?.tag;
+        let tag = {};
+        if (sheetTag) {
+            const res = JSON.parse(sheetTag);
+            tag = res;
+        }
+
+        const REG = /^\d+:\d+$/;
+        const { pageArea = '', groupSumArea = '', totalArea = '' } = tag;
+        //分页区域范围
+        let pageAreaStartRow = rowCount;
+        let pageAreaEndRow = rowCount;
+
+        if (pageArea && REG.test(pageArea)) {
+            const res = pageArea.split(':');
+            pageAreaStartRow = Number(res[0]) - 1;
+            pageAreaEndRow = Number(res[1]);
+        }
+
+        //分组汇总区域范围
+        let groupSumAreaStartRow = rowCount;
+        let groupSumAreaEndRow = rowCount;
+
+        if (groupSumArea && REG.test(groupSumArea)) {
+            const res = groupSumArea.split(':');
+            groupSumAreaStartRow = Number(res[0]) - 1;
+            groupSumAreaEndRow = Number(res[1]);
+        }
+
+        //统计区域范围
+        let totalAreaStartRow = rowCount;
+        let totalAreaEndRow = rowCount;
+        if (totalArea && REG.test(totalArea)) {
+            const res = totalArea.split(':');
+            totalAreaStartRow = Number(res[0]) - 1;
+            totalAreaEndRow = Number(res[1]);
+        }
+
+        let template = null;
+        let row = 0;
+        do {
+            let rowTemplate = this.parseRowDataTable({
+                row,
+                sheet,
+            });
+
+            //判断当前行是否属于分组汇总区域
+            if (row >= groupSumAreaStartRow && row < groupSumAreaEndRow) {
+                rowTemplate.isGroupSumArea = true;
+            }
+
+            //判断当前行是否属于总计区域
+            if (row >= totalAreaStartRow && row < totalAreaEndRow) {
+                rowTemplate.isTotalArea = true;
+            }
+
+            //当前行与上一行存在合并关系，这两行作为一个模板
+            if (template && row < template.endRow) {
+                template.height += rowTemplate.height;
+                template.dataTables.push(...rowTemplate.dataTables);
+                if (rowTemplate.endRow > template.endRow) {
+                    template.endRow = rowTemplate.endRow;
+                    template.rowCount = template.endRow - template.row;
+                }
+
+                template.datas = {
+                    ...template.datas,
+                    ...rowTemplate.datas,
+                };
+
+                template.allDatas = {
+                    ...template.allDatas,
+                    ...rowTemplate.allDatas,
+                };
+
+                if (rowTemplate.isGroupSumArea) {
+                    template.isGroupSumArea = rowTemplate.isGroupSumArea;
+                }
+
+                template.dataPath.push(...rowTemplate.dataPath);
+                template.cellPlugins.push(...rowTemplate.cellPlugins);
+                template.tableCodes = {
+                    ...template.tableCodes,
+                    ...rowTemplate.tableCodes,
+                };
+            } else {
+                template = rowTemplate;
+            }
+
+            //分页区域作为一个整体处理
+            if (row >= pageAreaStartRow && row < pageAreaEndRow) {
+                template.endRow = pageAreaEndRow;
+                template.rowCount = template.endRow - template.row;
+            }
+
+            //将模板方法指定区域模板中
+            if (row + 1 === template.endRow) {
+                template.verticalAutoMergeRanges = [];
+                template.dataTables.forEach(function (dataTable) {
+                    const { mergeInfos = [] } = dataTable;
+                    const len = mergeInfos.length;
+                    if (len > 0) {
+                        const autoMergeRanges = [];
+                        let merge = mergeInfos[0];
+                        for (let i = 1; i < len; i++) {
+                            const item = mergeInfos[i];
+                            if (
+                                merge.row === item.row &&
+                                merge.rowCount === item.rowCount &&
+                                merge.columnMerge === item.columnMerge &&
+                                merge.rowMerge === item.rowMerge &&
+                                merge.col + merge.colCount === item.col
+                            ) {
+                                merge.colCount += item.colCount;
+                            } else {
+                                genAutoMergeRanges(
+                                    merge,
+                                    autoMergeRanges,
+                                    template.row
+                                );
+                                merge = item;
+                            }
+                        }
+                        genAutoMergeRanges(
+                            merge,
+                            autoMergeRanges,
+                            template.row
+                        );
+                        dataTable.autoMergeRanges = [];
+
+                        autoMergeRanges.filter(function (item) {
+                            if (item.range.rowCount === template.rowCount) {
+                                template.verticalAutoMergeRanges.push(item);
+                            } else if (item.range.colCount > 1) {
+                                dataTable.autoMergeRanges.push(item);
+                            }
+                        });
+                    }
+                });
+
+                if (template.row < pageAreaStartRow) {
+                    this.collectTemplate(template, 'header');
+                } else if (template.row >= pageAreaEndRow) {
+                    this.collectTemplate(template, 'footer');
+                } else {
+                    this.collectTemplate(template, 'content');
+                }
+                template = null;
+            }
+
+            row++;
+        } while (row < rowCount);
+    }
     parse() {
         const sheets = Object.values(this.reportJson.sheets);
         this.sheetNames = [];
         sheets.forEach((sheet) => {
-            const { visible = 1, rowCount = 200, data, name } = sheet;
+            const { visible = 1, name } = sheet;
             //当前sheet不可见，直接跳过解析
             if (visible === 0) {
                 return;
             }
+            this.initTempates();
+            this.genTemplateFromSheet(sheet);
 
-            //头部区域模板
-            const headerTemplates = [];
-            //底部区域模板
-            const footerTemplates = [];
-            //表格区域模板
-            const contentTemplates = [];
-
-            const sheetTag = data?.defaultDataNode?.tag;
-            let tag = {};
-            if (sheetTag) {
-                const res = JSON.parse(sheetTag);
-                tag = res;
-            }
-
-            const REG = /^\d+:\d+$/;
-            const { pageArea = '', groupSumArea = '', totalArea = '' } = tag;
-            //分页区域范围
-            let pageAreaStartRow = rowCount;
-            let pageAreaEndRow = rowCount;
-
-            if (pageArea && REG.test(pageArea)) {
-                const res = pageArea.split(':');
-                pageAreaStartRow = Number(res[0]) - 1;
-                pageAreaEndRow = Number(res[1]);
-            }
-
-            //分组汇总区域范围
-            let groupSumAreaStartRow = rowCount;
-            let groupSumAreaEndRow = rowCount;
-
-            if (groupSumArea && REG.test(groupSumArea)) {
-                const res = groupSumArea.split(':');
-                groupSumAreaStartRow = Number(res[0]) - 1;
-                groupSumAreaEndRow = Number(res[1]);
-            }
-
-            //统计区域范围
-            let totalAreaStartRow = rowCount;
-            let totalAreaEndRow = rowCount;
-            if (totalArea && REG.test(totalArea)) {
-                const res = totalArea.split(':');
-                totalAreaStartRow = Number(res[0]) - 1;
-                totalAreaEndRow = Number(res[1]);
-            }
-
-            let template = null;
-            let row = 0;
-            do {
-                let rowTemplate = this.parseRowDataTable({
-                    row,
-                    sheet,
-                });
-
-                //判断当前行是否属于分组汇总区域
-                if (row >= groupSumAreaStartRow && row < groupSumAreaEndRow) {
-                    rowTemplate.isGroupSumArea = true;
-                }
-
-                //判断当前行是否属于总计区域
-                if (row >= totalAreaStartRow && row < totalAreaEndRow) {
-                    rowTemplate.isTotalArea = true;
-                }
-
-                //当前行与上一行存在合并关系，这两行作为一个模板
-                if (template && row < template.endRow) {
-                    template.height += rowTemplate.height;
-                    template.dataTables.push(...rowTemplate.dataTables);
-                    if (rowTemplate.endRow > template.endRow) {
-                        template.endRow = rowTemplate.endRow;
-                        template.rowCount = template.endRow - template.row;
-                    }
-
-                    template.datas = {
-                        ...template.datas,
-                        ...rowTemplate.datas,
-                    };
-
-                    template.allDatas = {
-                        ...template.allDatas,
-                        ...rowTemplate.allDatas,
-                    };
-
-                    if (rowTemplate.isGroupSumArea) {
-                        template.isGroupSumArea = rowTemplate.isGroupSumArea;
-                    }
-
-                    template.dataPath.push(...rowTemplate.dataPath);
-                    template.cellPlugins.push(...rowTemplate.cellPlugins);
-                    template.tableCodes = {
-                        ...template.tableCodes,
-                        ...rowTemplate.tableCodes,
-                    };
-                } else {
-                    template = rowTemplate;
-                }
-
-                //分页区域作为一个整体处理
-                if (row >= pageAreaStartRow && row < pageAreaEndRow) {
-                    template.endRow = pageAreaEndRow;
-                    template.rowCount = template.endRow - template.row;
-                }
-
-                //将模板方法指定区域模板中
-                if (row + 1 === template.endRow) {
-                    template.verticalAutoMergeRanges = [];
-                    template.dataTables.forEach(function (dataTable) {
-                        const { mergeInfos = [] } = dataTable;
-                        const len = mergeInfos.length;
-                        if (len > 0) {
-                            const autoMergeRanges = [];
-                            let merge = mergeInfos[0];
-                            for (let i = 1; i < len; i++) {
-                                const item = mergeInfos[i];
-                                if (
-                                    merge.row === item.row &&
-                                    merge.rowCount === item.rowCount &&
-                                    merge.columnMerge === item.columnMerge &&
-                                    merge.rowMerge === item.rowMerge &&
-                                    merge.col + merge.colCount === item.col
-                                ) {
-                                    merge.colCount += item.colCount;
-                                } else {
-                                    genAutoMergeRanges(
-                                        merge,
-                                        autoMergeRanges,
-                                        template.row
-                                    );
-                                    merge = item;
-                                }
-                            }
-                            genAutoMergeRanges(
-                                merge,
-                                autoMergeRanges,
-                                template.row
-                            );
-                            dataTable.autoMergeRanges = [];
-
-                            autoMergeRanges.filter(function (item) {
-                                if (item.range.rowCount === template.rowCount) {
-                                    template.verticalAutoMergeRanges.push(item);
-                                } else if (item.range.colCount > 1) {
-                                    dataTable.autoMergeRanges.push(item);
-                                }
-                            });
-                        }
-                    });
-
-                    if (template.row < pageAreaStartRow) {
-                        headerTemplates.push(template);
-                    } else if (template.row >= pageAreaEndRow) {
-                        footerTemplates.push(template);
-                    } else {
-                        contentTemplates.push(template);
-                    }
-                    template = null;
-                }
-
-                row++;
-            } while (row < rowCount);
             const templateInfo = this.tempConfig[name];
             let sheetNames = [name];
             let sheetDatas = {};
@@ -526,7 +667,7 @@ export default class ParseReportJson {
             if (templateInfo) {
                 const res = this.groupDatas(templateInfo);
                 sheetDatas = res.sheetDatas;
-                sheetNames = res.groupNames;
+                res.groupNames.length && (sheetNames = res.groupNames);
                 tableCode = res.tableCode;
             }
 
@@ -536,11 +677,7 @@ export default class ParseReportJson {
 
             pageInfos.tableCode = tableCode;
             pageInfos.sheet = sheet;
-            const templates = this.splitTemplate({
-                headerTemplates,
-                footerTemplates,
-                contentTemplates,
-            });
+            const templates = this.templates;
 
             const groupCount = sheetNames.length;
             this.sheetPages[name] = {
@@ -548,14 +685,16 @@ export default class ParseReportJson {
                 datas: [],
             };
             pageInfos.unionDatasourceDatas = {};
+
             sheetNames.forEach((sheetName, index) => {
                 pageInfos.groupName = sheetName;
                 pageInfos.isLastGroup = groupCount === index + 1;
 
                 if (sheetDatas[sheetName]) {
                     pageInfos.groupDatas = sheetDatas[sheetName];
+                    let heightChangeInfos = {};
                     this.dataSourceMap.forEach(
-                        ({ tableCode, datas, unionDatasource }) => {
+                        ({ tableCode, datas, unionDatasource, type }) => {
                             if (tableCode === pageInfos.tableCode) {
                                 const newDatas = {
                                     ...datas,
@@ -563,10 +702,46 @@ export default class ParseReportJson {
                                 };
                                 pageInfos.unionDatasourceDatas[sheetName] =
                                     newDatas;
+                                const oldCount = unionDatasource.getCount();
                                 unionDatasource.load(newDatas);
+                                const newCount = unionDatasource.getCount();
+                                if (
+                                    oldCount !== newCount &&
+                                    (type === 'header' || type === 'footer')
+                                ) {
+                                    heightChangeInfos[type] = true;
+                                }
                             }
                         }
                     );
+                    //如果头部和尾部用到了分组数据，则重新计算头部和尾部高度
+                    Object.keys(heightChangeInfos).forEach((key) => {
+                        const tempInfos = this.templates[key];
+                        Object.values(tempInfos).forEach(function (infos) {
+                            infos.height = 0;
+                            infos.template.forEach((temp) => {
+                                const { dataTables, unionDatasource } = temp;
+
+                                let height = 0;
+                                const dataLen = unionDatasource.getCount() || 1;
+
+                                for (let i = 0; i < dataLen; i++) {
+                                    dataTables.forEach(function ({
+                                        rows = {},
+                                    }) {
+                                        //计算高度
+                                        if (rows.hasOwnProperty('size')) {
+                                            height += rows?.size;
+                                        } else {
+                                            height += 20;
+                                        }
+                                    });
+                                }
+
+                                infos.height += height;
+                            });
+                        });
+                    });
                 }
 
                 if (index > 0) {
@@ -577,7 +752,7 @@ export default class ParseReportJson {
                 this.render(pageInfos, templates);
             });
             this.resetSheet(pageInfos);
-            // this.resetSheet(this.sheetPages[name].datas[0]);
+            //this.resetSheet(this.sheetPages[name].datas[0]);
         });
     }
     parseRowDataTable(params) {
@@ -740,167 +915,6 @@ export default class ParseReportJson {
 
         //只支持一个实体进行分组
         return { sheetDatas, groupNames: temp.groupNames, tableCode };
-    }
-
-    splitTemplate({ headerTemplates, footerTemplates, contentTemplates }) {
-        const dataSourceMap = [];
-        const templates = [
-            {
-                type: 'header',
-                template: headerTemplates,
-            },
-            {
-                type: 'footer',
-                template: footerTemplates,
-            },
-            {
-                type: 'content',
-                template: contentTemplates,
-            },
-        ];
-
-        const _templates = {
-            header: {
-                1: {
-                    template: headerTemplates,
-                    height: 0,
-                    allTableCodes: {},
-                },
-                2: {
-                    template: [],
-                    height: 0,
-                    allTableCodes: {},
-                },
-                3: {
-                    template: [],
-                    height: 0,
-                    allTableCodes: {},
-                },
-            },
-            footer: {
-                1: {
-                    template: footerTemplates,
-                    height: 0,
-                    allTableCodes: {},
-                },
-                2: {
-                    template: [],
-                    height: 0,
-                    allTableCodes: {},
-                },
-                3: {
-                    template: [],
-                    height: 0,
-                    allTableCodes: {},
-                },
-            },
-            content: {
-                1: {
-                    template: contentTemplates,
-                    height: 0,
-                    allTableCodes: {},
-                },
-                2: {
-                    template: [],
-                    height: 0,
-                    allTableCodes: {},
-                },
-                3: {
-                    template: [],
-                    height: 0,
-                    allTableCodes: {},
-                },
-                dataLen: 0,
-            },
-        };
-
-        templates.forEach(({ type, template }) => {
-            template.forEach((temp) => {
-                const {
-                    tableCodes,
-                    datas,
-                    allDatas,
-                    dataTables,
-                    dataPath,
-                    cellPlugins,
-                } = temp;
-
-                //生成联合数据源
-                const setting = {
-                    ...this.setting,
-                    cellPlugins,
-                };
-                const unionDatasource = new UnionDatasource(dataPath, setting);
-                unionDatasource.load(datas);
-                Object.keys(datas).forEach((tableCode) => {
-                    dataSourceMap.push({
-                        tableCode,
-                        datas,
-                        unionDatasource,
-                    });
-                });
-                temp.unionDatasource = unionDatasource;
-
-                const unionDatasourceAll = new UnionDatasource(
-                    dataPath,
-                    setting
-                );
-                unionDatasourceAll.load(allDatas);
-                temp.unionDatasourceAll = unionDatasourceAll;
-
-                //计算高度
-                let height = 0;
-                const dataLen =
-                    type === 'content' ? 1 : unionDatasource.getCount() || 1;
-
-                for (let i = 0; i < dataLen; i++) {
-                    dataTables.forEach(function ({ rows = {} }) {
-                        //计算高度
-                        if (rows.hasOwnProperty('size')) {
-                            height += rows?.size;
-                        } else {
-                            height += 20;
-                        }
-                    });
-                }
-
-                //所有模板
-                let tempType = 1;
-                if (type === 'content') {
-                    _templates[type].dataLen = unionDatasource.getCount() || 1;
-                }
-                _templates[type][tempType].allTableCodes = {
-                    ..._templates[type][tempType].allTableCodes,
-                    tableCodes,
-                };
-                _templates[type][tempType].height += height;
-                tempType += 1;
-
-                if (!temp.isTotalArea) {
-                    //不包含总计的模板
-
-                    _templates[type][tempType].template.push(temp);
-                    _templates[type][tempType].allTableCodes = {
-                        ..._templates[type][tempType].allTableCodes,
-                        tableCodes,
-                    };
-                    _templates[type][tempType].height += height;
-                    tempType += 1;
-
-                    //不包含章合计和总计的模板
-                    if (!temp.isGroupSumArea) {
-                        _templates[type][tempType].template.push(temp);
-                        _templates[type][tempType].allTableCodes = {
-                            ..._templates[type][tempType].allTableCodes,
-                            tableCodes,
-                        };
-                        _templates[type][tempType].height += height;
-                    }
-                }
-            });
-        });
-        this.dataSourceMap = dataSourceMap;
-        return _templates;
     }
 
     genPageDataTables(params) {
