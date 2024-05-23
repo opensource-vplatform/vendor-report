@@ -166,7 +166,7 @@ export default function () {
                 <Fill></Fill>
                 <Button
                     type='primary'
-                    style={{ height: 26 }}
+                    style={{ height: 26,width:110 }}
                     disabled={!data.report}
                     onClick={() => {
                         setLoadMsg('导出到excel中，请稍候...');

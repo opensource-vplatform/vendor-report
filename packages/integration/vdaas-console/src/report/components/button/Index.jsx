@@ -43,7 +43,6 @@ const Button = styled.button`
 
 const Text = styled.span`
     width: max-content;
-    margin: 4px 8px;
     white-space: nowrap;
 `;
 
