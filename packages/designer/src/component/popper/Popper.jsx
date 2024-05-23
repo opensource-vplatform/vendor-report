@@ -89,6 +89,19 @@ export default function (props) {
                     contentRef.current.style.top = '0px';
                 }
             }
+            if(rect.left + rect.width > document.body.clientWidth){
+                //超出浏览器宽度，尝试向左偏移
+                const hostRect = ref.current.getBoundingClientRect();
+                if (hostRect.left - rect.width >= 0) {
+                    //左边有位置，展示在左方
+                    contentRef.current.style.left = `${
+                        hostRect.left - rect.width
+                    }px`;
+                } else {
+                    //左边位置不够,直接顶着最左边展示
+                    contentRef.current.style.left = '0px';
+                }
+            }
         }
     }, [data.contentVisible]);
     return (
