@@ -1,7 +1,9 @@
+import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../base/BaseIcon';
 
 const getBase64Data = function(){
-    return `./css/icons/shape/image.png`;
+    return getBaseUrl() + `/css/icons/shape/image.png`;
 }
 
 /**
