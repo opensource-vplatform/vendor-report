@@ -11,12 +11,14 @@ export const withBatchCalcUpdate = function (spread, updateHandler) {
     if (spread) {
         spread.suspendPaint();
         spread.suspendEvent();
+        spread.suspendCalcService();
         const sheet = spread.getActiveSheet();
         try {
             updateHandler(sheet);
         } finally {
             spread.resumePaint();
             spread.resumeEvent();
+            spread.resumeCalcService();
         }
     }
 };
