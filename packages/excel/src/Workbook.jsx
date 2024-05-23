@@ -195,7 +195,7 @@ export default function (props) {
         tabStripVisible = true,
         onInited,
         onEnterCell,
-        onActiveSheetChanged,
+        onActiveSheetChanged: _onActiveSheetChanged,
         onValueChanged,
         onSelectionChanged,
         onSelectionChanging,
@@ -254,10 +254,9 @@ export default function (props) {
             spread: null,
             showError: showError,
             showWarn: showWarn,
+            pageInfo: null,
         };
     });
-
-    const [pageIndex, setPageIndex] = useState(0);
 
     const el = useRef(null);
     const { json } = useMemo(() => {
@@ -269,37 +268,7 @@ export default function (props) {
                 tempConfig: template,
                 setting,
             });
-
-            const goToPage = (step = 1) => {
-                const sheet = data.spread.getActiveSheet();
-                const sheetJson = sheet.toJSON();
-                const sheetPage = inst.sheetPages[sheetJson.name];
-                sheetPage.pageIndex += step;
-                if (sheetPage.pageIndex < 0) {
-                    sheetPage.pageIndex = 0;
-                }
-                if (sheetPage.pageIndex >= sheetPage.datas.length) {
-                    sheetPage.pageIndex = sheetPage.datas.length - 1;
-                }
-                const newSheet = sheetPage.datas[sheetPage.pageIndex];
-                newSheet.sheet = sheetJson;
-                inst.resetSheet(newSheet);
-                sheet.fromJSON(sheetJson);
-            };
-
-            const lastPage = () => {
-                goToPage(-1);
-            };
-
-            const nextPage = () => {
-                goToPage();
-            };
-            if (onPageCompleted) {
-                onPageCompleted({
-                    lastPage,
-                    nextPage,
-                });
-            }
+            data.pageInfo = inst;
 
             const item = localStorage.getItem('storeSpreadJson');
             if (item) {
@@ -311,6 +280,11 @@ export default function (props) {
             json,
         };
     }, [_json, dataSource, JSON.stringify(template), JSON.stringify(setting)]);
+
+    const onActiveSheetChanged = (type, args) => {
+        _onActiveSheetChanged && _onActiveSheetChanged(type, args);
+        handlePage();
+    };
 
     const initSpread = async () => {
         if (enablePrint) {
@@ -454,6 +428,47 @@ export default function (props) {
         }
     };
 
+    const handlePage = () => {
+        const inst = data.pageInfo;
+        const changePageIndex = (pageIndex = 1) => {
+            let newIndex = Number.parseInt(Number(pageIndex));
+            const sheet = data.spread.getActiveSheet();
+            const sheetJson = sheet.toJSON();
+            const sheetPage = inst.sheetPages[sheetJson.name];
+
+            if (newIndex <= 1) {
+                newIndex = 1;
+            }
+
+            if (newIndex >= sheetPage.datas.length) {
+                newIndex = sheetPage.datas.length;
+            }
+
+            sheetPage.pageIndex = newIndex - 1;
+
+            const newSheet = sheetPage.datas[sheetPage.pageIndex];
+            newSheet.sheet = sheetJson;
+            inst.resetSheet(newSheet);
+            sheet.fromJSON(sheetJson);
+        };
+
+        if (onPageCompleted) {
+            onPageCompleted((params) => {
+                const sheet = data.spread.getActiveSheet();
+                const sheetJson = sheet.toJSON();
+                const sheetPage = inst.sheetPages[sheetJson.name];
+                return new Promise((resolve) => {
+                    resolve({
+                        changePageIndex,
+                        isPage: sheetPage.isPage,
+                        pageIndex: (sheetPage.pageIndex || 0) + 1,
+                        total: sheetPage.datas.length || 1,
+                    });
+                });
+            });
+        }
+    };
+
     const customRegister = () => {
         //必须每次都注册，否则spread填充json后，自定义函数注册被清空
         const spread = data.spread;
@@ -476,6 +491,7 @@ export default function (props) {
                 handleSheets(json);
                 handleDatas();
                 handlePrint();
+                handlePage();
                 if (onInited) {
                     const promise = onInited(data.spread);
                     if (promise && promise.then) {

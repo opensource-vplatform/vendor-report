@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useEffect,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
@@ -7,6 +10,7 @@ const Wrap = styled.div`
     align-items: center;
     user-select: none;
     font-size: 14px;
+    margin-right: 10px;
 `;
 
 const PageBtnIcon = styled.div`
@@ -33,6 +37,10 @@ const Button = styled.button`
     cursor: pointer;
     &:hover {
         background-color: #ddd;
+    }
+    &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 `;
 
@@ -94,73 +102,143 @@ const NextPageBtnImage = `url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4w
 const LastPageBtnImage = `url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTZweCIgaGVpZ2h0PSIxNnB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+RW5kPC90aXRsZT4KICAgIDxnIGlkPSJFbmQiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxwYXRoIGQ9Ik0xMywxIEwxMywxNSBMMTIsMTUgTDEyLDEgTDEzLDEgWiBNMywxIEwxMiw4IEwzLDE1IEwzLDEgWiIgaWQ9IuW9oueKtue7k+WQiCIgZmlsbD0iIzY2NjY2NiI+PC9wYXRoPgogICAgPC9nPgo8L3N2Zz4=)`;
 
 export default function (props) {
-    const { firstPage } = props;
+    const { onInited } = props;
     const [pageInfos, setPageInfos] = useState({
-        total: 56,
+        total: 1,
         pageIndex: 1,
+        isPage: false,
+        changePageIndex() {},
     });
 
-    const firstPageHandler = () => {
-        if (typeof firstPage === 'function') {
-            firstPage();
-        }
+    const [pageIndex, setPageIndex] = useState(1);
+
+    const changePageIndexHandler = (index) => {
         setPageInfos({
             ...pageInfos,
-            pageIndex: 1,
+            pageIndex: index,
         });
+        setPageIndex(index);
+        pageInfos.changePageIndex(index);
+    };
+
+    const firstPageHandler = () => {
+        changePageIndexHandler(1);
     };
 
     const prePageHandler = () => {
         const newIndex = pageInfos.pageIndex - 1;
         if (newIndex >= 1) {
-            setPageInfos({
-                ...pageInfos,
-                pageIndex: newIndex,
-            });
+            changePageIndexHandler(newIndex);
         }
     };
 
     const nextPageHandler = () => {
         const newIndex = pageInfos.pageIndex + 1;
         if (newIndex <= pageInfos.total) {
-            setPageInfos({
-                ...pageInfos,
-                pageIndex: newIndex,
-            });
+            changePageIndexHandler(newIndex);
         }
     };
 
     const lastPageHandler = () => {
-        setPageInfos({
-            ...pageInfos,
-            pageIndex: pageInfos.total,
-        });
+        changePageIndexHandler(pageInfos.total);
     };
+
+    const changeHandler = (e) => {
+        let newValue = Number(e.target.value);
+        if (!Number.isInteger(newValue)) {
+            newValue = pageIndex;
+        }
+        if (newValue > pageInfos.total) {
+            newValue = pageIndex;
+        }
+        if (newValue <= 0) {
+            newValue = '';
+        }
+        setPageIndex(newValue);
+    };
+
+    const blurHandler = (e) => {
+        let newValue = Number(e.target.value);
+        if (!Number.isInteger(newValue)) {
+            newValue = pageInfos.pageIndex;
+        }
+        if (newValue > pageInfos.total) {
+            newValue = pageInfos.total;
+        }
+        if (newValue <= 1) {
+            newValue = 1;
+        }
+        changePageIndexHandler(newValue);
+    };
+
+    useEffect(() => {
+        if (onInited) {
+            onInited({
+                setPageInfos(datas) {
+                    setPageInfos(datas);
+                    setPageIndex(datas.pageIndex);
+                },
+            });
+        }
+    }, []);
+
+    if (!pageInfos.isPage) {
+        return null;
+    }
+
+    if (true) {
+        return null;
+    }
 
     return (
         <Wrap>
-            <Button type='button' title='第一页' onClick={firstPageHandler}>
+            <Button
+                type='button'
+                title='第一页'
+                onClick={firstPageHandler}
+                className={pageIndex === 1 ? `disabled` : ''}
+            >
                 <PageBtnIcon
                     style={{ backgroundImage: FirstPageBtnImage }}
                 ></PageBtnIcon>
             </Button>
-            <Button type='button' title='上一页' onClick={prePageHandler}>
+            <Button
+                type='button'
+                title='上一页'
+                onClick={prePageHandler}
+                className={pageIndex === 1 ? `disabled` : ''}
+            >
                 <PageBtnIcon
                     style={{ backgroundImage: PrePageBtnImage }}
                 ></PageBtnIcon>
             </Button>
             <InputWrap title='跳转至'>
-                <Input type='text' value={pageInfos.pageIndex} />
+                <Input
+                    type='text'
+                    value={pageIndex}
+                    onBlur={blurHandler}
+                    onChange={changeHandler}
+                />
             </InputWrap>
             <Label>
                 <span>/ {pageInfos.total}</span>
             </Label>
-            <Button type='button' title='下一页' onClick={nextPageHandler}>
+            <Button
+                type='button'
+                title='下一页'
+                onClick={nextPageHandler}
+                className={pageIndex === pageInfos.total ? `disabled` : ''}
+            >
                 <PageBtnIcon
                     style={{ backgroundImage: NextPageBtnImage }}
                 ></PageBtnIcon>
             </Button>
-            <Button type='button' title='最后一页' onClick={lastPageHandler}>
+            <Button
+                type='button'
+                title='最后一页'
+                onClick={lastPageHandler}
+                className={pageIndex === pageInfos.total ? `disabled` : ''}
+            >
                 <PageBtnIcon
                     style={{ backgroundImage: LastPageBtnImage }}
                 ></PageBtnIcon>

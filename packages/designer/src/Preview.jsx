@@ -7,6 +7,7 @@ import {
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
+import Page from '@components/page';
 import {
   EVENTS,
   fire,
@@ -108,10 +109,10 @@ export default function () {
     const toolbar = getToolbar(context);
     let printHandler = null;
     const handlePrint = () => {
-        if(printHandler){
-            printHandler().then((spread)=>{
+        if (printHandler) {
+            printHandler().then((spread) => {
                 spread.print();
-            })
+            });
         }
     };
     const handleEdit = () => {
@@ -126,34 +127,22 @@ export default function () {
         });
     };
 
-    let lastPageHandler = null;
-
-    const handleLastPage = () => {
-        lastPageHandler && lastPageHandler();
-    };
-
-    let nextPageHandler = null;
-    const handleNextPage = () => {
-        nextPageHandler && nextPageHandler();
-    };
+    let pageCompletedHandler = null;
+    let setPageInfos = null;
 
     return (
         <Wrap>
             <Toolbar>
-                {/* <Button
-                    style={{ marginRight: 8 }}
-                    type='primary'
-                    onClick={handleLastPage}
-                >
-                    上一页
-                </Button>
-                <Button
-                    style={{ marginRight: 8 }}
-                    type='primary'
-                    onClick={handleNextPage}
-                >
-                    下一页
-                </Button> */}
+                <Page
+                    onInited={(datas) => {
+                        setPageInfos = datas.setPageInfos;
+                        if (pageCompletedHandler) {
+                            pageCompletedHandler().then((datas) => {
+                                setPageInfos(datas);
+                            });
+                        }
+                    }}
+                ></Page>
                 <Button
                     style={{ marginRight: 8 }}
                     type='primary'
@@ -198,9 +187,13 @@ export default function () {
                     onInited={function (a) {
                         window.mapTest = a;
                     }}
-                    onPageCompleted={({ lastPage, nextPage }) => {
-                        lastPageHandler = lastPage;
-                        nextPageHandler = nextPage;
+                    onPageCompleted={(handler) => {
+                        pageCompletedHandler = handler;
+                        if (setPageInfos) {
+                            pageCompletedHandler().then((datas) => {
+                                setPageInfos(datas);
+                            });
+                        }
                     }}
                     setting={setting}
                 >

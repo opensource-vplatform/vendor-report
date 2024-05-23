@@ -4,6 +4,7 @@ import {
   getTableCodesFromFormula,
 } from '../enhance/index';
 import Tool from '../enhance/Tool';
+import { getVarName } from '../utils/varUtil';
 import UnionDatasource from './UnionDatasource';
 
 function getPrintConversionUnits() {
@@ -322,10 +323,21 @@ export default class ParseReportJson {
                 this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
             }
         } else {
+            const sheetPage = {
+                sheet: pageInfos.sheet,
+                spans: [],
+                rows: [],
+                rules: [],
+                dataTable: {},
+                autoMergeRanges: [],
+                rowCount: 0,
+            };
             this.genPageDataTables({
                 templates: header[1].template,
                 pageInfos,
+                sheetPage,
             });
+            this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
         }
     }
     genPageInfos({ sheet }) {
@@ -492,6 +504,7 @@ export default class ParseReportJson {
         }
     }
     genTemplateFromSheet(sheet) {
+        this.namedStyles = [];
         const { rowCount = 200, data } = sheet;
 
         this.initTempates();
@@ -682,6 +695,7 @@ export default class ParseReportJson {
 
             const groupCount = sheetNames.length;
             this.sheetPages[name] = {
+                isPage: pageInfos.pageArea ? true : false,
                 pageIndex: 0,
                 datas: [],
             };
@@ -752,6 +766,7 @@ export default class ParseReportJson {
 
                 this.render(pageInfos, templates);
             });
+            pageInfos.sheet.namedStyles = this.namedStyles;
             this.resetSheet(pageInfos);
             //this.resetSheet(this.sheetPages[name].datas[0]);
         });
@@ -810,72 +825,75 @@ export default class ParseReportJson {
         dataTableInfos.rows = getOldRowHeight(rows, row);
         result.height = dataTableInfos?.rows?.size;
 
-        Object.entries(rowDataTable).forEach(
-            ([colStr, { bindingPath, tag, formula, style = {} }]) => {
-                const col = Number(colStr);
-                let isBindEntity = bindingPath?.includes?.('.');
-
-                if (isBindEntity) {
-                    result.dataPath.push(bindingPath);
-                    const tableCode = bindingPath.split('.')[0];
-                    result.tableCodes[tableCode] = true;
-                    result.datas[tableCode] = this.datas[tableCode] || [];
-                    result.allDatas[tableCode] = this.datas[tableCode] || [];
-                    const span = rowSpans.find((span) => span.col === col) || {
-                        rowCount: 1,
-                        colCount: 1,
-                    };
-                    if (tag) {
-                        //收集当前单元格是否已经设置了行合并或列合并
-                        const jsonTag = JSON.parse(tag);
-                        const columnMerge = jsonTag.columnMerge || false;
-                        const rowMerge = jsonTag.rowMerge || false;
-                        if (columnMerge || rowMerge) {
-                            dataTableInfos.mergeInfos.push({
-                                ...span,
-                                row,
-                                col,
-                                columnMerge,
-                                rowMerge,
-                            });
-                        }
-                        const plugins = jsonTag.plugins;
-                        if (Array.isArray(plugins)) {
-                            result.cellPlugins.push({
-                                plugins,
-                                bindingPath,
-                            });
-                        }
+        Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
+            const { bindingPath, tag, formula, style = {} } = _colDataTable;
+            const col = Number(colStr);
+            let isBindEntity = bindingPath?.includes?.('.');
+            const namedStyles = getVarName();
+            this.namedStyles.push({
+                ...style,
+                name: namedStyles,
+            });
+            _colDataTable.style = namedStyles;
+            if (isBindEntity) {
+                result.dataPath.push(bindingPath);
+                const tableCode = bindingPath.split('.')[0];
+                result.tableCodes[tableCode] = true;
+                result.datas[tableCode] = this.datas[tableCode] || [];
+                result.allDatas[tableCode] = this.datas[tableCode] || [];
+                const span = rowSpans.find((span) => span.col === col) || {
+                    rowCount: 1,
+                    colCount: 1,
+                };
+                if (tag) {
+                    //收集当前单元格是否已经设置了行合并或列合并
+                    const jsonTag = JSON.parse(tag);
+                    const columnMerge = jsonTag.columnMerge || false;
+                    const rowMerge = jsonTag.rowMerge || false;
+                    if (columnMerge || rowMerge) {
+                        dataTableInfos.mergeInfos.push({
+                            ...span,
+                            row,
+                            col,
+                            columnMerge,
+                            rowMerge,
+                        });
                     }
-                }
-                if (formula) {
-                    const tableCodes = getTableCodesFromFormula(formula);
-                    if (Array.isArray(tableCodes)) {
-                        tableCodes.forEach((tableCode) => {
-                            result.tableCodes[tableCode] = true;
-                            result.datas[tableCode] =
-                                this.datas[tableCode] || [];
-                            result.allDatas[tableCode] =
-                                this.datas[tableCode] || [];
+                    const plugins = jsonTag.plugins;
+                    if (Array.isArray(plugins)) {
+                        result.cellPlugins.push({
+                            plugins,
+                            bindingPath,
                         });
                     }
                 }
-
-                if (style?.decoration) {
-                    delete style?.decoration;
-                }
-
-                getColRules({
-                    rules: rowRules,
-                    col,
-                    colHandler(rule) {
-                        dataTableInfos.rules.push({
-                            ...rule,
-                        });
-                    },
-                });
             }
-        );
+            if (formula) {
+                const tableCodes = getTableCodesFromFormula(formula);
+                if (Array.isArray(tableCodes)) {
+                    tableCodes.forEach((tableCode) => {
+                        result.tableCodes[tableCode] = true;
+                        result.datas[tableCode] = this.datas[tableCode] || [];
+                        result.allDatas[tableCode] =
+                            this.datas[tableCode] || [];
+                    });
+                }
+            }
+
+            if (style?.decoration) {
+                delete style?.decoration;
+            }
+
+            getColRules({
+                rules: rowRules,
+                col,
+                colHandler(rule) {
+                    dataTableInfos.rules.push({
+                        ...rule,
+                    });
+                },
+            });
+        });
         result.rowCount = maxRowCount;
         result.endRow = result.row + maxRowCount;
         return result;
@@ -1169,6 +1187,7 @@ export default class ParseReportJson {
                                     };
                                     this.delayFormula.push(formulaHandler);
                                 }
+                                delete colDataTable.tag;
                             }
                         );
 
