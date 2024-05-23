@@ -13,10 +13,10 @@ import {
 } from '../utils/constant';
 import { license } from '../utils/license';
 import {
+  download,
+  exportPdf,
   getParameter,
   getTitle,
-  exportPdf,
-  download,
 } from '../utils/utils';
 import Button from './components/button/Index';
 import Error from './components/error/Index';
@@ -33,6 +33,7 @@ const Wrap = styled.div`
 
 const Toolbar = styled.div`
     height: 36px;
+    min-height: 36px;
     width: 100%;
     display: flex;
     padding-left: 8px;
@@ -40,7 +41,6 @@ const Toolbar = styled.div`
     gap: 8px;
     box-sizing: border-box;
     align-items: center;
-    justify-content: end;
     flex-shrink: 0;
     &:empty {
         display: none;
@@ -49,7 +49,7 @@ const Toolbar = styled.div`
 
 const ExcelWrap = styled.div`
     display: flex;
-    height: 100%;
+    height: calc(100% - 36px);
     width: 100%;
     padding: 16px 10px;
     background-color: #494949;
@@ -61,6 +61,10 @@ const ExcelHost = styled.div`
     height: 100%;
     background-color: white;
     padding: 2px;
+`;
+
+const Fill = styled.div`
+    width: 100%;
 `;
 
 const getError = function (result) {
@@ -180,6 +184,7 @@ export default function () {
         ></Error>
       ) : null}
       <Toolbar>
+        <Fill></Fill>
         <Button
           type='primary'
           style={{ height: 26 }}

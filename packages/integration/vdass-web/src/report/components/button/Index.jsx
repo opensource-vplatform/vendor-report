@@ -6,45 +6,67 @@ const Button = styled.button`
     border-radius: 4px;
     cursor: pointer;
     min-width: 80px;
+    width: max-content;
     user-select: none;
-    &:hover{
+    &:hover {
         background-color: #e0eef9;
-        border-color:#5292f7;
+        border-color: #5292f7;
     }
-    &[data-type='primary']{
+    &[data-type='primary'] {
         background-color: #2d8cf0;
         border-color: #2d8cf0;
         color: #fff;
     }
-    &[data-type='primary']:hover{
+    &[data-type='primary']:hover {
         background-color: #57a3f3;
         border-color: #57a3f3;
     }
-    &[data-type='primary']:disabled{
-        border-color: #2d8cf0 !important;
-    }
-    &[data-type='warning']{
+    &[data-type='warning'] {
         background-color: #f90;
         border-color: #f90;
         color: #fff;
     }
-    &[data-type='warning']:hover{
+    &[data-type='warning']:hover {
         background-color: #ffad33;
         border-color: #ffad33;
     }
-    &[data-type='warning']:disabled{
+    &[data-type='warning']:disabled {
         border-color: #2d8cf0 !important;
     }
     &:disabled {
-        background-color: transparent !important;
-        border-color:#d5d5d5 !important;
+        background-color: #f7f7f7 !important;
+        color: #c5c8ce !important;
+        border-color: #d5d5d5 !important;
         cursor: not-allowed;
     }
 `;
 
-function Index(props){
-    const {title,onClick,style={},disabled=false,type='default',children} = props;
-    return <Button data-type={type} disabled={disabled} title={title} style={style} onClick={onClick}>{children}</Button>
+const Text = styled.span`
+    width: max-content;
+    margin: 4px 8px;
+    white-space: nowrap;
+`;
+
+function Index(props) {
+    const {
+        title,
+        onClick,
+        style = {},
+        disabled = false,
+        type = 'default',
+        children,
+    } = props;
+    return (
+        <Button
+            data-type={type}
+            disabled={disabled}
+            title={title}
+            style={style}
+            onClick={onClick}
+        >
+            <Text>{children}</Text>
+        </Button>
+    );
 }
 
 export default Index;
