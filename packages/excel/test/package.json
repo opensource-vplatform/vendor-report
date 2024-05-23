@@ -7,6 +7,8 @@
         "test": "vite"
     },
     "dependencies": {
+        "diff": "^5.2.0",
+        "js-struct-compare": "^1.1.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "resource-manager-js": "^5.0.7",

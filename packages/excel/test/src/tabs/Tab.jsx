@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import styled from 'styled-components';
 
 import Context from './Context';
@@ -19,16 +21,27 @@ const Wrap = styled.div`
 `;
 
 function Tab(props) {
-    const { code, children, style = {} } = props;
+    const { code, children, style = {},onVisible } = props;
+    const ref = useRef(null);
+    /*useEffect(()=>{
+        if(ref.current){
+            onVisible&&onVisible();
+        }
+    },[ref.current]);*/
     return (
         <Context.Consumer>
             {({ active, appearance }) => {
                 if (appearance == 'normal') {
-                    return active == code ? (
+                    const isActive = active == code;
+                    if(isActive){
+                        onVisible&&onVisible();
+                    }
+                    return isActive ? (
                         <Wrap
                             data-active={active == code}
                             data-appearance={appearance}
                             style={style}
+                            ref={ref}
                         >
                             {children}
                         </Wrap>
@@ -39,6 +52,7 @@ function Tab(props) {
                             data-active={active == code}
                             data-appearance={appearance}
                             style={style}
+                            ref={ref}
                         >
                             {children}
                         </Wrap>

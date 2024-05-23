@@ -7,3 +7,7 @@ pnpm-lock.yaml
 packages/integration/vdaas-console/resources/page/spreadsheet/**
 packages/integration/vdass-web/resources/static/vdaasweb/spreadsheet/**
 packages/integration/vdaas-service/resources/**
+.project
+.classpath
+org.eclipse.jdt.core.prefs
+org.eclipse.m2e.core.prefs

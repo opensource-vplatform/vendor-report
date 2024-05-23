@@ -1,7 +1,5 @@
-import cover from './cover';
-
-const units = [cover];
+import ipes from './ipes/index';
 
 export const getUnits = function () {
-    return units;
+    return [...ipes()];
 };

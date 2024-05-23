@@ -22,11 +22,17 @@ https://scm.toone.com.cn:9501/Vproject1/Vdaas/Trunk/02vdaas_gateway/vdaas-web/sr
 #### 替换jar包
 
 链接到服务器：10.1.39.119
-cd到以下目录：/home/toone/toone-home/toone-build/vdaas-web/vdaasapp/lib
+cd到以下目录：
+```sh
+cd /home/toone/toone-home/toone-build/vdaas-web/vdaasapp/lib
+```
 替换该目录下的：vdaas-web-1.0.jar
 
 #### 构建docker镜像
-cd到以下目录：/home/toone/toone-home/toone-build/vdaas-web
+cd到以下目录：
+```sh
+cd /home/toone/toone-home/toone-build/vdaas-web
+```
 执行以下命令：
 ```sh
 docker build --no-cache -t 10.1.39.165:9000/vdaas/vdaas-web:$(date +%Y%m%d) .
@@ -56,7 +62,7 @@ VDAAS_IMGTAG_WEB=10.1.39.165:9000/vdaas/vdaas-web:20240514
 
 cd到以下目录
 ```sh
-/mnt/data/toone-home/vdaas-home-dev/vdaas-apps/vdaas-gateway
+cd /mnt/data/toone-home/vdaas-home-dev/vdaas-apps/vdaas-gateway
 ```
 执行关闭命令：
 ```sh

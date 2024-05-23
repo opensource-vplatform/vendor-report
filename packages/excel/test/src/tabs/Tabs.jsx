@@ -25,6 +25,8 @@ const Headers = styled.div`
 const HeaderWrap = styled.div`
     display: flex;
     width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
 `;
 
 const ToolWrap = styled.div`
