@@ -29,7 +29,8 @@ export const DialogButton = function (props) {
     const { style = {}, children, ...others } = props;
     const btnStyle = { width: 80, height: 32 };
     return (
-       /*  <Button style={{ ...btnStyle, ...style }} {...others}>
+        <div></div>
+        /*  <Button style={{ ...btnStyle, ...style }} {...others}>
             {children}
         </Button> */
     );
