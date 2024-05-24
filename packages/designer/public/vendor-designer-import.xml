@@ -6,6 +6,7 @@
     </styles>
     <scripts>
         <script src="./vendor/excel/17.0.5/excel.all.min.js"></script>
+        <script src="./vendor/excel/17.0.5/plugins/shapes.min.js"></script>
         <script src="./vendor/excel/17.0.5/resources/zh/excel.resources.zh.min.js"></script>
         <!--<script src="./vendor/excel/16.2.6/excel.all.min.js"></script>
         <script src="./vendor/excel/16.2.6/resources/zh/excel.resources.zh.min.js"></script>-->

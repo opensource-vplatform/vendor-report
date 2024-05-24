@@ -277,7 +277,7 @@ export default function (props) {
                             attr='height'
                         ></CustomInteger>
                     </HLayout>
-                    <HLayout>
+                    {/*<HLayout>
                         <CustomInteger
                             title='裁剪X：'
                             attr='clipX'
@@ -310,7 +310,7 @@ export default function (props) {
                             datas={ImageSparklineVAlignItems}
                             attr='vAlign'
                         ></CustomSelect>
-                    </HLayout>
+                    </HLayout>*/}
                 </VGroupItem>
             </Wrapper>
         </OperationDialog>

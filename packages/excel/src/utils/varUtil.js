@@ -14,7 +14,7 @@ function encode() {
     let k = 1;
     while (n > 63) {
         str = TOKENS[n % 64] + str;
-        n = n / 64;
+        n = parseInt(n / 64);
         k *= 64;
     }
     if (n < 10) {

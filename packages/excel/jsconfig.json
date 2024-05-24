@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "allowJs": true,
+        "paths": {
+            "@utils/componentUtil":["src/utils/componentUtil"],
+            "@utils/environmentUtil":["src/utils/environmentUtil"],
+            "@utils/fileUtil":["src/utils/fileUtil"],
+            "@utils/licenseUtil":["src/utils/licenseUtil"],
+            "@utils/mathUtil":["src/utils/mathUtil"],
+            "@utils/objectUtils":["src/utils/objectUtils"],
+            "@utils/other":["src/utils/other"],
+            "@utils/printUtil":["src/utils/printUtil"],
+            "@utils/spreadUtil":["src/utils/spreadUtil"],
+            "@utils/styleUtil":["src/utils/styleUtil"],
+            "@utils/varUtil":["src/utils/varUtil"],
+        }
+    },
+    "include": ["src/**/*.js", "src/**/*.jsx"],
+    "exclude": []
+}

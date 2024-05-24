@@ -4,7 +4,6 @@ import {
   bind,
   EVENTS,
 } from '@event/EventManager';
-import { genUUID } from '@utils/commonUtil';
 import { getOffsetFromBody } from '@utils/domUtil';
 import { isUndefined } from '@utils/objectUtil';
 import {
@@ -20,9 +19,10 @@ import Setting, {
 
 const GC = getNamespace();
 
-const Ele_Id = genUUID();
-
 export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
+
+    provider = 'toone';
+
     constructor() {
         super();
         this._bindEvent();
