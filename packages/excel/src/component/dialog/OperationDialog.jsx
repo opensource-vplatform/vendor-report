@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
-import Button from '@components/button/Index';
-
+//import Button from '@components/button/Index';
 import Dialog from './Dialog';
 
 const Wrap = styled.div`
@@ -30,9 +29,9 @@ export const DialogButton = function (props) {
     const { style = {}, children, ...others } = props;
     const btnStyle = { width: 80, height: 32 };
     return (
-        <Button style={{ ...btnStyle, ...style }} {...others}>
+       /*  <Button style={{ ...btnStyle, ...style }} {...others}>
             {children}
-        </Button>
+        </Button> */
     );
 };
 
