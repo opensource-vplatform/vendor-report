@@ -83,6 +83,11 @@ class Report {
                 onPrintHandler: (handler) => {
                     this.printHandler = handler;
                 },
+                onPageCompleted: (handler) => {
+                    handler().then((datas) => {
+                        this.pageInfos = datas;
+                    });
+                },
                 baseUrl: this.conf?.baseUrl,
                 onFetchData,
                 rowMerge,
@@ -256,6 +261,23 @@ class Report {
                 reject(Error('打印失败，原因：报表未初始化'));
             }
         });
+    }
+    getPrintTotalPages() {
+        return this.pageInfos.total;
+    }
+    /**
+     * 切换到一下
+     * @returns Promise
+     */
+    nextPage() {
+        return this.pageInfos.nextPage();
+    }
+    /**
+     * 判断是否分页
+     * @returns Boolean
+     */
+    isPaged() {
+        return this.pageInfos.isPage;
     }
 }
 

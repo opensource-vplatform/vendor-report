@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import {
+  useRef,
+  useState,
+} from 'react';
 
 import styled from 'styled-components';
 
@@ -25,6 +28,7 @@ const PageInfosWrap = styled.div`
     & .info {
         border-bottom: 1px solid #ddd;
         padding: 0 10px;
+        min-width: 30px;
     }
 `;
 
@@ -42,31 +46,48 @@ const Input = styled.input`
 `;
 
 export default function (props) {
-    const datas = {
+    const { spread } = props;
+    const datas = useRef({
         pageIndex: 1,
         total: 88,
-    };
+        oldValue: null,
+        start: 1,
+        printTotal: 20,
+        surplusTotal: 88,
+    }).current;
 
     const [printInfos, setPrintInfos] = useState({
         start: 1,
         printTotal: 20,
     });
 
-    let oldValue = null;
     const onChangeHandler = (e, type) => {
-        oldValue = printInfos[type];
+        if (printInfos[type]) {
+            datas.oldValue = printInfos[type];
+        }
         let newValue = Number(e.target.value);
         if (!Number.isInteger(newValue)) {
-            newValue = oldValue;
+            newValue = datas.oldValue;
         }
         if (newValue > datas.total) {
-            newValue = oldValue;
+            newValue = datas.oldValue;
         }
         if (newValue <= 0) {
             newValue = '';
         }
         setPrintInfos({ ...printInfos, [type]: newValue });
     };
+
+    const onBlurHandler = (e, type) => {
+        if (!e.target.value) {
+            setPrintInfos({
+                ...printInfos,
+                [type]: datas.oldValue || datas[type],
+            });
+        }
+    };
+
+    return <></>;
 
     return (
         <Dialog width='500px' height='500px'>
@@ -77,23 +98,59 @@ export default function (props) {
                 </PageInfosWrap>
                 <PageInfosWrap>
                     <Label>总页数</Label>：
-                    <sapn className='info'>{datas.total}</sapn>
+                    <span className='info'>{datas.total}</span>
+                </PageInfosWrap>
+                <PageInfosWrap>
+                    <Label>剩余打印数</Label>：
+                    <span className='info'>{datas.surplusTotal}</span>
                 </PageInfosWrap>
                 <PageInfosWrap>
                     <Label>打印起始页</Label>：
-                    <Input
+                    <span className='info'>{printInfos.start}</span>
+                    {/*  <Input
                         value={printInfos.start}
                         onChange={(e) => {
                             onChangeHandler(e, 'start');
                         }}
-                    ></Input>
+                        onBlur={(e) => {
+                            onBlurHandler(e, 'start');
+                        }}
+                    ></Input> */}
                 </PageInfosWrap>
                 <PageInfosWrap>
                     <Label>打印总页数</Label>：
                     <Input
                         value={printInfos.printTotal}
-                        onChange={(e) => {}}
+                        onChange={(e) => {
+                            onChangeHandler(e, 'printTotal');
+                        }}
+                        onBlur={(e) => {
+                            onBlurHandler(e, 'printTotal');
+                        }}
                     ></Input>
+                </PageInfosWrap>
+                <PageInfosWrap>
+                    <button
+                        onClick={() => {
+                            spread.print();
+                        }}
+                    >
+                        打印上一批次
+                    </button>
+                    <button
+                        onClick={() => {
+                            spread.print();
+                        }}
+                    >
+                        打印当前批次
+                    </button>
+                    <button
+                        onClick={() => {
+                            spread.print();
+                        }}
+                    >
+                        打印一下批次
+                    </button>
                 </PageInfosWrap>
             </Wrap>
         </Dialog>

@@ -10,6 +10,7 @@ import resourceManager from 'resource-manager-js';
 import { register } from './custom/index';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
+import Print from './Print';
 import ParseReportJson from './template/ParseReportJson';
 import { withDivStyled } from './utils/componentUtil';
 import { setBaseUrl } from './utils/environmentUtil';
@@ -451,7 +452,29 @@ export default function (props) {
             inst.resetSheet(newSheet);
             sheet.fromJSON(sheetJson);
         };
-
+        const nextPage = () => {
+            return new Promise((resolve) => {
+                const sheet = data.spread.getActiveSheet();
+                const sheetJson = sheet.toJSON();
+                const sheetPage = inst.sheetPages[sheetJson.name];
+                const newPageIndex = sheetPage.pageIndex + 1;
+                if (newPageIndex < sheetPage.datas.length) {
+                    sheetPage.pageIndex = newPageIndex;
+                    const newSheet = sheetPage.datas[newPageIndex];
+                    newSheet.sheet = sheetJson;
+                    inst.resetSheet(newSheet);
+                    sheet.fromJSON(sheetJson);
+                }
+                resolve({
+                    value: newPageIndex + 1,
+                    done:
+                        newPageIndex + 1 >= sheetPage.datas.length
+                            ? true
+                            : false,
+                });
+            });
+        };
+        window.nextPage = nextPage;
         if (onPageCompleted) {
             onPageCompleted((params) => {
                 const sheet = data.spread.getActiveSheet();
@@ -460,6 +483,7 @@ export default function (props) {
                 return new Promise((resolve) => {
                     resolve({
                         changePageIndex,
+                        nextPage,
                         isPage: sheetPage.isPage,
                         pageIndex: (sheetPage.pageIndex || 0) + 1,
                         total: sheetPage.datas.length || 1,
@@ -524,6 +548,7 @@ export default function (props) {
     ]);
     return (
         <Wrap>
+            <Print spread={data.spread}></Print>
             {data.showError ? (
                 <LicenseError></LicenseError>
             ) : (
