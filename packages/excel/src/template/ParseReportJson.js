@@ -827,14 +827,19 @@ export default class ParseReportJson {
 
         Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
             const { bindingPath, tag, formula, style = {} } = _colDataTable;
+            //样式采用命名空间
+            if (_colDataTable.style) {
+                const namedStyles = getVarName();
+                this.namedStyles.push({
+                    ...style,
+                    name: namedStyles,
+                });
+                _colDataTable.style = namedStyles;
+            }
+
             const col = Number(colStr);
             let isBindEntity = bindingPath?.includes?.('.');
-            const namedStyles = getVarName();
-            this.namedStyles.push({
-                ...style,
-                name: namedStyles,
-            });
-            _colDataTable.style = namedStyles;
+
             if (isBindEntity) {
                 result.dataPath.push(bindingPath);
                 const tableCode = bindingPath.split('.')[0];
@@ -1240,16 +1245,26 @@ export default class ParseReportJson {
                             });
 
                             //行高
-                            pageInfos.rows[rowCount] = {
-                                ...(pageInfos.rows[rowCount] || {}),
-                                ...rows,
-                            };
-                            if (sheetPage) {
-                                sheetPage.rows[sheetPageRowCount] = {
-                                    ...(pageInfos.rows[sheetPageRowCount] ||
-                                        {}),
+                            const rowsKeys = Object.keys(rows);
+                            const hasSizeKey = rows.hasOwnProperty('size');
+                            if (
+                                !(
+                                    hasSizeKey &&
+                                    rowsKeys.length === 1 &&
+                                    rows.size === 20
+                                )
+                            ) {
+                                pageInfos.rows[rowCount] = {
+                                    ...(pageInfos.rows[rowCount] || {}),
                                     ...rows,
                                 };
+                                if (sheetPage) {
+                                    sheetPage.rows[sheetPageRowCount] = {
+                                        ...(pageInfos.rows[sheetPageRowCount] ||
+                                            {}),
+                                        ...rows,
+                                    };
+                                }
                             }
 
                             //自动合并区域
