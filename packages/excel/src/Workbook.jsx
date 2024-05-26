@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import resourceManager from 'resource-manager-js';
 
@@ -14,22 +9,15 @@ import Print from './Print';
 import ParseReportJson from './template/ParseReportJson';
 import { withDivStyled } from './utils/componentUtil';
 import { setBaseUrl } from './utils/environmentUtil';
-import {
-  checkLicense,
-  getLicense,
-  setLicense,
-} from './utils/licenseUtil';
-import {
-  genAutoMergeRangeInfos,
-  genSpans,
-  sortData,
-} from './utils/other';
+import { checkLicense, getLicense, setLicense } from './utils/licenseUtil';
+import { genAutoMergeRangeInfos, genSpans, sortData } from './utils/other';
 import { setPrintInfo } from './utils/printUtil';
 import {
-  getNamespace,
-  getPluginSrc,
-  withBatchCalcUpdate,
+    getNamespace,
+    getPluginSrc,
+    withBatchCalcUpdate,
 } from './utils/spreadUtil';
+import { EVENTS, fire } from './event/EventManager';
 
 const GC = getNamespace();
 const GCsheets = GC.Spread.Sheets;
@@ -301,6 +289,10 @@ export default function (props) {
                 tabStripVisible,
             });
             data.spread = spread;
+            fire({
+                event: EVENTS.OnSpreadInited,
+                args: [spread],
+            });
             return true;
         }
         return false;
@@ -338,15 +330,17 @@ export default function (props) {
         if (json) {
             withBatchCalcUpdate(spread, () => {
                 spread.fromJSON(json);
-                customRegister();
+                fire({
+                    event: EVENTS.OnSpreadJsonParsed,
+                    args: [spread],
+                });
                 const sheets = spread.sheets;
                 if (sheets && sheets.length > 0) {
                     sheets.forEach((sheet) => {
-                        sheet.options.sheetAreaOffset = {
-                            left: 1,
-                            top: 1,
-                        };
-                        sheet.recalcAll(true);
+                        fire({
+                            event: EVENTS.OnSheetInited,
+                            args: [sheet],
+                        });
                         onSheetChanged &&
                             onSheetChanged('SheetChanged', { sheet });
                     });
@@ -370,13 +364,13 @@ export default function (props) {
                         colCount = 20,
                     } = sheet.props;
                     const workSheet = new GC.Spread.Sheets.Worksheet(name);
-                    workSheet.options.sheetAreaOffset = {
-                        left: 1,
-                        top: 1,
-                    };
                     workSheet.setRowCount(rowCount);
                     workSheet.setColumnCount(colCount);
                     spread.addSheet(index, workSheet);
+                    fire({
+                        event: EVENTS.OnSheetInited,
+                        args: [workSheet],
+                    });
                     onSheetChanged &&
                         onSheetChanged('SheetChanged', { sheet: workSheet });
                 });
@@ -493,16 +487,6 @@ export default function (props) {
         }
     };
 
-    const customRegister = () => {
-        //必须每次都注册，否则spread填充json后，自定义函数注册被清空
-        const spread = data.spread;
-        spread.suspendEvent();
-        spread.suspendCalcService(false);
-        register(data.spread);
-        spread.resumeEvent();
-        spread.resumeCalcService(true);
-    };
-
     useEffect(() => {
         (async () => {
             const inited = await initSpread();
@@ -521,14 +505,9 @@ export default function (props) {
                     if (promise && promise.then) {
                         promise.then((json) => {
                             handleSheets(json);
-                            customRegister();
                         });
                     }
-                } else {
-                    customRegister();
                 }
-            } else {
-                customRegister();
             }
         })();
     }, [

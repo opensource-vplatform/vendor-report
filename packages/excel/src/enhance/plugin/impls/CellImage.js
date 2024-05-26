@@ -22,7 +22,7 @@ const toFormulaArg = function (val) {
 };
 
 const toFormula = function (data) {
-    const formula = ['IMAGE('];
+    const formula = ['TOONE.IMAGE('];
     argList.forEach((argDef) => {
         let argName,
             argDeft = undefined;
