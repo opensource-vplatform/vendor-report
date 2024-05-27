@@ -1,5 +1,12 @@
-import { registerCellType, registerFuncs } from './custom';
-import { EVENTS, bind } from './event/EventManager';
+import {
+  registerCellType,
+  registerFuncs,
+} from './custom';
+import {
+  bind,
+  EVENTS,
+} from './event/EventManager';
+import { handleShapeChanged } from './shape/ShapeManager';
 
 export const init = function () {
     bind({
@@ -32,5 +39,11 @@ export const init = function () {
             };
             registerCellType(sheet);
         },
+    });
+    bind({
+        event: EVENTS.OnShapeChanged,
+        handler: function(e,info){
+            handleShapeChanged(info);
+        }
     });
 };

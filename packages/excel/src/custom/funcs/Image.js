@@ -16,7 +16,7 @@ Image.prototype.description = function () {
     };
 };
 Image.prototype.evaluate = function (url, mode, width, height) {
-    return JSON.stringify({ url, mode, width, height });
+    return '';
 };
 
 export default Image;

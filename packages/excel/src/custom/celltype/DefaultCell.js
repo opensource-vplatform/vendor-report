@@ -3,20 +3,25 @@ import { getNamespace } from '../../utils/spreadUtil';
 
 const GC = getNamespace();
 
+const IMAGE_ARG_REGEX = /TOONE\.IMAGE\((.+?)\)/;
+
 class PictureShape {
     constructor(params) {
-        const { url, mode, left, width, height, sheet } = params;
+        const { url, mode, left,top, width, height, sheet, row, col } = params;
         this.url = url;
-        (this.left = left), (this.top = top);
+        this.left = left;
+        this.top = top;
         this.width = width;
         this.height = height;
         this.sheet = sheet;
         this.mode = mode;
+        this.row = row;
+        this.col = col;
         this.load();
     }
 
     load() {
-        const request = new XMLHttpRequest();
+        /*const request = new XMLHttpRequest();
         request.open('GET', this.url, true);
         request.responseType = 'blob';
         request.onload = () => {
@@ -30,7 +35,16 @@ class PictureShape {
                     shape.top
                 );
             };
-        };
+        };*/
+        this.key = `CellImage_${this.row}_${this.col}`;
+        this.sheet.shapes.addPictureShape(
+            this.key,
+            this.url,
+            this.left,
+            this.top,
+            this.width,
+            this.height
+        );
     }
 }
 
@@ -52,6 +66,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             const { sheet, row, col } = context;
             const formula = sheet.getFormula(row, col);
             if (formula && formula.startsWith('TOONE.IMAGE(')) {
+                formula.mat
                 try {
                     const config = JSON.parse(value);
                     if (!this.existPicture(row, col)) {
@@ -69,12 +84,15 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                                 top: colHeaderVisible
                                     ? y - sheet.defaults.rowHeight
                                     : y,
+                                width: w,
+                                height: h,
+                                row,
+                                col,
                             })
                         );
                         value = '';
                     }
                 } catch (e) {
-                    console.error(e);
                 }
             }
         }
