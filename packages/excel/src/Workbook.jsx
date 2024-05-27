@@ -16,18 +16,21 @@ export default function (props) {
     } = props;
 
     const { json, inst } = useMemo(() => {
-        const json = JSON.parse(JSON.stringify(_json));
+        let json = null;
         let inst = null;
-        if (json && dataSource) {
-            inst = new ParseReportJson({
-                reportJson: json,
-                datas: dataSource,
-                tempConfig: template,
-                setting,
-            });
-            const item = localStorage.getItem('storeSpreadJson');
-            if (item) {
-                localStorage.setItem('spreadJson', JSON.stringify(json));
+        if (_json) {
+            json = JSON.parse(JSON.stringify(_json));
+            if (json && dataSource) {
+                inst = new ParseReportJson({
+                    reportJson: json,
+                    datas: dataSource,
+                    tempConfig: template,
+                    setting,
+                });
+                const item = localStorage.getItem('storeSpreadJson');
+                if (item) {
+                    localStorage.setItem('spreadJson', JSON.stringify(json));
+                }
             }
         }
 
