@@ -6,17 +6,17 @@ import {
 import { useSelector } from 'react-redux';
 
 import { Commands } from '@commands/index';
+import { VIconTitleWithDropdown } from '@components/nav/Index';
 import EmptyIcon from '@icons/base/Empty';
 import ColWidth from '@icons/cell/ColWidth';
 import RowHeight from '@icons/cell/RowHeight';
 import SettingIcon from '@icons/cell/Setting';
-import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
 import { exeCommand } from '@utils/spreadUtil';
 
 import Dialog from './Dialog';
 
-const SettingIconMenu = WithIconMenu('设置', SettingIcon, [
+const Cell_Setting_Menus = [
     {
         value: 'rowHeight',
         title: '行高',
@@ -153,7 +153,7 @@ const SettingIconMenu = WithIconMenu('设置', SettingIcon, [
             exeCommand(spread, Commands.Visible.ShowCol, {});
         },
     },
-]);
+];
 
 export default function () {
     const { spread } = useSelector(({ appSlice }) => appSlice);
@@ -202,7 +202,12 @@ export default function () {
                     onClose={handleSettingCell}
                 ></Dialog>
             ) : null}
-            <SettingIconMenu onNodeClick={handleNodeClick}></SettingIconMenu>
+            <VIconTitleWithDropdown
+                title='设置'
+                icon={SettingIcon}
+                menus={Cell_Setting_Menus}
+                onNodeClick={handleNodeClick}
+            ></VIconTitleWithDropdown>
         </Fragment>
     );
 }

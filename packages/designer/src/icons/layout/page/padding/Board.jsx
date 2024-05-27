@@ -1,4 +1,5 @@
 import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../../../base/BaseIcon';
 
 /**
@@ -10,7 +11,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/board.svg)`}
+            icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/board.png)`}
         ></BaseIcon>
     );
 };

@@ -21,7 +21,7 @@ const getError = function (result) {
     if (result && result.data) {
         const data = result.data;
         if (data.success === false) {
-            return data.msg || '存在未知异常！';
+            return data.msg || data.message || '存在未知异常！';
         } else {
             return getError(data);
         }

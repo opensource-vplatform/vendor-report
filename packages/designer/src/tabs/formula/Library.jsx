@@ -8,12 +8,14 @@ import styled from 'styled-components';
 
 import Formula from '@components/formula/Index';
 import {
-  GroupItem,
   HLayout,
   VGroupItem,
-  VItem,
 } from '@components/group/Index';
 import Menu from '@components/menu/Index';
+import {
+  HCard,
+  VIconTitle,
+} from '@components/nav/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
 import EmptyIcon from '@icons/base/Empty';
 import CalculationIcon from '@icons/formula/Calculation';
@@ -277,59 +279,42 @@ export default function () {
                     onClose={() => setData({ ...data, showEditor: false })}
                 ></Formula>
             ) : null}
-            <GroupItem title='函数库'>
+            <HCard title='函数库'>
+                <VGroupItem>
+                    <VIconTitle
+                        title='插入函数'
+                        icon={FormulaIcon}
+                        onClick={handleFormulaInsert}
+                    ></VIconTitle>
+                </VGroupItem>
                 <HLayout>
-                    <VGroupItem>
-                        <VItem
-                            title='插入函数'
-                            style={{
-                                marginLeft: 8,
-                                marginRight: 8,
-                                paddingLeft: 4,
-                                paddingRight: 4,
-                                paddingBottom: 4,
-                            }}
-                            icon={
-                                <FormulaIcon
-                                    iconStyle={{ width: 28, height: 28 }}
-                                ></FormulaIcon>
-                            }
-                            onClick={handleFormulaInsert}
-                        ></VItem>
-                    </VGroupItem>
-                    <HLayout>
-                        <AutoSumItem
-                            onNodeClick={handleCalculationFormula('all')}
-                        ></AutoSumItem>
-                        <RecentItem
-                            onNodeClick={handleMenuChange('recent')}
-                        ></RecentItem>
-                        <FinanceItem
-                            onNodeClick={handleMenuChange('financial')}
-                        ></FinanceItem>
-                        <LogicItem
-                            onNodeClick={handleMenuChange('logical')}
-                        ></LogicItem>
-                        <TextItem
-                            onNodeClick={handleMenuChange('text')}
-                        ></TextItem>
-                        <DateItem
-                            onNodeClick={handleMenuChange('dateAndTime')}
-                        ></DateItem>
-                        <SearchItem
-                            onNodeClick={handleMenuChange('lookupAndReference')}
-                        ></SearchItem>
-                        <MathItem
-                            onNodeClick={handleMenuChange(
-                                'mathAndTrigonometry'
-                            )}
-                        ></MathItem>
-                        <OtherItem
-                            onNodeClick={handleMenuChange('all')}
-                        ></OtherItem>
-                    </HLayout>
+                    <AutoSumItem
+                        onNodeClick={handleCalculationFormula('all')}
+                    ></AutoSumItem>
+                    <RecentItem
+                        onNodeClick={handleMenuChange('recent')}
+                    ></RecentItem>
+                    <FinanceItem
+                        onNodeClick={handleMenuChange('financial')}
+                    ></FinanceItem>
+                    <LogicItem
+                        onNodeClick={handleMenuChange('logical')}
+                    ></LogicItem>
+                    <TextItem onNodeClick={handleMenuChange('text')}></TextItem>
+                    <DateItem
+                        onNodeClick={handleMenuChange('dateAndTime')}
+                    ></DateItem>
+                    <SearchItem
+                        onNodeClick={handleMenuChange('lookupAndReference')}
+                    ></SearchItem>
+                    <MathItem
+                        onNodeClick={handleMenuChange('mathAndTrigonometry')}
+                    ></MathItem>
+                    <OtherItem
+                        onNodeClick={handleMenuChange('all')}
+                    ></OtherItem>
                 </HLayout>
-            </GroupItem>
+            </HCard>
         </Fragment>
     );
 }

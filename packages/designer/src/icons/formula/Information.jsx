@@ -11,7 +11,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon={`url(${getBaseUrl()}/css/icons/formula/information.svg)`}
+            icon={`url(${getBaseUrl()}/css/icons/formula/information.png)`}
         ></BaseIcon>
     );
 };

@@ -7,12 +7,10 @@ import styled from 'styled-components';
 import { Commands } from '@commands/index';
 import ColorEditor from '@components/color/Index';
 import { Select } from '@components/form/Index';
-import {
-  GroupItem,
-  ItemList,
-} from '@components/group/Index';
+import { ItemList } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Menu.jsx';
+import { VCard } from '@components/nav/Index';
 import ArrowDown from '@icons/arrow/ArrowDown';
 import BorderBottom from '@icons/border/BorderBottom';
 import BackColor from '@icons/font/BackColor';
@@ -146,7 +144,7 @@ export default function () {
     const fontSizes = getFontSizes();
     const borders = getBorderEnums();
     return (
-        <GroupItem
+        <VCard
             title='字体'
             onMore={genCellSettingVisibleHandler(spread, dispatch, 'font')}
         >
@@ -216,6 +214,6 @@ export default function () {
                     <ForeColor tips='字体颜色'></ForeColor>
                 </ColorEditor>
             </ItemList>
-        </GroupItem>
+        </VCard>
     );
 }

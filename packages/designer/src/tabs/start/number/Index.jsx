@@ -10,11 +10,9 @@ import {
 
 import { Commands } from '@commands/index';
 import { Select } from '@components/form/Index';
-import {
-  GroupItem,
-  ItemList,
-} from '@components/group/Index';
+import { ItemList } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
+import { VCard } from '@components/nav/Index';
 import {
   bind,
   EVENTS,
@@ -168,7 +166,7 @@ export default function () {
         exeCommand(spread, Commands.Format.Demimal, { operator: 'decrease' });
     };
     return (
-        <GroupItem
+        <VCard
             title='数字'
             onMore={showCellSetting}
         >
@@ -199,6 +197,6 @@ export default function () {
                     onClick={handleDecreaseDecimal}
                 ></DecreaseDecimalIcon>
             </ItemList>
-        </GroupItem>
+        </VCard>
     );
 }

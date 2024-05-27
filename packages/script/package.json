@@ -1,0 +1,16 @@
+{
+    "name": "@toone/report-script",
+    "version": "1.0.0",
+    "description": "报表脚本",
+    "main": "src/index.jsx",
+    "scripts": {
+        "icon": "node src/designer/icon/index.js"
+    },
+    "devDependencies": {
+        "del": "^6.1.1",
+        "md5": "^2.3.0"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

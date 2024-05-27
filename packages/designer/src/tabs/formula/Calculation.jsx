@@ -4,11 +4,10 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
-  GroupItem,
-  HLayout,
   ItemList,
   VGroupItem,
 } from '@components/group/Index';
+import { HCard } from '@components/nav/Index';
 import EmptyIcon from '@icons/base/Empty';
 import CalculatorIcon from '@icons/formula/Calculator';
 import CalWorkSheetIcon from '@icons/formula/CalWorkSheet';
@@ -20,6 +19,13 @@ const Label = styled.span`
     font-size: 12px;
     margin-right: 4px;
 `;
+
+const iconStyle = {
+    margin: 0,
+    padding: 0,
+    height: 20,
+    width: 20,
+};
 
 export default function () {
     const { spread } = useSelector(({ appSlice }) => appSlice);
@@ -67,33 +73,33 @@ export default function () {
         },
     ]);
     return (
-        <GroupItem title='计算'>
-            <HLayout>
-                <CalculationOption
-                    value={mode}
-                    onNodeClick={handleNodeClick}
-                ></CalculationOption>
-                <VGroupItem>
-                    <ItemList>
-                        <CalculatorIcon
-                            onClick={handleAutoCalculation}
-                            disabled={isAuto}
-                            tips='立即对整个工作簿进行计算。只有当关闭自动计算时才需要使用它。'
-                        >
-                            <Label>开始计算</Label>
-                        </CalculatorIcon>
-                    </ItemList>
-                    <ItemList>
-                        <CalWorkSheetIcon
-                            onClick={handleCalcWorksheet}
-                            disabled={isAuto}
-                            tips='立即对当前工作表进行计算。只有当关闭自动计算时才需要使用它。'
-                        >
-                            <Label>计算工作表</Label>
-                        </CalWorkSheetIcon>
-                    </ItemList>
-                </VGroupItem>
-            </HLayout>
-        </GroupItem>
+        <HCard title='计算'>
+            <CalculationOption
+                value={mode}
+                onNodeClick={handleNodeClick}
+            ></CalculationOption>
+            <VGroupItem>
+                <ItemList>
+                    <CalculatorIcon
+                        onClick={handleAutoCalculation}
+                        disabled={isAuto}
+                        iconStyle={iconStyle}
+                        tips='立即对整个工作簿进行计算。只有当关闭自动计算时才需要使用它。'
+                    >
+                        <Label>开始计算</Label>
+                    </CalculatorIcon>
+                </ItemList>
+                <ItemList>
+                    <CalWorkSheetIcon
+                        onClick={handleCalcWorksheet}
+                        disabled={isAuto}
+                        iconStyle={iconStyle}
+                        tips='立即对当前工作表进行计算。只有当关闭自动计算时才需要使用它。'
+                    >
+                        <Label>计算工作表</Label>
+                    </CalWorkSheetIcon>
+                </ItemList>
+            </VGroupItem>
+        </HCard>
     );
 }

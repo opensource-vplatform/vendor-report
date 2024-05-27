@@ -4,11 +4,11 @@ import {
 } from 'react-redux';
 
 import {
-  GroupItem,
-  VItem,
-} from '@components/group/Index';
+  HCard,
+  VIconTitle,
+} from '@components/nav/Index';
 import { Template } from '@components/reportDesignWizard/Index';
-import WizardIcon from '@icons/report/wizard';
+import TempalteIcon from '@icons/report/template';
 import { toggleBooleanValue } from '@store/navSlice/navSlice';
 import { toggleBooleanValue as _toggleBooleanValue } from '@store/wizardSlice';
 
@@ -60,56 +60,24 @@ export default function Index(props) {
                     }}
                 ></Template>
             )}
-            <GroupItem title='模板'>
+            <HCard title='模板'>
                 <div style={{ display: 'flex' }}>
-                    <VItem
+                    <VIconTitle
                         title='创建模板'
                         desc='点击创建模板'
-                        style={{
-                            marginLeft: 4,
-                            marginRight: 4,
-                            paddingLeft: 4,
-                            paddingRight: 4,
-                            paddingBottom: 4,
-                            cursor: 'pointer',
-                        }}
-                        icon={
-                            <WizardIcon
-                                iconStyle={{
-                                    width: 28,
-                                    height: 28,
-                                    cursor: 'pointer',
-                                }}
-                            ></WizardIcon>
-                        }
+                        icon={TempalteIcon}
                         onClick={clickHandler}
-                    ></VItem>
+                    ></VIconTitle>
                     {currentSheetIsTemplate && (
-                        <VItem
+                        <VIconTitle
                             title='编辑模板'
                             desc='点击编辑模板'
-                            style={{
-                                marginLeft: 4,
-                                marginRight: 4,
-                                paddingLeft: 4,
-                                paddingRight: 4,
-                                paddingBottom: 4,
-                                cursor: 'pointer',
-                            }}
-                            icon={
-                                <WizardIcon
-                                    iconStyle={{
-                                        width: 28,
-                                        height: 28,
-                                        cursor: 'pointer',
-                                    }}
-                                ></WizardIcon>
-                            }
+                            icon={TempalteIcon}
                             onClick={editClickHandler}
-                        ></VItem>
+                        ></VIconTitle>
                     )}
                 </div>
-            </GroupItem>
+            </HCard>
         </>
     );
 }

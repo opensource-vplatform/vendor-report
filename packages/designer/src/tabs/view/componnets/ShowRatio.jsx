@@ -12,8 +12,8 @@ import {
   Radio,
   RadioGroup,
 } from '@components/form/Index';
-import { VItem } from '@components/group/Index';
-import SearchIcon from '@icons/shape/Search';
+import { VIconTitle } from '@components/nav/Index';
+import RatioIcon from '@icons/shape/Ratio';
 import { getRatioBySelection } from '@utils/worksheetUtil';
 
 import { zoom } from '../../../utils/worksheetUtil';
@@ -88,23 +88,11 @@ export default function () {
                     </RadioGroup>
                 </OperationDialog>
             ) : null}
-            <VItem
+            <VIconTitle
                 title='显示比例'
-                style={{
-                    paddingLeft: 4,
-                    paddingBottom: 4,
-                }}
-                icon={
-                    <SearchIcon
-                        iconStyle={{
-                            width: 44,
-                            height: 44,
-                            color: '#367fc9',
-                        }}
-                    ></SearchIcon>
-                }
+                icon={RatioIcon}
                 onClick={() => setData({ ...data, dialogVisible: true })}
-            ></VItem>
+            ></VIconTitle>
         </Fragment>
     );
 }

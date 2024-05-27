@@ -5,10 +5,10 @@ import {
   useSelector,
 } from 'react-redux';
 
-import Menu from '@components/menu/Index';
 import EmptyIcon from '@icons/base/Empty';
 import ClearRulesIcon from '@icons/style/ClearRules';
 import ColorScalesListIcon from '@icons/style/ColorScalesList';
+import ConditionFormatIcon from '@icons/style/conditionFormat';
 import ConditionFormatManageRuleIcon
   from '@icons/style/ConditionFormatManageRule';
 import ConditionFormatNewRuleIcon from '@icons/style/ConditionFormatNewRule';
@@ -35,6 +35,7 @@ import {
 import { exeCommand } from '@utils/spreadUtil';
 
 import { Commands } from '../../command';
+import VIconTitleWithDropdown from '../nav/VIconTitleWithDropdown';
 import ConditionRuleManager from './ConditionRuleManager';
 import DateCompareDialog from './DateCompareDialog';
 import { dispatcher } from './dispatcher';
@@ -254,9 +255,12 @@ export default function (props) {
     };
     return (
         <Fragment>
-            <Menu datas={Condition_Menu_Datas} onNodeClick={handleNodeClick}>
-                {children}
-            </Menu>
+            <VIconTitleWithDropdown
+                title='条件格式'
+                icon={ConditionFormatIcon}
+                menus={Condition_Menu_Datas}
+                onNodeClick={handleNodeClick}
+            ></VIconTitleWithDropdown>
             {conditionStyle.textCompareVisible ? (
                 <TextCompareDialog
                     onCancel={closeTextCompareDialog}

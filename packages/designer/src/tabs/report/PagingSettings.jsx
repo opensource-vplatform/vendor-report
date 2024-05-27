@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import {
-  GroupItem,
-  VItem,
-} from '@components/group/Index';
+  HCard,
+  VIconTitle,
+} from '@components/nav/Index';
 import PageSettings from '@components/pageSettings/Index';
 import PagingSettingsIcon from '@icons/report/pagingSettings';
 import { getNamespace } from '@utils/spreadUtil';
@@ -65,7 +65,6 @@ export default function Index(props) {
                 sheet.setValue(i, 0, 'T', GC.Spread.Sheets.SheetArea.rowHeader);
             }
         }
-
         setShow(false);
     };
 
@@ -82,30 +81,14 @@ export default function Index(props) {
                     totalRange={totalRange}
                 ></PageSettings>
             )}
-            <GroupItem title='分页设置'>
-                <VItem
+            <HCard title='分页设置'>
+                <VIconTitle
                     title='分页设置'
                     desc='分页设置'
-                    style={{
-                        marginLeft: 4,
-                        marginRight: 4,
-                        paddingLeft: 4,
-                        paddingRight: 4,
-                        paddingBottom: 4,
-                        cursor: 'pointer',
-                    }}
-                    icon={
-                        <PagingSettingsIcon
-                            iconStyle={{
-                                width: 28,
-                                height: 28,
-                                cursor: 'pointer',
-                            }}
-                        ></PagingSettingsIcon>
-                    }
+                    icon={PagingSettingsIcon}
                     onClick={clickHandler}
-                ></VItem>
-            </GroupItem>
+                ></VIconTitle>
+            </HCard>
         </>
     );
 }

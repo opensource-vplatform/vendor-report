@@ -1,11 +1,11 @@
 import { useSelector } from 'react-redux';
 
-import {
-  GroupItem,
-  HLayout,
-  VItem,
-} from '@components/group/Index';
+import { VItem } from '@components/group/Index';
 import Menu from '@components/menu/Index';
+import {
+  HCard,
+  VIconTitle,
+} from '@components/nav/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
 import FirstColumnIcon from '@icons/frozen/FirstColumn';
 import FirstRowIcon from '@icons/frozen/FirstRow';
@@ -26,7 +26,7 @@ export default function () {
         {
             value: 'frozenWindow',
             text: '冻结窗格',
-            title:'根据当前选中的单元格位置，冻结行和列',
+            title: '根据当前选中的单元格位置，冻结行和列',
             icon: <FrozenWindowIcon iconStyle={iconStyle}></FrozenWindowIcon>,
         },
         {
@@ -54,54 +54,24 @@ export default function () {
             icon: <LastColumnIcon iconStyle={iconStyle}></LastColumnIcon>,
         },
     ];
-    const handleNodeClick = (val)=>{
-        if(val == 'frozenWindow'){
+    const handleNodeClick = (val) => {
+        if (val == 'frozenWindow') {
             frozenBySelection(spread);
-        }else if(val == 'firstRow'){
-            frozen(spread,{rowCount:1});
-        }else if(val == 'firstColumn'){
-            frozen(spread,{colCount:1});
-        }else if(val == 'lastRow'){
-            frozen(spread,{trailingRowCount:1});
-        }else if(val == 'lastColumn'){
-            frozen(spread,{trailingColCount:1});
+        } else if (val == 'firstRow') {
+            frozen(spread, { rowCount: 1 });
+        } else if (val == 'firstColumn') {
+            frozen(spread, { colCount: 1 });
+        } else if (val == 'lastRow') {
+            frozen(spread, { trailingRowCount: 1 });
+        } else if (val == 'lastColumn') {
+            frozen(spread, { trailingColCount: 1 });
         }
-    }
+    };
     return (
-        <GroupItem title='窗口'>
-            <HLayout>
-                <Menu
-                    datas={menuDatas}
-                    onNodeClick={handleNodeClick}
-                >
-                    <VItem
-                        title='冻结窗格'
-                        style={{
-                            marginLeft: 8,
-                            paddingLeft: 4,
-                            paddingRight: 4,
-                            paddingBottom: 4,
-                        }}
-                        icon={
-                            <FrozenWindowIcon
-                                iconStyle={{
-                                    width: 28,
-                                    height: 28,
-                                }}
-                            ></FrozenWindowIcon>
-                        }
-                        onClick={() => {}}
-                    >
-                        <ArrowDownIcon
-                            style={{
-                                width: 16,
-                                height: 16,
-                            }}
-                        ></ArrowDownIcon>
-                    </VItem>
-                </Menu>
+        <HCard title='窗口'>
+            <Menu datas={menuDatas} onNodeClick={handleNodeClick}>
                 <VItem
-                    title='取消冻结窗格'
+                    title='冻结窗格'
                     style={{
                         marginLeft: 8,
                         paddingLeft: 4,
@@ -116,11 +86,23 @@ export default function () {
                             }}
                         ></FrozenWindowIcon>
                     }
-                    onClick={() => {
-                        unFrozen(spread);
-                    }}
-                ></VItem>
-            </HLayout>
-        </GroupItem>
+                    onClick={() => {}}
+                >
+                    <ArrowDownIcon
+                        style={{
+                            width: 16,
+                            height: 16,
+                        }}
+                    ></ArrowDownIcon>
+                </VItem>
+            </Menu>
+            <VIconTitle
+                title='取消冻结窗格'
+                icon={FrozenWindowIcon}
+                onClick={() => {
+                    unFrozen(spread);
+                }}
+            ></VIconTitle>
+        </HCard>
     );
 }

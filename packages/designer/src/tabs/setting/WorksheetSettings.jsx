@@ -6,14 +6,15 @@ import {
 } from 'react-redux';
 
 import {
-  GroupItem,
-  HLayout,
   ItemList,
   VGroupItem,
-  VItem,
 } from '@components/group/Index';
+import {
+  HCard,
+  VIconTitle,
+} from '@components/nav/Index';
 import SheetTitleIcon from '@icons/setting/SheetTitle';
-import SpreadGeneral from '@icons/setting/spreadGeneral';
+import SpreadGeneral from '@icons/setting/SpreadGeneral';
 import TabstripIcon from '@icons/setting/Tabstrip';
 import {
   setActive,
@@ -22,6 +23,13 @@ import {
 
 import { Label } from './Components';
 import WorksheetDialog from './worksheetSetting/Index';
+
+const iconStyle = {
+    margin: 0,
+    padding: 0,
+    height: 20,
+    width: 20,
+};
 
 export default function () {
     const dispatch = useDispatch();
@@ -32,72 +40,55 @@ export default function () {
     return (
         <Fragment>
             {opened ? <WorksheetDialog></WorksheetDialog> : null}
-            <GroupItem title='工作表设置'>
-                <HLayout>
-                    <VItem
-                        title='常规'
-                        desc='设置工作表的常规属性'
-                        style={{
-                            marginLeft: 4,
-                            marginRight: 4,
-                            paddingLeft: 4,
-                            paddingRight: 4,
-                            paddingBottom: 4,
-                        }}
-                        icon={
-                            <SpreadGeneral
-                                iconStyle={{
-                                    width: 28,
-                                    height: 28,
-                                }}
-                            ></SpreadGeneral>
-                        }
-                        onClick={() => {
-                            dispatch(setOpened(true));
-                            dispatch(setActive({ code: 'common' }));
-                        }}
-                    ></VItem>
-                    <VGroupItem>
-                        <ItemList style={style}>
-                            <SpreadGeneral
-                                onClick={() => {
-                                    dispatch(setOpened(true));
-                                    dispatch(setActive({ code: 'gridline' }));
-                                }}
-                                tips='网格线'
-                            >
-                                <Label>网格线</Label>
-                            </SpreadGeneral>
-                        </ItemList>
-                        <ItemList style={style}>
-                            <SheetTitleIcon
-                                onClick={() => {
-                                    dispatch(setOpened(true));
-                                    dispatch(
-                                        setActive({ code: 'title' })
-                                    );
-                                }}
-                                tips='标题'
-                            >
-                                <Label>标题</Label>
-                            </SheetTitleIcon>
-                        </ItemList>
-                        <ItemList style={style}>
-                            <TabstripIcon
-                                onClick={() => {
-                                    dispatch(setOpened(true));
-                                    dispatch(
-                                        setActive({ code: 'label' })
-                                    );
-                                }}
-                                tips='工作表标签'
-                            >
-                                <Label>工作表标签</Label>
-                            </TabstripIcon>
-                        </ItemList>
-                    </VGroupItem>
-                </HLayout>
-            </GroupItem>
+            <HCard title='工作表设置'>
+                <VIconTitle
+                    title='常规'
+                    desc='设置工作表的常规属性'
+                    icon={SpreadGeneral}
+                    onClick={() => {
+                        dispatch(setOpened(true));
+                        dispatch(setActive({ code: 'common' }));
+                    }}
+                ></VIconTitle>
+                <VGroupItem>
+                    <ItemList style={style}>
+                        <SpreadGeneral
+                            onClick={() => {
+                                dispatch(setOpened(true));
+                                dispatch(setActive({ code: 'gridline' }));
+                            }}
+                            iconStyle={iconStyle}
+                            tips='网格线'
+                        >
+                            <Label>网格线</Label>
+                        </SpreadGeneral>
+                    </ItemList>
+                    <ItemList style={style}>
+                        <SheetTitleIcon
+                            onClick={() => {
+                                dispatch(setOpened(true));
+                                dispatch(setActive({ code: 'title' }));
+                            }}
+                            iconStyle={iconStyle}
+                            tips='标题'
+                        >
+                            <Label>标题</Label>
+                        </SheetTitleIcon>
+                    </ItemList>
+                    <ItemList style={style}>
+                        <TabstripIcon
+                            onClick={() => {
+                                dispatch(setOpened(true));
+                                dispatch(setActive({ code: 'label' }));
+                            }}
+                            iconStyle={iconStyle}
+                            tips='工作表标签'
+                        >
+                            <Label>工作表标签</Label>
+                        </TabstripIcon>
+                    </ItemList>
+                </VGroupItem>
+            </HCard>
         </Fragment>
     );
 }

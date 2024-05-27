@@ -21,7 +21,7 @@ const getError = function (result) {
     if (result && result.data) {
         const data = result.data;
         if (data.success === false) {
-            return data.msg || '存在未知异常！';
+            return data.msg || data.message || '存在未知异常！';
         } else {
             return getError(data);
         }
@@ -193,7 +193,8 @@ const designer = new Designer({
                                         tableMetadata: enhanceMetadata(
                                             metadata?.data?.data?.define || []
                                         ),
-                                        excelJson: excelJson?.reportJson||null,
+                                        excelJson:
+                                            excelJson?.reportJson || null,
                                         datasourceSetting:
                                             excelJson?.datasourceSetting || {},
                                         wizardSlice:
@@ -204,7 +205,7 @@ const designer = new Designer({
                         } else {
                             resolve({
                                 tableMetadata: [],
-                                excelJson: excelJson?.reportJson||null,
+                                excelJson: excelJson?.reportJson || null,
                                 datasourceSetting:
                                     excelJson?.datasourceSetting || {},
                                 wizardSlice: excelJson?.context?.wizardSlice,

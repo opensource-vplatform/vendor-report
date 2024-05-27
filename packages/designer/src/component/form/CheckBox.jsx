@@ -64,7 +64,7 @@ export default function (props) {
                 <FillCheckIcon
                     style={{
                         ...defaultStyle,
-                        color: dsb ? '#bdbdbd' : '#0075ff',
+                        color: dsb ? '#aaaaaa' : '#155cec',
                     }}
                     hoverable={!(readonly||disabled)}
                     iconStyle={iconStyle}
@@ -75,7 +75,7 @@ export default function (props) {
                 <FillUnCheckIcon
                     style={{
                         ...defaultStyle,
-                        color: dsb ? '#bdbdbd' : '#6d6d6d',
+                        color: dsb ? '#aaaaaa' : '#6d6d6d',
                     }}
                     hoverable={!(readonly||disabled)}
                     iconStyle={iconStyle}

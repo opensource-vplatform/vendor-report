@@ -30,6 +30,7 @@ const getDirNames = function (sourcePath) {
 };
 
 let dirnames = getDirNames(designerDist);
+dirnames.push("image.png");
 
 dirnames.forEach((dirname) => {
     buildUtils.copy(

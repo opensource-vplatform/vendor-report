@@ -6,6 +6,7 @@ import {
 import { useSelector } from 'react-redux';
 
 import { Commands } from '@commands/index';
+import { VIconTitleWithDropdown } from '@components/nav/Index';
 import InsertIcon from '@icons/cell/Insert';
 import InsertRowIcon from '@icons/cell/InsertRow';
 import InsertSheet from '@icons/cell/InsertSheet';
@@ -15,13 +16,12 @@ import {
   insertColumns,
   insertRows,
 } from '@utils/cellUtil';
-import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
 import { exeCommand } from '@utils/spreadUtil';
 
 import Dialog from './Dialog';
 
-const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [
+const Cell_Insert_Menus = [
     {
         value: 'insertCell',
         title: '插入单元格',
@@ -39,18 +39,18 @@ const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [
         title: '插入工作表行',
         text: '插入工作表行',
         icon: <InsertSheetRow></InsertSheetRow>,
-        handler: function(spread,setData){
+        handler: function (spread, setData) {
             insertRows(spread);
-        }
+        },
     },
     {
         value: 'insertSheetCol',
         title: '插入工作表列',
         text: '插入工作表列',
         icon: <InsertSheetCol></InsertSheetCol>,
-        handler: function(spread){
+        handler: function (spread) {
             insertColumns(spread);
-        }
+        },
     },
     'divider',
     {
@@ -58,20 +58,20 @@ const InsertMenuIcon = WithIconMenu('插入', InsertIcon, [
         title: '插入工作表',
         text: '插入工作表',
         icon: <InsertSheet></InsertSheet>,
-        handler: function(spread){
-            exeCommand(spread,Commands.Insert.Sheet,{});
-        }
+        handler: function (spread) {
+            exeCommand(spread, Commands.Insert.Sheet, {});
+        },
     },
-]);
+];
 
 export default function () {
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const [data, setData] = useState({ showDialog: false });
     const handleInsertCell = (val) => {
-        switch(val){
+        switch (val) {
             case 'right':
             case 'down':
-                exeCommand(spread,Commands.Insert.Cell,{position:val});
+                exeCommand(spread, Commands.Insert.Cell, { position: val });
                 break;
             case 'row':
                 insertRows(spread);
@@ -83,18 +83,23 @@ export default function () {
 
         setData({ ...data, showDialog: false });
     };
-    const handleNodeClick = (value,node)=>{
+    const handleNodeClick = (value, node) => {
         const handler = node.handler;
-        if(isFunction(handler)){
-            handler(spread,setData);
+        if (isFunction(handler)) {
+            handler(spread, setData);
         }
-    }
+    };
     return (
         <Fragment>
             {data.showDialog ? (
                 <Dialog onClose={handleInsertCell}></Dialog>
             ) : null}
-            <InsertMenuIcon onNodeClick={handleNodeClick}></InsertMenuIcon>
+            <VIconTitleWithDropdown
+                title='插入'
+                icon={InsertIcon}
+                menus={Cell_Insert_Menus}
+                onNodeClick={handleNodeClick}
+            ></VIconTitleWithDropdown>
         </Fragment>
     );
 }

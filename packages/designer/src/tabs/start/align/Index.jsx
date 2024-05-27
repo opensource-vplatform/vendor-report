@@ -5,13 +5,13 @@ import {
 import styled from 'styled-components';
 
 import {
-  GroupItem,
   HLayout,
   ItemList,
   VGroupItem,
 } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Index';
+import { VCard } from '@components/nav/Index';
 import AlignCenter from '@icons/align/AlignCenter';
 import AlignLeft from '@icons/align/AlignLeft';
 import AlignRight from '@icons/align/AlignRight';
@@ -121,7 +121,7 @@ export default function FontAlign() {
     const wordDirections = getWordDirections();
     const mergeTypes = getMergeTypes();
     return (
-        <GroupItem
+        <VCard
             title='对齐方式'
             onMore={showCellSetting}
         >
@@ -205,6 +205,6 @@ export default function FontAlign() {
                     </ItemList>
                 </VGroupItem>
             </HLayout>
-        </GroupItem>
+        </VCard>
     );
 }

@@ -7,6 +7,8 @@ pnpm-lock.yaml
 packages/integration/vdaas-console/resources/page/spreadsheet/**
 packages/integration/vdass-web/resources/static/vdaasweb/spreadsheet/**
 packages/integration/vdaas-service/resources/**
+packages/script/src/designer/icon/icons/**
+packages/script/src/designer/icon/delta/**
 .project
 .classpath
 org.eclipse.jdt.core.prefs

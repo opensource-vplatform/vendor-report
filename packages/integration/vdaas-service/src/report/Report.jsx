@@ -15,10 +15,10 @@ import { license } from '../utils/license';
 import {
   getParameter,
   registerServerFont,
-  // getTitle,
 } from '../utils/utils';
 import Error from './components/error/Index';
 import WaitMsg from './components/loading/Index';
+
 // import Button from './components/button/Index'
 
 const Wrap = styled.div`
@@ -63,145 +63,154 @@ const ExcelHost = styled.div`
 `;
 
 const getError = function (result) {
-  if (result && result.data) {
-    const data = result.data;
-    if (data.success === false) {
-      return data.msg || '存在未知异常！';
-    } else {
-      return getError(data);
+    if (result && result.data) {
+        const data = result.data;
+        if (data.success === false) {
+            return data.msg || data.message || '存在未知异常！';
+        } else {
+            return getError(data);
+        }
     }
-  }
-  return null;
+    return null;
 };
 
 export default function () {
-  const ref = useRef(null);
-  const [data, setData] = useState({
-    loadMsg: '初始化中，请稍候...',
-    errorMsg: null,
-    report: null,
-  });
-  const handleError = (err) => {
-    setData({
-      ...data,
-      loadMsg: null,
-      errorMsg: typeof err == 'string' ? err : err.message,
+    const ref = useRef(null);
+    const [data, setData] = useState({
+        loadMsg: '初始化中，请稍候...',
+        errorMsg: null,
+        report: null,
     });
-    if (typeof exportPDFError !== 'undefined') {
-      exportPDFError(typeof err == 'string' ? err : err.message);
-    }
-  };
-  const setLoadMsg = (msg) => {
-    setData({
-      ...data,
-      loadMsg: msg,
-    });
-  };
-  const isPrint = getParameter('isPrint') == '1';
-  useEffect(() => {
-    if (ref.current) {
-      axios
-        .get(getReportConfigUrl())
-        .then((config) => {
-          let error = getError(config);
-          if (error != null) {
-            return handleError(error);
-          }
-          const excelJsonStr = config?.data?.data?.data?.config;
-          let excelJson = null;
-          try {
-            excelJson = JSON.parse(excelJsonStr);
-          } catch (e) { }
-          const initReport = (excelJson, datas) => {
-            const report = new TOONE.Report.Preview({
-              license,
-              enablePrint: isPrint,
-              dataSource: datas,
-              json: excelJson,
-            });
-            //报表挂载到指定dom元素
-            report.mount(ref.current);
-            data.report = report;
-            setData({ ...data, loadMsg: null, errorMsg: null });
-            const sheets = excelJson?.reportJson?.sheets
-            const fontFamaly = new Set()
+    const handleError = (err) => {
+        setData({
+            ...data,
+            loadMsg: null,
+            errorMsg: typeof err == 'string' ? err : err.message,
+        });
+        if (typeof exportPDFError !== 'undefined') {
+            exportPDFError(typeof err == 'string' ? err : err.message);
+        }
+    };
+    const setLoadMsg = (msg) => {
+        setData({
+            ...data,
+            loadMsg: msg,
+        });
+    };
+    const isPrint = getParameter('isPrint') == '1';
+    useEffect(() => {
+        if (ref.current) {
+            axios
+                .get(getReportConfigUrl())
+                .then((config) => {
+                    let error = getError(config);
+                    if (error != null) {
+                        return handleError(error);
+                    }
+                    const excelJsonStr = config?.data?.data?.data?.config;
+                    let excelJson = null;
+                    try {
+                        excelJson = JSON.parse(excelJsonStr);
+                    } catch (e) {}
+                    const initReport = (excelJson, datas) => {
+                        const report = new TOONE.Report.Preview({
+                            license,
+                            enablePrint: isPrint,
+                            dataSource: datas,
+                            json: excelJson,
+                        });
+                        //报表挂载到指定dom元素
+                        report.mount(ref.current);
+                        data.report = report;
+                        setData({ ...data, loadMsg: null, errorMsg: null });
+                        const sheets = excelJson?.reportJson?.sheets;
+                        const fontFamaly = new Set();
 
-            for (let sheet of Object.values(sheets)) {
-              const dataTable = sheet?.data?.dataTable
-              for (let cell of Object.values(dataTable)) {
-                for (let cellStyle of Object.values(cell)) {
-                  const style = cellStyle?.style ?? {}
-                  fontFamaly.add(style.fontFamily ?? 'Calibri')
-                }
-              }
-            }
+                        for (let sheet of Object.values(sheets)) {
+                            const dataTable = sheet?.data?.dataTable;
+                            for (let cell of Object.values(dataTable)) {
+                                for (let cellStyle of Object.values(cell)) {
+                                    const style = cellStyle?.style ?? {};
+                                    fontFamaly.add(
+                                        style.fontFamily ?? 'Calibri'
+                                    );
+                                }
+                            }
+                        }
 
-            const requestFontFamily = [...fontFamaly].map(item => registerServerFont(item, 'normal', `/font?fontFamilyName=${item}`))
-            if (typeof exportPDF !== 'undefined') {
-              console.log('导出PDF')
-              Promise.all(requestFontFamily).then(() => {
-                report.exportPdf('a.pdf', {
-                  persistence: false,
-                  author: '',
-                  creator: '',
-                  keywords: '',
-                  subject: '',
-                  title: '',
-                  sheetIndex: null,
-                }).then(blob => {
-                  const render = new FileReader(blob)
-                  render.onload = function (e) {
-                    const base64 = e.target.result
-                    console.log(base64)
-                    exportPDF(base64)
-                  }
-                  render.readAsDataURL(blob)
-                })
-              })
-              // registerServerFont('Calibri','normal','http://localhost:3000/font/微软雅黑.ttf')
-
-            }
-          };
-          if (excelJson) {
-            const usedDatasources = excelJson.usedDatasources || [];
-            if (usedDatasources && usedDatasources.length > 0) {
-              axios
-                .get(getTableDataUrl(usedDatasources.join(',')))
-                .then((data) => {
-                  let error = getError(data);
-                  if (error != null) {
-                    return handleError(error);
-                  }
-                  initReport(
-                    excelJson,
-                    data.data?.data?.data
-                  );
+                        const requestFontFamily = [...fontFamaly].map((item) =>
+                            registerServerFont(
+                                item,
+                                'normal',
+                                `/font?fontFamilyName=${item}`
+                            )
+                        );
+                        if (typeof exportPDF !== 'undefined') {
+                            console.log('导出PDF');
+                            Promise.all(requestFontFamily).then(() => {
+                                report
+                                    .exportPdf('a.pdf', {
+                                        persistence: false,
+                                        author: '',
+                                        creator: '',
+                                        keywords: '',
+                                        subject: '',
+                                        title: '',
+                                        sheetIndex: null,
+                                    })
+                                    .then((blob) => {
+                                        const render = new FileReader(blob);
+                                        render.onload = function (e) {
+                                            const base64 = e.target.result;
+                                            console.log(base64);
+                                            exportPDF(base64);
+                                        };
+                                        render.readAsDataURL(blob);
+                                    });
+                            });
+                            // registerServerFont('Calibri','normal','http://localhost:3000/font/微软雅黑.ttf')
+                        }
+                    };
+                    if (excelJson) {
+                        const usedDatasources = excelJson.usedDatasources || [];
+                        if (usedDatasources && usedDatasources.length > 0) {
+                            axios
+                                .get(getTableDataUrl(usedDatasources.join(',')))
+                                .then((data) => {
+                                    let error = getError(data);
+                                    if (error != null) {
+                                        return handleError(error);
+                                    }
+                                    initReport(
+                                        excelJson,
+                                        data.data?.data?.data
+                                    );
+                                })
+                                .catch(handleError);
+                        } else {
+                            initReport(excelJson, {});
+                        }
+                    } else {
+                        initReport();
+                    }
                 })
                 .catch(handleError);
-            } else {
-              initReport(excelJson, {});
-            }
-          } else {
-            initReport();
-          }
-        })
-        .catch(handleError);
-    }
-  }, []);
-  return (
-    <Wrap>
-      {data.loadMsg != null ? (
-        <WaitMsg title={data.loadMsg}></WaitMsg>
-      ) : null}
-      {data.errorMsg != null ? (
-        <Error
-          message={data.errorMsg}
-          onClose={() =>
-            setData({ ...data, loadMsg: null, errorMsg: null })
-          }
-        ></Error>
-      ) : null}
-      {/* <Toolbar>
+        }
+    }, []);
+    return (
+        <Wrap>
+            {data.loadMsg != null ? (
+                <WaitMsg title={data.loadMsg}></WaitMsg>
+            ) : null}
+            {data.errorMsg != null ? (
+                <Error
+                    message={data.errorMsg}
+                    onClose={() =>
+                        setData({ ...data, loadMsg: null, errorMsg: null })
+                    }
+                ></Error>
+            ) : null}
+            {/* <Toolbar>
         <Button
           type='primary'
           style={{ height: 26 }}
@@ -246,9 +255,9 @@ export default function () {
           </Button>
         ) : null}
       </Toolbar> */}
-      <ExcelWrap>
-        <ExcelHost ref={ref}></ExcelHost>
-      </ExcelWrap>
-    </Wrap>
-  );
+            <ExcelWrap>
+                <ExcelHost ref={ref}></ExcelHost>
+            </ExcelWrap>
+        </Wrap>
+    );
 }

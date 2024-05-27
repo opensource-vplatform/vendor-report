@@ -10,7 +10,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon={`url(${getBaseUrl()}/css/icons/cell/setting.svg)`}
+            icon={`url(${getBaseUrl()}/css/icons/cell/setting.png)`}
         ></BaseIcon>
     );
 };

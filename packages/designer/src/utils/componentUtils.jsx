@@ -2,6 +2,7 @@ import { useDispatch } from 'react-redux';
 
 import { VItem } from '@components/group/Index';
 import Menu from '@components/menu/Index';
+import { VIconTitleWithDropdown } from '@components/nav/Index';
 import Popper from '@components/popper/Index';
 import { Tab } from '@components/tabs/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
@@ -40,12 +41,12 @@ export const WithIconMenu = function (title, Icon, datas, options = {}) {
     return (props) => {
         const menuDatas = typeof datas == 'function' ? datas() : datas;
         return menuDatas.length == 0 ? null : (
-            <IconMenu
+            <VIconTitleWithDropdown
                 title={title}
                 icon={Icon}
-                datas={menuDatas}
+                menus={menuDatas}
                 {...{ ...props, ...options }}
-            ></IconMenu>
+            ></VIconTitleWithDropdown>
         );
     };
 };

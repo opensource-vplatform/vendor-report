@@ -67,7 +67,7 @@ const getError = function (result) {
     if (result && result.data) {
         const data = result.data;
         if (data.success === false) {
-            return data.msg || '存在未知异常！';
+            return data.msg || data.message || '存在未知异常！';
         } else {
             return getError(data);
         }
@@ -113,7 +113,7 @@ export default function () {
                     const initReport = (excelJson, datas) => {
                         const report = new TOONE.Report.Preview({
                             license,
-                            baseUrl:'../',
+                            baseUrl: '../',
                             enablePrint: isPrint,
                             dataSource: datas,
                             json: excelJson,
@@ -166,7 +166,7 @@ export default function () {
                 <Fill></Fill>
                 <Button
                     type='primary'
-                    style={{ height: 26,width:110 }}
+                    style={{ height: 26, width: 110 }}
                     disabled={!data.report}
                     onClick={() => {
                         setLoadMsg('导出到excel中，请稍候...');

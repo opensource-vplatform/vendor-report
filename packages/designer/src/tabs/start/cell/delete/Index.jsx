@@ -6,6 +6,7 @@ import {
 import { useSelector } from 'react-redux';
 
 import { Commands } from '@commands/index';
+import { VIconTitleWithDropdown } from '@components/nav/Index';
 import DeleteIcon from '@icons/cell/Delete';
 import DeleteCell from '@icons/cell/DeleteCell';
 import DeleteSheet from '@icons/cell/DeleteSheet';
@@ -15,13 +16,12 @@ import {
   deleteColumns,
   deleteRows,
 } from '@utils/cellUtil';
-import { WithIconMenu } from '@utils/componentUtils';
 import { isFunction } from '@utils/objectUtil';
 import { exeCommand } from '@utils/spreadUtil';
 
 import Dialog from './Dialog';
 
-const DeleteIconMenu = WithIconMenu('删除', DeleteIcon, [
+const Cell_Delete_Menus = [
     {
         value: 'deleteCell',
         title: '删除单元格',
@@ -62,7 +62,7 @@ const DeleteIconMenu = WithIconMenu('删除', DeleteIcon, [
             exeCommand(spread, Commands.Delete.Sheet, {});
         },
     },
-]);
+];
 
 export default function () {
     const { spread } = useSelector(({ appSlice }) => appSlice);
@@ -93,7 +93,12 @@ export default function () {
             {data.showDialog ? (
                 <Dialog onClose={handleDeleteCell}></Dialog>
             ) : null}
-            <DeleteIconMenu onNodeClick={handleNodeClick}></DeleteIconMenu>
+            <VIconTitleWithDropdown
+                title='删除'
+                icon={DeleteIcon}
+                menus={Cell_Delete_Menus}
+                onNodeClick={handleNodeClick}
+            ></VIconTitleWithDropdown>
         </Fragment>
     );
 }

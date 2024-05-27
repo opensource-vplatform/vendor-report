@@ -23,6 +23,7 @@
             "@components/list/Index": ["src/component/list/Index"],
             "@components/loading/Index": ["src/component/loading/Index"],
             "@components/menu/Index": ["src/component/menu/Index"],
+            "@components/nav/Index": ["src/component/nav/Index"],
             "@components/pageSettings/Index": ["src/component/pageSettings/Index"],
             "@components/popper/Index": ["src/component/popper/Index"],
             "@components/preview/Index": ["src/component/preview/Index"],

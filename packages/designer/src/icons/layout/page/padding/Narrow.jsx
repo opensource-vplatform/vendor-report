@@ -12,7 +12,7 @@ export default function (props) {
         <BaseIcon
             {...props}
             /* icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/narrow.png)`} */
-            icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/normal.svg)`}
+            icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/normal.png)`}
         ></BaseIcon>
     );
 }

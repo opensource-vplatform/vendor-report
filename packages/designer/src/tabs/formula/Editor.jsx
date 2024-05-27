@@ -7,11 +7,8 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { Dialog } from '@components/dialog/Index';
-import {
-  GroupItem,
-  ItemList,
-  VGroupItem,
-} from '@components/group/Index';
+import { ItemList } from '@components/group/Index';
+import { VCard } from '@components/nav/Index';
 import EditorIcon from '@icons/formula/Editor';
 import ShowIcon from '@icons/formula/Show';
 import { setShowFormulas } from '@utils/worksheetUtil';
@@ -49,27 +46,31 @@ export default function () {
                     title='公式编辑器'
                     anchor={true}
                     onClose={() => setShowEditor(false)}
-                ><Editor onClose={() => setShowEditor(false)}></Editor></Dialog>
+                >
+                    <Editor onClose={() => setShowEditor(false)}></Editor>
+                </Dialog>
             ) : null}
-            <GroupItem title='公式编辑'>
-                <VGroupItem>
-                    <ItemList>
-                        <ShowIcon
-                            tips='显示公式'
-                            style={style}
-                            active={showFormula}
-                            onClick={handleShowFormula}
-                        >
-                            <Label>显示公式</Label>
-                        </ShowIcon>
-                    </ItemList>
-                    <ItemList>
-                        <EditorIcon tips='显示公式编辑器' style={style} onClick={()=>setShowEditor(true)}>
-                            <Label>显示公式编辑器</Label>
-                        </EditorIcon>
-                    </ItemList>
-                </VGroupItem>
-            </GroupItem>
+            <VCard title='公式编辑'>
+                <ItemList>
+                    <ShowIcon
+                        tips='显示公式'
+                        style={style}
+                        active={showFormula}
+                        onClick={handleShowFormula}
+                    >
+                        <Label>显示公式</Label>
+                    </ShowIcon>
+                </ItemList>
+                <ItemList>
+                    <EditorIcon
+                        tips='显示公式编辑器'
+                        style={style}
+                        onClick={() => setShowEditor(true)}
+                    >
+                        <Label>显示公式编辑器</Label>
+                    </EditorIcon>
+                </ItemList>
+            </VCard>
         </Fragment>
     );
 }
