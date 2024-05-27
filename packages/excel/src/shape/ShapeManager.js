@@ -15,7 +15,7 @@ export const addShape = function (sheet, shape) {
  */
 const dealPictureRect = function (item, shape) {
     const { mode, cellWidth, cellHeight } = item.shape;
-    if (mode == 1) {
+    if (mode == 0) {
         //保持长宽比
         const originalWidth = shape.getOriginalWidth();
         const originalHeight = shape.getOriginalHeight();
@@ -26,17 +26,17 @@ const dealPictureRect = function (item, shape) {
         const height = originalHeight * ratio;
         shape.height(height);
         shape.width(width);
-    } else if (mode == 2) {
+    } else if (mode == 1) {
         //拉伸
         shape.height(cellHeight);
         shape.width(cellWidth);
-    } else if (mode == 3) {
+    } else if (mode == 2) {
         //原始尺寸
         const originalWidth = shape.getOriginalWidth();
         const originalHeight = shape.getOriginalHeight();
         shape.width(originalWidth);
         shape.height(originalHeight);
-    } else if (mode == 4) {
+    } else if (mode == 3) {
         //自定义尺寸
         const { width, height } = item.shape;
         shape.width(width);

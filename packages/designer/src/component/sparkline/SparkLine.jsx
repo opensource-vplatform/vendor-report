@@ -75,22 +75,22 @@ const Warn = styled.div`
 
 const ImageSparklineModeItems = [
     {
-        value: 1,
+        value: 0,
         title: '保持长宽比',
         text: '保持长宽比',
     },
     {
-        value: 2,
+        value: 1,
         title: '拉伸',
         text: '拉伸',
     },
     {
-        value: 3,
+        value: 2,
         title: '原始尺寸',
         text: '原始尺寸',
     },
     {
-        value: 4,
+        value: 3,
         title: '定制尺寸',
         text: '定制尺寸',
     },
