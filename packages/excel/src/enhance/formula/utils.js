@@ -1,5 +1,6 @@
 import { isNullOrUndef } from '../../utils/objectUtils';
 import { getNamespace } from '../../utils/spreadUtil';
+import { formulaToAST as fatoAST } from '../../utils/formulaUtil';
 
 function _getType(type) {
     const GC = getNamespace();
@@ -42,15 +43,15 @@ export function toBooleanAST(value) {
     return { lMt: true, type: _getType('boolean'), value };
 }
 
-export function toAST(value){
+export function toAST(value) {
     const type = typeof value;
-    switch(type){
+    switch (type) {
         case 'number':
             return toNumberAST(value);
-        case "boolean":
+        case 'boolean':
             return toBooleanAST(value);
         default:
-            return toStringAST(isNullOrUndef(value) ? '':value);
+            return toStringAST(isNullOrUndef(value) ? '' : value);
     }
 }
 
@@ -59,7 +60,4 @@ export function toAST(value){
  * @param {*} formula
  * @returns
  */
-export const formulaToAST = function (formula) {
-    const GC = getNamespace();
-    return GC.Spread.Sheets.CalcEngine.formulaToExpression(null, formula, 0, 0);
-};
+export const formulaToAST = fatoAST;

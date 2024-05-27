@@ -1,5 +1,13 @@
+export const isUndef = function (obj) {
+    return obj === undefined;
+};
+
+export const isNull = function (obj) {
+    return obj === null;
+};
+
 export const isNullOrUndef = function (obj) {
-    return obj === null || obj === undefined;
+    return isNull(obj) || isUndef(obj);
 };
 
 export const isObject = function (obj) {

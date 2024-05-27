@@ -1,32 +1,23 @@
 import { useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { OperationDialog } from '@components/dialog/Index';
-import {
-  Integer,
-  Select,
-} from '@components/form/Index';
+import { Integer, Select } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import { genUUID } from '@utils/commonUtil';
 
+import { setConfig, setVisible } from '../../store/sparklineSlice';
 import {
-  setConfig,
-  setVisible,
-} from '../../store/sparklineSlice';
-import {
-  handleCancel as onCancel,
-  handleConfirm as onConfirm,
-  isAlignDisabled,
-  isRectDisabled,
+    handleCancel as onCancel,
+    handleConfirm as onConfirm,
+    isAlignDisabled,
+    isRectDisabled,
 } from '../../utils/sparklineUtil';
 
 const Wrapper = styled.div`
-    background-color:white;
+    background-color: white;
     padding: 10px;
 `;
 
@@ -213,14 +204,14 @@ export default function (props) {
     });
     const rectDisabled = isRectDisabled(config);
     const alignDisabled = isAlignDisabled(config);
-    const handleConfirm = ()=>{
+    const handleConfirm = () => {
         dispatch(setVisible(false));
-        onConfirm(callbackId,config);
-    }
-    const handleCancel = ()=>{
+        onConfirm(callbackId, config);
+    };
+    const handleCancel = () => {
         dispatch(setVisible(false));
         onCancel(callbackId);
-    }
+    };
     return (
         <OperationDialog
             title='迷你图参数设置'
@@ -296,7 +287,7 @@ export default function (props) {
                             title='裁剪高度：'
                             attr='clipHeight'
                         ></CustomInteger>
-                    </HLayout>
+                    </HLayout>*/}
                     <HLayout>
                         <CustomSelect
                             title='水平对齐：'
@@ -310,7 +301,7 @@ export default function (props) {
                             datas={ImageSparklineVAlignItems}
                             attr='vAlign'
                         ></CustomSelect>
-                    </HLayout>*/}
+                    </HLayout>
                 </VGroupItem>
             </Wrapper>
         </OperationDialog>
