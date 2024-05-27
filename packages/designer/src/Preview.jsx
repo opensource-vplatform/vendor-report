@@ -111,7 +111,6 @@ export default function () {
     const handlePrint = () => {
         if (printHandler) {
             printHandler().then((spread) => {
-                debugger;
                 spread.print();
             });
         }

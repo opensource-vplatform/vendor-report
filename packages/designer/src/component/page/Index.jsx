@@ -186,10 +186,6 @@ export default function (props) {
         return null;
     }
 
-    if (true) {
-        return null;
-    }
-
     return (
         <Wrap>
             <Button

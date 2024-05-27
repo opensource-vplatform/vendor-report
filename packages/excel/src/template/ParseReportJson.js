@@ -97,15 +97,23 @@ function getColRules({ rules, col, colHandler }) {
 
 export default class ParseReportJson {
     constructor(config) {
-        const { reportJson, datas, tempConfig = {}, setting } = config;
+        const {
+            reportJson,
+            datas,
+            tempConfig = {},
+            setting,
+            showPageCount = 20,
+        } = config;
         console.time('耗时多久');
         this.datas = datas;
+        this.showPageCount = showPageCount;
         this.reportJson = reportJson;
         this.tempConfig = Copy(tempConfig);
         this.setting = setting;
         this.delayPlugins = [];
         this.delayFormula = [];
         this.sheetPages = {};
+        this.sheetPrintPages = {};
 
         //打印换算单位
         this.printConversionUnits = getPrintConversionUnits();
@@ -236,6 +244,17 @@ export default class ParseReportJson {
                     content[3].template[0].unionDatasource.getCount()
                 );
             pageSubtotal = pageSubtotal || 1; //处理分页区域绑定的实体无数据时，整个报表不显示问题 add by xiedh
+
+            let showPageCount = 1;
+            let sheetPrintPage = {
+                sheet: pageInfos.sheet,
+                spans: [],
+                rows: [],
+                rules: [],
+                dataTable: {},
+                autoMergeRanges: [],
+                rowCount: 0,
+            };
             while (index < pageSubtotal) {
                 const sheetPage = {
                     sheet: pageInfos.sheet,
@@ -246,6 +265,18 @@ export default class ParseReportJson {
                     autoMergeRanges: [],
                     rowCount: 0,
                 };
+
+                if (!sheetPrintPage) {
+                    sheetPrintPage = {
+                        sheet: pageInfos.sheet,
+                        spans: [],
+                        rows: [],
+                        rules: [],
+                        dataTable: {},
+                        autoMergeRanges: [],
+                        rowCount: 0,
+                    };
+                }
                 const isLastPage = index + 1 >= pageSubtotal;
                 if (isLastPage) {
                     let {
@@ -294,6 +325,7 @@ export default class ParseReportJson {
                     templates: headerTemplates,
                     pageInfos,
                     sheetPage,
+                    sheetPrintPage,
                 });
                 let endIndex = startIndex + contentTempCount;
                 //最后一页
@@ -306,11 +338,13 @@ export default class ParseReportJson {
                     startIndex,
                     endIndex,
                     sheetPage,
+                    sheetPrintPage,
                 });
                 this.genPageDataTables({
                     templates: footerTemplates,
                     pageInfos,
                     sheetPage,
+                    sheetPrintPage,
                 });
 
                 if (index + 1 < pageSubtotal) {
@@ -321,6 +355,18 @@ export default class ParseReportJson {
                 startIndex += contentTempCount;
                 index++;
                 this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
+                if (showPageCount % this.showPageCount === 0) {
+                    this.sheetPrintPages[pageInfos.sheet.name].datas.push(
+                        sheetPrintPage
+                    );
+                    sheetPrintPage = null;
+                }
+                showPageCount += 1;
+            }
+            if (sheetPrintPage) {
+                this.sheetPrintPages[pageInfos.sheet.name].datas.push(
+                    sheetPrintPage
+                );
             }
         } else {
             const sheetPage = {
@@ -338,6 +384,7 @@ export default class ParseReportJson {
                 sheetPage,
             });
             this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
+            this.sheetPrintPages[pageInfos.sheet.name].datas.push(sheetPage);
         }
     }
     genPageInfos({ sheet }) {
@@ -666,11 +713,16 @@ export default class ParseReportJson {
         const sheets = Object.values(this.reportJson.sheets);
         this.sheetNames = [];
         sheets.forEach((sheet) => {
-            const { visible = 1, name } = sheet;
+            const { visible = 1, name, isSelected } = sheet;
             //当前sheet不可见，直接跳过解析
             if (visible === 0) {
                 return;
             }
+
+            if (isSelected) {
+                this.activeSheetName = name;
+            }
+
             this.initTempates();
             this.genTemplateFromSheet(sheet);
 
@@ -699,6 +751,13 @@ export default class ParseReportJson {
                 pageIndex: 0,
                 datas: [],
             };
+
+            this.sheetPrintPages[name] = {
+                isPage: pageInfos.pageArea ? true : false,
+                pageIndex: 0,
+                datas: [],
+            };
+
             pageInfos.unionDatasourceDatas = {};
 
             sheetNames.forEach((sheetName, index) => {
@@ -767,8 +826,8 @@ export default class ParseReportJson {
                 this.render(pageInfos, templates);
             });
             pageInfos.sheet.namedStyles = this.namedStyles;
-            this.resetSheet(pageInfos);
-            //this.resetSheet(this.sheetPages[name].datas[0]);
+            //this.resetSheet(pageInfos);
+            this.resetSheet(this.sheetPages[name].datas[0]);
         });
     }
     parseRowDataTable(params) {
@@ -948,6 +1007,7 @@ export default class ParseReportJson {
             startIndex = 0,
             endIndex = 0,
             sheetPage,
+            sheetPrintPage,
         } = params;
         templates.forEach((temp) => {
             const {
@@ -1207,6 +1267,12 @@ export default class ParseReportJson {
                                     dataTable;
                             }
 
+                            if (sheetPrintPage) {
+                                sheetPrintPage.dataTable[
+                                    sheetPrintPage.rowCount
+                                ] = dataTable;
+                            }
+
                             //合并信息
                             spans.forEach(function (span) {
                                 pageInfos.spans.push({
@@ -1217,6 +1283,11 @@ export default class ParseReportJson {
                                     sheetPage.spans.push({
                                         ...span,
                                         row: sheetPageRowCount,
+                                    });
+                                sheetPrintPage &&
+                                    sheetPrintPage.spans.push({
+                                        ...span,
+                                        row: sheetPrintPage.rowCount,
                                     });
                             });
 
@@ -1239,6 +1310,16 @@ export default class ParseReportJson {
                                             {
                                                 ...rule.ranges[0],
                                                 row: sheetPageRowCount,
+                                            },
+                                        ],
+                                    });
+                                sheetPrintPage &&
+                                    sheetPrintPage.rules.push({
+                                        ...rule,
+                                        ranges: [
+                                            {
+                                                ...rule.ranges[0],
+                                                row: sheetPrintPage.rowCount,
                                             },
                                         ],
                                     });
@@ -1265,6 +1346,16 @@ export default class ParseReportJson {
                                         ...rows,
                                     };
                                 }
+
+                                if (sheetPrintPage) {
+                                    sheetPrintPage.rows[
+                                        sheetPrintPage.rowCount
+                                    ] = {
+                                        ...(pageInfos.rows[sheetPageRowCount] ||
+                                            {}),
+                                        ...rows,
+                                    };
+                                }
                             }
 
                             //自动合并区域
@@ -1274,10 +1365,16 @@ export default class ParseReportJson {
                                 pageInfos.autoMergeRanges.push(cobyItem);
                                 sheetPage &&
                                     sheetPage.autoMergeRanges.push(cobyItem);
+
+                                sheetPrintPage &&
+                                    sheetPrintPage.autoMergeRanges.push(
+                                        cobyItem
+                                    );
                             });
 
                             pageInfos.rowCount += 1;
                             sheetPage && (sheetPage.rowCount += 1);
+                            sheetPrintPage && (sheetPrintPage.rowCount += 1);
                         }
                     }
                 );
