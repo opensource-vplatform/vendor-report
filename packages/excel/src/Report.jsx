@@ -27,6 +27,8 @@ class Report {
 
     printHandler = null;
 
+    exportExcelHandler = null;
+
     /**
      * @constructor
      * @param {Object} conf 配置信息<br/>
@@ -83,6 +85,9 @@ class Report {
                 onPrintHandler: (handler) => {
                     this.printHandler = handler;
                 },
+                onExportExcelHandler: (handler) => {
+                    this.exportExcelHandler = handler;
+                },
                 onPageCompleted: (handler) => {
                     handler().then((datas) => {
                         this.pageInfos = datas;
@@ -112,6 +117,27 @@ class Report {
      * @returns Promise
      */
     exportExcel(
+        filename,
+        options = { ignoreFormula: false, ignoreStyle: false }
+    ) {
+        return new Promise((resolve, reject) => {
+            if (typeof filename == 'string' && filename.trim() !== '') {
+                if (this.exportExcelHandler) {
+                    this.exportExcelHandler()
+                        .then(({ exportExcel }) => {
+                            exportExcel(filename, options);
+                            resolve();
+                        })
+                        .catch(reject);
+                } else {
+                    reject(Error('导出excel失败，原因：报表未初始化'));
+                }
+            } else {
+                reject(Error('导出excel失败，原因:没有传递导出文件名'));
+            }
+        });
+    }
+    /*  exportExcel(
         filename,
         options = { ignoreFormula: false, ignoreStyle: false }
     ) {
@@ -152,7 +178,7 @@ class Report {
                 reject(Error('导出excel失败，原因:没有传递导出文件名'));
             }
         });
-    }
+    } */
 
     /**
      * 导出pdf

@@ -4,10 +4,17 @@ import {
   useState,
 } from 'react';
 
+import JSZip from 'JSZip';
+import resourceManager from 'resource-manager-js';
 import styled from 'styled-components';
 
 import Dialog from './component/dialog';
 import Button from './component/form/Button';
+import { download } from './utils/fileUtil';
+import {
+  getNamespace,
+  getPluginSrc,
+} from './utils/spreadUtil';
 import WorkbookItem from './WorkbookItem';
 
 const Wrap = styled.div`
@@ -88,6 +95,77 @@ export default function (props) {
         printed: {},
     });
 
+    const exportExcel = (
+        filename,
+        options = { ignoreFormula: false, ignoreStyle: false }
+    ) => {
+        const zip = new JSZip();
+        const blobs = [];
+        const result = new Promise((resolve, reject) => {
+            if (typeof filename == 'string' && filename.trim() !== '') {
+                resourceManager.loadScript(getPluginSrc('excel')).then(() => {
+                    const GC = getNamespace();
+                    const { activeSheetName, sheetPrintPages } = inst;
+                    const pageDatas = sheetPrintPages[activeSheetName];
+                    const excelIO = new GC.Spread.Excel.IO();
+                    const sheet = datas.spread.getActiveSheet();
+                    const sheetJson = sheet.toJSON();
+                    const datasLen = pageDatas.datas.length;
+                    for (let i = 0; i < datasLen; i++) {
+                        let newfilename = filename + (i + 1) + '.xlsx';
+
+                        const newSheet = pageDatas.datas[i];
+                        newSheet.sheet = sheetJson;
+                        inst.resetSheet(newSheet);
+                        sheet.fromJSON(sheetJson);
+                        const json = JSON.stringify(datas.spread.toJSON());
+                        excelIO.save(
+                            json,
+                            (blob) => {
+                                blobs.unshift({
+                                    filename: newfilename,
+                                    blob,
+                                });
+
+                                if (blobs.length === pageDatas.datas.length) {
+                                    resolve();
+                                }
+                            },
+                            (err) => {
+                                reject(err);
+                            },
+                            {
+                                columnHeadersAsFrozenRows: false,
+                                includeAutoMergedCells: false,
+                                includeBindingSource: false,
+                                includeCalcModelCache: false,
+                                includeEmptyRegionCells: true,
+                                includeFormulas: !options.ignoreFormula,
+                                includeStyles: !options.ignoreStyle,
+                                includeUnusedNames: true,
+                                password: undefined,
+                                rowHeadersAsFrozenColumns: false,
+                                saveAsView: false,
+                            }
+                        );
+                    }
+                });
+            } else {
+                reject(Error('导出excel失败，原因:没有传递导出文件名'));
+            }
+        });
+        result.then(() => {
+            blobs.forEach(({ filename, blob }) => {
+                zip.file(filename, blob, { binary: true });
+            });
+
+            zip.generateAsync({ type: 'blob' }).then(function (content) {
+                download(content, `${filename}.zip`);
+            });
+        });
+        return result;
+    };
+
     useEffect(() => {
         if (typeof onInited === 'function') {
             onInited({
@@ -97,6 +175,7 @@ export default function (props) {
                 hide() {
                     setShow(false);
                 },
+                exportExcel,
             });
         }
     });

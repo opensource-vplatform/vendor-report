@@ -887,7 +887,11 @@ export default class ParseReportJson {
         Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
             const { bindingPath, tag, formula, style = {} } = _colDataTable;
             //样式采用命名空间
-            if (_colDataTable.style) {
+            if (
+                _colDataTable.style &&
+                typeof _colDataTable.style !== 'string' &&
+                !_colDataTable?.style?.parentName
+            ) {
                 const namedStyles = getVarName();
                 this.namedStyles.push({
                     ...style,
