@@ -1,0 +1,16 @@
+config:
+  target: "http://pdf.server.t.vtoone.com"
+  phases:
+    - duration: 60
+      arrivalRate: 10  # 每秒到达的用户数
+    - pause: 30  # 暂停30秒
+    - duration: 60
+      arrivalRate: 20  # 每秒到达的用户数
+    - pause: 30  # 暂停30秒
+    - duration: 60
+      arrivalRate: 30  # 每秒到达的用户数
+
+scenarios:
+  - flow:
+    - get:
+        url: "/reportapi/APP20240407001/report/exportPdf"
