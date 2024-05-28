@@ -6,6 +6,11 @@ import {
 } from '../utils/constant';
 import { license } from '../utils/license';
 import {
+  genResponseErrorCallback,
+  getData,
+  handleError,
+} from '../utils/responseUtil';
+import {
   getReportId,
   getTitle,
 } from '../utils/utils';
@@ -127,92 +132,103 @@ const designer = new Designer({
                 };
                 RPC.post(getSaveReportUrl(), params)
                     .then((response) => {
-                        const error = getError(response);
-                        if (error != null) {
-                            return reject(Error(error));
+                        if (!handleError(response, reject, '保存报表失败！')) {
+                            resolve({ success: true });
                         }
-                        resolve({ success: true });
                     })
-                    .catch((e) => {
-                        console.error(e);
-                        reject({
-                            success: false,
-                            message: '出现未知异常！',
-                        });
-                    });
+                    .catch(genResponseErrorCallback(reject));
             });
         },
         onDatasourceSelectVisible: function () {
             return new Promise(function (resolve, reject) {
                 RPC.get(getTableMetadataUrl())
                     .then((metadata) => {
-                        let error = getError(metadata);
-                        if (error != null) {
-                            return reject(Error(error));
+                        if (
+                            !handleError(
+                                metadata,
+                                reject,
+                                '获取数据集定义信息失败！'
+                            )
+                        ) {
+                            resolve(
+                                enhanceMetadata(
+                                    getData(metadata, 'define') || []
+                                )
+                            );
                         }
-                        resolve(
-                            enhanceMetadata(metadata?.data?.data?.define || [])
-                        );
                     })
-                    .catch(reject);
+                    .catch(genResponseErrorCallback(reject));
             });
         },
         onDesignerInited: function () {
             return new Promise(function (resolve, reject) {
                 RPC.get(getReportConfigUrl())
                     .then((config) => {
-                        let error = getError(config);
-                        if (error != null) {
-                            return reject(Error(error));
-                        }
-                        let excelJson = null;
-                        if (config?.data?.data?.data?.config) {
+                        if (
+                            !handleError(
+                                config,
+                                reject,
+                                '获取报表配置信息失败！'
+                            )
+                        ) {
+                            let excelJson = null;
                             try {
                                 excelJson = JSON.parse(
-                                    config.data.data.data.config
+                                    getData(config, 'config')
                                 );
                             } catch (e) {}
-                        }
-                        const selectedDatasources =
-                            excelJson?.selectedDatasources;
-                        if (
-                            selectedDatasources &&
-                            selectedDatasources.length > 0
-                        ) {
-                            RPC.get(
-                                getTableMetadataUrl() +
-                                    '&requestTables=' +
-                                    selectedDatasources.join(',')
-                            )
-                                .then((metadata) => {
-                                    let error = getError(metadata);
-                                    if (error != null) {
-                                        return reject(Error(error));
-                                    }
-                                    resolve({
-                                        tableMetadata: enhanceMetadata(
-                                            metadata?.data?.data?.define || []
-                                        ),
-                                        excelJson:
-                                            excelJson?.reportJson || null,
-                                        datasourceSetting:
-                                            excelJson?.datasourceSetting || {},
-                                        wizardSlice:
-                                            excelJson?.context?.wizardSlice,
-                                    });
-                                })
-                                .catch(reject);
-                        } else {
-                            resolve({
-                                tableMetadata: [],
-                                excelJson: excelJson?.reportJson || null,
-                                datasourceSetting:
-                                    excelJson?.datasourceSetting || {},
-                                wizardSlice: excelJson?.context?.wizardSlice,
-                            });
+                            const selectedDatasources =
+                                excelJson?.selectedDatasources;
+                            if (
+                                selectedDatasources &&
+                                selectedDatasources.length > 0
+                            ) {
+                                RPC.get(
+                                    getTableMetadataUrl() +
+                                        '&requestTables=' +
+                                        selectedDatasources.join(',')
+                                )
+                                    .then((metadata) => {
+                                        if (
+                                            !handleError(
+                                                metadata,
+                                                reject,
+                                                '获取数据集定义信息失败！'
+                                            )
+                                        ) {
+                                            resolve({
+                                                tableMetadata: enhanceMetadata(
+                                                    getData(
+                                                        metadata,
+                                                        'define'
+                                                    ) || []
+                                                ),
+                                                excelJson:
+                                                    excelJson?.reportJson ||
+                                                    null,
+                                                datasourceSetting:
+                                                    excelJson?.datasourceSetting ||
+                                                    {},
+                                                wizardSlice:
+                                                    excelJson?.context
+                                                        ?.wizardSlice,
+                                            });
+                                        }
+                                    })
+                                    .catch(genResponseErrorCallback(reject));
+                            } else {
+                                resolve({
+                                    tableMetadata: [],
+                                    excelJson: excelJson?.reportJson || null,
+                                    datasourceSetting:
+                                        excelJson?.datasourceSetting || {},
+                                    wizardSlice:
+                                        excelJson?.context?.wizardSlice,
+                                });
+                            }
                         }
                     })
-                    .catch(reject);
+                    .catch(genResponseErrorCallback(reject));
             });
         },
         onPreview: function (context) {
@@ -220,13 +236,13 @@ const designer = new Designer({
                 const usedDatasources = getUsedDatasources(context);
                 RPC.get(getTableDataUrl(usedDatasources.join(',')))
                     .then((data) => {
-                        let error = getError(data);
-                        if (error != null) {
-                            return reject(error);
+                        if (
+                            !handleError(data, reject, '获取数据集数据失败！')
+                        ) {
+                            resolve(getData(data, 'data', true));
                         }
-                        resolve(data.data?.data?.data);
                     })
-                    .catch(reject);
+                    .catch(genResponseErrorCallback(reject));
             });
         },
     },

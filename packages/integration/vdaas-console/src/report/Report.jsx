@@ -13,6 +13,11 @@ import {
 } from '../utils/constant';
 import { license } from '../utils/license';
 import {
+  genResponseErrorCallback,
+  getData,
+  handleError as handleErrorUtil,
+} from '../utils/responseUtil';
+import {
   getParameter,
   getTitle,
 } from '../utils/utils';
@@ -64,21 +69,8 @@ const Fill = styled.div`
     width: 100%;
 `;
 
-const getError = function (result) {
-    if (result && result.data) {
-        const data = result.data;
-        if (data.success === false) {
-            return data.msg || data.message || '存在未知异常！';
-        } else {
-            return getError(data);
-        }
-    }
-    return null;
-};
-
 export default function () {
     const ref = useRef(null);
-
     const page = useRef({
         pageCompletedHandler: null,
         setPageInfos: null,
@@ -108,62 +100,76 @@ export default function () {
             axios
                 .get(getReportConfigUrl())
                 .then((config) => {
-                    let error = getError(config);
-                    if (error != null) {
-                        return handleError(error);
-                    }
-                    const excelJsonStr = config?.data?.data?.data?.config;
-                    let excelJson = null;
-                    try {
-                        excelJson = JSON.parse(excelJsonStr);
-                    } catch (e) {}
-                    const initReport = (excelJson, datas) => {
-                        const report = new TOONE.Report.Preview({
-                            license,
-                            baseUrl: '../',
-                            enablePrint: isPrint,
-                            dataSource: datas,
-                            json: excelJson,
-                            onPageCompleted(handler) {
-                                page.pageCompletedHandler = handler;
-                                if (page.setPageInfos) {
-                                    page.pageCompletedHandler().then(
-                                        (datas) => {
-                                            page.setPageInfos(datas);
-                                        }
-                                    );
-                                }
-                            },
-                        });
-                        //报表挂载到指定dom元素
-                        report.mount(ref.current);
-                        data.report = report;
-                        setData({ ...data, loadMsg: null, errorMsg: null });
-                    };
-                    if (excelJson) {
-                        const usedDatasources = excelJson.usedDatasources || [];
-                        if (usedDatasources && usedDatasources.length > 0) {
-                            axios
-                                .get(getTableDataUrl(usedDatasources.join(',')))
-                                .then((data) => {
-                                    let error = getError(data);
-                                    if (error != null) {
-                                        return handleError(error);
+                    if (
+                        !handleErrorUtil(
+                            config,
+                            handleError,
+                            '获取报表配置失败！'
+                        )
+                    ) {
+                        let excelJson = null;
+                        try {
+                            excelJson = JSON.parse(getData(config, 'config'));
+                        } catch (e) {}
+                        const initReport = (excelJson, datas) => {
+                            const report = new TOONE.Report.Preview({
+                                license,
+                                baseUrl: '../',
+                                enablePrint: isPrint,
+                                dataSource: datas,
+                                json: excelJson,
+                                onPageCompleted(handler) {
+                                    page.pageCompletedHandler = handler;
+                                    if (page.setPageInfos) {
+                                        page.pageCompletedHandler().then(
+                                            (datas) => {
+                                                page.setPageInfos(datas);
+                                            }
+                                        );
                                     }
-                                    initReport(
-                                        excelJson,
-                                        data.data?.data?.data
+                                },
+                            });
+                            //报表挂载到指定dom元素
+                            report.mount(ref.current);
+                            data.report = report;
+                            setData({ ...data, loadMsg: null, errorMsg: null });
+                        };
+                        if (excelJson) {
+                            const usedDatasources =
+                                excelJson.usedDatasources || [];
+                            if (usedDatasources && usedDatasources.length > 0) {
+                                axios
+                                    .get(
+                                        getTableDataUrl(
+                                            usedDatasources.join(',')
+                                        )
+                                    )
+                                    .then((data) => {
+                                        if (
+                                            !handleErrorUtil(
+                                                data,
+                                                handleError,
+                                                '获取数据集数据失败！'
+                                            )
+                                        ) {
+                                            initReport(
+                                                excelJson,
+                                                getData(data, 'data', true)
+                                            );
+                                        }
+                                    })
+                                    .catch(
+                                        genResponseErrorCallback(handleError)
                                     );
-                                })
-                                .catch(handleError);
+                            } else {
+                                initReport(excelJson, {});
+                            }
                         } else {
-                            initReport(excelJson, {});
+                            initReport();
                         }
-                    } else {
-                        initReport();
                     }
                 })
-                .catch(handleError);
+                .catch(genResponseErrorCallback(handleError));
         }
     }, []);
     return (

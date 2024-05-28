@@ -13,6 +13,11 @@ import {
 } from '../utils/constant';
 import { license } from '../utils/license';
 import {
+  genResponseErrorCallback,
+  getData,
+  handleError as handleErrorUtil,
+} from '../utils/responseUtil';
+import {
   download,
   exportPdf,
   getParameter,
@@ -68,175 +73,183 @@ const Fill = styled.div`
 `;
 
 const getError = function (result) {
-  if (result && result.data) {
-    const data = result.data;
-    if (data.success === false) {
-      return data.msg|| data.message || '存在未知异常！';
-    } else {
-      return getError(data);
+    if (result && result.data) {
+        const data = result.data;
+        if (data.success === false) {
+            return data.msg || data.message || '存在未知异常！';
+        } else {
+            return getError(data);
+        }
     }
-  }
-  return null;
+    return null;
 };
 
 export default function () {
-  const ref = useRef(null);
-  const [data, setData] = useState({
-    loadMsg: '初始化中，请稍候...',
-    errorMsg: null,
-    report: null,
-  });
-  const handleError = (err) => {
-    setData({
-      ...data,
-      loadMsg: null,
-      errorMsg: typeof err == 'string' ? err : err.message,
+    const ref = useRef(null);
+    const [data, setData] = useState({
+        loadMsg: '初始化中，请稍候...',
+        errorMsg: null,
+        report: null,
     });
-  };
+    const handleError = (err) => {
+        setData({
+            ...data,
+            loadMsg: null,
+            errorMsg: typeof err == 'string' ? err : err.message,
+        });
+    };
 
-  const handleRequestError = (err) => {
-    setData({
-      ...data,
-      loadMsg: null,
-      errorMsg: err?.response?.status == 404 ? '网络异常' : (err?.response?.data?.msg ?? err?.response?.data?.data?.msg ?? err.message)
-    });
-  };
-
-  const setLoadMsg = (msg) => {
-    setData({
-      ...data,
-      loadMsg: msg,
-    });
-  };
-  const isPrint = getParameter('isPrint') == '1';
-  useEffect(() => {
-    if (ref.current) {
-      axios
-        .get(getReportConfigUrl())
-        .then((config) => {
-          let error = getError(config);
-          if (error != null) {
-            return handleError(error);
-          }
-          const excelJsonStr = config?.data?.data?.data?.config;
-          let excelJson = null;
-          try {
-            excelJson = JSON.parse(excelJsonStr);
-          } catch (e) { }
-          const initReport = (excelJson, datas) => {
-            const report = new TOONE.Report.Preview({
-              license,
-              enablePrint: isPrint,
-              dataSource: datas,
-              json: excelJson,
-            });
-            //报表挂载到指定dom元素
-            report.mount(ref.current);
-            data.report = report;
-            setData({ ...data, loadMsg: null, errorMsg: null });
-            window.exportPdf = () => {
-              setLoadMsg('导出到pdf中，请稍候...');
-              data.report
-                .exportPdf(getTitle('未命名'))
-                .then(() => {
-                  setLoadMsg(null);
+    const setLoadMsg = (msg) => {
+        setData({
+            ...data,
+            loadMsg: msg,
+        });
+    };
+    const isPrint = getParameter('isPrint') == '1';
+    useEffect(() => {
+        if (ref.current) {
+            axios
+                .get(getReportConfigUrl())
+                .then((config) => {
+                    if (
+                        !handleErrorUtil(
+                            config,
+                            handleError,
+                            '获取报表配置失败！'
+                        )
+                    ) {
+                        let excelJson = null;
+                        try {
+                            excelJson = JSON.parse(getData(config, 'config'));
+                        } catch (e) {}
+                        const initReport = (excelJson, datas) => {
+                            const report = new TOONE.Report.Preview({
+                                license,
+                                enablePrint: isPrint,
+                                dataSource: datas,
+                                json: excelJson,
+                            });
+                            //报表挂载到指定dom元素
+                            report.mount(ref.current);
+                            data.report = report;
+                            setData({ ...data, loadMsg: null, errorMsg: null });
+                            window.exportPdf = () => {
+                                setLoadMsg('导出到pdf中，请稍候...');
+                                data.report
+                                    .exportPdf(getTitle('未命名'))
+                                    .then(() => {
+                                        setLoadMsg(null);
+                                    })
+                                    .catch(handleError);
+                            };
+                        };
+                        if (excelJson) {
+                            const usedDatasources =
+                                excelJson.usedDatasources || [];
+                            if (usedDatasources && usedDatasources.length > 0) {
+                                axios
+                                    .get(
+                                        getTableDataUrl(
+                                            usedDatasources.join(',')
+                                        )
+                                    )
+                                    .then((data) => {
+                                        if (
+                                            !handleErrorUtil(
+                                                data,
+                                                handleError,
+                                                '获取数据集数据失败！'
+                                            )
+                                        ) {
+                                            initReport(
+                                                excelJson,
+                                                getData(data, 'data', true)
+                                            );
+                                        }
+                                    })
+                                    .catch(
+                                        genResponseErrorCallback(handleError)
+                                    );
+                            } else {
+                                initReport(excelJson, {});
+                            }
+                        } else {
+                            initReport();
+                        }
+                    }
                 })
-                .catch(handleError);
-            }
-          };
-          if (excelJson) {
-            const usedDatasources = excelJson.usedDatasources || [];
-            if (usedDatasources && usedDatasources.length > 0) {
-              axios
-                .get(getTableDataUrl(usedDatasources.join(',')))
-                .then((data) => {
-                  let error = getError(data);
-                  if (error != null) {
-                    return handleError(error);
-                  }
-                  initReport(
-                    excelJson,
-                    data.data?.data?.data
-                  );
-                })
-                .catch(handleError);
-            } else {
-              initReport(excelJson, {});
-            }
-          } else {
-            initReport();
-          }
-        })
-        .catch(handleRequestError);
-    }
-  }, []);
-  return (
-    <Wrap>
-      {data.loadMsg != null ? (
-        <WaitMsg title={data.loadMsg}></WaitMsg>
-      ) : null}
-      {data.errorMsg != null ? (
-        <Error
-          message={data.errorMsg}
-          onClose={() =>
-            setData({ ...data, loadMsg: null, errorMsg: null })
-          }
-        ></Error>
-      ) : null}
-      <Toolbar>
-        <Fill></Fill>
-        <Button
-          type='primary'
-          style={{ height: 26,width:110 }}
-          // disabled={!data.report}
-          onClick={() => {
-            if(!data.report) return;
-            setLoadMsg('导出到excel中，请稍候...');
-            data.report
-              .exportExcel(getTitle('未命名'))
-              .then(() => {
-                setLoadMsg(null);
-              })
-              .catch(handleError);
-          }}
-        >
-          导出到excel
-        </Button>
-        <Button
-          type='primary'
-          style={{ height: 26 }}
-          // disabled={!data.report}
-          onClick={() => {
-            if(!data.report) return;
-            setLoadMsg('导出到pdf中，请稍候...');
-            exportPdf()
-              .then((data) => {
-                setLoadMsg(null);
-                if (Object.prototype.toString.call(data) === '[object Blob]')
-                  download(data, getTitle('未命名') + '.pdf')
-                else
-                  handleError(data.message)
-              })
-              .catch(handleError);
-          }}
-        >
-          导出到pdf
-        </Button>
-        {isPrint ? (
-          <Button
-            type='primary'
-            style={{ height: 26 }}
-            onClick={() => {
-              data.report && data.report.print();
-            }}
-          >
-            打印
-          </Button>
-        ) : null}
-      </Toolbar>
-      <ExcelWrap>
-        <ExcelHost ref={ref}></ExcelHost>
-      </ExcelWrap>
-    </Wrap>
-  );
+                .catch(genResponseErrorCallback(handleError));
+        }
+    }, []);
+    return (
+        <Wrap>
+            {data.loadMsg != null ? (
+                <WaitMsg title={data.loadMsg}></WaitMsg>
+            ) : null}
+            {data.errorMsg != null ? (
+                <Error
+                    message={data.errorMsg}
+                    onClose={() =>
+                        setData({ ...data, loadMsg: null, errorMsg: null })
+                    }
+                ></Error>
+            ) : null}
+            <Toolbar>
+                <Fill></Fill>
+                <Button
+                    type='primary'
+                    style={{ height: 26, width: 110 }}
+                    // disabled={!data.report}
+                    onClick={() => {
+                        if (!data.report) return;
+                        setLoadMsg('导出到excel中，请稍候...');
+                        data.report
+                            .exportExcel(getTitle('未命名'))
+                            .then(() => {
+                                setLoadMsg(null);
+                            })
+                            .catch(handleError);
+                    }}
+                >
+                    导出到excel
+                </Button>
+                <Button
+                    type='primary'
+                    style={{ height: 26 }}
+                    // disabled={!data.report}
+                    onClick={() => {
+                        if (!data.report) return;
+                        setLoadMsg('导出到pdf中，请稍候...');
+                        exportPdf()
+                            .then((data) => {
+                                setLoadMsg(null);
+                                if (
+                                    Object.prototype.toString.call(data) ===
+                                    '[object Blob]'
+                                )
+                                    download(data, getTitle('未命名') + '.pdf');
+                                else handleError(data.message);
+                            })
+                            .catch(handleError);
+                    }}
+                >
+                    导出到pdf
+                </Button>
+                {isPrint ? (
+                    <Button
+                        type='primary'
+                        style={{ height: 26 }}
+                        onClick={() => {
+                            data.report && data.report.print();
+                        }}
+                    >
+                        打印
+                    </Button>
+                ) : null}
+            </Toolbar>
+            <ExcelWrap>
+                <ExcelHost ref={ref}></ExcelHost>
+            </ExcelWrap>
+        </Wrap>
+    );
 }
