@@ -130,58 +130,66 @@ class ExcelEnhancer {
     parseSparkline(sheet, row, col) {
         return new Promise((resolve, reject) => {
             const value = sheet.getValue(row, col);
-            if (
-                value &&
-                value.typeName == 'SparklineExValue' &&
-                value.value &&
-                value.value.imageBase64Data
-            ) {
-                const { drawType, hAlign, imageBase64Data, vAlign } =
-                    value.value;
-                const GC = getNamespace();
-                base64DataURLToImageData(imageBase64Data)
-                    .then((imgData) => {
-                        const { width: originalWidth, height: originalHeight } =
-                            imgData;
-                        const picture =
-                            new GC.Spread.Sheets.Shapes.PictureShape(
-                                sheet,
-                                `CellImage_${row}_${col}`,
-                                imageBase64Data,
-                                this.getLeft(sheet, col),
-                                this.getTop(sheet, row)
+            if (value && value.typeName == 'SparklineExValue') {
+                if (!value.value || !value.value.imageBase64Data) {
+                    this.items.push({
+                        type: 'sparklineEnhancer',
+                        sheetName: sheet.name(),
+                        row,
+                        col,
+                        picture: null,
+                    });
+                    resolve();
+                } else {
+                    const { drawType, hAlign, imageBase64Data, vAlign } =
+                        value.value;
+                    const GC = getNamespace();
+                    base64DataURLToImageData(imageBase64Data)
+                        .then((imgData) => {
+                            const {
+                                width: originalWidth,
+                                height: originalHeight,
+                            } = imgData;
+                            const picture =
+                                new GC.Spread.Sheets.Shapes.PictureShape(
+                                    sheet,
+                                    `CellImage_${row}_${col}`,
+                                    imageBase64Data,
+                                    this.getLeft(sheet, col),
+                                    this.getTop(sheet, row)
+                                );
+                            picture.allowMove(false);
+                            picture.allowResize(false);
+                            picture.allowRotate(false);
+                            picture.canPrint(true);
+                            const cellWidth = sheet.getColumnWidth(col);
+                            const cellHeight = sheet.getRowHeight(row);
+                            this.dealPictureRect(
+                                cellWidth,
+                                originalWidth,
+                                cellHeight,
+                                originalHeight,
+                                drawType,
+                                picture
                             );
-                        picture.allowMove(false);
-                        picture.allowResize(false);
-                        picture.allowRotate(false);
-                        picture.canPrint(true);
-                        const cellWidth = sheet.getColumnWidth(col);
-                        const cellHeight = sheet.getRowHeight(row);
-                        this.dealPictureRect(
-                            cellWidth,
-                            originalWidth,
-                            cellHeight,
-                            originalHeight,
-                            drawType,
-                            picture
-                        );
-                        this.dealPictureAlign(
-                            cellWidth,
-                            cellHeight,
-                            hAlign,
-                            vAlign,
-                            picture
-                        );
-                        this.items.push({
-                            type: 'sparklineEnhancer',
-                            sheetName: sheet.name(),
-                            row,
-                            col,
-                            picture,
-                        });
-                        resolve();
-                    })
-                    .catch(reject);
+                            this.dealPictureAlign(
+                                cellWidth,
+                                cellHeight,
+                                hAlign,
+                                vAlign,
+                                picture
+                            );
+                            this.items.push({
+                                type: 'sparklineEnhancer',
+                                sheetName: sheet.name(),
+                                row,
+                                col,
+                                picture,
+                            });
+                            resolve();
+                        })
+                        .catch(reject);
+                }
             } else {
                 resolve();
             }
@@ -228,9 +236,11 @@ class ExcelEnhancer {
         //将单元格的值设置为空字符串，防止excel中显示!value
         json.data.dataTable[row][col].value = '';
         json.data.dataTable[row][col].formula = undefined;
-        const shapes = json.shapes || [];
-        shapes.push(picture.toJSON());
-        json.shapes = shapes;
+        if(picture){
+            const shapes = json.shapes || [];
+            shapes.push(picture.toJSON());
+            json.shapes = shapes;
+        }
     }
 
     executeEnhancer(json) {
@@ -253,7 +263,7 @@ class ExcelEnhancer {
             this.parseSpread()
                 .then(() => {
                     const json = this.spread.toJSON();
-                    this.executeEnhancer(json)
+                    this.executeEnhancer(json);
                     resolve(json);
                 })
                 .catch(reject);

@@ -126,7 +126,7 @@ export default function () {
                     ) {
                         let excelJson = null;
                         try {
-                            excelJson = JSON.parse(getData(config, 'config'));
+                            excelJson = JSON.parse(getData(config.data, 'config'));
                         } catch (e) {}
                         const initReport = (excelJson, datas) => {
                             const report = new TOONE.Report.Preview({
@@ -179,7 +179,7 @@ export default function () {
                                         ) {
                                             initReport(
                                                 excelJson,
-                                                getData(data, 'data', true)
+                                                getData(data.data, 'data', true)
                                             );
                                         }
                                     })

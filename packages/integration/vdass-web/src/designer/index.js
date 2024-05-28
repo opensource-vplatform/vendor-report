@@ -152,7 +152,7 @@ const designer = new Designer({
                         ) {
                             resolve(
                                 enhanceMetadata(
-                                    getData(metadata, 'define') || []
+                                    getData(metadata.data, 'define') || []
                                 )
                             );
                         }
@@ -174,7 +174,7 @@ const designer = new Designer({
                             let excelJson = null;
                             try {
                                 excelJson = JSON.parse(
-                                    getData(config, 'config')
+                                    getData(config.data, 'config')
                                 );
                             } catch (e) {}
                             const selectedDatasources =
@@ -199,7 +199,7 @@ const designer = new Designer({
                                             resolve({
                                                 tableMetadata: enhanceMetadata(
                                                     getData(
-                                                        metadata,
+                                                        metadata.data,
                                                         'define'
                                                     ) || []
                                                 ),
@@ -239,7 +239,7 @@ const designer = new Designer({
                         if (
                             !handleError(data, reject, '获取数据集数据失败！')
                         ) {
-                            resolve(getData(data, 'data', true));
+                            resolve(getData(data.data, 'data', true));
                         }
                     })
                     .catch(genResponseErrorCallback(reject));

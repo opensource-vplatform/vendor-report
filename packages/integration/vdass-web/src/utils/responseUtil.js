@@ -56,13 +56,16 @@ const getError = function (data, defMsg) {
     if (hasError(data)) {
         return getErrorMsg(data, defMsg);
     } else if (data.data) {
-        return getError(data.data);
+        return getError(data.data, defMsg);
     } else {
         return null;
     }
 };
 
 export const getData = function (data, attr, deepFirst = false) {
+    if(!data){
+        return null;
+    }
     if (deepFirst) {
         let result = null;
         if (data.data) {

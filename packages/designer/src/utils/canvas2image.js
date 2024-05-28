@@ -67,7 +67,7 @@ function getUsedRange(spread) {
  */
 function getActiveSheetSnapshot(spread, width, height) {
     const el = spread.getHost();
-    const sourceCanvas = el.querySelector('canvas');
+    const sourceCanvas = el.querySelector("canvas[gcuielement=\"gcWorksheetCanvas\"]");
     const canvasWidth = sourceCanvas.width;
     const convasHeight = sourceCanvas.height;
     const position = getUsedRange(spread);
