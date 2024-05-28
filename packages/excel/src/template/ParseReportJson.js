@@ -245,16 +245,6 @@ export default class ParseReportJson {
                 );
             pageSubtotal = pageSubtotal || 1; //处理分页区域绑定的实体无数据时，整个报表不显示问题 add by xiedh
 
-            let showPageCount = 1;
-            let sheetPrintPage = {
-                sheet: pageInfos.sheet,
-                spans: [],
-                rows: [],
-                rules: [],
-                dataTable: {},
-                autoMergeRanges: [],
-                rowCount: 0,
-            };
             while (index < pageSubtotal) {
                 const sheetPage = {
                     sheet: pageInfos.sheet,
@@ -266,8 +256,8 @@ export default class ParseReportJson {
                     rowCount: 0,
                 };
 
-                if (!sheetPrintPage) {
-                    sheetPrintPage = {
+                if (!pageInfos.sheetPrintPage) {
+                    pageInfos.sheetPrintPage = {
                         sheet: pageInfos.sheet,
                         spans: [],
                         rows: [],
@@ -325,7 +315,7 @@ export default class ParseReportJson {
                     templates: headerTemplates,
                     pageInfos,
                     sheetPage,
-                    sheetPrintPage,
+                    sheetPrintPage: pageInfos.sheetPrintPage,
                 });
                 let endIndex = startIndex + contentTempCount;
                 //最后一页
@@ -338,13 +328,13 @@ export default class ParseReportJson {
                     startIndex,
                     endIndex,
                     sheetPage,
-                    sheetPrintPage,
+                    sheetPrintPage: pageInfos.sheetPrintPage,
                 });
                 this.genPageDataTables({
                     templates: footerTemplates,
                     pageInfos,
                     sheetPage,
-                    sheetPrintPage,
+                    sheetPrintPage: pageInfos.sheetPrintPage,
                 });
 
                 if (index + 1 < pageSubtotal) {
@@ -355,18 +345,14 @@ export default class ParseReportJson {
                 startIndex += contentTempCount;
                 index++;
                 this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
-                if (showPageCount % this.showPageCount === 0) {
+                if (pageInfos.showPageCount % this.showPageCount === 0) {
                     this.sheetPrintPages[pageInfos.sheet.name].datas.push(
-                        sheetPrintPage
+                        pageInfos.sheetPrintPage
                     );
-                    sheetPrintPage = null;
+                    pageInfos.sheetPrintPage = null;
+                    pageInfos.showPageCount = 0;
                 }
-                showPageCount += 1;
-            }
-            if (sheetPrintPage) {
-                this.sheetPrintPages[pageInfos.sheet.name].datas.push(
-                    sheetPrintPage
-                );
+                pageInfos.showPageCount += 1;
             }
         } else {
             const sheetPage = {
@@ -760,6 +746,17 @@ export default class ParseReportJson {
 
             pageInfos.unionDatasourceDatas = {};
 
+            pageInfos.sheetPrintPage = {
+                sheet: pageInfos.sheet,
+                spans: [],
+                rows: [],
+                rules: [],
+                dataTable: {},
+                autoMergeRanges: [],
+                rowCount: 0,
+            };
+            pageInfos.showPageCount = 1;
+
             sheetNames.forEach((sheetName, index) => {
                 pageInfos.groupName = sheetName;
                 pageInfos.isLastGroup = groupCount === index + 1;
@@ -825,6 +822,11 @@ export default class ParseReportJson {
 
                 this.render(pageInfos, templates);
             });
+            if (pageInfos.sheetPrintPage) {
+                this.sheetPrintPages[pageInfos.sheet.name].datas.push(
+                    pageInfos.sheetPrintPage
+                );
+            }
             pageInfos.sheet.namedStyles = this.namedStyles;
             //this.resetSheet(pageInfos);
             this.resetSheet(this.sheetPages[name].datas[0]);
