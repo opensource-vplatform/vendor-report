@@ -232,8 +232,26 @@ export default function (props) {
         }
     };
 
+    const Excel = (
+        <div style={{ display: 'none' }}>
+            <WorkbookItem
+                json={json}
+                dataSource={dataSource}
+                license={license}
+                onInited={(spread) => {
+                    datas.spread = spread;
+                }}
+                onPrintHandler={(handler) => {
+                    datas.printHandler = handler;
+                }}
+                enablePrint={enablePrint}
+                inst={inst}
+            ></WorkbookItem>
+        </div>
+    );
+
     if (!show) {
-        return <></>;
+        return Excel;
     }
 
     return (
@@ -246,21 +264,7 @@ export default function (props) {
                 }}
             >
                 <Wrap>
-                    <div style={{ display: 'none' }}>
-                        <WorkbookItem
-                            json={json}
-                            dataSource={dataSource}
-                            license={license}
-                            onInited={(spread) => {
-                                datas.spread = spread;
-                            }}
-                            onPrintHandler={(handler) => {
-                                datas.printHandler = handler;
-                            }}
-                            enablePrint={enablePrint}
-                            inst={inst}
-                        ></WorkbookItem>
-                    </div>
+                    {Excel}
                     <PageInfosWrap>
                         <Label>总页数</Label>：
                         <span className='info'>{datas.total}</span>
