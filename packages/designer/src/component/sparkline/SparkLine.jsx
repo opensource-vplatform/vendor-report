@@ -1,19 +1,28 @@
 import { useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import { OperationDialog } from '@components/dialog/Index';
-import { Integer, Select } from '@components/form/Index';
+import {
+  Integer,
+  Select,
+} from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import { genUUID } from '@utils/commonUtil';
 
-import { setConfig, setVisible } from '../../store/sparklineSlice';
 import {
-    handleCancel as onCancel,
-    handleConfirm as onConfirm,
-    isAlignDisabled,
-    isRectDisabled,
+  setConfig,
+  setVisible,
+} from '../../store/sparklineSlice';
+import {
+  handleCancel as onCancel,
+  handleConfirm as onConfirm,
+  isAlignDisabled,
+  isRectDisabled,
 } from '../../utils/sparklineUtil';
 
 const Wrapper = styled.div`

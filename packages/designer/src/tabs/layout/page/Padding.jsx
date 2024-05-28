@@ -173,7 +173,7 @@ const Menus = [
         title: '自定义页边距...',
         text: '自定义页边距...',
         handler: function (spread, dispatch) {
-            dispatch(setEditorVisible({ visible: true, reason: 'custom' }));
+            dispatch(setEditorVisible(true));
             dispatch(setActive('padding'));
         },
     },

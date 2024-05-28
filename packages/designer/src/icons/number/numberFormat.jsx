@@ -11,7 +11,8 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon={`url(${getBaseUrl()}/css/icons/number/numberFormat.svg)`}
+            type="toone"
+            icon={`url(${getBaseUrl()}/css/icons/number/numberFormat.png)`}
         ></BaseIcon>
     );
 }    

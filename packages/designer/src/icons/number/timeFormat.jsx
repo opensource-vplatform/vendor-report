@@ -11,7 +11,8 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon={`url(${getBaseUrl()}/css/icons/number/timeFormat.svg)`}
+            type="toone"
+            icon={`url(${getBaseUrl()}/css/icons/number/timeFormat.png)`}
         ></BaseIcon>
     );
 }    

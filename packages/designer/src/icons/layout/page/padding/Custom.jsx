@@ -11,8 +11,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            /* icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/custom.png)`} */
-            icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/normal.png)`}
+            icon={`url(${getBaseUrl()}/css/icons/layout/page/padding/custom.png)`}
         ></BaseIcon>
     );
 }

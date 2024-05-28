@@ -11,10 +11,6 @@ const EventNames = [
      * 工作簿json解析后事件
      */
     'OnSpreadJsonParsed',
-    /**
-     * 任何形状发生变化时触发
-     */
-    'OnShapeChanged',
 ];
 
 export const EVENTS = {};

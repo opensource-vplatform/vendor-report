@@ -11,7 +11,8 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon={`url(${getBaseUrl()}/css/icons/formula/toSetting.svg)`}
+            size="middle"
+            icon={`url(${getBaseUrl()}/css/icons/formula/toSetting.png)`}
         ></BaseIcon>
     );
 };

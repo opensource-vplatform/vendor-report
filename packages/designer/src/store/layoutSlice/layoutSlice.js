@@ -64,9 +64,7 @@ export const navSlice = createSlice({
          * @param {*} param1 
          */
         setEditorVisible(state,{payload}){
-            const {visible,reason} = payload;
-            state.editorVisible = visible;
-            state.editorVisibleReason = reason;
+            state.editorVisible = payload;
         },
         /**
          * 设置信息

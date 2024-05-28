@@ -1,4 +1,5 @@
 import { getBaseUrl } from '@utils/environmentUtil';
+
 import BaseIcon from '../base/BaseIcon';
 
 /**
@@ -10,7 +11,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            type='toone'
+            size="large"
             icon={`url(${getBaseUrl()}/css/icons/indent/increaseIndent.png)`}
         ></BaseIcon>
     );

@@ -19,7 +19,7 @@ export default function () {
     const { editorVisible } = useSelector(({ layoutSlice }) => layoutSlice);
     const dispatch = useDispatch();
     const closeEditor = () => {
-        dispatch(setEditorVisible({ visible: false, reason: null }));
+        dispatch(setEditorVisible(false));
     };
     return (
         <Fragment>

@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import Dialog from './component/dialog';
 import Button from './component/form/Button';
+import ExcelEnhancer from './utils/ExcelEnhancer';
 import { download } from './utils/fileUtil';
 import {
   getNamespace,
@@ -118,36 +119,39 @@ export default function (props) {
                         newSheet.sheet = sheetJson;
                         inst.resetSheet(newSheet);
                         sheet.fromJSON(sheetJson);
-                        const json = JSON.stringify(datas.spread.toJSON());
-                        excelIO.save(
-                            json,
-                            (blob) => {
-                                blobs.unshift({
-                                    filename: newfilename,
-                                    blob,
-                                });
-
-                                if (blobs.length === pageDatas.datas.length) {
-                                    resolve();
+                        const enhancer = new ExcelEnhancer(datas.spread);
+                        enhancer.enhance().then((result)=>{
+                            const json = JSON.stringify(result);
+                            excelIO.save(
+                                json,
+                                (blob) => {
+                                    blobs.unshift({
+                                        filename: newfilename,
+                                        blob,
+                                    });
+    
+                                    if (blobs.length === pageDatas.datas.length) {
+                                        resolve();
+                                    }
+                                },
+                                (err) => {
+                                    reject(err);
+                                },
+                                {
+                                    columnHeadersAsFrozenRows: false,
+                                    includeAutoMergedCells: false,
+                                    includeBindingSource: false,
+                                    includeCalcModelCache: false,
+                                    includeEmptyRegionCells: true,
+                                    includeFormulas: !options.ignoreFormula,
+                                    includeStyles: !options.ignoreStyle,
+                                    includeUnusedNames: true,
+                                    password: undefined,
+                                    rowHeadersAsFrozenColumns: false,
+                                    saveAsView: false,
                                 }
-                            },
-                            (err) => {
-                                reject(err);
-                            },
-                            {
-                                columnHeadersAsFrozenRows: false,
-                                includeAutoMergedCells: false,
-                                includeBindingSource: false,
-                                includeCalcModelCache: false,
-                                includeEmptyRegionCells: true,
-                                includeFormulas: !options.ignoreFormula,
-                                includeStyles: !options.ignoreStyle,
-                                includeUnusedNames: true,
-                                password: undefined,
-                                rowHeadersAsFrozenColumns: false,
-                                saveAsView: false,
-                            }
-                        );
+                            );
+                        }).catch(reject);
                     }
                 });
             } else {

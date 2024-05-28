@@ -10,7 +10,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            type='toone'
+            size="large"
             icon={`url(${getBaseUrl()}/css/icons/cell/colWidth.png)`}
         ></BaseIcon>
     );

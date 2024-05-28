@@ -16,7 +16,7 @@ export const IconWrap = styled.label`
     &[data-disabled='true']:hover {
         background-color: transparent;
     }
-    &[data-type='toone-md'] {
+    &[data-size='middle'] {
         min-height: 24px;
         min-width: 24px;
     }

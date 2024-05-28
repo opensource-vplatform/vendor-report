@@ -10,7 +10,7 @@ import BaseIcon from '../base/BaseIcon';
 export default function (props) {
     return (
         <BaseIcon
-            type='toone'
+            size="large"
             icon={`url(${getBaseUrl()}/css/icons/border/borderOutline.png)`}
             {...props}
         ></BaseIcon>

@@ -11,7 +11,8 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            icon={`url(${getBaseUrl()}/css/icons/border/borderTopThickBottom.svg)`}
+            size="large"
+            icon={`url(${getBaseUrl()}/css/icons/border/borderTopThickBottom.png)`}
         ></BaseIcon>
     );
 }

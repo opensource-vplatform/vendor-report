@@ -1,7 +1,8 @@
-import { registerCellType, registerFuncs } from './custom';
-import { bind, EVENTS, fire } from './event/EventManager';
-import { handleShapeChanged } from './shape/ShapeManager';
-import { getNamespace } from './utils/spreadUtil';
+import { registerFuncs } from './custom';
+import {
+  bind,
+  EVENTS,
+} from './event/EventManager';
 
 export const init = function () {
     bind({
@@ -32,20 +33,6 @@ export const init = function () {
                 left: 1,
                 top: 1,
             };
-            registerCellType(sheet);
-            const GC = getNamespace();
-            sheet.bind(GC.Spread.Sheets.Events.ShapeChanged, (evt, info) => {
-                fire({
-                    event: EVENTS.OnShapeChanged,
-                    args: [evt, info],
-                });
-            });
-        },
-    });
-    bind({
-        event: EVENTS.OnShapeChanged,
-        handler: function (e, info) {
-            handleShapeChanged(info);
         },
     });
 };

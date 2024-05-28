@@ -15,7 +15,7 @@ export default function (props) {
     return (
         <BaseIcon
             {...props}
-            type='toone'
+            size="large"
             icon={`url(${getBase64Data()})`}
         ></BaseIcon>
     );

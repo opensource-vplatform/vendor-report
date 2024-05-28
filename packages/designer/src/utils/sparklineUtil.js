@@ -32,14 +32,15 @@ const toFormulaArg = function (val) {
 
 const argList = [
     ['url', ''],
-    ['mode', 1],
+    ['alt', ''],
+    ['mode', 0],
     ['height', 0],
     ['width', 0],
     ['clipX', 0],
     ['clipY', 0],
     ['clipHeight', 0],
     ['clipWidth', 0],
-    ['vAlign', 1],
+    ['vAlign', 2],
     ['hAlign', 1],
 ];
 

@@ -3,6 +3,7 @@ import Plugin from '../Plugin';
 
 const argList = [
     ['url', ''],
+    ['alt', ''],
     ['mode', 1],
     ['height', 0],
     ['width', 0],
@@ -10,7 +11,7 @@ const argList = [
     ['clipY', 0],
     ['clipHeight', 0],
     ['clipWidth', 0],
-    ['vAlign', 1],
+    ['vAlign', 2],
     ['hAlign', 1],
 ];
 
@@ -22,8 +23,8 @@ const toFormulaArg = function (val) {
 };
 
 const toFormula = function (data) {
-    const formula = ['TOONE.IMAGE('];
-    //const formula = ['IMAGE('];
+    //const formula = ['TOONE.IMAGE('];
+    const formula = ['IMAGE('];
     argList.forEach((argDef) => {
         let argName,
             argDeft = undefined;

@@ -10,13 +10,19 @@ const Icon = styled.div`
     background-repeat: no-repeat;
     background-position: center center;
     background-size: 100%;
-    &[data-type='toone'] {
+    &[data-size='large'] {
         padding: 0px;
         margin: 0px;
         height: 24px;
         width: 24px;
     }
-    &[data-type='toone-md'] {
+    &[data-size='middle'] {
+        padding: 0px;
+        margin: 0px;
+        height: 21px;
+        width: 21px;
+    }
+    &[data-size='small'] {
         padding: 0px;
         margin: 0px;
         height: 18px;
@@ -34,7 +40,7 @@ function Index(pros) {
         disabled = false,
         style = {},
         iconStyle = {},
-        type,
+        size,
         children,
         ...others
     } = pros;
@@ -53,11 +59,11 @@ function Index(pros) {
             title={tips}
             onClick={handleClick}
             style={st}
-            data-type={type}
+            data-size={size}
             data-disabled={disabled}
             data-hoverable={hoverable}
         >
-            <Icon style={icSt} data-type={type}></Icon>
+            <Icon style={icSt} data-size={size}></Icon>
             {children}
         </IconWrap>
     );
