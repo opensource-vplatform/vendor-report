@@ -278,8 +278,9 @@ class Report {
         return new Promise((resolve, reject) => {
             if (this.printHandler) {
                 this.printHandler(params)
-                    .then(() => {
-                        this.spread.print();
+                    .then((spread) => {
+                        spread.print();
+                        //this.spread.print();
                         resolve();
                     })
                     .catch(reject);

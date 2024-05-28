@@ -306,7 +306,7 @@ e.exports=n=function(){return a},e.exports.__esModule=!0,e.exports.default=e.exp
         text-align: center;
         height: 30px;
         line-height: 30px;
-        width: auto;
+        width: max-content;
         margin-left: 5px;
         margin-right: 3px;
     }
