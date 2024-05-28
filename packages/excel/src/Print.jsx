@@ -102,7 +102,7 @@ export default function (props) {
     ) => {
         const zip = new JSZip();
         const blobs = [];
-        const result = new Promise((resolve, reject) => {
+        const result = new Promise((_resolve, reject) => {
             if (typeof filename == 'string' && filename.trim() !== '') {
                 resourceManager.loadScript(getPluginSrc('excel')).then(() => {
                     const GC = getNamespace();
@@ -110,49 +110,72 @@ export default function (props) {
                     const pageDatas = sheetPrintPages[activeSheetName];
                     const excelIO = new GC.Spread.Excel.IO();
                     const sheet = datas.spread.getActiveSheet();
-                    const sheetJson = sheet.toJSON();
                     const datasLen = pageDatas.datas.length;
-                    for (let i = 0; i < datasLen; i++) {
-                        let newfilename = filename + (i + 1) + '.xlsx';
 
-                        const newSheet = pageDatas.datas[i];
-                        newSheet.sheet = sheetJson;
-                        inst.resetSheet(newSheet);
-                        sheet.fromJSON(sheetJson);
-                        const enhancer = new ExcelEnhancer(datas.spread);
-                        enhancer.enhance().then((result)=>{
-                            const json = JSON.stringify(result);
-                            excelIO.save(
-                                json,
-                                (blob) => {
-                                    blobs.unshift({
-                                        filename: newfilename,
-                                        blob,
-                                    });
-    
-                                    if (blobs.length === pageDatas.datas.length) {
-                                        resolve();
-                                    }
-                                },
-                                (err) => {
-                                    reject(err);
-                                },
-                                {
-                                    columnHeadersAsFrozenRows: false,
-                                    includeAutoMergedCells: false,
-                                    includeBindingSource: false,
-                                    includeCalcModelCache: false,
-                                    includeEmptyRegionCells: true,
-                                    includeFormulas: !options.ignoreFormula,
-                                    includeStyles: !options.ignoreStyle,
-                                    includeUnusedNames: true,
-                                    password: undefined,
-                                    rowHeadersAsFrozenColumns: false,
-                                    saveAsView: false,
-                                }
-                            );
-                        }).catch(reject);
+                    const promiseFns = [];
+                    for (let i = 0; i < datasLen; i++) {
+                        promiseFns.push(() => {
+                            return new Promise((resolve) => {
+                                let newfilename = filename + (i + 1) + '.xlsx';
+                                const sheetJson = sheet.toJSON();
+                                const newSheet = pageDatas.datas[i];
+                                newSheet.sheet = sheetJson;
+                                inst.resetSheet(newSheet);
+                                sheet.fromJSON(sheetJson);
+
+                                const enhancer = new ExcelEnhancer(
+                                    datas.spread
+                                );
+
+                                enhancer
+                                    .enhance()
+                                    .then((result) => {
+                                        const json = JSON.stringify(result);
+                                        excelIO.save(
+                                            json,
+                                            (blob) => {
+                                                blobs.unshift({
+                                                    filename: newfilename,
+                                                    blob,
+                                                });
+                                                resolve();
+                                                console.log(i, '测试');
+                                                if (
+                                                    blobs.length ===
+                                                    pageDatas.datas.length
+                                                ) {
+                                                    _resolve();
+                                                }
+                                            },
+                                            (err) => {
+                                                reject(err);
+                                            },
+                                            {
+                                                columnHeadersAsFrozenRows: false,
+                                                includeAutoMergedCells: false,
+                                                includeBindingSource: false,
+                                                includeCalcModelCache: false,
+                                                includeEmptyRegionCells: true,
+                                                includeFormulas:
+                                                    !options.ignoreFormula,
+                                                includeStyles:
+                                                    !options.ignoreStyle,
+                                                includeUnusedNames: true,
+                                                password: undefined,
+                                                rowHeadersAsFrozenColumns: false,
+                                                saveAsView: false,
+                                            }
+                                        );
+                                    })
+                                    .catch(reject);
+                            });
+                        });
                     }
+                    promiseFns.reduce((prev, cur) => {
+                        return prev.then(() => {
+                            return cur().then(() => {});
+                        });
+                    }, Promise.resolve());
                 });
             } else {
                 reject(Error('导出excel失败，原因:没有传递导出文件名'));
@@ -169,7 +192,7 @@ export default function (props) {
         });
         return result;
     };
-
+    window.exportExcel = exportExcel;
     useEffect(() => {
         if (typeof onInited === 'function') {
             onInited({
