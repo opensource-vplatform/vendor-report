@@ -125,8 +125,9 @@ class Report {
                 if (this.exportExcelHandler) {
                     this.exportExcelHandler()
                         .then(({ exportExcel }) => {
-                            exportExcel(filename, options);
-                            resolve();
+                            exportExcel(filename, options).then(() => {
+                                resolve();
+                            });
                         })
                         .catch(reject);
                 } else {
