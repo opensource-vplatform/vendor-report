@@ -86,6 +86,12 @@ const getError = function (result) {
 
 export default function () {
     const ref = useRef(null);
+
+    const page = useRef({
+        pageCompletedHandler: null,
+        setPageInfos: null,
+    });
+
     const [data, setData] = useState({
         loadMsg: '初始化中，请稍候...',
         errorMsg: null,
@@ -128,6 +134,16 @@ export default function () {
                                 enablePrint: isPrint,
                                 dataSource: datas,
                                 json: excelJson,
+                                onPageCompleted(handler) {
+                                    page.pageCompletedHandler = handler;
+                                    if (page.setPageInfos) {
+                                        page.pageCompletedHandler().then(
+                                            (datas) => {
+                                                page.setPageInfos(datas);
+                                            }
+                                        );
+                                    }
+                                },
                             });
                             //报表挂载到指定dom元素
                             report.mount(ref.current);
@@ -196,6 +212,16 @@ export default function () {
             ) : null}
             <Toolbar>
                 <Fill></Fill>
+                <Page
+                    onInited={(datas) => {
+                        page.setPageInfos = datas.setPageInfos;
+                        if (page.pageCompletedHandler) {
+                            page.pageCompletedHandler().then((datas) => {
+                                page.setPageInfos(datas);
+                            });
+                        }
+                    }}
+                ></Page>
                 <Button
                     type='primary'
                     style={{ height: 26, width: 110 }}
