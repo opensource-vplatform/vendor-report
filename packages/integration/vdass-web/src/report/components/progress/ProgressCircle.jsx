@@ -45,13 +45,16 @@ const ProgressTitle = styled.div`
   text-overflow:ellipsis;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
+  text-align: center;
 `;
 
-const ProgressCircle = ({ percent, title = '' }) => {
+const ProgressCircle = ({ percent, title = '' }, ref) => {
   const progressRef = useRef(null);
+
 
   useEffect(() => {
     const progressCircle = progressRef.current;
+    if (!progressCircle) return
     const radius = 80;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference * (1 - percent / 100);
@@ -59,6 +62,7 @@ const ProgressCircle = ({ percent, title = '' }) => {
     progressCircle.style.strokeDashoffset = offset;
 
   }, [percent]);
+
 
 
   return (
