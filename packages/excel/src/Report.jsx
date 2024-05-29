@@ -121,7 +121,6 @@ class Report {
         options = {
             ignoreFormula: false,
             ignoreStyle: false,
-            progress: function (current, amount) {},
         }
     ) {
         return new Promise((resolve, reject) => {

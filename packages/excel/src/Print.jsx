@@ -91,7 +91,7 @@ export default function (props) {
 
     const [printInfos, setPrintInfos] = useState({
         start: 1,
-        end: 20,
+        end: datas.total >= 20 ? 20 : datas.total,
         printTotal: 20,
         printed: {},
     });
@@ -138,14 +138,40 @@ export default function (props) {
                                                     filename: newfilename,
                                                     blob,
                                                 });
-                                                resolve();
-                                                console.log(i, '测试');
+
+                                                if (
+                                                    typeof options.progress ===
+                                                    'function'
+                                                ) {
+                                                    let currentIndex =
+                                                        (i + 1) * 20;
+                                                    const total = currentIndex;
+                                                    if (
+                                                        currentIndex >=
+                                                        datas.total
+                                                    ) {
+                                                        currentIndex =
+                                                            datas.total;
+                                                    }
+                                                    for (
+                                                        let i = total - 20 + 1;
+                                                        i <= currentIndex;
+                                                        i++
+                                                    ) {
+                                                        options.progress(
+                                                            i,
+                                                            datas.total
+                                                        );
+                                                    }
+                                                }
+
                                                 if (
                                                     blobs.length ===
                                                     pageDatas.datas.length
                                                 ) {
                                                     _resolve();
                                                 }
+                                                resolve();
                                             },
                                             (err) => {
                                                 reject(err);
@@ -172,7 +198,7 @@ export default function (props) {
                         });
                     }
                     promiseFns.reduce((prev, cur) => {
-                        return prev.then(() => {
+                        return prev.then((a) => {
                             return cur().then(() => {});
                         });
                     }, Promise.resolve());

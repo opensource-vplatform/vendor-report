@@ -25,6 +25,7 @@ import Button from './components/button/Index';
 import Error from './components/error/Index';
 import WaitMsg from './components/loading/Index';
 import Page from './components/page/Index';
+import Progress from './components/progress';
 
 const Wrap = styled.div`
     display: flex;
@@ -76,6 +77,8 @@ export default function () {
         setPageInfos: null,
     });
 
+    const progressRef = useRef(null);
+
     const [data, setData] = useState({
         loadMsg: '初始化中，请稍候...',
         errorMsg: null,
@@ -109,7 +112,9 @@ export default function () {
                     ) {
                         let excelJson = null;
                         try {
-                            excelJson = JSON.parse(getData(config.data, 'config'));
+                            excelJson = JSON.parse(
+                                getData(config.data, 'config')
+                            );
                         } catch (e) {}
                         const initReport = (excelJson, datas) => {
                             const report = new TOONE.Report.Preview({
@@ -185,6 +190,7 @@ export default function () {
                     }
                 ></Error>
             ) : null}
+            <Progress ref={progressRef}></Progress>
             <Toolbar>
                 <Fill></Fill>
                 <Page
@@ -202,11 +208,29 @@ export default function () {
                     style={{ height: 26, width: 110 }}
                     disabled={!data.report}
                     onClick={() => {
-                        setLoadMsg('导出到excel中，请稍候...');
+                        const title = '导出到，请稍候...';
+                        //setLoadMsg('导出到excel中，请稍候...');
+                        progressRef.current.setProgress(0, title);
+                        progressRef.current.onShow();
                         data.report
-                            .exportExcel(getTitle('未命名'))
+                            .exportExcel(getTitle('未命名'), {
+                                progress(current, total = 1) {
+                                    const percent = Math.floor(
+                                        (current / total) * 100
+                                    );
+                                    progressRef.current.setProgress(
+                                        percent,
+                                        title
+                                    );
+                                },
+                            })
                             .then(() => {
-                                setLoadMsg(null);
+                                //setLoadMsg(null);
+                                progressRef.current.setProgress(
+                                    100,
+                                    '导出完成'
+                                );
+                                progressRef.current.onClose();
                             })
                             .catch(handleError);
                     }}
