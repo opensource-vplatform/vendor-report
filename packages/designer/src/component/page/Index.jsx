@@ -143,6 +143,14 @@ export default function (props) {
         changePageIndexHandler(pageInfos.total);
     };
 
+    const keyDownHandler = (e) => {
+        // 检查按下的键是否是回车键（键码为13）
+        if (e.keyCode === 13) {
+            // 在这里执行回车键被按下时的操作
+            blurHandler(e);
+        }
+    };
+
     const changeHandler = (e) => {
         let newValue = Number(e.target.value);
         if (!Number.isInteger(newValue)) {
@@ -214,6 +222,7 @@ export default function (props) {
                     value={pageIndex}
                     onBlur={blurHandler}
                     onChange={changeHandler}
+                    onKeyDown={keyDownHandler}
                 />
             </InputWrap>
             <Label>

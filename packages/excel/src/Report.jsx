@@ -118,7 +118,11 @@ class Report {
      */
     exportExcel(
         filename,
-        options = { ignoreFormula: false, ignoreStyle: false }
+        options = {
+            ignoreFormula: false,
+            ignoreStyle: false,
+            progress: function (current, amount) {},
+        }
     ) {
         return new Promise((resolve, reject) => {
             if (typeof filename == 'string' && filename.trim() !== '') {

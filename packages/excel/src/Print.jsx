@@ -182,13 +182,20 @@ export default function (props) {
             }
         });
         result.then(() => {
-            blobs.forEach(({ filename, blob }) => {
-                zip.file(filename, blob, { binary: true });
-            });
+            if (blobs.length > 1) {
+                blobs.forEach(({ filename, blob }) => {
+                    zip.file(filename, blob, { binary: true });
+                });
 
-            zip.generateAsync({ type: 'blob' }).then(function (content) {
-                download(content, `${filename}.zip`);
-            });
+                zip.generateAsync({ type: 'blob' }).then(function (content) {
+                    download(content, `${filename}.zip`);
+                });
+            } else {
+                blobs.forEach(({ blob }) => {
+                    let newfilename = filename + '.xlsx';
+                    download(blob, newfilename);
+                });
+            }
         });
         return result;
     };

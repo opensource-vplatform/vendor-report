@@ -371,6 +371,7 @@ export default class ParseReportJson {
             });
             this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
             this.sheetPrintPages[pageInfos.sheet.name].datas.push(sheetPage);
+            pageInfos.sheetPrintPage = null;
         }
     }
     genPageInfos({ sheet }) {
