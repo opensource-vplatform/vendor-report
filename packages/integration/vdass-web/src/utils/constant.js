@@ -62,5 +62,5 @@ export const getExportPdfUrl = function(fileId){
  * @returns 
  */
 export const getExportPdfProgressUrl = function(fileId){
-  return `${getHost()}/reportapi/report/reportExportProgress/${fileId}`;
+  return `${getHost()}/reportapi/${getAppCode()}/report/reportExportProgress/${fileId}${window.location.search}`;
 }
