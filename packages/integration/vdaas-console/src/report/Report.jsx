@@ -92,7 +92,7 @@ export default function () {
         setData({
             ...data,
             loadMsg: null,
-            pageError:null,
+            pageError: null,
             errorMsg: typeof err == 'string' ? err : err.message,
         });
     };
@@ -226,9 +226,9 @@ export default function () {
                     style={{ height: 26, width: 110 }}
                     disabled={!data.report}
                     onClick={() => {
-                        const title = '导出到，请稍候...';
+                        const title = '导出中，请稍候...';
                         //setLoadMsg('导出到excel中，请稍候...');
-                        progressRef.current.setProgress(0, title);
+                        progressRef.current.setProgress(1, title);
                         progressRef.current.onShow();
                         data.report
                             .exportExcel(getTitle('未命名'), {
