@@ -121,7 +121,7 @@ export default function () {
                 if (data.progress == 100) {
                     setTimeout(() => {
                         progressRef.current.onClose();
-                        progressRef.current.setProgress(0, '导出中...');
+                        progressRef.current.setProgress(0, '导出中，请稍候...');
                     }, 500);
                 } else
                     setTimeout(() => {
@@ -132,7 +132,7 @@ export default function () {
                 else handleErrorUtil(data.message);
                 setTimeout(() => {
                     progressRef.current.onClose();
-                    progressRef.current.setProgress(0, '导出中...');
+                    progressRef.current.setProgress(0, '导出中，请稍候...');
                 }, 500);
             }
         });
@@ -296,9 +296,9 @@ export default function () {
                     // disabled={!data.report}
                     onClick={() => {
                         if (!data.report) return;
-                        const title = '导出到，请稍候...';
+                        const title = '导出中，请稍候...';
                         //setLoadMsg('导出到excel中，请稍候...');
-                        progressRef.current.setProgress(0, title);
+                        progressRef.current.setProgress(1, title);
                         progressRef.current.onShow();
                         data.report
                             .exportExcel(getTitle('未命名'), {
@@ -333,7 +333,7 @@ export default function () {
                         if (!data.report) return;
                         // setLoadMsg('导出到pdf中，请稍候...');
                         const fileId = genUUID();
-                        progressRef.current.setProgress(0, '导出中...');
+                        progressRef.current.setProgress(0, '导出中，请稍候...');
                         progressRef.current.onShow();
 
                         exportPdf(fileId)
