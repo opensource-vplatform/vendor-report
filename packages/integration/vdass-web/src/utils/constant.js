@@ -52,6 +52,15 @@ export const getTableDataUrl = function(requestTables){
  * 导出pdf
  * @returns 
  */
-export const getExportPdfUrl = function(){
-  return `${getHost()}/reportapi/${getAppCode()}/report/exportPdf/${window.location.search}`;
+export const getExportPdfUrl = function(fileId){
+  return `${getHost()}/reportapi/${getAppCode()}/report/exportPdf/${window.location.search}${fileId ? '&fileId=' + fileId : ''}`;
+}
+
+
+/**
+ * 查询导出pdf进度
+ * @returns 
+ */
+export const getExportPdfProgressUrl = function(fileId){
+  return `${getHost()}/reportapi/report/reportExportProgress/${fileId}`;
 }

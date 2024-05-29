@@ -1,6 +1,6 @@
 import { genUUID as md5 } from './commonUtil';
 import axios from 'axios';
-import {getExportPdfUrl} from './constant'
+import {getExportPdfUrl,getExportPdfProgressUrl} from './constant'
 
 const urlSearchParams = new URLSearchParams(window.location.search);
 const host = window.location.origin;
@@ -38,12 +38,26 @@ export const parameterToUrl = function(except){
  * 调用服务端导出PDF接口
  * @returns 
  */
-export const exportPdf = function () {
+export const exportPdf = function (fileId) {
   return new Promise((resolve, reject) => {
     axios({
       method: 'GET',
-      url: getExportPdfUrl(),
+      url: getExportPdfUrl(fileId),
       responseType: 'blob'
+    }).then(res => {
+      resolve(res.data)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+export const exportPdfProgress = function(fileId){
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'GET',
+      url: getExportPdfProgressUrl(fileId),
+      // responseType: 'application/json'
     }).then(res => {
       resolve(res.data)
     }).catch(err => {
@@ -91,3 +105,4 @@ export function download(data,filename){
       }, 0);
   }
 }
+

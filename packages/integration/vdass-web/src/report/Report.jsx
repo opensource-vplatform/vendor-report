@@ -22,7 +22,10 @@ import {
   exportPdf,
   getParameter,
   getTitle,
+  exportPdfProgress,
 } from '../utils/utils';
+import { genUUID } from '../utils/commonUtil';
+import ProgressCircle from './components/progress';
 import Button from './components/button/Index';
 import {
   ErrorDialog,
@@ -77,233 +80,295 @@ const Fill = styled.div`
 `;
 
 const getError = function (result) {
-    if (result && result.data) {
-        const data = result.data;
-        if (data.success === false) {
-            return data.msg || data.message || '存在未知异常！';
-        } else {
-            return getError(data);
-        }
+  if (result && result.data) {
+    const data = result.data;
+    if (data.success === false) {
+      return data.msg || data.message || '存在未知异常！';
+    } else {
+      return getError(data);
     }
-    return null;
+  }
+  return null;
 };
 
 export default function () {
-    const ref = useRef(null);
+  const ref = useRef(null);
+  const progressRef = useRef(null);
 
-    const page = useRef({
-        pageCompletedHandler: null,
-        setPageInfos: null,
-    });
+  const page = useRef({
+    pageCompletedHandler: null,
+    setPageInfos: null,
+  });
 
-    const [data, setData] = useState({
-        loadMsg: '初始化中，请稍候...',
-        report: null,
-        pageError: null,
-        dialogError: null,
-    });
-    const handleDialogError = (err) => {
-        setData({
-            ...data,
-            loadMsg: null,
-            dialogError:{
-                title: typeof err == 'string' ? err : err.message,
-                detail: typeof err == 'string' ? '': err.detail,
-            } 
-        });
-    };
-    const handlePageError = (err) => {
-        setData({
-            ...data,
-            loadMsg: null,
-            dialogError: null,
-            pageError: {
-                title: err.message,
-                detail: err.detail || '',
-            },
-        });
-    };
-    const setLoadMsg = (msg) => {
-        setData({
-            ...data,
-            loadMsg: msg,
-        });
-    };
-    const isPrint = getParameter('isPrint') == '1';
-    useEffect(() => {
-        if (ref.current) {
-            axios
-                .get(getReportConfigUrl())
-                .then((config) => {
-                    if (
-                        !handleErrorUtil(
-                            config,
-                            handlePageError,
-                            '获取报表配置失败！'
-                        )
-                    ) {
-                        let excelJson = null;
-                        try {
-                            excelJson = JSON.parse(
-                                getData(config.data, 'config')
-                            );
-                        } catch (e) {}
-                        const initReport = (excelJson, datas) => {
-                            const report = new TOONE.Report.Preview({
-                                license,
-                                enablePrint: isPrint,
-                                dataSource: datas,
-                                json: excelJson,
-                                onPageCompleted(handler) {
-                                    page.pageCompletedHandler = handler;
-                                    if (page.setPageInfos) {
-                                        page.pageCompletedHandler().then(
-                                            (datas) => {
-                                                page.setPageInfos(datas);
-                                            }
-                                        );
-                                    }
-                                },
-                            });
-                            //报表挂载到指定dom元素
-                            report.mount(ref.current);
-                            data.report = report;
-                            setData({ ...data, loadMsg: null, errorMsg: null });
-                            window.exportPdf = () => {
-                                setLoadMsg('导出到pdf中，请稍候...');
-                                data.report
-                                    .exportPdf(getTitle('未命名'))
-                                    .then(() => {
-                                        setLoadMsg(null);
-                                    })
-                                    .catch(genResponseErrorCallback(handleDialogError));
-                            };
-                        };
-                        if (excelJson) {
-                            const usedDatasources =
-                                excelJson.usedDatasources || [];
-                            if (usedDatasources && usedDatasources.length > 0) {
-                                axios
-                                    .get(
-                                        getTableDataUrl(
-                                            usedDatasources.join(',')
-                                        )
-                                    )
-                                    .then((data) => {
-                                        if (
-                                            !handleErrorUtil(
-                                                data,
-                                                handlePageError,
-                                                '获取数据集数据失败！'
-                                            )
-                                        ) {
-                                            initReport(
-                                                excelJson,
-                                                getData(data.data, 'data', true)
-                                            );
-                                        }
-                                    })
-                                    .catch(
-                                        genResponseErrorCallback(handlePageError)
-                                    );
-                            } else {
-                                initReport(excelJson, {});
-                            }
-                        } else {
-                            initReport();
-                        }
-                    }
-                })
-                .catch(genResponseErrorCallback(handlePageError));
+  const [data, setData] = useState({
+    loadMsg: '初始化中，请稍候...',
+    report: null,
+    pageError: null,
+    dialogError: null,
+  });
+
+  const getExportPdfProgressCallback = (fileId, isTimeout = false) => {
+    exportPdfProgress(fileId).then((data) => {
+      if (data.success) {
+        if (!!data.progress)
+          progressRef.current.setProgress(data.progress, data.progress == 100 ? '导出完成' : `导出中：${data.curPageIndex} / ${data.pageCounts}`);
+        if (data.progress == 100) {
+          setTimeout(() => {
+            progressRef.current.onClose();
+            progressRef.current.setProgress(0, '导出中...');
+          }, 500)
         }
-    }, []);
-    return (
-        <Wrap>
-            {data.loadMsg != null ? (
-                <WaitMsg title={data.loadMsg}></WaitMsg>
-            ) : null}
-            {data.dialogError != null ? (
-                <ErrorDialog
-                    message={data.dialogError.title}
-                    detail={data.dialogError.detail}
-                    onClose={() =>
-                        setData({ ...data, loadMsg: null, dialogError: null })
+
+        else
+          setTimeout(() => {
+            getExportPdfProgressCallback(fileId, true)
+          }, 1000)
+
+      }
+      else {
+        if (isTimeout)
+          progressRef.current.setProgress(100, `导出完成`);
+        else handleErrorUtil(data.message);
+        setTimeout(() => {
+          progressRef.current.onClose();
+          progressRef.current.setProgress(0, '导出中...');
+        }, 500)
+
+      }
+    })
+  }
+
+  const handleDialogError = (err) => {
+    setData({
+      ...data,
+      loadMsg: null,
+      dialogError: {
+        title: typeof err == 'string' ? err : err.message,
+        detail: typeof err == 'string' ? '' : err.detail,
+      }
+    });
+  };
+  const handlePageError = (err) => {
+    setData({
+      ...data,
+      loadMsg: null,
+      dialogError: null,
+      pageError: {
+        title: err.message,
+        detail: err.detail || '',
+      },
+    });
+  };
+  const setLoadMsg = (msg) => {
+    setData({
+      ...data,
+      loadMsg: msg,
+    });
+  };
+  const isPrint = getParameter('isPrint') == '1';
+  useEffect(() => {
+    if (ref.current) {
+      axios
+        .get(getReportConfigUrl())
+        .then((config) => {
+          if (
+            !handleErrorUtil(
+              config,
+              handlePageError,
+              '获取报表配置失败！'
+            )
+          ) {
+            let excelJson = null;
+            try {
+              excelJson = JSON.parse(
+                getData(config.data, 'config')
+              );
+            } catch (e) { }
+            const initReport = (excelJson, datas) => {
+              const report = new TOONE.Report.Preview({
+                license,
+                enablePrint: isPrint,
+                dataSource: datas,
+                json: excelJson,
+                onPageCompleted(handler) {
+                  page.pageCompletedHandler = handler;
+                  if (page.setPageInfos) {
+                    page.pageCompletedHandler().then(
+                      (datas) => {
+                        page.setPageInfos(datas);
+                      }
+                    );
+                  }
+                },
+              });
+              //报表挂载到指定dom元素
+              report.mount(ref.current);
+              data.report = report;
+              setData({ ...data, loadMsg: null, errorMsg: null });
+              window.exportPdf = () => {
+                setLoadMsg('导出到pdf中，请稍候...');
+                data.report
+                  .exportPdf(getTitle('未命名'))
+                  .then(() => {
+                    setLoadMsg(null);
+                  })
+                  .catch(genResponseErrorCallback(handleDialogError));
+              };
+            };
+            if (excelJson) {
+              const usedDatasources =
+                excelJson.usedDatasources || [];
+              if (usedDatasources && usedDatasources.length > 0) {
+                axios
+                  .get(
+                    getTableDataUrl(
+                      usedDatasources.join(',')
+                    )
+                  )
+                  .then((data) => {
+                    if (
+                      !handleErrorUtil(
+                        data,
+                        handlePageError,
+                        '获取数据集数据失败！'
+                      )
+                    ) {
+                      initReport(
+                        excelJson,
+                        getData(data.data, 'data', true)
+                      );
                     }
-                ></ErrorDialog>
-            ) : null}
-            <Toolbar>
-                <Fill></Fill>
-                <Page
-                    onInited={(datas) => {
-                        page.setPageInfos = datas.setPageInfos;
-                        if (page.pageCompletedHandler) {
-                            page.pageCompletedHandler().then((datas) => {
-                                page.setPageInfos(datas);
-                            });
-                        }
-                    }}
-                ></Page>
-                <Button
-                    type='primary'
-                    style={{ height: 26, width: 110 }}
-                    // disabled={!data.report}
-                    onClick={() => {
-                        if (!data.report) return;
-                        setLoadMsg('导出到excel中，请稍候...');
-                        data.report
-                            .exportExcel(getTitle('未命名'))
-                            .then(() => {
-                                setLoadMsg(null);
-                            })
-                            .catch(handleDialogError);
-                    }}
-                >
-                    导出到excel
-                </Button>
-                <Button
-                    type='success'
-                    style={{ height: 26 }}
-                    // disabled={!data.report}
-                    onClick={() => {
-                        if (!data.report) return;
-                        setLoadMsg('导出到pdf中，请稍候...');
-                        exportPdf()
-                            .then((data) => {
-                                setLoadMsg(null);
-                                if (
-                                    Object.prototype.toString.call(data) ===
-                                    '[object Blob]'
-                                )
-                                    download(data, getTitle('未命名') + '.pdf');
-                                else handleDialogError(data.message);
-                            })
-                            .catch(handleDialogError);
-                    }}
-                >
-                    导出到pdf
-                </Button>
-                {isPrint ? (
-                    <Button
-                        type='info'
-                        style={{ height: 26 }}
-                        onClick={() => {
-                            data.report && data.report.print();
-                        }}
-                    >
-                        打印
-                    </Button>
-                ) : null}
-            </Toolbar>
-            <ExcelWrap>
-                {data.pageError ? (
-                    <ErrorPage
-                        message={data.pageError.title}
-                        detail={data.pageError.detail}
-                    ></ErrorPage>
-                ) : (
-                    <ExcelHost ref={ref}></ExcelHost>
-                )}
-            </ExcelWrap>
-        </Wrap>
-    );
+                  })
+                  .catch(
+                    genResponseErrorCallback(handlePageError)
+                  );
+              } else {
+                initReport(excelJson, {});
+              }
+            } else {
+              initReport();
+            }
+          }
+        })
+        .catch(genResponseErrorCallback(handlePageError));
+    }
+  }, []);
+  return (
+    <Wrap>
+      {data.loadMsg != null ? (
+        <WaitMsg title={data.loadMsg}></WaitMsg>
+      ) : null}
+      {data.dialogError != null ? (
+        <ErrorDialog
+          message={data.dialogError.title}
+          detail={data.dialogError.detail}
+          onClose={() =>
+            setData({ ...data, loadMsg: null, dialogError: null })
+          }
+        ></ErrorDialog>
+      ) : null}
+      <ProgressCircle ref={progressRef} />
+      <Toolbar>
+        <Fill></Fill>
+        <Page
+          onInited={(datas) => {
+            page.setPageInfos = datas.setPageInfos;
+            if (page.pageCompletedHandler) {
+              page.pageCompletedHandler().then((datas) => {
+                page.setPageInfos(datas);
+              });
+            }
+          }}
+        ></Page>
+        <Button
+          type='primary'
+          style={{ height: 26, width: 110 }}
+          // disabled={!data.report}
+          onClick={() => {
+            if (!data.report) return;
+            const title = '导出到，请稍候...';
+            //setLoadMsg('导出到excel中，请稍候...');
+            progressRef.current.setProgress(0, title);
+            progressRef.current.onShow();
+            data.report
+              .exportExcel(getTitle('未命名'), {
+                progress(current, total = 1) {
+                  const percent = Math.floor(
+                    (current / total) * 100
+                  );
+                  progressRef.current.setProgress(
+                    percent,
+                    title
+                  );
+                },
+              })
+              .then(() => {
+                //setLoadMsg(null);
+                progressRef.current.setProgress(
+                  100,
+                  '导出完成'
+                );
+                progressRef.current.onClose();
+              })
+              .catch(handleDialogError);
+          }}
+        >
+          导出到excel
+        </Button>
+        <Button
+          type='success'
+          style={{ height: 26 }}
+          // disabled={!data.report}
+          onClick={() => {
+            if (!data.report) return;
+            // setLoadMsg('导出到pdf中，请稍候...');
+            const fileId = genUUID();
+            progressRef.current.setProgress(0, '导出中...')
+            progressRef.current.onShow();
+
+            exportPdf(fileId)
+              .then((data) => {
+                // setLoadMsg(null);
+                if (
+                  Object.prototype.toString.call(data) ===
+                  '[object Blob]'
+                )
+                  download(data, getTitle('未命名') + '.pdf');
+                else handleDialogError(data.message);
+              })
+              .catch((data) => {
+                progressRef.current.onClose();
+                handleDialogError(data.message);
+              });
+            setTimeout(() => {
+              getExportPdfProgressCallback(fileId)
+            }, 200)
+          }}
+        >
+          导出到pdf
+        </Button>
+        {isPrint ? (
+          <Button
+            type='info'
+            style={{ height: 26 }}
+            onClick={() => {
+              data.report && data.report.print();
+            }}
+          >
+            打印
+          </Button>
+        ) : null}
+      </Toolbar>
+      <ExcelWrap>
+        {data.pageError ? (
+          <ErrorPage
+            message={data.pageError.title}
+            detail={data.pageError.detail}
+          ></ErrorPage>
+        ) : (
+          <ExcelHost ref={ref}></ExcelHost>
+        )}
+      </ExcelWrap>
+    </Wrap>
+  );
 }
