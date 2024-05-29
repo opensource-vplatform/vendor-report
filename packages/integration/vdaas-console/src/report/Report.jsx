@@ -133,7 +133,7 @@ export default function () {
                                 getData(config.data, 'config')
                             );
                             zoomToFit(
-                                excelJson,
+                                excelJson.reportJson,
                                 parseInt(getComputedStyle(ref.current).width)
                             );
                         } catch (e) {}
