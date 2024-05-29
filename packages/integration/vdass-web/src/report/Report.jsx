@@ -26,6 +26,7 @@ import {
 import Button from './components/button/Index';
 import Error from './components/error/Index';
 import WaitMsg from './components/loading/Index';
+import Page from './components/page/Index';
 
 const Wrap = styled.div`
     display: flex;
@@ -240,7 +241,7 @@ export default function () {
                     导出到excel
                 </Button>
                 <Button
-                    type='info'
+                    type='success'
                     style={{ height: 26 }}
                     // disabled={!data.report}
                     onClick={() => {
@@ -263,7 +264,7 @@ export default function () {
                 </Button>
                 {isPrint ? (
                     <Button
-                        type='primary'
+                        type='info'
                         style={{ height: 26 }}
                         onClick={() => {
                             data.report && data.report.print();

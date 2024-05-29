@@ -31,6 +31,15 @@ const Button = styled.button`
         border-color: #e5e5e5;
         color:#162ddc;
     }
+    &[data-type='success'] {
+        background-color: #0ac947;
+        border-color: #0ac947;
+        color: #fff;
+    }
+    &[data-type='success']:hover {
+        background-color: #20af84;
+        border-color: #20af84;
+    }
     &[data-type='warning'] {
         background-color: #f90;
         border-color: #f90;
