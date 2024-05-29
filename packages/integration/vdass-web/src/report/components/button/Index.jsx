@@ -13,13 +13,23 @@ const Button = styled.button`
         border-color: #5292f7;
     }
     &[data-type='primary'] {
-        background-color: #2d8cf0;
-        border-color: #2d8cf0;
+        background-color: #162ddc;
+        border-color: #162ddc;
         color: #fff;
     }
     &[data-type='primary']:hover {
-        background-color: #57a3f3;
-        border-color: #57a3f3;
+        background-color: #00285d;
+        border-color: #00285d;
+    }
+    &[data-type='info'] {
+        background-color: #fff;
+        border-color: #dcdfe6;
+        color: #606266;
+    }
+    &[data-type='info']:hover {
+        background-color: #fff;
+        border-color: #e5e5e5;
+        color:#162ddc;
     }
     &[data-type='warning'] {
         background-color: #f90;

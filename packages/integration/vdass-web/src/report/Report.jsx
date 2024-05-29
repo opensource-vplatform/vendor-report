@@ -240,7 +240,7 @@ export default function () {
                     导出到excel
                 </Button>
                 <Button
-                    type='primary'
+                    type='info'
                     style={{ height: 26 }}
                     // disabled={!data.report}
                     onClick={() => {
