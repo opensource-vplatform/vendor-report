@@ -47,10 +47,16 @@ const toFormula = function (data) {
 class CellImage extends Plugin {
     execute(value, tool) {
         const config = this.getConfig();
-        const url = value.type == 'formula' ? value.value : `"${value.value}"`;
-        const data = { url, ...config };
-        const formula = toFormula(data);
-        return { type: 'formula', value: formula };
+        const val = value.value;
+        if(val){
+            //有值的时候才生成IMAGE函数
+            const url = value.type == 'formula' ? val : `"${val}"`;
+            const data = { url, ...config };
+            const formula = toFormula(data);
+            return { type: 'formula', value: formula };
+        }else{
+            return { type: 'text', value:''};
+        }
     }
 }
 

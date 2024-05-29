@@ -11,14 +11,20 @@ export const base64DataURLToImageData = function (base64DataURL) {
                 return;
             }
             context.drawImage(img, 0, 0);
-            const imageData = context.getImageData(
+            let imageData = context.getImageData(
                 0,
                 0,
                 canvas.width,
                 canvas.height
             );
+            if(typeof imageData.data == 'object'){
+                const data = {colorSpace:imageData.colorSpace,width:imageData.width,height:imageData.height};
+                data.data = canvas.toDataURL('png');
+                imageData = data;
+            }
             resolve(imageData);
         };
+        img.crossOrigin = 'Anonymous'
         img.onerror = (error) => {
             reject(error);
         };

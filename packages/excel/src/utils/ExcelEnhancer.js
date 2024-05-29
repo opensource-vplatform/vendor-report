@@ -131,7 +131,11 @@ class ExcelEnhancer {
         return new Promise((resolve, reject) => {
             const value = sheet.getValue(row, col);
             if (value && value.typeName == 'SparklineExValue') {
-                if (!value.value || !value.value.imageBase64Data) {
+                if (
+                    !value.value ||
+                    (!value.value.imageBase64Data && !value.value.url)
+                ) {
+                    //添加迷你图处理，防止导出后excel中出现值错误问题（#VALUE）
                     this.items.push({
                         type: 'sparklineEnhancer',
                         sheetName: sheet.name(),
@@ -141,20 +145,21 @@ class ExcelEnhancer {
                     });
                     resolve();
                 } else {
-                    const { drawType, hAlign, imageBase64Data, vAlign } =
+                    const { drawType, hAlign, imageBase64Data, url, vAlign } =
                         value.value;
                     const GC = getNamespace();
-                    base64DataURLToImageData(imageBase64Data)
+                    base64DataURLToImageData(imageBase64Data || url)
                         .then((imgData) => {
                             const {
                                 width: originalWidth,
                                 height: originalHeight,
+                                data,
                             } = imgData;
                             const picture =
                                 new GC.Spread.Sheets.Shapes.PictureShape(
                                     sheet,
                                     `CellImage_${row}_${col}`,
-                                    imageBase64Data,
+                                    data,
                                     this.getLeft(sheet, col),
                                     this.getTop(sheet, row)
                                 );
@@ -188,7 +193,17 @@ class ExcelEnhancer {
                             });
                             resolve();
                         })
-                        .catch(reject);
+                        .catch(()=>{
+                            //加载图片信息出现异常
+                            this.items.push({
+                                type: 'sparklineEnhancer',
+                                sheetName: sheet.name(),
+                                row,
+                                col,
+                                picture: null,
+                            });
+                            resolve();
+                        });
                 }
             } else {
                 resolve();
@@ -236,7 +251,7 @@ class ExcelEnhancer {
         //将单元格的值设置为空字符串，防止excel中显示!value
         json.data.dataTable[row][col].value = '';
         json.data.dataTable[row][col].formula = undefined;
-        if(picture){
+        if (picture) {
             const shapes = json.shapes || [];
             shapes.push(picture.toJSON());
             json.shapes = shapes;
