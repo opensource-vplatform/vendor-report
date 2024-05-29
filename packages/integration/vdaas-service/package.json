@@ -9,7 +9,9 @@
     "postBuild-view": "node scripts/postBuild-view.js",
     "clean": "node scripts/clean.js",
     "build-view": "vite build -c=vite.config.build-view.js && npm run postBuild-view",
-    "build": "npm run clean && npm run build-view"
+    "build": "npm run clean && npm run build-view",
+    "tenant-server" : "npm run node webServer.js",
+    "console-server" : "npm run node consoleServer.js"
   },
   "dependencies": {
     "nacos" : "^2.6.0",

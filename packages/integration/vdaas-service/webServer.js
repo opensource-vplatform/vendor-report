@@ -40,7 +40,11 @@ let proxyPDFMiddleware = createProxyMiddleware({
 // 使用代理中间件
 app.use('/reportapi', proxyPDFMiddleware);
 
-app.get('/', (req, res) => {
+app.get('/designer', (req, res) => {
+  res.sendFile(path.join(__dirname, '../vdass-web/resources/static/vdaasweb/spreadsheet', 'designer.html'));
+});
+
+app.get('/view', (req, res) => {
   res.sendFile(path.join(__dirname, '../vdass-web/resources/static/vdaasweb/spreadsheet', 'view.html'));
 });
 
