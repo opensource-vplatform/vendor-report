@@ -63,7 +63,7 @@ const getError = function (data, defMsg) {
 };
 
 export const getData = function (data, attr, deepFirst = false) {
-    if(!data){
+    if (!data) {
         return null;
     }
     if (deepFirst) {
@@ -91,8 +91,8 @@ export const handleReponseError = function (err, setData, data) {
         ...data,
         loadMsg: null,
         errorMsg:
-            err?.response?.status == 404
-                ? '网络异常'
+            err?.code == 'ERR_NETWORK' || err?.response?.status == 404
+                ? '网络连接异常'
                 : err?.response?.data?.msg ??
                   err?.response?.data?.data?.msg ??
                   err.message,
@@ -100,8 +100,8 @@ export const handleReponseError = function (err, setData, data) {
 };
 
 const getResponseMsg = function (err) {
-    return err?.response?.status == 404
-        ? '网络异常'
+    return err?.code == 'ERR_NETWORK' || err?.response?.status == 404
+        ? '网络连接异常'
         : err?.response?.data?.msg ??
               err?.response?.data?.data?.msg ??
               err.message;
@@ -114,9 +114,10 @@ export const genResponseErrorCallback = function (reject) {
 export const handleError = function (response, reject, defMsg) {
     const error = getError(response, defMsg);
     if (error != null) {
-        reject(Error(error.title));
+        const err = new Error(error.title);
+        err.detail = error.detail;
+        reject(err);
         return true;
     }
     return false;
 };
-

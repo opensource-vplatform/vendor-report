@@ -5,6 +5,7 @@ demo
 dist/
 pnpm-lock.yaml
 packages/integration/vdaas-console/resources/page/spreadsheet/**
+packages/integration/vdaas-console/resources/page/vdaas/spreadsheet/**
 packages/integration/vdass-web/resources/static/vdaasweb/spreadsheet/**
 packages/integration/vdaas-service/resources/**
 packages/script/src/designer/icon/icons/**

@@ -74,6 +74,7 @@ export const GlobalComponent = function () {
             {appSlice.errorMsg != null ? (
                 <Error
                     message={appSlice.errorMsg}
+                    detail={appSlice.errorDetail}
                     onClose={() => {
                         dispatch(setErrorMsg({ message: null }));
                     }}

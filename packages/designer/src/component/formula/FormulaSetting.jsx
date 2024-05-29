@@ -11,7 +11,7 @@ import styled from 'styled-components';
 
 import Dialog from '@components/dialog/Index';
 import { getFormulaMetadata } from '@metadatas/formula';
-import { showErrorMessage } from '@utils/messageUtil';
+import { handleError } from '@utils/messageUtil';
 
 import { Commands } from '../../command';
 import { exeCommand } from '../../utils/spreadUtil';
@@ -148,13 +148,13 @@ export default function (props) {
         spread.setActiveSheet(hostSheet.name());
         const { hostRow, hostCol, funCode, args } = data;
         try {
-            exeCommand(spread,Commands.Formula.Set,{
-                formula:`=${funCode}(${argsToFormulaArgs(args).join(',')})`,
-                row:hostRow,
-                col:hostCol,
+            exeCommand(spread, Commands.Formula.Set, {
+                formula: `=${funCode}(${argsToFormulaArgs(args).join(',')})`,
+                row: hostRow,
+                col: hostCol,
             });
         } catch (e) {
-            showErrorMessage(dispatch, typeof e == 'string' ? e : e.message);
+            handleError(dispatch,e);
         }
         if (typeof onClose == 'function') {
             onClose();

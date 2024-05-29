@@ -24,7 +24,10 @@ import {
   getTitle,
 } from '../utils/utils';
 import Button from './components/button/Index';
-import Error from './components/error/Index';
+import {
+  ErrorDialog,
+  ErrorPage,
+} from './components/error/Index';
 import WaitMsg from './components/loading/Index';
 import Page from './components/page/Index';
 
@@ -95,17 +98,31 @@ export default function () {
 
     const [data, setData] = useState({
         loadMsg: '初始化中，请稍候...',
-        errorMsg: null,
         report: null,
+        pageError: null,
+        dialogError: null,
     });
-    const handleError = (err) => {
+    const handleDialogError = (err) => {
         setData({
             ...data,
             loadMsg: null,
-            errorMsg: typeof err == 'string' ? err : err.message,
+            dialogError:{
+                title: typeof err == 'string' ? err : err.message,
+                detail: typeof err == 'string' ? '': err.detail,
+            } 
         });
     };
-
+    const handlePageError = (err) => {
+        setData({
+            ...data,
+            loadMsg: null,
+            dialogError: null,
+            pageError: {
+                title: err.message,
+                detail: err.detail || '',
+            },
+        });
+    };
     const setLoadMsg = (msg) => {
         setData({
             ...data,
@@ -121,13 +138,15 @@ export default function () {
                     if (
                         !handleErrorUtil(
                             config,
-                            handleError,
+                            handlePageError,
                             '获取报表配置失败！'
                         )
                     ) {
                         let excelJson = null;
                         try {
-                            excelJson = JSON.parse(getData(config.data, 'config'));
+                            excelJson = JSON.parse(
+                                getData(config.data, 'config')
+                            );
                         } catch (e) {}
                         const initReport = (excelJson, datas) => {
                             const report = new TOONE.Report.Preview({
@@ -157,7 +176,7 @@ export default function () {
                                     .then(() => {
                                         setLoadMsg(null);
                                     })
-                                    .catch(handleError);
+                                    .catch(genResponseErrorCallback(handleDialogError));
                             };
                         };
                         if (excelJson) {
@@ -174,7 +193,7 @@ export default function () {
                                         if (
                                             !handleErrorUtil(
                                                 data,
-                                                handleError,
+                                                handlePageError,
                                                 '获取数据集数据失败！'
                                             )
                                         ) {
@@ -185,7 +204,7 @@ export default function () {
                                         }
                                     })
                                     .catch(
-                                        genResponseErrorCallback(handleError)
+                                        genResponseErrorCallback(handlePageError)
                                     );
                             } else {
                                 initReport(excelJson, {});
@@ -195,7 +214,7 @@ export default function () {
                         }
                     }
                 })
-                .catch(genResponseErrorCallback(handleError));
+                .catch(genResponseErrorCallback(handlePageError));
         }
     }, []);
     return (
@@ -203,13 +222,14 @@ export default function () {
             {data.loadMsg != null ? (
                 <WaitMsg title={data.loadMsg}></WaitMsg>
             ) : null}
-            {data.errorMsg != null ? (
-                <Error
-                    message={data.errorMsg}
+            {data.dialogError != null ? (
+                <ErrorDialog
+                    message={data.dialogError.title}
+                    detail={data.dialogError.detail}
                     onClose={() =>
-                        setData({ ...data, loadMsg: null, errorMsg: null })
+                        setData({ ...data, loadMsg: null, dialogError: null })
                     }
-                ></Error>
+                ></ErrorDialog>
             ) : null}
             <Toolbar>
                 <Fill></Fill>
@@ -235,7 +255,7 @@ export default function () {
                             .then(() => {
                                 setLoadMsg(null);
                             })
-                            .catch(handleError);
+                            .catch(handleDialogError);
                     }}
                 >
                     导出到excel
@@ -255,9 +275,9 @@ export default function () {
                                     '[object Blob]'
                                 )
                                     download(data, getTitle('未命名') + '.pdf');
-                                else handleError(data.message);
+                                else handleDialogError(data.message);
                             })
-                            .catch(handleError);
+                            .catch(handleDialogError);
                     }}
                 >
                     导出到pdf
@@ -275,7 +295,14 @@ export default function () {
                 ) : null}
             </Toolbar>
             <ExcelWrap>
-                <ExcelHost ref={ref}></ExcelHost>
+                {data.pageError ? (
+                    <ErrorPage
+                        message={data.pageError.title}
+                        detail={data.pageError.detail}
+                    ></ErrorPage>
+                ) : (
+                    <ExcelHost ref={ref}></ExcelHost>
+                )}
             </ExcelWrap>
         </Wrap>
     );

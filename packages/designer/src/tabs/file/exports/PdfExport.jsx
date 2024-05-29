@@ -11,7 +11,7 @@ import { Select } from '@components/form/Index';
 import { toExcelPluginUrl } from '@utils/environmentUtil';
 import { download } from '@utils/fileUtil';
 import {
-  showErrorMessage,
+  handleError,
   showLoadingMessage,
 } from '@utils/messageUtil';
 
@@ -107,7 +107,7 @@ function Index(props) {
                             closeHandler();
                         },
                         (err) => {
-                            showErrorMessage(dispatch, err.message || err);
+                            handleError(dispatch,err);
                         },
                         {
                             author: data.auther,

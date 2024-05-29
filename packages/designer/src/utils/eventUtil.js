@@ -4,8 +4,8 @@ import {
 } from '@event/EventManager';
 
 import {
+  handleError,
   hideLoadingMessage,
-  showErrorMessage,
   showLoadingMessage,
 } from './messageUtil';
 import { getActiveIndexBySheet } from './worksheetUtil';
@@ -40,14 +40,7 @@ export const handleEventPrmiseResult = function (
                         resolve(data);
                     })
                     .catch((e) => {
-                        showErrorMessage(
-                            dispatch,
-                            typeof e == 'string'
-                                ? e
-                                : e.message
-                                  ? e.message
-                                  : null
-                        );
+                        handleError(dispatch,e);
                         reject();
                     });
             } else {

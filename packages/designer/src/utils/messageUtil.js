@@ -5,6 +5,7 @@ import {
 
 import { setConfirmMsg } from '../store/appSlice/appSlice';
 import { addCallback } from './callbackUtil';
+import { isString } from './objectUtil';
 
 let _dispatch = null;
 
@@ -29,13 +30,29 @@ export const hideLoadingMessage = function (dispatch) {
 };
 
 /**
+ * 处理异常
+ * @param {*} dispatch 
+ * @param {*} err 
+ */
+export const handleError = function(dispatch,err){
+    let messsage = '', detail = '';
+    if(isString(err)){
+        messsage = err;
+    }else{
+        messsage = err.message;
+        detail = err.detail;
+    }
+    showErrorMessage(dispatch,messsage,detail);
+}
+
+/**
  * 设置错误信息
  * @param {*} dispatch
  * @param {*} message
  */
-export function showErrorMessage(dispatch, message) {
+export function showErrorMessage(dispatch, message, detail) {
     hideLoadingMessage(dispatch);
-    dispatch(setErrorMsg({ message }));
+    dispatch(setErrorMsg({ message,detail }));
 }
 
 /**
@@ -43,7 +60,7 @@ export function showErrorMessage(dispatch, message) {
  * @param {} dispatch
  */
 export const hideErrorMessage = function (dispatch) {
-    dispatch(setErrorMsg({ message: null }));
+    dispatch(setErrorMsg({ message: null,detail:null }));
 };
 
 /**

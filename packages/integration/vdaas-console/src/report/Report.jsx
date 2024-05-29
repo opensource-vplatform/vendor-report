@@ -22,7 +22,10 @@ import {
   getTitle,
 } from '../utils/utils';
 import Button from './components/button/Index';
-import Error from './components/error/Index';
+import {
+  ErrorDialog,
+  ErrorPage,
+} from './components/error/Index';
 import WaitMsg from './components/loading/Index';
 import Page from './components/page/Index';
 import Progress from './components/progress';
@@ -81,14 +84,27 @@ export default function () {
 
     const [data, setData] = useState({
         loadMsg: '初始化中，请稍候...',
-        errorMsg: null,
         report: null,
+        pageError: null,
+        dialogError: null,
     });
-    const handleError = (err) => {
+    const handleDialogError = (err) => {
         setData({
             ...data,
             loadMsg: null,
+            pageError:null,
             errorMsg: typeof err == 'string' ? err : err.message,
+        });
+    };
+    const handlePageError = (err) => {
+        setData({
+            ...data,
+            loadMsg: null,
+            dialogError: null,
+            pageError: {
+                title: err.message,
+                detail: err.detail || '',
+            },
         });
     };
     const setLoadMsg = (msg) => {
@@ -106,7 +122,7 @@ export default function () {
                     if (
                         !handleErrorUtil(
                             config,
-                            handleError,
+                            handlePageError,
                             '获取报表配置失败！'
                         )
                     ) {
@@ -153,7 +169,7 @@ export default function () {
                                         if (
                                             !handleErrorUtil(
                                                 data,
-                                                handleError,
+                                                handlePageError,
                                                 '获取数据集数据失败！'
                                             )
                                         ) {
@@ -164,7 +180,9 @@ export default function () {
                                         }
                                     })
                                     .catch(
-                                        genResponseErrorCallback(handleError)
+                                        genResponseErrorCallback(
+                                            handlePageError
+                                        )
                                     );
                             } else {
                                 initReport(excelJson, {});
@@ -174,7 +192,7 @@ export default function () {
                         }
                     }
                 })
-                .catch(genResponseErrorCallback(handleError));
+                .catch(genResponseErrorCallback(handlePageError));
         }
     }, []);
     return (
@@ -183,12 +201,12 @@ export default function () {
                 <WaitMsg title={data.loadMsg}></WaitMsg>
             ) : null}
             {data.errorMsg != null ? (
-                <Error
+                <ErrorDialog
                     message={data.errorMsg}
                     onClose={() =>
                         setData({ ...data, loadMsg: null, errorMsg: null })
                     }
-                ></Error>
+                ></ErrorDialog>
             ) : null}
             <Progress ref={progressRef}></Progress>
             <Toolbar>
@@ -232,7 +250,7 @@ export default function () {
                                 );
                                 progressRef.current.onClose();
                             })
-                            .catch(handleError);
+                            .catch(handleDialogError);
                     }}
                 >
                     导出到excel
@@ -269,7 +287,14 @@ export default function () {
                 ) : null}
             </Toolbar>
             <ExcelWrap>
-                <ExcelHost ref={ref}></ExcelHost>
+                {data.pageError ? (
+                    <ErrorPage
+                        message={data.pageError.title}
+                        detail={data.pageError.detail}
+                    ></ErrorPage>
+                ) : (
+                    <ExcelHost ref={ref}></ExcelHost>
+                )}
             </ExcelWrap>
         </Wrap>
     );

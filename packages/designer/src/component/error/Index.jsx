@@ -1,9 +1,13 @@
+import { useState } from 'react';
+
 import styled from 'styled-components';
 
 import ErrorIcon from '@icons/common/Error';
+import { copyToClipboard } from '@utils/commonUtil';
 
 import Button from '../button/Index';
 import Dialog from '../dialog/Index';
+import ErrorMessage from './ErrorMessage';
 
 const Wrap = styled.div`
     display: flex;
@@ -34,7 +38,14 @@ const ActionWrap = styled.div`
 `;
 
 function Index(props) {
-    const { title = '错误', message = null, open = true, onClose } = props;
+    const {
+        title = '错误',
+        message = null,
+        detail,
+        open = true,
+        onClose,
+    } = props;
+    const [copied, markCopied] = useState(false);
     return open && message !== null ? (
         <Dialog title={title} onClose={onClose}>
             <Wrap>
@@ -42,11 +53,16 @@ function Index(props) {
                     <ErrorIcon
                         style={{
                             cursor: 'default',
-                            backgroundColor: 'transparent' 
+                            backgroundColor: 'transparent',
                         }}
                         iconStyle={{ width: 32, height: 32, marginLeft: 20 }}
                     ></ErrorIcon>
-                    <Content>{message}</Content>
+                    <Content>
+                        <ErrorMessage
+                            message={message}
+                            detail={detail}
+                        ></ErrorMessage>
+                    </Content>
                 </ContentWrap>
                 <ActionWrap>
                     <Button
@@ -57,6 +73,21 @@ function Index(props) {
                         }}
                     >
                         确定
+                    </Button>
+                    <Button
+                        type='text'
+                        style={{ height: 32, marginRight: 8 }}
+                        disabled={copied}
+                        onClick={() => {
+                            copyToClipboard(
+                                detail
+                                    ? `异常消息：${message}\n异常详细：${detail}`
+                                    : message
+                            );
+                            markCopied(true);
+                        }}
+                    >
+                        {copied ? '已复制' : '复制内容'}
                     </Button>
                 </ActionWrap>
             </Wrap>

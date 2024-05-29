@@ -35,6 +35,22 @@ const Button = styled.button`
     &[data-type='warning']:disabled{
         border-color: #2d8cf0 !important;
     }
+    &[data-type='text'] {
+        background-color: transparent;
+        border: none;
+        color: blue;
+    }
+    &[data-type='text']:hover {
+        background-color: transparent;
+        border: none;
+        text-decoration: underline;
+    }
+    &[data-type='text']:disabled {
+        background-color: transparent !important;
+        border: none;
+        color: #c5c8ce !important;
+        text-decoration: none;
+    }
     &:disabled {
         background-color: transparent !important;
         border-color:#d5d5d5 !important;

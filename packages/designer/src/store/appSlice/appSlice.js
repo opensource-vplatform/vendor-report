@@ -7,6 +7,7 @@ export const appSlice = createSlice({
         mode: 'edit',
         waitMsg: null,
         errorMsg: null,
+        errorDetail:null,
         confirmMsg: null,
         confirmTitle: null,
         confirmCallbackId: null,
@@ -28,8 +29,9 @@ export const appSlice = createSlice({
         setWaitMsg(state, action) {
             state.waitMsg = action.payload.message;
         },
-        setErrorMsg(state, action) {
-            state.errorMsg = action.payload.message;
+        setErrorMsg(state, {payload}) {
+            state.errorMsg = payload.message;
+            state.errorDetail = payload.detail;
         },
         setNavStyle(state, action) {
             state.navStyle = action.payload;
