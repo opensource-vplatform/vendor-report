@@ -17,6 +17,7 @@ import {
   getData,
   handleError as handleErrorUtil,
 } from '../utils/responseUtil';
+import { zoomToFit } from '../utils/sheetUtil';
 import {
   getParameter,
   getTitle,
@@ -130,6 +131,10 @@ export default function () {
                         try {
                             excelJson = JSON.parse(
                                 getData(config.data, 'config')
+                            );
+                            zoomToFit(
+                                excelJson,
+                                parseInt(getComputedStyle(ref.current).width)
                             );
                         } catch (e) {}
                         const initReport = (excelJson, datas) => {
