@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const puppeteer = require('puppeteer');
-const { Readable } = require('stream');
+// const { Readable } = require('stream');
 const crypto = require('crypto');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const fs = require('fs');
@@ -114,7 +114,7 @@ app.use('/font', (req, res) => {
 });
 
 
-app.all('/reportapi/report/reportExportProgress/:fileId', (req, res) => {
+app.all('/reportapi/:appCode/report/reportExportProgress/:fileId', (req, res) => {
   const fileId = req.params.fileId;
   res.setHeader('Content-Type', 'application/json');
   if (fileMap.get(fileId))
@@ -166,7 +166,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded.');
   }
-  console.log("存文件时间:", new Date().toString());
+  // console.log("存文件时间:", new Date().toString());
 
   const fileId = req.body.fileId; // 使用文件名作为唯一标识符
   // const fileBuffer = req.file.buffer;
@@ -218,9 +218,10 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       throw new Error("当前文件ID正在导出进程中，请切换文件ID再重试")
     if (!!req.query.fileId)
       fileMap.set(req.query.fileId, {
-        isInit: true
+        pageCounts: 1,
+        curPageIndex: 0,
       });
-    console.log("开始的时间是:", new Date().toString());
+    // console.log("开始的时间是:", new Date().toString());
     let fileName = req.query.fileName;
     const appCode = req.params.appCode;
     const queryParams = querystring.stringify(req.query);
@@ -240,7 +241,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       //   console.log("打开一个新页面",pages);
 
       const exportPDF = (fileId) => {
-        console.log("有人调用 exportPDF 方法了");
+        // console.log("有人调用 exportPDF 方法了");
         resolve(fileId);
       };
 
@@ -266,7 +267,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
 
 
     }).then(async (fileId) => {
-      console.log("进到导出最后操作用时间:", new Date().toString());
+      // console.log("进到导出最后操作用时间:", new Date().toString());
       const { filePath } = fileMap.get(fileId);
       if (!filePath) {
         runLogs.error(`导出PDF失败：${fileId} 文件不存在`);
@@ -298,13 +299,13 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       const fileStat = fs.statSync(lastPath);
       // 输出数据 MD5 哈希值
       res.setHeader('X-MD5-Hash', md5Hash);
-      console.log('MD5 哈希值:', md5Hash);
+      // console.log('MD5 哈希值:', md5Hash);
       res.setHeader('Content-Length', fileStat.size);
       // 将流管道连接到响应
       stream.pipe(res);
       // 当可读流读取完所有数据时触发
       stream.on('end', () => {
-        console.log('数据读取完成，关闭可读流');
+        // console.log('数据读取完成，关闭可读流');
         // 在 'end' 事件触发后关闭可读流
         page.close();
         stream.destroy();
@@ -315,7 +316,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
             fs.rmSync(item)
           }
         runLogs.info(`导出PDF成功：${fileName}.pdf`);
-        console.log("完成时间是:", new Date().toString());
+        // console.log("完成时间是:", new Date().toString());
       });
       // 设置响应头，指定内容类型和文件名
       res.setHeader('Content-Type', 'application/octet-stream');
@@ -328,6 +329,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
         errDesc: typeof err === 'string' ? err : err.message,
         success: false
       })
+      fileMap.delete(fileId);
     })
   } catch (err) {
 
@@ -338,6 +340,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       errDesc: typeof err === 'string' ? err : err.message,
       success: false
     })
+    fileMap.delete(fileId);
     // res.status(500).end();
   }
 })

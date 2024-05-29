@@ -193,7 +193,19 @@ export default function () {
               console.log('导出PDF')
 
               Promise.all(requestFontFamily).then(() => {
-
+                // 清除打印区域   
+                var sheetCount = report.spread.getSheetCount();
+                for (var i = 0; i < sheetCount; i++) {
+                  var sheet = report.spread.getSheet(i);
+                  if (sheet) {
+                    const printInfo = sheet.printInfo();
+                    printInfo.rowStart(-1);
+                    printInfo.rowEnd(-1);
+                    printInfo.columnStart(-1);
+                    printInfo.columnEnd(-1);
+                    sheet.removeCustomName('Print_Area');
+                  }
+                }
                 if (report.pageInfos.isPage && report.pageInfos.total > 1) {
                   pageExportPDF()
                 }
