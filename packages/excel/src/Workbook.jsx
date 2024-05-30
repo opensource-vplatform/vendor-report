@@ -2,6 +2,11 @@ import { useMemo } from 'react';
 
 import Print from './Print';
 import ParseReportJson from './template/ParseReportJson';
+import {
+  getLicense,
+  setLicense,
+} from './utils/licenseUtil';
+import { getNamespace } from './utils/spreadUtil';
 import WorkbookItem from './WorkbookItem';
 
 export default function (props) {
@@ -15,6 +20,15 @@ export default function (props) {
         template,
         setting,
     } = props;
+    if (license) {
+        setLicense(license);
+    }
+    const GC = getNamespace();
+
+    const licenseKey = getLicense();
+    if (licenseKey) {
+        GC.Spread.Sheets.LicenseKey = licenseKey;
+    }
 
     const { json, inst } = useMemo(() => {
         let json = null;
