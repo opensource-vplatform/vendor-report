@@ -1,36 +1,26 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import axios from 'axios';
 import styled from 'styled-components';
 
 import { genUUID } from '../utils/commonUtil';
-import {
-  getReportConfigUrl,
-  getTableDataUrl,
-} from '../utils/constant';
+import { getReportConfigUrl, getTableDataUrl } from '../utils/constant';
 import { license } from '../utils/license';
 import {
-  genResponseErrorCallback,
-  getData,
-  handleError as handleErrorUtil,
+    genResponseErrorCallback,
+    getData,
+    handleError as handleErrorUtil,
 } from '../utils/responseUtil';
 import { zoomToFit } from '../utils/sheetUtil';
 import {
-  download,
-  exportPdf,
-  exportPdfProgress,
-  getParameter,
-  getTitle,
+    download,
+    exportPdf,
+    getParameter,
+    getTitle,
 } from '../utils/utils';
+import { getExportPdfProgressUrl } from './../utils/constant';
 import Button from './components/button/Index';
-import {
-  ErrorDialog,
-  ErrorPage,
-} from './components/error/Index';
+import { ErrorDialog, ErrorPage } from './components/error/Index';
 import WaitMsg from './components/loading/Index';
 import Page from './components/page/Index';
 import ProgressCircle from './components/progress';
@@ -108,35 +98,37 @@ export default function () {
         dialogError: null,
     });
 
-    const getExportPdfProgressCallback = (fileId, isTimeout = false) => {
-        exportPdfProgress(fileId).then((data) => {
-            if (data.success) {
-                if (!!data.progress)
-                    progressRef.current.setProgress(
-                        data.progress,
-                        data.progress == 100
-                            ? '导出完成'
-                            : `导出中：${data.curPageIndex} / ${data.pageCounts}`
-                    );
-                if (data.progress == 100) {
-                    setTimeout(() => {
-                        progressRef.current.onClose();
-                        progressRef.current.setProgress(0, '导出中，请稍候...');
-                    }, 500);
-                } else
-                    setTimeout(() => {
-                        getExportPdfProgressCallback(fileId, true);
-                    }, 1000);
-            } else {
-                if (isTimeout) progressRef.current.setProgress(100, `导出完成`);
-                else handleErrorUtil(data.message);
+    const getExportPdfProgressStream = (fileId) => {
+        const eventSource = new EventSource(getExportPdfProgressUrl(fileId));
+
+        eventSource.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            progressRef.current.setProgress(
+                data.progress,
+                data.progress == 100
+                    ? '导出完成'
+                    : `导出中：${data.curPageIndex} / ${data.pageCounts}`
+            );
+            if (data.progress == 100)
                 setTimeout(() => {
                     progressRef.current.onClose();
                     progressRef.current.setProgress(0, '导出中，请稍候...');
-                }, 500);
+                    eventSource.close();
+                }, 1000);
+            if (!data.success) {
+                progressRef.current.onClose();
+                progressRef.current.setProgress(0, '导出中，请稍候...');
+                eventSource.close();
             }
+        };
+
+        eventSource.addEventListener('end', function (event) {
+            eventSource.close();
+            progressRef.current.setProgress(0, '导出中，请稍候...');
         });
+
     };
+
 
     const handleDialogError = (err) => {
         setData({
@@ -184,7 +176,7 @@ export default function () {
                                 getData(config.data, 'config')
                             );
                             zoomToFit(
-                                excelJson.reportJson,
+                                excelJson,
                                 parseInt(getComputedStyle(ref.current).width)
                             );
                         } catch (e) {}
@@ -351,7 +343,7 @@ export default function () {
                                 handleDialogError(data.message);
                             });
                         setTimeout(() => {
-                            getExportPdfProgressCallback(fileId);
+                            getExportPdfProgressStream(fileId);
                         }, 200);
                     }}
                 >

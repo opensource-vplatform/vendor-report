@@ -52,20 +52,6 @@ export const exportPdf = function (fileId) {
   })
 }
 
-export const exportPdfProgress = function(fileId){
-  return new Promise((resolve, reject) => {
-    axios({
-      method: 'GET',
-      url: getExportPdfProgressUrl(fileId),
-      // responseType: 'application/json'
-    }).then(res => {
-      resolve(res.data)
-    }).catch(err => {
-      reject(err)
-    })
-  })
-}
-
 function triggerClick(ele) {
   try {
       ele.dispatchEvent(new MouseEvent("click"))
