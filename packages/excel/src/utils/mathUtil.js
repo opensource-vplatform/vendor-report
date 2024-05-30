@@ -6,6 +6,7 @@ const getSheet = function(){
     if(_Sheet==null){
         const GC = getNamespace();
         const spread = new GC.Spread.Sheets.Workbook();
+        spread.addSheet(0);
         _Sheet = spread.getSheet(0);
     }
     return _Sheet;

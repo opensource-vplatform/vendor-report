@@ -3,7 +3,6 @@ import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import resourceManager from 'resource-manager-js';
 
-import WorkBookApi from './api/WorkBook';
 import { download } from './utils/fileUtil';
 import {
   getNamespace,
@@ -56,7 +55,7 @@ class Report {
             }
             if (typeof ready == 'function') {
                 withBatchCalcUpdate(spread, () => {
-                    ready(new WorkBookApi(spread));
+                    ready(spread);
                 });
             }
         };

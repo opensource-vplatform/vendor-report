@@ -13,39 +13,30 @@
         <script>
             //实例化报表
             var report = new TOONE.Report.Preview({ready:function(workBook){
-                //workBook使用方法参考docs/index.html中基础定义/WorkBook
+                //workBook使用方法参考:https://demo.grapecity.com.cn/spreadjs/help/api/classes/GC.Spread.Sheets.Workbook
                 workBook.addSheet(0);
-                workBook.setOptions({
-                    newTabVisible:false,
-                    tabStripVisible:false,
-                });
+                workBook.options.newTabVisible = false;
+                workBook.options.tabStripVisible = false;
                 var sheet = workBook.getSheet(0);
-                sheet.setDefaults({
-                    rowHeight:40,
-                    colWidth: 80
-                });
-                sheet.setOptions({
-                    //colHeaderVisible:false,
-                    //rowHeaderVisible:false,
-                    showHorizontalGridline:false,
-                    showVerticalGridline:false
-                });
+                sheet.defaults.rowHeight = 40;
+                sheet.defaults.colWidth = 80;
+                sheet.options.showHorizontalGridline = false;
+                sheet.options.showVerticalGridline = false;
                 sheet.setRowCount(5);
                 sheet.setColumnCount(5);
                 sheet.addSpan(0,0,4,4);
                 sheet.setValue(0,0,"测试数据");
-                var NS = TOONE.Report;
                 var range = sheet.getRange(0,0,4,4);
-                const border = new NS.LineBorder();
-                border.setColor("#000");
-                border.setStyle(NS.LineStyle.thin);
+                const border = new GC.Spread.Sheets.LineBorder();
+                border.color = "#000";
+                border.style = GC.Spread.Sheets.LineStyle.thin;
                 range.setBorder(border,{outline:true});
-                range.hAlign(NS.HAlign.center);
-                range.vAlign(NS.VAlign.center);
-                range.fontWeight(NS.FontWeight.bold);
+                range.hAlign(GC.Spread.Sheets.HorizontalAlign.center);
+                range.vAlign(GC.Spread.Sheets.VerticalAlign.center);
+                range.fontWeight("bold");
                 range.fontFamily("微软雅黑");
-                range.fontStyle(NS.FontStyle.italic);
-                range.fontSize(16);
+                range.fontStyle("italic");
+                range.fontSize("16px");
             }});
             //报表挂载到指定dom元素
             report.mount(document.getElementById('app'));
