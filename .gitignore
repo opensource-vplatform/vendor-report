@@ -14,3 +14,6 @@ packages/script/src/designer/icon/delta/**
 .classpath
 org.eclipse.jdt.core.prefs
 org.eclipse.m2e.core.prefs
+packages/integration/vdaas-service/uploads/**
+packages/integration/vdaas-service/httpAccess.log
+packages/integration/vdaas-service/runLogs.log

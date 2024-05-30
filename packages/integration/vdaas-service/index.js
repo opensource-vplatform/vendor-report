@@ -16,9 +16,11 @@ const { PDFDocument } = require('pdf-lib');
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
 const upload = multer({ dest: 'uploads/' });
+let isDev = false;
 
 // 用于存储文件流的 Map
 const fileMap = new Map();
+const clientMap = new Map();
 
 // 创建一个自定义的 silent logger 配置
 const logConfig = {
@@ -46,7 +48,7 @@ const runLogs = log4js.getLogger('runLogs');
 const app = express();
 let port = 8080;
 let client;
-let serverUrl = 'http://service.vdaas.t.vtoone.com';
+let serverUrl = 'http://dev.service.vdaas.t.vtoone.com';
 
 
 // 读取数据环境变量的值
@@ -72,6 +74,12 @@ if (portArgIndex !== -1) {
   console.log('修改运行端口Port:', port);
 }
 
+// 解析命令行参数
+const DevArgIndex = args.findIndex(arg => arg.startsWith('--isDev='));
+if (DevArgIndex !== -1) {
+  isDev = args[DevArgIndex].split('=')[1];
+  console.log('现在是开发模式');
+}
 
 let browser;
 
@@ -113,6 +121,11 @@ app.use('/font', (req, res) => {
   })
 });
 
+// 通知对应客户端更新消息
+const notifyClient = (fileId, data) => {
+  if (!!clientMap.get(fileId))
+    clientMap.get(fileId).write(`data: ${JSON.stringify(data)}\n\n`);
+};
 
 app.all('/reportapi/:appCode/report/reportExportProgress/:fileId', (req, res) => {
   const fileId = req.params.fileId;
@@ -138,6 +151,47 @@ app.all('/reportapi/:appCode/report/reportExportProgress/:fileId', (req, res) =>
       success: false
     })
   }
+})
+
+
+
+app.all('/reportapi/:appCode/report/reportExportStreamProgress/:fileId', (req, res) => {
+  const fileId = req.params.fileId;
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  clientMap.set(fileId, res);
+  if (fileMap.get(fileId))
+    try {
+      const data = {
+        curPageIndex: fileMap.get(fileId).curPageIndex,
+        pageCounts: fileMap.get(fileId).pageCounts,
+        progress: Math.round((fileMap.get(fileId).curPageIndex / fileMap.get(fileId).pageCounts).toFixed(2) * 100),
+        success: true
+      }
+      res.write(`data : ${JSON.stringify(data)}\n\n`)
+    } catch (err) {
+      const errData = {
+        message: `查询进度异常：${typeof err === 'string' ? err : err.message}`,
+        success: false
+      }
+      res.write(`data : ${JSON.stringify(errData)}\n\n`);
+      runLogs.error(`导出PDF失败:${err}`);
+      res.end();
+    }
+  else {
+    const errData = {
+      message: '没找到fileId对应的导出进程,请检查参数是否正确',
+      success: false
+    }
+    res.write(`data : ${JSON.stringify(errData)}\n\n`);
+    res.end();
+  }
+  // 处理客户端断开连接
+  req.on('close', () => {
+    res.end();
+    clientMap.delete(fileId);
+  });
 })
 
 /**
@@ -195,7 +249,13 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.json({
     fileId,
   })
-
+  if (req.body.pageCounts !== req.body.pageIndex)
+    notifyClient(fileId, {
+      curPageIndex: fileMap.get(fileId).curPageIndex,
+      pageCounts: fileMap.get(fileId).pageCounts,
+      progress: Math.round((fileMap.get(fileId).curPageIndex / fileMap.get(fileId).pageCounts).toFixed(2) * 100),
+      success: true
+    })
 })
 
 
@@ -212,15 +272,19 @@ app.get('/', (req, res) => {
  * @returns {Promise<void>} - A Promise that resolves when the PDF file has been exported.
  */
 app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
-
+  // 如果没有传入fileId 则生成一个
+  const fileId = req.query.fileId ?? uuidv4()
   try {
+    if (!!req.query.fileId && Array.isArray(req.query.fileId))
+      throw new Error("只能接受一个fileId,请重新确定参数再重试")
     if (!!req.query.fileId && !!fileMap.get(req.query.fileId))
       throw new Error("当前文件ID正在导出进程中，请切换文件ID再重试")
-    if (!!req.query.fileId)
-      fileMap.set(req.query.fileId, {
-        pageCounts: 1,
-        curPageIndex: 0,
-      });
+
+
+    fileMap.set(fileId, {
+      pageCounts: 1,
+      curPageIndex: 0,
+    });
     // console.log("开始的时间是:", new Date().toString());
     let fileName = req.query.fileName;
     const appCode = req.params.appCode;
@@ -254,7 +318,7 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       });
 
       // 访问指定的网址
-      await page.goto(`${req.protocol}://localhost:${port}/?${queryParams}&appcode=${appCode}${!req.query.fileId ? `&fileId=${uuidv4()}` : ''}`);
+      await page.goto(`${req.protocol}://localhost:${port}/?${queryParams}&appcode=${appCode}${!req.query.fileId ? `&fileId=${fileId}` : ''}`);
 
       // Set screen size
       // await page.setViewport({ width: 1080, height: 1024 });
@@ -307,8 +371,15 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       stream.on('end', () => {
         // console.log('数据读取完成，关闭可读流');
         // 在 'end' 事件触发后关闭可读流
-        page.close();
+        !isDev && page.close();
         stream.destroy();
+        notifyClient(fileId, {
+          curPageIndex: fileMap.get(fileId).curPageIndex,
+          pageCounts: fileMap.get(fileId).pageCounts,
+          progress: 100,
+          success: true
+        })
+        clientMap.get(fileId) && clientMap.get(fileId).end();
         fileMap.delete(fileId);
         fs.rmSync(lastPath);
         if (filePath.length > 1)
@@ -329,21 +400,39 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
         errDesc: typeof err === 'string' ? err : err.message,
         success: false
       })
-      fileMap.delete(fileId);
+      handleError(err, fileId);
     })
   } catch (err) {
 
-    runLogs.error(`导出PDF失败:${err}`);
+
     res.setHeader('Content-Type', 'application/json');
     res.json({
       message: '导出PDF失败,请检查参数是否正确',
       errDesc: typeof err === 'string' ? err : err.message,
       success: false
     })
-    fileMap.delete(fileId);
+    handleError(err, fileId);
     // res.status(500).end();
   }
 })
+
+// 异常处理
+const handleError = (err, fileId) => {
+  if (!!fileId) {
+    fileMap.delete(fileId);
+    const { filePath } = fileMap.get(fileId) ?? [];
+    if (filePath.length > 1)
+      for (let item of filePath) {
+        fs.rmSync(item)
+      }
+    notifyClient(fileId, {
+      message: '导出PDF失败,请检查参数是否正确',
+      errDesc: typeof err === 'string' ? err : err.message,
+      success: false
+    })
+  }
+  runLogs.error(`导出PDF失败:${err}`);
+}
 
 // 本地测试需要跨域中间件代理
 let proxyMiddleware = createProxyMiddleware({
@@ -378,8 +467,8 @@ function updateProxyTarget(newTargetUrl) {
 
 app.listen(port, async () => {
   console.log(`Server is running on port ${port}`);
-  browser = await puppeteer.launch({ headless: true, timeout: 60000, args: ['--no-sandbox'], })
-  registerNacos().then(() => {
+  browser = await puppeteer.launch({ headless: !isDev ? true : false, timeout: 60000, args: ['--no-sandbox'], })
+  !isDev && registerNacos().then(() => {
     console.log("注册成功");
     // client.getAllInstances('v3gateway').then(service => {
     //   console.log(service);

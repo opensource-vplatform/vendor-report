@@ -6,7 +6,7 @@ const app = express();
 
 const port = 3001;
 
-let serverUrl = 'http://service.vdaas.t.vtoone.com';
+let serverUrl = 'http://dev.service.vdaas.t.vtoone.com';
 
 // 设置 Express 使用静态文件目录
 app.use(express.static(path.join(__dirname, '../vdass-web/resources/static/vdaasweb/spreadsheet')));
