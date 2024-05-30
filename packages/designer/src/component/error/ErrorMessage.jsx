@@ -29,6 +29,7 @@ const Wrap = styled.span`
 const Pre = styled.pre`
     margin: 0px;
     text-indent: 0;
+    white-space: pre-wrap;
 `;
 
 const Expand = function (props) {
