@@ -451,17 +451,20 @@ export default function (props) {
 
         if (onPageCompleted) {
             onPageCompleted((params) => {
-                const sheet = data.spread.getActiveSheet();
-                const sheetJson = sheet.toJSON();
-                const sheetPage = inst.sheetPages[sheetJson.name];
-                return new Promise((resolve) => {
-                    resolve({
-                        changePageIndex,
-                        nextPage,
-                        isPage: sheetPage?.isPage,
-                        pageIndex: (sheetPage?.pageIndex || 0) + 1,
-                        total: sheetPage?.datas?.length || 1,
-                    });
+                return new Promise((resolve, reject) => {
+                    const sheet = data.spread.getActiveSheet();
+                    if (sheet) {
+                        const sheetJson = sheet.toJSON();
+                        const sheetPage = inst.sheetPages[sheetJson.name];
+
+                        resolve({
+                            changePageIndex,
+                            nextPage,
+                            isPage: sheetPage?.isPage,
+                            pageIndex: (sheetPage?.pageIndex || 0) + 1,
+                            total: sheetPage?.datas?.length || 1,
+                        });
+                    }
                 });
             });
         }
