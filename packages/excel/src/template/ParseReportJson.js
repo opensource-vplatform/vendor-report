@@ -1389,6 +1389,9 @@ export default class ParseReportJson {
             verticalAutoMergeRanges.forEach(function (item) {
                 item.range.rowCount = pageInfos.rowCount - item.range.row;
                 pageInfos.autoMergeRanges.push(item);
+                sheetPage && sheetPage.autoMergeRanges.push(item);
+
+                sheetPrintPage && sheetPrintPage.autoMergeRanges.push(item);
             });
         });
     }
