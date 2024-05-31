@@ -5,7 +5,7 @@ export const zoomToFit = function(spreadJson,width){
     if(sheets){
         for(let sheet of Object.values(sheets)){
             if(sheet.visible){
-                let sheetWidth = showVerticalScrollbar ? 30:0;
+                let sheetWidth = showVerticalScrollbar ? 40:0;
                 const rowHeaderVisible = !(sheet.rowHeaderVisible === false)
                 if(rowHeaderVisible){
                     sheetWidth += sheet.defaults?.rowHeaderColWidth||40;
@@ -20,10 +20,10 @@ export const zoomToFit = function(spreadJson,width){
                     const colCount = sheet.columnCount;
                     sheetWidth += defColWidth*colCount;                 
                 }
-                if (sheetWidth < width) {
+                //if (sheetWidth < width) {
                     const zoom = width/sheetWidth;
                     sheet.zoomFactor = zoom;
-                }
+                //}
                 break;
             }
         }

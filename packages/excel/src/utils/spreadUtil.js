@@ -60,9 +60,8 @@ export const toExcelPluginUrl = function (filename) {
     return `${getExcelBaseUrl()}/plugins/${filename}`;
 };
 
-const getSheetRect = function (sheet) {
+const getSheetRect = function (sheet,spread) {
     const sheetJSON = sheet.toJSON();
-
     const {
         rows = [],
         rowCount = 200,
@@ -91,18 +90,20 @@ const getSheetRect = function (sheet) {
     }
 
     //内容宽度
-    let sheetWidth = 0;
+    let sheetWidth = 0;//显示竖向滚动条，则添加竖向滚动条宽度
     if (rowHeaderVisible) {
+        const rowHeaderWidth = sheetJSON.defaults?.rowHeaderColWidth||40;//默认行标题宽度
         if (rowHeaderColInfos.length > 0) {
             rowHeaderColInfos.forEach((info) => {
-                sheetWidth += info?.size || 40;
+                sheetWidth += info?.size || rowHeaderWidth;
             });
         } else {
-            sheetWidth += 40;
+            sheetWidth += rowHeaderWidth;
         }
     }
+    const defColWidth = sheetJSON.defaults?.colWidth||62;//默认列宽
     for (let i = 0; i < columnCount; i++) {
-        sheetWidth += columns[i]?.size || 62;
+        sheetWidth += columns[i]?.size || defColWidth;
     }
 
     return {
@@ -137,8 +138,9 @@ export const zoomToPage = function (spread, width, height) {
 
 export const zoomToFit = function (spread, width) {
     spread.sheets.forEach((sheet) => {
-        const { sheetWidth } = getSheetRect(sheet);
+        let { sheetWidth } = getSheetRect(sheet,spread);
         if (sheetWidth > 0) {
+            sheetWidth += 5;//添加偏差量，防止表格与容器太贴合
             let zoomFactor = width / sheetWidth;
             if (zoomFactor >= 4) {
                 zoomFactor = 4;

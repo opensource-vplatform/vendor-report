@@ -20,10 +20,10 @@ export const zoomToFit = function (spreadJson, width) {
                     const colCount = sheet.columnCount;
                     sheetWidth += defColWidth*colCount;                 
                 }
-                if (sheetWidth < width) {
+                //if (sheetWidth < width) {
                     const zoom = width / sheetWidth;
                     sheet.zoomFactor = zoom;
-                }
+                //}
                 break;
             }
         }
