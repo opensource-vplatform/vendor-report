@@ -247,7 +247,8 @@ export default function () {
           };
           if (excelJson) {
             const usedDatasources = excelJson.usedDatasources || [];
-            if (usedDatasources && usedDatasources.length > 0) {
+            const previewOnly = getParameter("previewOnly"); 
+            if (previewOnly !== 'true' && usedDatasources && usedDatasources.length > 0) {
               axios
                 .get(getTableDataUrl(usedDatasources.join(',')))
                 .then((data) => {
