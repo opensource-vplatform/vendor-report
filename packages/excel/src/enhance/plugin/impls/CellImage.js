@@ -55,7 +55,7 @@ class CellImage extends Plugin {
             const formula = toFormula(data);
             return { type: 'formula', value: formula };
         }else{
-            return { type: 'text', value:''};
+            return [{ type: 'text', value:''},{ type: 'formula', value: '' }];
         }
     }
 }

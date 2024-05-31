@@ -161,9 +161,14 @@ export default function () {
                             setData({ ...data, loadMsg: null, errorMsg: null });
                         };
                         if (excelJson) {
+                            const previewOnly = getParameter('previewOnly');
                             const usedDatasources =
                                 excelJson.usedDatasources || [];
-                            if (usedDatasources && usedDatasources.length > 0) {
+                            if (
+                                previewOnly !== 'true' &&
+                                usedDatasources &&
+                                usedDatasources.length > 0
+                            ) {
                                 axios
                                     .get(
                                         getTableDataUrl(

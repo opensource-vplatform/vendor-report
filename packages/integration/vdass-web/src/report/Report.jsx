@@ -1,26 +1,36 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import axios from 'axios';
 import styled from 'styled-components';
 
 import { genUUID } from '../utils/commonUtil';
-import { getReportConfigUrl, getTableDataUrl } from '../utils/constant';
+import {
+  getExportPdfProgressUrl,
+  getReportConfigUrl,
+  getTableDataUrl,
+} from '../utils/constant';
 import { license } from '../utils/license';
 import {
-    genResponseErrorCallback,
-    getData,
-    handleError as handleErrorUtil,
+  genResponseErrorCallback,
+  getData,
+  handleError as handleErrorUtil,
 } from '../utils/responseUtil';
 import { zoomToFit } from '../utils/sheetUtil';
 import {
-    download,
-    exportPdf,
-    getParameter,
-    getTitle,
+  download,
+  exportPdf,
+  getParameter,
+  getTitle,
 } from '../utils/utils';
-import { getExportPdfProgressUrl } from './../utils/constant';
 import Button from './components/button/Index';
-import { ErrorDialog, ErrorPage } from './components/error/Index';
+import {
+  ErrorDialog,
+  ErrorPage,
+} from './components/error/Index';
 import WaitMsg from './components/loading/Index';
 import Page from './components/page/Index';
 import ProgressCircle from './components/progress';
@@ -176,7 +186,7 @@ export default function () {
                                 getData(config.data, 'config')
                             );
                             zoomToFit(
-                                excelJson,
+                                excelJson.reportJson,
                                 parseInt(getComputedStyle(ref.current).width)
                             );
                         } catch (e) {}
@@ -216,9 +226,10 @@ export default function () {
                             };
                         };
                         if (excelJson) {
+                            const previewOnly = getParameter("previewOnly");
                             const usedDatasources =
                                 excelJson.usedDatasources || [];
-                            if (usedDatasources && usedDatasources.length > 0) {
+                            if (previewOnly!=='true' && usedDatasources && usedDatasources.length > 0) {
                                 axios
                                     .get(
                                         getTableDataUrl(
