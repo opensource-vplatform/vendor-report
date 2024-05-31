@@ -1,0 +1,55 @@
+{
+    "ds": [
+        {
+            "id": "image",
+            "type": "table",
+            "typeName": "列表",
+            "desc": "行列合并",
+            "code": "merge",
+            "name": "行列合并",
+            "children": [
+                {
+                    "id": "id",
+                    "type": "text",
+                    "typeName": "记录id",
+                    "desc": "记录id",
+                    "code": "id",
+                    "name": "记录id"
+                },
+                {
+                    "id": "col",
+                    "type": "text",
+                    "typeName": "文本",
+                    "desc": "列合并",
+                    "code": "col",
+                    "name": "列合并"
+                },
+                {
+                    "id": "row",
+                    "type": "text",
+                    "typeName": "文本",
+                    "desc": "行合并",
+                    "code": "row",
+                    "name": "行合并"
+                }
+            ]
+        }
+    ],
+    "datas": {
+        "merge": [
+            {
+                "id": "1",
+                "col": "A",
+                "row": "A"
+            },{
+                "id": "2",
+                "col": "A",
+                "row": "B"
+            },{
+                "id": "3",
+                "col": "C",
+                "row": "C"
+            }
+        ]
+    }
+}

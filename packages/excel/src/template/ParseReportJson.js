@@ -125,7 +125,7 @@ export default class ParseReportJson {
         this.delayFormula = [];
         this.sheetPages = {};
         this.sheetPrintPages = {};
-
+        this.removeDesignerInfo();
         //打印换算单位
         this.printConversionUnits = getPrintConversionUnits();
         this.parse();
@@ -141,6 +141,39 @@ export default class ParseReportJson {
             formulaHandler();
         }
         console.timeEnd('耗时多久');
+    }
+    /**
+     * 移除设计器中设置的样式信息
+     * 如：行列合并设置的角标
+     */
+    removeDesignerInfo(){
+        if(this.reportJson){
+            const sheets = this.reportJson?.sheets;
+            if(!sheets){
+                return;
+            }
+            Object.entries(sheets).forEach(([sheetName,sheet])=>{
+                const dataTable = sheet.data?.dataTable;
+                if (!dataTable) {
+                    return;
+                }
+                Object.entries(dataTable).forEach(([rowStr, columns]) => {
+                    Object.entries(columns).forEach(([colStr, { style }]) => {
+                        if(style){
+                            style.decoration = undefined;
+                            /*const cellStyle = style.cellType;
+                            if(cellStyle&&cellStyle.typeName=="1"){
+                                //移除旧版本json中绑定样式设置
+                                const col = Number(colStr);
+                                sheet.getCell(row, col).cellType(undefined);
+                                const style = sheet.getStyle(row,col);
+                                style.decoration = undefined;
+                            }*/ 
+                        }
+                    });
+                });
+            });
+        }
     }
     initTempates() {
         this.dataSourceMap = [];

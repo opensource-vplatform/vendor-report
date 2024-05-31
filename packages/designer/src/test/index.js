@@ -3,6 +3,7 @@ import zjjlb from './jlzf/zjjlb';
 import zjjlzfhzb from './jlzf/zjjlzfhzb';
 import zqzfzs from './jlzf/zqzfzs';
 import image from './jsonData/image.json';
+import merge from './jsonData/merge';
 import otherData from './jsonData/otherData.json';
 import jsonStr from './jsonData/reportJsonData';
 import salesData from './jsonData/salesData.json';
@@ -198,6 +199,7 @@ const datasourceDefines = [
         ],
     },
     ...image.ds,
+    ...merge.ds,
 ];
 
 tourismData.data.length = 2 || 21;
@@ -254,6 +256,7 @@ export default {
             ...zjjlb.datas,
             ...zjjlzfhzb.datas,
             ...image.datas,
+            ...merge.datas,
             sales: salesData.data || [
                 ...salesData.data,
                 ...salesData.data,
