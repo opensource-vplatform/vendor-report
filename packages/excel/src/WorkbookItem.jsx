@@ -29,6 +29,7 @@ import {
   getNamespace,
   getPluginSrc,
   withBatchCalcUpdate,
+  zoom,
 } from './utils/spreadUtil';
 
 const GC = getNamespace();
@@ -211,8 +212,6 @@ export default function (props) {
         columnMerge = false,
         rowMergeColumns = {},
         colMergeColumns = {},
-        template,
-        setting,
         onColumnWidthChanged,
         onRowHeightChanged,
         onLeftColumnChanged,
@@ -409,6 +408,7 @@ export default function (props) {
             let newIndex = Number.parseInt(Number(pageIndex));
             const sheet = data.spread.getActiveSheet();
             const sheetJson = sheet.toJSON();
+            sheet.setRowCount(0);
             const sheetPage = inst.sheetPages[sheetJson.name];
 
             if (newIndex <= 1) {
@@ -437,6 +437,7 @@ export default function (props) {
                     const newSheet = sheetPage.datas[newPageIndex];
                     newSheet.sheet = sheetJson;
                     inst.resetSheet(newSheet);
+                    sheet.setRowCount(0);
                     sheet.fromJSON(sheetJson);
                 }
                 resolve({
@@ -484,7 +485,22 @@ export default function (props) {
                 handlePrint();
                 handlePage();
                 if (onInited) {
-                    const promise = onInited(data.spread);
+                    const promise = onInited(data.spread, {
+                        zoom(value) {
+                            zoom({ el, value, spread: data.spread });
+                        },
+                        zoomOptions: {
+                            suitableToPage: 'suitableToPage',
+                            suitableToPageWidth: 'suitableToPageWidth',
+                            actualSize: 'actualSize',
+                        },
+                    });
+                    dataSource &&
+                        zoom({
+                            el,
+                            value: 'suitableToPageWidth',
+                            spread: data.spread,
+                        });
                     if (promise && promise.then) {
                         promise.then((json) => {
                             handleSheets(json);
