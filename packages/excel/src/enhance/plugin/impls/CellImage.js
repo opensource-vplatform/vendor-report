@@ -44,18 +44,39 @@ const toFormula = function (data) {
     return formula.join('');
 };
 
+/**
+ * 非image函数默认值
+ * @param {} value
+ * @returns
+ */
+const isNotDefImageValue = function (value) {
+    if (
+        value &&
+        value.typeName == 'SparklineExValue' &&
+        value.value &&
+        value.value.url == './image.png'
+    ) {
+        //配置的时候会将公式设置为IMAGE("./image.png")，引发单元格有值
+        return false;
+    }
+    return true;
+};
+
 class CellImage extends Plugin {
     execute(value, tool) {
         const config = this.getConfig();
         const val = value.value;
-        if(val){
+        if (val && isNotDefImageValue(val)) {
             //有值的时候才生成IMAGE函数
             const url = value.type == 'formula' ? val : `"${val}"`;
             const data = { url, ...config };
             const formula = toFormula(data);
             return { type: 'formula', value: formula };
-        }else{
-            return [{ type: 'text', value:''},{ type: 'formula', value: '' }];
+        } else {
+            return [
+                { type: 'text', value: '' },
+                { type: 'formula', value: '' },
+            ];
         }
     }
 }
