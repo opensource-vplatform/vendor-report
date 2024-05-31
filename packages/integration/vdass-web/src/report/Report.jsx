@@ -347,11 +347,14 @@ export default function () {
                                     '[object Blob]'
                                 )
                                     download(data, getTitle('未命名') + '.pdf');
-                                else handleDialogError(data.message);
+                                else {
+                                  progressRef.current.onClose();
+                                  handleDialogError(data?.message);
+                                }
                             })
                             .catch((data) => {
                                 progressRef.current.onClose();
-                                handleDialogError(data.message);
+                                handleDialogError(data?.message);
                             });
                         setTimeout(() => {
                             getExportPdfProgressStream(fileId);
