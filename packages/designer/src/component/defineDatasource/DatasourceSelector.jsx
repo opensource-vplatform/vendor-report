@@ -382,7 +382,7 @@ export default function (props) {
     return (
         <OperationDialog
             title='选择数据集'
-            style={{maxWidth:1358,minWidth:600}}
+            style={{maxWidth:1102,minWidth:600}}
             onCancel={handleCancel}
             onConfirm={handleConfirm}
         >
