@@ -177,7 +177,7 @@ app.all('/reportapi/:appCode/report/reportExportStreamProgress/:fileId', (req, r
       }
       res.write(`data : ${JSON.stringify(errData)}\n\n`);
       runLogs.error(`导出PDF失败:${err}`);
-      res.end();
+      // res.end();
     }
   else {
     const errData = {
@@ -185,7 +185,7 @@ app.all('/reportapi/:appCode/report/reportExportStreamProgress/:fileId', (req, r
       success: false
     }
     res.write(`data : ${JSON.stringify(errData)}\n\n`);
-    res.end();
+    // res.end();
   }
   // 处理客户端断开连接
   req.on('close', () => {
@@ -419,8 +419,8 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
 // 异常处理
 const handleError = (err, fileId) => {
   if (!!fileId) {
-    fileMap.delete(fileId);
-    const { filePath } = fileMap.get(fileId) ?? [];
+
+    const { filePath } = fileMap.get(fileId) ?? { filePath: [] };
     if (filePath.length > 1)
       for (let item of filePath) {
         fs.rmSync(item)
@@ -430,6 +430,7 @@ const handleError = (err, fileId) => {
       errDesc: typeof err === 'string' ? err : err.message,
       success: false
     })
+    fileMap.delete(fileId);
   }
   runLogs.error(`导出PDF失败:${err}`);
 }
