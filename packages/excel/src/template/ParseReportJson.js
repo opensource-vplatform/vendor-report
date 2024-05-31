@@ -7,6 +7,17 @@ import Tool from '../enhance/Tool';
 import { getVarName } from '../utils/varUtil';
 import UnionDatasource from './UnionDatasource';
 
+function enhance(dataTable, enhanceResult) {
+    let res = enhanceResult;
+    if (!Array.isArray(res)) {
+        res = [res];
+    }
+    res.forEach(({ type, value }) => {
+        const key = type === 'text' ? 'value' : type;
+        dataTable[key] = value;
+    });
+}
+
 function getPrintConversionUnits() {
     //打印换算单位
     const divId = 'wd2mn37k18jf19j8yw1q8d4pt2jpzx35xlw8nzjbj';
@@ -1191,7 +1202,8 @@ export default class ParseReportJson {
                                                     return unionDatasource;
                                                 }
                                             );
-                                            const { type, value } = exePlugins(
+
+                                            let res = exePlugins(
                                                 {
                                                     type: 'text',
                                                     value: colDataTable.value,
@@ -1199,11 +1211,7 @@ export default class ParseReportJson {
                                                 plugins,
                                                 tool
                                             );
-                                            const key =
-                                                type === 'formula'
-                                                    ? type
-                                                    : 'value';
-                                            colDataTable[key] = value;
+                                            enhance(colDataTable, res);
                                         }
 
                                         if (isDelay) {
@@ -1246,16 +1254,14 @@ export default class ParseReportJson {
                                             }
                                         });
 
-                                        const { type, value } = enhanceFormula(
+                                        let res = enhanceFormula(
                                             {
                                                 type: 'formula',
                                                 value: colDataTable.formula,
                                             },
                                             tool
                                         );
-                                        const key =
-                                            type === 'formula' ? type : 'value';
-                                        colDataTable[key] = value;
+                                        enhance(colDataTable, res);
                                     };
                                     this.delayFormula.push(formulaHandler);
                                 }
