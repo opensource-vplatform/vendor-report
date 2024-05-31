@@ -4,6 +4,7 @@ import {
   getTableCodesFromFormula,
 } from '../enhance/index';
 import Tool from '../enhance/Tool';
+import { isObject } from '../utils/objectUtils';
 import { getVarName } from '../utils/varUtil';
 import UnionDatasource from './UnionDatasource';
 
@@ -159,7 +160,7 @@ export default class ParseReportJson {
                 }
                 Object.entries(dataTable).forEach(([rowStr, columns]) => {
                     Object.entries(columns).forEach(([colStr, { style }]) => {
-                        if(style){
+                        if(style&&isObject(style)){
                             style.decoration = undefined;
                             /*const cellStyle = style.cellType;
                             if(cellStyle&&cellStyle.typeName=="1"){
