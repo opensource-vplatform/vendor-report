@@ -10,11 +10,13 @@ const Wrap = styled.div`
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
+    height: 100%;
 `;
 
 const Content = styled.div`
     display: flex;
     flex-direction: column;
+    height: 100%;
 `;
 
 export const ButtonWrap = styled.div`

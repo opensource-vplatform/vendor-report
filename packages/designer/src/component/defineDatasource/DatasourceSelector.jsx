@@ -83,7 +83,7 @@ const SubTitle = styled.div`
 const DescItem = styled.div`
     display: flex;
     flex-direction: column;
-    height: 43px;
+    min-height: 43px;
     padding: 8px;
     font-size: 12px;
     max-width: 100%;
@@ -219,17 +219,19 @@ const DialogWrap = styled.div`
     display: flex;
     width: 100%;
     justify-content: center;
-    max-height: 536px;
+    height: calc(100% - 86px);
     overflow: auto;
 `;
 
 const DatasourceItemWrap = styled.div`
-    display: flex;
+    display: grid;
     flex-wrap: wrap;
     max-width: 100%;
     width: max-content;
     height: 100%;
-    gap: 8px;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, 261px);
+    grid-template-rows: repeat(auto-fill, 120px);
 `;
 
 const Toolbar = styled.div`
@@ -382,7 +384,7 @@ export default function (props) {
     return (
         <OperationDialog
             title='选择数据集'
-            style={{maxWidth:1102,minWidth:600}}
+            style={{width:'90%',height:'90%'}}
             onCancel={handleCancel}
             onConfirm={handleConfirm}
         >
