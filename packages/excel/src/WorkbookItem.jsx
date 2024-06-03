@@ -5,11 +5,15 @@ import {
 } from 'react';
 
 import resourceManager from 'resource-manager-js';
+import styled from 'styled-components';
 
+import Select from './component/form/Select';
+import Page from './component/page/Index';
 import {
   EVENTS,
   fire,
 } from './event/EventManager';
+import AddIcon from './icons/shape/Add';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
 import { withDivStyled } from './utils/componentUtil';
@@ -30,7 +34,26 @@ import {
   getPluginSrc,
   withBatchCalcUpdate,
   zoom,
+  zoomIn,
+  zoomOut,
 } from './utils/spreadUtil';
+
+const zoomOptions = [
+    {
+        value: 'actualSize',
+        text: '实际大小',
+    },
+    { value: 'suitableToPage', text: '适合页面' },
+    { value: 'suitableToPageWidth', text: '适合页宽' },
+    { value: '0.5', text: '50%' },
+    { value: '0.75', text: '75%' },
+    { value: '1', text: '100%' },
+    { value: '1.25', text: '125%' },
+    { value: '1.50', text: '150%' },
+    { value: '2.00', text: '200%' },
+    { value: '3.00', text: '300%' },
+    { value: '4.00', text: '400%' },
+];
 
 const GC = getNamespace();
 const GCsheets = GC.Spread.Sheets;
@@ -40,7 +63,57 @@ const Wrap = withDivStyled({
     height: '100%',
     overflow: 'visible',
     userSelect: 'none',
+    display: 'flex',
+    flexDirection: 'column',
 });
+
+const Toolbar = styled.div`
+    border-bottom: solid 1px lightgray;
+    background-color: white;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    height: 35px;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    align-items: center;
+`;
+
+const ToolbarRight = styled.div`
+    position: absolute;
+    width: max-content;
+    right: 0;
+    display: flex;
+    justify-content: end;
+    height: 22px;
+    gap: 8px;
+    padding-right: 8px;
+`;
+
+const ZoomWrap = styled.div`
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+`;
+
+const ZoomOut = styled.div`
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:hover {
+        background-color: #dadada;
+    }
+`;
+const ZoomOutIcon = styled.div`
+    width: 10px;
+    border: 1px solid #333;
+    border-radius: 10px;
+`;
 
 const bindEvent = function (spread, typeName, handler) {
     if (handler) {
@@ -178,6 +251,56 @@ const bindDataSource = function (params) {
     });
 };
 
+function Zoom(props) {
+    const {
+        zoomOptions,
+        defaultZoom = 'suitableToPageWidth',
+        el,
+        data,
+    } = props;
+    const [value, setValue] = useState(defaultZoom);
+    return (
+        <ZoomWrap>
+            <ZoomOut
+                onClick={function () {
+                    const res = zoomOut(data.spread);
+                    setValue(res);
+                }}
+            >
+                <ZoomOutIcon></ZoomOutIcon>
+            </ZoomOut>
+
+            <div
+                onClick={function () {
+                    const res = zoomIn(data.spread);
+                    setValue(res);
+                }}
+            >
+                <AddIcon></AddIcon>
+            </div>
+            <Select
+                datas={zoomOptions}
+                onChange={function (value) {
+                    setValue(value);
+                    zoom({
+                        el,
+                        value: value,
+                        spread: data.spread,
+                    });
+                }}
+                style={{
+                    minWidth: 100,
+                    width: 102,
+                    height: 22,
+                    /*  borderRadius: 4, */
+                }}
+                value={value}
+                text={`${value}%`}
+            ></Select>
+        </ZoomWrap>
+    );
+}
+
 export default function (props) {
     const {
         newTabVisible = true,
@@ -218,6 +341,8 @@ export default function (props) {
         onTopRowChanged,
         onViewZoomed,
         inst,
+        isShowToolbar = true,
+        toolbar,
     } = props;
     if (license) {
         setLicense(license);
@@ -244,6 +369,7 @@ export default function (props) {
             showError: showError,
             showWarn: showWarn,
             pageInfo: inst,
+            setPageInfos: null,
         };
     });
 
@@ -469,6 +595,23 @@ export default function (props) {
                 });
             });
         }
+
+        const sheet = data.spread.getActiveSheet();
+        if (sheet && inst) {
+            const sheetJson = sheet.toJSON();
+            const sheetPage = inst.sheetPages[sheetJson.name];
+
+            data.pageOpt = {
+                changePageIndex,
+                nextPage,
+                isPage: sheetPage?.isPage,
+                pageIndex: (sheetPage?.pageIndex || 0) + 1,
+                total: sheetPage?.datas?.length || 1,
+            };
+            if (data.setPageInfos) {
+                data.setPageInfos(data.pageOpt);
+            }
+        }
     };
 
     useEffect(() => {
@@ -524,8 +667,25 @@ export default function (props) {
         onUndo,
         onRedo,
     ]);
+
     return (
         <Wrap>
+            {isShowToolbar && (
+                <Toolbar>
+                    <Zoom zoomOptions={zoomOptions} el={el} data={data}></Zoom>
+                    <ToolbarRight>
+                        <Page
+                            onInited={(datas) => {
+                                data.setPageInfos = datas.setPageInfos;
+                                if (data.spread && data.pageOpt) {
+                                    data.setPageInfos(data.pageOpt);
+                                }
+                            }}
+                        ></Page>
+                        {toolbar}
+                    </ToolbarRight>
+                </Toolbar>
+            )}
             {data.showError ? (
                 <LicenseError></LicenseError>
             ) : (
@@ -535,6 +695,9 @@ export default function (props) {
                         height: '100%',
                         overflow: 'visible',
                         userSelect: 'none',
+                        flex: 1,
+                        padding: '8px',
+                        boxSizing: 'border-box',
                     }}
                     ref={el}
                 ></div>

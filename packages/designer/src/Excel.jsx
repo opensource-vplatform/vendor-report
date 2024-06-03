@@ -212,7 +212,7 @@ export default function () {
                     datasourceSetting,
                     wizardSlice,
                 }) => {
-                    if(excelJson){
+                    if (excelJson) {
                         enhanceSpreadJson(excelJson);
                         resolve(excelJson);
                     }
@@ -318,6 +318,7 @@ export default function () {
                 onLeftColumnChanged={genEventHandler('LeftColumnChanged')}
                 onTopRowChanged={genEventHandler('TopRowChanged')}
                 onViewZoomed={genEventHandler('ViewZoomed')}
+                isShowToolbar={false}
             >
                 <Worksheet
                     name={sheetName}

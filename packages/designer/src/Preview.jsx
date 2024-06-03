@@ -7,7 +7,6 @@ import {
 import styled from 'styled-components';
 
 import Button from '@components/button/Index';
-import Page from '@components/page';
 import {
   EVENTS,
   fire,
@@ -47,10 +46,11 @@ const Toolbar = styled.div`
 `;
 
 const ExcelWrap = styled.div`
-    padding: 8px;
+    padding: 0px;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
+    padding-top: 0;
 `;
 
 //如果表格允许行合并或者列合并(相邻单元格数据相同会自动合并成一个单元格)，则对数据进行处理
@@ -127,46 +127,42 @@ export default function () {
         });
     };
 
-    let pageCompletedHandler = null;
-    let setPageInfos = null;
+    /*     let pageCompletedHandler = null;
+    let setPageInfos = null; */
+
+    const _toolbar = (
+        <>
+            {/*  <Page
+                onInited={(datas) => {
+                    setPageInfos = datas.setPageInfos;
+                    if (pageCompletedHandler) {
+                        pageCompletedHandler().then((datas) => {
+                            setPageInfos(datas);
+                        });
+                    }
+                }}
+            ></Page> */}
+            <Button type='primary' onClick={handlePrint}>
+                打印
+            </Button>
+            <Button onClick={handleEdit}>编辑</Button>
+            {toolbar.map(function ({ title, type, onClick, desc }, index) {
+                return (
+                    <Button
+                        onClick={onClick}
+                        type={type}
+                        key={index}
+                        title={desc}
+                    >
+                        {title}
+                    </Button>
+                );
+            })}
+        </>
+    );
 
     return (
         <Wrap>
-            <Toolbar>
-                <Page
-                    onInited={(datas) => {
-                        setPageInfos = datas.setPageInfos;
-                        if (pageCompletedHandler) {
-                            pageCompletedHandler().then((datas) => {
-                                setPageInfos(datas);
-                            });
-                        }
-                    }}
-                ></Page>
-                <Button
-                    style={{ marginRight: 8 }}
-                    type='primary'
-                    onClick={handlePrint}
-                >
-                    打印
-                </Button>
-                <Button style={{ marginRight: 8 }} onClick={handleEdit}>
-                    编辑
-                </Button>
-                {toolbar.map(function ({ title, type, onClick, desc }, index) {
-                    return (
-                        <Button
-                            style={{ marginRight: 8 }}
-                            onClick={onClick}
-                            type={type}
-                            key={index}
-                            title={desc}
-                        >
-                            {title}
-                        </Button>
-                    );
-                })}
-            </Toolbar>
             <ExcelWrap>
                 <Workbook
                     license={license}
@@ -187,15 +183,16 @@ export default function () {
                     onInited={function (a) {
                         window.mapTest = a;
                     }}
-                    onPageCompleted={(handler) => {
+                    /*  onPageCompleted={(handler) => {
                         pageCompletedHandler = handler;
                         if (setPageInfos) {
                             pageCompletedHandler().then((datas) => {
                                 setPageInfos(datas);
                             });
                         }
-                    }}
+                    }} */
                     setting={setting}
+                    toolbar={_toolbar}
                 >
                     <Worksheet></Worksheet>
                 </Workbook>

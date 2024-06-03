@@ -60,7 +60,7 @@ export const toExcelPluginUrl = function (filename) {
     return `${getExcelBaseUrl()}/plugins/${filename}`;
 };
 
-const getSheetRect = function (sheet,spread) {
+const getSheetRect = function (sheet, spread) {
     const sheetJSON = sheet.toJSON();
     const {
         rows = [],
@@ -74,7 +74,7 @@ const getSheetRect = function (sheet,spread) {
     } = sheetJSON;
 
     //内容高度
-    let sheetHeight = 20;
+    let sheetHeight = 0;
     if (colHeaderVisible) {
         if (colHeaderRowInfos.length > 0) {
             colHeaderRowInfos.forEach((info) => {
@@ -90,9 +90,9 @@ const getSheetRect = function (sheet,spread) {
     }
 
     //内容宽度
-    let sheetWidth = 0;//显示竖向滚动条，则添加竖向滚动条宽度
+    let sheetWidth = 0; //显示竖向滚动条，则添加竖向滚动条宽度
     if (rowHeaderVisible) {
-        const rowHeaderWidth = sheetJSON.defaults?.rowHeaderColWidth||40;//默认行标题宽度
+        const rowHeaderWidth = sheetJSON.defaults?.rowHeaderColWidth || 40; //默认行标题宽度
         if (rowHeaderColInfos.length > 0) {
             rowHeaderColInfos.forEach((info) => {
                 sheetWidth += info?.size || rowHeaderWidth;
@@ -101,7 +101,7 @@ const getSheetRect = function (sheet,spread) {
             sheetWidth += rowHeaderWidth;
         }
     }
-    const defColWidth = sheetJSON.defaults?.colWidth||62;//默认列宽
+    const defColWidth = sheetJSON.defaults?.colWidth || 62; //默认列宽
     for (let i = 0; i < columnCount; i++) {
         sheetWidth += columns[i]?.size || defColWidth;
     }
@@ -117,7 +117,7 @@ export const zoomToPage = function (spread, width, height) {
         const { sheetHeight, sheetWidth } = getSheetRect(sheet);
         let heightZoomFactor = 1;
         if (sheetHeight > 0) {
-            heightZoomFactor = height / sheetHeight;
+            heightZoomFactor = Math.floor((height / sheetHeight) * 10) / 10;
         }
         let widthZoomFactor = 1;
         if (sheetWidth > 0) {
@@ -132,20 +132,20 @@ export const zoomToPage = function (spread, width, height) {
             zoomFactor = 4;
         }
 
-        sheet.zoom(zoomFactor);
+        sheetZoom(sheet, zoomFactor);
     });
 };
 
 export const zoomToFit = function (spread, width) {
     spread.sheets.forEach((sheet) => {
-        let { sheetWidth } = getSheetRect(sheet,spread);
+        let { sheetWidth } = getSheetRect(sheet, spread);
         if (sheetWidth > 0) {
-            sheetWidth += 5;//添加偏差量，防止表格与容器太贴合
+            sheetWidth += 5; //添加偏差量，防止表格与容器太贴合
             let zoomFactor = width / sheetWidth;
             if (zoomFactor >= 4) {
                 zoomFactor = 4;
             }
-            sheet.zoom(zoomFactor);
+            sheetZoom(sheet, zoomFactor);
         }
     });
 };
@@ -202,4 +202,68 @@ export const zoom = function ({ el, value, spread }) {
         zoomToPage(spread, width, height);
         return;
     }
+};
+
+export const zoomOut = function (spread) {
+    let result = 25;
+    spread.sheets.forEach((sheet) => {
+        let value = sheet.zoom();
+        if (value <= 0.25) {
+            return;
+        }
+
+        if (value === 1.25 || value === 0.75 || value === 0.25) {
+            value += 0.05;
+        }
+        value = Math.floor(value * 10);
+        let step = -1;
+        if (value >= 31) {
+            step = -4;
+        } else if (value >= 21) {
+            step = -3;
+        } else if (value >= 11) {
+            step = -2;
+        }
+        value = (value + step) / 10;
+        if (value <= 0.25) {
+            value = 0.25;
+        }
+        sheet.zoom(value);
+        result = value * 100;
+    });
+    return result.toFixed(0);
+};
+
+export const zoomIn = function (spread) {
+    let result = 400;
+    spread.sheets.forEach((sheet) => {
+        let value = sheet.zoom();
+        if (value >= 4) {
+            return;
+        }
+
+        if (value === 1.25 || value === 0.75 || value === 0.25) {
+            value += 0.05;
+        }
+        value = Math.floor(value * 10);
+        let step = 1;
+        if (value >= 33) {
+            step = 4;
+        } else if (value >= 21) {
+            step = 3;
+        } else if (value >= 11) {
+            step = 2;
+        }
+        value = (value + step) / 10;
+        if (value >= 4) {
+            value = 4;
+        }
+        sheet.zoom(value);
+        result = value * 100;
+    });
+    return result.toFixed(0);
+};
+
+const sheetZoom = function (sheet, value) {
+    sheet.zoom(value / (window.devicePixelRatio || 1));
 };

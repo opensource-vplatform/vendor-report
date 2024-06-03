@@ -31,7 +31,6 @@ import {
   ErrorPage,
 } from './components/error/Index';
 import WaitMsg from './components/loading/Index';
-import Page from './components/page/Index';
 import ProgressCircle from './components/progress';
 
 const Wrap = styled.div`
@@ -135,9 +134,7 @@ export default function () {
             eventSource.close();
             progressRef.current.setProgress(0, '导出中，请稍候...');
         });
-
     };
-
 
     const handleDialogError = (err) => {
         setData({
@@ -167,6 +164,85 @@ export default function () {
         });
     };
     const isPrint = getParameter('isPrint') == '1';
+    const toolbar = (
+        <>
+            <Button
+                type='primary'
+                style={{ height: 26, width: 110 }}
+                // disabled={!data.report}
+                onClick={() => {
+                    if (!data.report) return;
+                    const title = '导出中，请稍候...';
+                    //setLoadMsg('导出到excel中，请稍候...');
+                    progressRef.current.setProgress(1, title);
+                    progressRef.current.onShow();
+                    data.report
+                        .exportExcel(getTitle('未命名'), {
+                            progress(current, total = 1) {
+                                const percent = Math.floor(
+                                    (current / total) * 100
+                                );
+                                progressRef.current.setProgress(percent, title);
+                            },
+                        })
+                        .then(() => {
+                            //setLoadMsg(null);
+                            progressRef.current.setProgress(100, '导出完成');
+                            progressRef.current.onClose();
+                        })
+                        .catch(handleDialogError);
+                }}
+            >
+                导出到excel
+            </Button>
+            <Button
+                type='success'
+                style={{ height: 26 }}
+                // disabled={!data.report}
+                onClick={() => {
+                    if (!data.report) return;
+                    // setLoadMsg('导出到pdf中，请稍候...');
+                    const fileId = genUUID();
+                    progressRef.current.setProgress(0, '导出中，请稍候...');
+                    progressRef.current.onShow();
+
+                    exportPdf(fileId)
+                        .then((data) => {
+                            // setLoadMsg(null);
+                            if (
+                                Object.prototype.toString.call(data) ===
+                                '[object Blob]'
+                            )
+                                download(data, getTitle('未命名') + '.pdf');
+                            else {
+                                progressRef.current.onClose();
+                                handleDialogError(data?.message);
+                            }
+                        })
+                        .catch((data) => {
+                            progressRef.current.onClose();
+                            handleDialogError(data?.message);
+                        });
+                    setTimeout(() => {
+                        getExportPdfProgressStream(fileId);
+                    }, 200);
+                }}
+            >
+                导出到pdf
+            </Button>
+            {isPrint ? (
+                <Button
+                    type='info'
+                    style={{ height: 26 }}
+                    onClick={() => {
+                        data.report && data.report.print();
+                    }}
+                >
+                    打印
+                </Button>
+            ) : null}
+        </>
+    );
     useEffect(() => {
         if (ref.current) {
             axios
@@ -201,6 +277,7 @@ export default function () {
                                         );
                                     }
                                 },
+                                toolbar,
                             });
                             //报表挂载到指定dom元素
                             report.mount(ref.current);
@@ -221,10 +298,14 @@ export default function () {
                             };
                         };
                         if (excelJson) {
-                            const previewOnly = getParameter("previewOnly");
+                            const previewOnly = getParameter('previewOnly');
                             const usedDatasources =
                                 excelJson.usedDatasources || [];
-                            if (previewOnly!=='true' && usedDatasources && usedDatasources.length > 0) {
+                            if (
+                                previewOnly !== 'true' &&
+                                usedDatasources &&
+                                usedDatasources.length > 0
+                            ) {
                                 axios
                                     .get(
                                         getTableDataUrl(
@@ -276,7 +357,7 @@ export default function () {
                 ></ErrorDialog>
             ) : null}
             <ProgressCircle ref={progressRef} />
-            <Toolbar>
+            {/*             <Toolbar>
                 <Fill></Fill>
                 <Page
                     onInited={(datas) => {
@@ -369,7 +450,7 @@ export default function () {
                         打印
                     </Button>
                 ) : null}
-            </Toolbar>
+            </Toolbar> */}
             <ExcelWrap>
                 {data.pageError ? (
                     <ErrorPage
