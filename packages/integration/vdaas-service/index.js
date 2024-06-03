@@ -48,7 +48,7 @@ const runLogs = log4js.getLogger('runLogs');
 const app = express();
 let port = 8080;
 let client;
-let serverUrl = 'http://dev.service.vdaas.t.vtoone.com';
+let serverUrl = 'http://test.service.vdaas.t.vtoone.com';
 
 
 // 读取数据环境变量的值
@@ -421,7 +421,7 @@ const handleError = (err, fileId) => {
   if (!!fileId) {
 
     const { filePath } = fileMap.get(fileId) ?? { filePath: [] };
-    if (filePath.length > 1)
+    if (Array.isArray(filePath) && filePath.length > 1)
       for (let item of filePath) {
         fs.rmSync(item)
       }
