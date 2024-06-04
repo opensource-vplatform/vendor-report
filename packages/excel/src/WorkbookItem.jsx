@@ -254,13 +254,14 @@ const bindDataSource = function (params) {
 
 function Zoom(props) {
     const {
-        zoomOptions,
+        zoomOptions = [],
         defaultZoom = 'suitableToPageWidth',
         el,
         data,
     } = props;
     const [value, setValue] = useState(defaultZoom);
-    let text = zoomOptions[value];
+    let zoomOptionsItem = zoomOptions.find((item) => item.value === value);
+    let text = zoomOptionsItem?.text;
     if (!text) {
         text = `${value}%`;
     }
