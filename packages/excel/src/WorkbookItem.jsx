@@ -88,6 +88,7 @@ const ToolbarRight = styled.div`
     height: 22px;
     gap: 8px;
     padding-right: 8px;
+    align-items: center;
 `;
 
 const ZoomWrap = styled.div`

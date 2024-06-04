@@ -168,7 +168,7 @@ export default function () {
         <>
             <Button
                 type='primary'
-                style={{ width: 110 }}
+                style={{ height: 26, width: 110 }}
                 // disabled={!data.report}
                 onClick={() => {
                     if (!data.report) return;
@@ -197,6 +197,7 @@ export default function () {
             </Button>
             <Button
                 type='success'
+                style={{ height: 26 }}
                 // disabled={!data.report}
                 onClick={() => {
                     if (!data.report) return;
@@ -232,6 +233,7 @@ export default function () {
             {isPrint ? (
                 <Button
                     type='info'
+                    style={{ height: 26 }}
                     onClick={() => {
                         data.report && data.report.print();
                     }}
