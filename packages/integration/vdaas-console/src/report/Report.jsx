@@ -118,7 +118,7 @@ export default function () {
         <>
             <Button
                 type='primary'
-                style={{ height: 26, width: 110 }}
+                style={{ width: 110 }}
                 onClick={() => {
                     const title = '导出中，请稍候...';
                     progressRef.current.setProgress(1, title);
@@ -145,7 +145,6 @@ export default function () {
             {isPrint ? (
                 <Button
                     type='primary'
-                    style={{ height: 26 }}
                     onClick={() => {
                         data.report && data.report.print();
                     }}
