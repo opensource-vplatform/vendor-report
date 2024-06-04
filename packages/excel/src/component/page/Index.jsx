@@ -189,7 +189,7 @@ export default function (props) {
         }
     }, []);
 
-    if (!pageInfos.isPage) {
+    if (!pageInfos.isPage || pageInfos.total <= 1) {
         return null;
     }
 
