@@ -11,6 +11,12 @@ import {
 } from './utils/spreadUtil';
 import Workbook from './Workbook';
 
+const invoker = function(handler,args){
+    if(typeof handler == 'function'){
+        handler.apply(null,args);
+    }
+}
+
 /**
  * 报表预览
  * @class Preview
@@ -47,17 +53,22 @@ class Report {
     mount(el) {
         const GC = getNamespace();
         GC.Spread.Common.CultureManager.culture('zh-cn');
-        const { onInited, ready, dataSource, ...others } = this.conf || {};
+        const { onInited, ready, dataSource,dev,license, ...others } = this.conf || {};
+        const readyHandler = (spread)=>{
+            const hasReady = ready||dev?.getParams()?.ready;
+            if(hasReady){
+                withBatchCalcUpdate(spread, () => {
+                    invoker(ready,[spread]);
+                    invoker(dev?.getParams()?.ready,[spread]);
+                });
+            }
+        }
         const onInitHandler = (spread) => {
             this.spread = spread;
             if (onInited) {
                 onInited(spread);
             }
-            if (typeof ready == 'function') {
-                withBatchCalcUpdate(spread, () => {
-                    ready(spread);
-                });
-            }
+            readyHandler(spread);
         };
         let json = this.conf?.json?.reportJson;
         if (json) {
@@ -103,6 +114,7 @@ class Report {
                 dataSource,
                 template,
                 setting,
+                license:license||dev?.getParams()?.license,
                 ...others,
                 json,
             })

@@ -267,6 +267,12 @@ export default function () {
                                 enablePrint: isPrint,
                                 dataSource: datas,
                                 json: excelJson,
+                                ready:function(workbook){
+                                    const sheet = workbook.getActiveSheet();
+                                    if(sheet){
+                                        sheet.clearSelection();
+                                    }
+                                },
                                 onPageCompleted(handler) {
                                     page.pageCompletedHandler = handler;
                                     if (page.setPageInfos) {
