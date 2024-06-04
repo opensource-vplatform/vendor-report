@@ -260,6 +260,10 @@ function Zoom(props) {
         data,
     } = props;
     const [value, setValue] = useState(defaultZoom);
+    let text = zoomOptions[value];
+    if (!text) {
+        text = `${value}%`;
+    }
     return (
         <ZoomWrap>
             <ZoomOut
@@ -296,7 +300,7 @@ function Zoom(props) {
                     /*  borderRadius: 4, */
                 }}
                 value={value}
-                text={`${value}%`}
+                text={text}
             ></Select>
         </ZoomWrap>
     );
