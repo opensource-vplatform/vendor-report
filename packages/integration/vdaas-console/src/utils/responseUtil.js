@@ -33,6 +33,14 @@ const isBusinessError = function (data) {
     return false;
 };
 
+const getErrorDetail = function(data){
+    let detail = data?.data?.errorDetail?.allStackMsg;
+    if(!detail){
+        detail = data.msg || data.message || '';
+    }
+    return detail;
+}
+
 /**
  * 获取异常信息
  * @param {*} data
@@ -42,12 +50,12 @@ const getErrorMsg = function (data, defMsg) {
     if (isBusinessError(data)) {
         return {
             title: data.title || defMsg,
-            detail: data.msg || data.message || '',
+            detail: getErrorDetail(data),
         };
     } else {
         return {
             title: defMsg,
-            detail: data.msg || data.message || '',
+            detail: getErrorDetail(data),
         };
     }
 };
