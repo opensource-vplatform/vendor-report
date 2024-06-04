@@ -60,7 +60,7 @@ const Toolbar = styled.div`
 
 const ExcelWrap = styled.div`
     display: flex;
-    height: calc(100% - 36px);
+    height: 100%;
     width: 100%;
     padding: 16px 10px;
     background-color: #494949;
