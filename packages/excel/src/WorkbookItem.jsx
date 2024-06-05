@@ -329,6 +329,7 @@ export default function (props) {
         onUndo,
         onRedo,
         license,
+        localLicenseUnCheck=false,
         enablePrint = false,
         json = null,
         onPrintHandler,
@@ -363,7 +364,7 @@ export default function (props) {
         GC.Spread.Sheets.LicenseKey = licenseKey;
     }
     const [data] = useState(() => {
-        const result = checkLicense();
+        const result = checkLicense(localLicenseUnCheck);
         let showError = false,
             showWarn = false;
         if (!result.success) {

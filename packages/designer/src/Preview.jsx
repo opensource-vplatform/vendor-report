@@ -18,6 +18,7 @@ import {
 import {
   getLicense,
   getToolbar,
+  isLocalLicenseUnCheck,
 } from '@utils/configUtil';
 
 import DesignerContext from './DesignerContext';
@@ -106,6 +107,7 @@ export default function () {
     const json = JSON.parse(sourceJson);
     //许可证
     const license = getLicense(context);
+    const localLicenseUnCheck = isLocalLicenseUnCheck(context);
     const toolbar = getToolbar(context);
     let printHandler = null;
     const handlePrint = () => {
@@ -166,6 +168,7 @@ export default function () {
             <ExcelWrap>
                 <Workbook
                     license={license}
+                    localLicenseUnCheck={localLicenseUnCheck}
                     json={json}
                     enablePrint={true}
                     baseUrl={getBaseUrl()}

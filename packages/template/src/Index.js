@@ -1,8 +1,35 @@
+
+/**
+ * 获取1cm对应多少像素
+ */
+const getUnitCount = function(){
+    const div = document.createElement("div");
+    div.style.width = '1cm';
+    document.body.appendChild(div);
+    const rect = window.getComputedStyle(div);
+    const unit = parseFloat(rect.width);
+    document.body.removeChild(div);
+    return unit;
+}
+
+/**
+ * 获取纸张大小
+ */
+const getPaperRect = function(unit){
+    //纸张(A4,横向)宽高，单位cm
+    const pageWidth = 29.7,pageHeight=21;
+    return {
+        width: pageWidth*unit,
+        height: pageHeight*unit,
+    }
+}
+
 export default function () {
     return new TOONE.Report.Dev({
-        license: import.meta.env.PROD ? '用许可证替换我' : null,
         ready: function (workbook) {
             //此处开始你的表演，workbook的api文档请参考：https://demo.grapecity.com.cn/spreadjs/help/api/classes/GC.Spread.Sheets.Workbook
+            const unit = getUnitCount();
+            const paper = getPaperRect(unit);
             workbook.addSheet(0);
             workbook.options.newTabVisible = false;
             workbook.options.tabStripVisible = false;

@@ -177,6 +177,7 @@ export default function () {
                         const initReport = (excelJson, datas) => {
                             const report = new TOONE.Report.Preview({
                                 license,
+                                localLicenseUnCheck:true,
                                 baseUrl: '../',
                                 enablePrint: isPrint,
                                 dataSource: datas,

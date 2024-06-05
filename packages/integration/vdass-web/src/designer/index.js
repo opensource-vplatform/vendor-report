@@ -105,6 +105,7 @@ const designer = new Designer({
     //配置详情参考README.md
     //batchGetDatasURL,
     //datasPath: 'data/data',
+    localLicenseUnCheck:true,
     nav: {
         file: true, //隐藏文件页签页，
         table: {

@@ -37,7 +37,7 @@ export const getLicense = function () {
     return LICENSE_127;
 };
 
-export const checkLicense = function () {
+export const checkLicense = function (ignoreLocal) {
     const GC = getNamespace();
     try {
         const spread = new GC.Spread.Sheets.Workbook();
@@ -48,7 +48,7 @@ export const checkLicense = function () {
             showError: true,//会引发spreadjs报错
         };
     }
-    if (isLocalhost()) {
+    if (!ignoreLocal&&isLocalhost()) {
         return {
             success: false,//失败
             showWarn: true,//不会引发spreadjs报错

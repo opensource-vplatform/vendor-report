@@ -43,7 +43,10 @@ import {
   findTreeNodeById,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil';
-import { getLicense } from '@utils/configUtil';
+import {
+  getLicense,
+  isLocalLicenseUnCheck,
+} from '@utils/configUtil';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import { getNamespace } from '@utils/spreadUtil';
@@ -257,6 +260,8 @@ export default function () {
     const tabStripVisible = sheetsConf.tabStripVisible !== false;
     //许可证
     const license = getLicense(context);
+    //是否忽略本地localhost许可证检查
+    const localLicenseUnCheck = isLocalLicenseUnCheck(context);
 
     useEffect(() => {
         const unbind = bind({
@@ -295,6 +300,7 @@ export default function () {
             <Workbook
                 baseUrl={getBaseUrl()}
                 license={license}
+                localLicenseUnCheck={localLicenseUnCheck}
                 json={json}
                 enablePrint={true}
                 newTabVisible={newTabVisible}

@@ -11,11 +11,11 @@ import {
 } from './utils/spreadUtil';
 import Workbook from './Workbook';
 
-const invoker = function(handler,args){
-    if(typeof handler == 'function'){
-        handler.apply(null,args);
+const invoker = function (handler, args) {
+    if (typeof handler == 'function') {
+        handler.apply(null, args);
     }
-}
+};
 
 /**
  * 报表预览
@@ -53,16 +53,18 @@ class Report {
     mount(el) {
         const GC = getNamespace();
         GC.Spread.Common.CultureManager.culture('zh-cn');
-        const { onInited, ready, dataSource,dev,license, ...others } = this.conf || {};
-        const readyHandler = (spread)=>{
-            const hasReady = ready||dev?.getParams()?.ready;
-            if(hasReady){
+        const { onInited, ready, dataSource, dev, license,localLicenseUnCheck, ...others } =
+            this.conf || {};
+        const readyHandler = (spread) => {
+            const hasReady = ready || dev?.getParams()?.ready;
+            if (hasReady) {
                 withBatchCalcUpdate(spread, () => {
-                    invoker(ready,[spread]);
-                    invoker(dev?.getParams()?.ready,[spread]);
+                    const args = [spread, { datas: dataSource || {} }];
+                    invoker(ready, args);
+                    invoker(dev?.getParams()?.ready, args);
                 });
             }
-        }
+        };
         const onInitHandler = (spread) => {
             this.spread = spread;
             if (onInited) {
@@ -114,7 +116,8 @@ class Report {
                 dataSource,
                 template,
                 setting,
-                license:license||dev?.getParams()?.license,
+                localLicenseUnCheck,
+                license: license || dev?.getParams()?.license,
                 ...others,
                 json,
             })

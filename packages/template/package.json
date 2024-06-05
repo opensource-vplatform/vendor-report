@@ -5,7 +5,8 @@
     "main": "src/index.jsx",
     "scripts": {
         "dev": "vite -c=vite.config.js --host",
-        "build": "vite build -c=vite.config.build.js"
+        "build": "vite build -c=vite.config.build.js",
+        "build-dev": "vite build -c=vite.config.build.dev.js"
     },
     "dependencies": {
     },

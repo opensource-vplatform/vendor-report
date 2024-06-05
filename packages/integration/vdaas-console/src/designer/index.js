@@ -105,6 +105,7 @@ const designer = new Designer({
         //allowToView: false, //不允许查看数据源
         allowToEdit: false, //不允许编辑数据源
     },
+    localLicenseUnCheck:true,
     event: {
         onSave: function (json, context) {
             return new Promise(function (resolve, reject) {

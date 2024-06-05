@@ -7,3 +7,9 @@ export function genUUID() {
     //return crypto.randomUUID().replaceAll('-', '');
 }
 
+
+export const isLocalhost = function(){
+    const reg = /^(127\.0\.0\.1|localhost)/g;
+    const hostname = location.hostname;
+    return reg.test(hostname)
+}
