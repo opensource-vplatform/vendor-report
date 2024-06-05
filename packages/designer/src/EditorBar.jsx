@@ -1,4 +1,5 @@
 import {
+  useContext,
   useEffect,
   useRef,
   useState,
@@ -10,6 +11,7 @@ import styled from 'styled-components';
 import FormulaIcon from '@icons/formula/Formula';
 import CheckIcon from '@icons/shape/Check';
 import CancelIcon from '@icons/shape/Close';
+import { ThemeContext } from '@toone/report-excel';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import Formula from './component/formula/Index';
@@ -35,6 +37,7 @@ const Wrap = styled.div`
 export default function () {
     const rangeBoxRef = useRef(null);
     const formulaBoxRef = useRef(null);
+    const themeContext = useContext(ThemeContext);
     const { spread } = useSelector(({ appSlice }) => appSlice);
     const [data, setData] = useState({
         cancelBtnDisabled: true,
@@ -110,8 +113,16 @@ export default function () {
             };
         }
     }, [spread]);
+
+    const WrapStyles = {};
+
+    if (themeContext.editorBar && typeof themeContext.editorBar === 'object') {
+        WrapStyles.margin = themeContext.editorBar.margin;
+        WrapStyles.backgroundColor = themeContext.editorBar.backgroundColor;
+    }
+
     return (
-        <Wrap>
+        <Wrap style={WrapStyles}>
             <SplitPane style={{ width: '100%', height: '100%', minHeight: 26 }}>
                 <div
                     ref={rangeBoxRef}

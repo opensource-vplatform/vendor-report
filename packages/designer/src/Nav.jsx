@@ -35,6 +35,7 @@ import SparklinesTab from '@tabs/sparklines/Index';
 import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
+import { ThemeContext } from '@toone/report-excel';
 import { fireCellEnter } from '@utils/eventUtil';
 
 import DesignerContext from './DesignerContext';
@@ -149,7 +150,7 @@ export default function () {
     const wizardSlice = useSelector(({ wizardSlice }) => wizardSlice);
     const { finalDsList } = datasourceSlice;
     const handleSave = (evt) => {
-        if(evt&&evt.preventDefault){
+        if (evt && evt.preventDefault) {
             evt.preventDefault();
         }
         if (spread) {
@@ -242,6 +243,8 @@ export default function () {
         }
     };
 
+    const themeContext = useContext(ThemeContext);
+
     const context = useContext(DesignerContext);
     //是否隐藏文件导航
     const isHiddenFile = getNavConfig(context, 'file');
@@ -317,6 +320,16 @@ export default function () {
             };
         }
     }, [navStyle, spread]);
+
+    const FileTabTitleStyles = {};
+    if (themeContext.type !== 'default') {
+        FileTabTitleStyles.padding = '0 8px';
+        FileTabTitleStyles.height = '100%';
+        FileTabTitleStyles.display = 'flex';
+        FileTabTitleStyles.alignItems = 'center';
+        FileTabTitleStyles.backgroundColor = 'transparent';
+    }
+
     return (
         <Fragment>
             <GlobalComponent></GlobalComponent>
@@ -393,7 +406,11 @@ export default function () {
                 <FileNavItem
                     code='file'
                     autoSelect={false}
-                    title={<FileTabTitle>文件</FileTabTitle>}
+                    title={
+                        <FileTabTitle style={FileTabTitleStyles}>
+                            文件
+                        </FileTabTitle>
+                    }
                     tabProps={{
                         closeHandler: () => dispatch(setActive({ code: null })),
                         hidden: isHiddenFile,

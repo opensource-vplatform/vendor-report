@@ -1,5 +1,6 @@
 import React, {
   Fragment,
+  useContext,
   useEffect,
   useState,
 } from 'react';
@@ -23,6 +24,7 @@ import {
   showTab,
 } from '@store/navSlice/navSlice';
 import { initWizardSlice } from '@store/wizardSlice';
+import { ThemeContext } from '@toone/report-excel';
 import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 
@@ -62,6 +64,7 @@ function Designer(props) {
     if (conf && conf.baseUrl) {
         setBaseUrl(conf.baseUrl);
     }
+    const themeContext = useContext(ThemeContext);
     const dispatch = useDispatch();
     const { mode, spread, navStyle } = useSelector(({ appSlice }) => appSlice);
     const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
@@ -126,6 +129,24 @@ function Designer(props) {
     }, [navStyle]);
     //是否显示导航
     const isShowNav = conf?.nav !== false;
+
+    const SplitPaneStyles = {
+        width: '100%',
+        display: 'flex',
+        height: '100%',
+        flexDirection: 'column',
+        overflow: 'hidden',
+    };
+
+    if (
+        themeContext.editingZome &&
+        typeof themeContext.editingZome === 'object'
+    ) {
+        SplitPaneStyles.padding = themeContext.editingZome.padding;
+        SplitPaneStyles.backgroundColor =
+            themeContext.editingZome.backgroundColor;
+    }
+
     return (
         <Fragment>
             <DesignerContext.Provider value={ctxValue}>
@@ -134,13 +155,7 @@ function Designer(props) {
                     <Wrap>
                         {isShowNav && <Nav></Nav>}
                         <SplitPane
-                            style={{
-                                width: '100%',
-                                display: 'flex',
-                                height: '100%',
-                                flexDirection: 'column',
-                                overflow: 'hidden',
-                            }}
+                            style={SplitPaneStyles}
                             onResize={() => spread.refresh()}
                         >
                             <EditorBar></EditorBar>
@@ -159,7 +174,11 @@ function Designer(props) {
                                     style={{ width: '100%' }}
                                     onResize={() => spread.refresh()}
                                 >
-                                    <Pane style={{ width: 248 }}>
+                                    <Pane
+                                        style={{
+                                            width: 248,
+                                        }}
+                                    >
                                         <DraggableDatasources></DraggableDatasources>
                                     </Pane>
                                     <Resizer size={8}></Resizer>

@@ -1,11 +1,14 @@
 import {
   Fragment,
+  useContext,
   useEffect,
   useRef,
   useState,
 } from 'react';
 
 import styled from 'styled-components';
+
+import { ThemeContext } from '@toone/report-excel';
 
 import Context from './Context';
 
@@ -25,6 +28,7 @@ const Headers = styled.div`
 const HeaderWrap = styled.div`
     display: flex;
     width: 100%;
+    align-items: center;
 `;
 
 const ToolWrap = styled.div`
@@ -172,11 +176,26 @@ function Tabs(props) {
             }
         };
     }, [appearance]);
+
+    const themeContext = useContext(ThemeContext);
+    Object.entries(themeContext.nav.navItemStyles).forEach(function ([
+        key,
+        value,
+    ]) {
+        headerStyle[key] = value;
+    });
+
     const headers = (
-        <Headers data-appearance={appearance}>
+        <Headers
+            data-appearance={appearance}
+            style={{
+                backgroundColor: themeContext.nav.backgroundColor,
+                height: themeContext.nav.height,
+            }}
+        >
             <HeaderWrap>
                 {children.map((child) => {
-                    if(!child) return null;
+                    if (!child) return null;
                     const childProps = child.props;
                     //隐藏导航
                     const hidden = childProps?.tabProps?.hidden;
@@ -189,9 +208,25 @@ function Tabs(props) {
                     const onClick = childProps.onClick;
                     const actived = childCode == active;
                     let children = childProps.title;
+                    const TitleWrapStyles = {};
+                    if (themeContext.type !== 'default') {
+                        TitleWrapStyles.padding = '0 8px';
+                        TitleWrapStyles.height = '100%';
+                        TitleWrapStyles.display = 'flex';
+                        TitleWrapStyles.alignItems = 'center';
+                        TitleWrapStyles.backgroundColor = 'transparent';
+                        TitleWrapStyles.color = actived
+                            ? themeContext.nav.activeTextColor
+                            : themeContext.nav.textColor;
+                    }
+
                     children =
                         typeof children == 'string' ? (
-                            <TitleWrap data-active={actived} data-type={type}>
+                            <TitleWrap
+                                data-active={actived}
+                                data-type={type}
+                                style={TitleWrapStyles}
+                            >
                                 {children}
                             </TitleWrap>
                         ) : (

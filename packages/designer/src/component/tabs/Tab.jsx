@@ -1,10 +1,13 @@
+import { useContext } from 'react';
+
 import styled from 'styled-components';
+
+import { ThemeContext } from '@toone/report-excel';
 
 import Context from './Context';
 
 const Wrap = styled.div`
     border: none;
-    padding: 0px;
     display: none;
     &[data-active='true'] {
         display: block !important;
@@ -20,6 +23,16 @@ const Wrap = styled.div`
 
 function Tab(props) {
     const { code, children, style = {} } = props;
+
+    const themeContext = useContext(ThemeContext);
+    if (
+        themeContext.functionalZone &&
+        typeof themeContext.functionalZone === 'object'
+    ) {
+        style.padding = themeContext.functionalZone.padding;
+        style.backgroundColor = themeContext.functionalZone.backgroundColor;
+    }
+
     return (
         <Context.Consumer>
             {({ active, appearance }) => {

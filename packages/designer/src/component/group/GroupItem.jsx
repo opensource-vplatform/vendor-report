@@ -3,21 +3,21 @@ import styled from 'styled-components';
 const GroupItemWrap = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 0px 2px;
     height: 106px;
     border-right: 1px solid lightgray;
 `;
 
 const GroupItemLabelWrap = styled.div`
     display: flex;
+    height: 14px;
     align-items: center;
 `;
 
 const GroupItemLabel = styled.div`
     align-self: center;
     font-size: 10px;
-    width:100%;
-    text-align:center;
+    width: 100%;
+    text-align: center;
 `;
 
 const MoreIconButton = styled.button`
@@ -33,7 +33,7 @@ const MoreIconButton = styled.button`
     justify-content: center;
     align-items: center;
     background-color: white;
-    &:hover{
+    &:hover {
         background-color: #dadada;
     }
 `;
@@ -48,9 +48,9 @@ const MoreIcon = styled.div`
 const Content = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: flex;
-    padding: 4px 2px;
+    align-items: center;
     height: 100%;
+    flex: 1;
 `;
 
 function Index(props) {
