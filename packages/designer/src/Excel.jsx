@@ -325,6 +325,7 @@ export default function () {
                 onTopRowChanged={genEventHandler('TopRowChanged')}
                 onViewZoomed={genEventHandler('ViewZoomed')}
                 isShowToolbar={false}
+                type='designer'
             >
                 <Worksheet
                     name={sheetName}

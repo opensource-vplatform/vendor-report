@@ -117,6 +117,10 @@ export default class ParseReportJson {
             showPageCount = 20,
         } = config;
         console.time('耗时多久');
+        reportJson.scrollbarMaxAlign = true;
+        reportJson.showHorizontalScrollbar = false;
+        reportJson.showVerticalScrollbar = false;
+        this.paper = {};
         this.datas = datas;
         this.showPageCount = showPageCount;
         this.reportJson = reportJson;
@@ -147,20 +151,20 @@ export default class ParseReportJson {
      * 移除设计器中设置的样式信息
      * 如：行列合并设置的角标
      */
-    removeDesignerInfo(){
-        if(this.reportJson){
+    removeDesignerInfo() {
+        if (this.reportJson) {
             const sheets = this.reportJson?.sheets;
-            if(!sheets){
+            if (!sheets) {
                 return;
             }
-            Object.entries(sheets).forEach(([sheetName,sheet])=>{
+            Object.entries(sheets).forEach(([sheetName, sheet]) => {
                 const dataTable = sheet.data?.dataTable;
                 if (!dataTable) {
                     return;
                 }
                 Object.entries(dataTable).forEach(([rowStr, columns]) => {
                     Object.entries(columns).forEach(([colStr, { style }]) => {
-                        if(style&&isObject(style)){
+                        if (style && isObject(style)) {
                             style.decoration = undefined;
                             /*const cellStyle = style.cellType;
                             if(cellStyle&&cellStyle.typeName=="1"){
@@ -169,7 +173,7 @@ export default class ParseReportJson {
                                 sheet.getCell(row, col).cellType(undefined);
                                 const style = sheet.getStyle(row,col);
                                 style.decoration = undefined;
-                            }*/ 
+                            }*/
                         }
                     });
                 });
@@ -453,6 +457,8 @@ export default class ParseReportJson {
         const _height = (printConversionUnits * (height || 1100)) / 100;
         marginBottom = (printConversionUnits * marginBottom) / 100;
         marginTop = (printConversionUnits * marginTop) / 100;
+        this.paper.width = _width;
+        this.paper.height = _height;
 
         let defaultHeaderHeight = 20;
         if (colHeaderRowInfos.length > 0) {
@@ -471,6 +477,8 @@ export default class ParseReportJson {
         if (orientation === 2) {
             pageTotalHeight =
                 _width - marginBottom - marginTop - colHeaderHeight;
+            this.paper.width = _height;
+            this.paper.height = _width;
         } else {
             pageTotalHeight =
                 _height - marginBottom - marginTop - colHeaderHeight;

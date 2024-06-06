@@ -90,7 +90,7 @@ const getSheetRect = function (sheet, spread) {
     }
 
     //内容宽度
-    let sheetWidth = 0; //显示竖向滚动条，则添加竖向滚动条宽度
+    let sheetWidth = 30; //显示竖向滚动条，则添加竖向滚动条宽度
     if (rowHeaderVisible) {
         const rowHeaderWidth = sheetJSON.defaults?.rowHeaderColWidth || 40; //默认行标题宽度
         if (rowHeaderColInfos.length > 0) {
@@ -112,16 +112,31 @@ const getSheetRect = function (sheet, spread) {
     };
 };
 
-export const zoomToPage = function (spread, width, height) {
+export const zoomToPage = function (spread, width, height, paper, setStyle) {
+    const heightZoomFactor = (height - 16) / paper.height;
+    const widthZoomFactor = (width - 16) / paper.width;
+    let zoomFactor = heightZoomFactor;
+    if (heightZoomFactor >= widthZoomFactor) {
+        zoomFactor = widthZoomFactor;
+    }
+
+    let newWidth = paper.width * zoomFactor;
+    let newHeight = paper.height * zoomFactor;
+
+    setStyle({
+        height: newHeight,
+        width: newWidth,
+        zoomFactor,
+    });
     spread.sheets.forEach((sheet) => {
         const { sheetHeight, sheetWidth } = getSheetRect(sheet);
         let heightZoomFactor = 1;
         if (sheetHeight > 0) {
-            heightZoomFactor = Math.floor((height / sheetHeight) * 10) / 10;
+            heightZoomFactor = Math.floor((newHeight / sheetHeight) * 10) / 10;
         }
         let widthZoomFactor = 1;
         if (sheetWidth > 0) {
-            widthZoomFactor = width / sheetWidth;
+            widthZoomFactor = newWidth / sheetWidth;
         }
         let zoomFactor = heightZoomFactor;
         if (heightZoomFactor >= widthZoomFactor) {
@@ -134,39 +149,65 @@ export const zoomToPage = function (spread, width, height) {
 
         sheetZoom(sheet, zoomFactor);
     });
+    setTimeout(() => spread.refresh(), 0);
 };
 
-export const zoomToFit = function (spread, width) {
+export const zoomToFit = function (spread, width, paper, setStyle) {
+    const zoomFactor = (width - 30) / paper.width;
+
+    let newWidth = paper.width * zoomFactor;
+    let newHeight = paper.height * zoomFactor;
+    setStyle({
+        height: newHeight,
+        width: newWidth,
+        zoomFactor,
+    });
     spread.sheets.forEach((sheet) => {
         let { sheetWidth } = getSheetRect(sheet, spread);
         if (sheetWidth > 0) {
             sheetWidth += 5; //添加偏差量，防止表格与容器太贴合
-            let zoomFactor = width / sheetWidth;
+            let zoomFactor = newWidth / sheetWidth;
             if (zoomFactor >= 4) {
                 zoomFactor = 4;
             }
             sheetZoom(sheet, zoomFactor);
         }
     });
+    setTimeout(() => spread.refresh(), 0);
 };
 
-export const zoomToRecover = function (spread) {
+export const zoomToRecover = function (spread, setStyle) {
+    let height = '100%';
+    let width = '100%';
     spread.sheets.forEach((sheet) => {
+        const { sheetHeight, sheetWidth } = getSheetRect(sheet);
+        height = sheetHeight + 50;
+        width = sheetWidth + 50;
         sheet.zoom(1);
     });
+    setStyle({
+        height,
+        width,
+        zoomFactor: 1,
+    });
+    setTimeout(() => spread.refresh(), 0);
 };
 
 const getSpreadCanvasRect = function (el) {
-    const canvasEl = el?.current?.querySelector?.('#vp_vp');
+    /* const canvasEl = el?.current?.querySelector?.('#vp_vp');
     const height = Number(canvasEl.getAttribute('height'));
-    const width = Number(canvasEl.getAttribute('width'));
+    const width = Number(canvasEl.getAttribute('width')); */
+    const css = getComputedStyle(el.current);
+    const height = css.height;
+    const width = css.width;
     return {
-        height,
-        width,
+        isRender: width.endsWith('px') ? true : false,
+        height: height.slice(0, -2),
+        width: width.slice(0, -2),
     };
 };
 
-const zoomByNumber = function (spread, value) {
+const zoomByNumber = function ({ spread, value, setStyle, _width, paper }) {
     let newValue = value;
     if (newValue >= 4) {
         newValue = 4;
@@ -174,94 +215,127 @@ const zoomByNumber = function (spread, value) {
     if (newValue <= 0.25) {
         newValue = 0.25;
     }
-
+    let height = '100%';
+    let width = '100%';
     spread.sheets.forEach((sheet) => {
-        sheet.zoom(newValue);
+        const { sheetHeight, sheetWidth } = getSheetRect(sheet);
+
+        height = sheetHeight * newValue;
+        width = sheetWidth * newValue;
+
+        let heightZoomFactor = 1;
+        if (sheetHeight > 0) {
+            heightZoomFactor =
+                Math.floor((height / (sheetHeight + 100)) * 1000) / 1000;
+        }
+        let widthZoomFactor = 1;
+        if (sheetWidth > 0) {
+            widthZoomFactor = Math.floor((width / sheetWidth) * 1000) / 1000;
+        }
+        let zoomFactor = heightZoomFactor;
+        if (heightZoomFactor >= widthZoomFactor) {
+            zoomFactor = widthZoomFactor;
+        }
+
+        if (zoomFactor >= 4) {
+            zoomFactor = 4;
+        }
+
+        var usedRange = sheet.getUsedRange(
+            window.GC.Spread.Sheets.UsedRangeType.all
+        ); // 获取使用了的区域
+        // 获取使用区域的最大列宽
+        var cell = sheet.getCellRect(0, usedRange.col);
+        var width1 = cell.x + cell.width; // 计算外部spread的容器的列宽
+        var fa = width / width1; // 获取应该放大的系数
+
+        sheet.zoom(zoomFactor);
     });
+
+    let exceededWidth = _width < width ? true : false;
+    setStyle({
+        height,
+        width,
+        zoomFactor: newValue,
+        exceededWidth,
+    });
+    setTimeout(() => spread.refresh(), 0);
 };
 
-export const zoom = function ({ el, value, spread }) {
+export const zoom = function ({ el, value, spread, paper, setStyle }) {
     if (value === 'actualSize') {
-        zoomToRecover(spread);
+        zoomToRecover(spread, setStyle);
         return;
     }
-
+    const { height, width, isRender } = getSpreadCanvasRect(el);
     let newValue = Number(value);
     if (!Number.isNaN(newValue)) {
-        zoomByNumber(spread, newValue);
+        zoomByNumber({ spread, value: newValue, setStyle, width, paper });
         return;
     }
 
-    const { height, width } = getSpreadCanvasRect(el);
+    if (!isRender) {
+        return;
+    }
     if (value === 'suitableToPageWidth') {
-        zoomToFit(spread, width);
+        zoomToFit(spread, width, paper, setStyle);
         return;
     }
 
     if (value === 'suitableToPage') {
-        zoomToPage(spread, width, height);
+        zoomToPage(spread, width, height, paper, setStyle);
         return;
     }
 };
 
-export const zoomOut = function (spread) {
-    let result = 25;
-    spread.sheets.forEach((sheet) => {
-        let value = sheet.zoom();
-        if (value <= 0.25) {
-            return;
-        }
+export const zoomOut = function ({ spread, getStyle, setStyle, el, paper }) {
+    let { zoomFactor } = getStyle();
+    zoomFactor = Math.floor(zoomFactor * 10);
+    if (zoomFactor === 12.5 || zoomFactor === 7.5 || zoomFactor === 2.5) {
+        zoomFactor += 0.5;
+    }
 
-        if (value === 1.25 || value === 0.75 || value === 0.25) {
-            value += 0.05;
-        }
-        value = Math.floor(value * 10);
-        let step = -1;
-        if (value >= 31) {
-            step = -4;
-        } else if (value >= 21) {
-            step = -3;
-        } else if (value >= 11) {
-            step = -2;
-        }
-        value = (value + step) / 10;
-        if (value <= 0.25) {
-            value = 0.25;
-        }
-        sheet.zoom(value);
-        result = value * 100;
-    });
-    return result.toFixed(0);
+    let step = -1;
+    if (zoomFactor >= 33) {
+        step = -4;
+    } else if (zoomFactor >= 21) {
+        step = -3;
+    } else if (zoomFactor >= 11) {
+        step = -2;
+    }
+    zoomFactor = (zoomFactor + step) / 10;
+    if (zoomFactor <= 0.25) {
+        zoomFactor = 0.25;
+    }
+
+    const { width: _width } = getSpreadCanvasRect(el);
+    zoomByNumber({ spread, value: zoomFactor, setStyle, width: _width, paper });
+    return (zoomFactor * 100).toFixed(0);
 };
 
-export const zoomIn = function (spread) {
-    let result = 400;
-    spread.sheets.forEach((sheet) => {
-        let value = sheet.zoom();
-        if (value >= 4) {
-            return;
-        }
+export const zoomIn = function ({ spread, getStyle, setStyle, el, paper }) {
+    let { zoomFactor } = getStyle();
+    zoomFactor = Math.floor(zoomFactor * 10);
+    if (zoomFactor === 12.5 || zoomFactor === 7.5 || zoomFactor === 2.5) {
+        zoomFactor += 0.5;
+    }
 
-        if (value === 1.25 || value === 0.75 || value === 0.25) {
-            value += 0.05;
-        }
-        value = Math.floor(value * 10);
-        let step = 1;
-        if (value >= 33) {
-            step = 4;
-        } else if (value >= 21) {
-            step = 3;
-        } else if (value >= 11) {
-            step = 2;
-        }
-        value = (value + step) / 10;
-        if (value >= 4) {
-            value = 4;
-        }
-        sheet.zoom(value);
-        result = value * 100;
-    });
-    return result.toFixed(0);
+    let step = 1;
+    if (zoomFactor >= 33) {
+        step = 4;
+    } else if (zoomFactor >= 21) {
+        step = 3;
+    } else if (zoomFactor >= 11) {
+        step = 2;
+    }
+    zoomFactor = (zoomFactor + step) / 10;
+    if (zoomFactor >= 4) {
+        zoomFactor = 4;
+    }
+
+    const { width: _width } = getSpreadCanvasRect(el);
+    zoomByNumber({ spread, value: zoomFactor, setStyle, width: _width, paper });
+    return (zoomFactor * 100).toFixed(0);
 };
 
 const sheetZoom = function (sheet, value) {

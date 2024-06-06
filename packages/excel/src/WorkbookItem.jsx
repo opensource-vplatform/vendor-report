@@ -67,6 +67,29 @@ const Wrap = withDivStyled({
     flexDirection: 'column',
 });
 
+const PaperWrap = styled.div`
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    user-select: none;
+    flex: 1;
+    padding: 8px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    &:has(.exceededWidth) {
+        display: block;
+    }
+`;
+
+const ExcelWrap = styled.div`
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    user-select: none;
+    box-sizing: border-box;
+`;
+
 const Toolbar = styled.div`
     border-bottom: solid 1px lightgray;
     background-color: white;
@@ -269,7 +292,13 @@ function Zoom(props) {
         <ZoomWrap>
             <ZoomOut
                 onClick={function () {
-                    const res = zoomOut(data.spread);
+                    const res = zoomOut({
+                        spread: data.spread,
+                        paper: data.pageInfo.paper,
+                        getStyle: data.getStyle,
+                        setStyle: data.setStyle,
+                        el,
+                    });
                     setValue(res);
                 }}
             >
@@ -278,7 +307,13 @@ function Zoom(props) {
 
             <div
                 onClick={function () {
-                    const res = zoomIn(data.spread);
+                    const res = zoomIn({
+                        spread: data.spread,
+                        paper: data.pageInfo.paper,
+                        getStyle: data.getStyle,
+                        setStyle: data.setStyle,
+                        el,
+                    });
                     setValue(res);
                 }}
             >
@@ -292,6 +327,8 @@ function Zoom(props) {
                         el,
                         value: value,
                         spread: data.spread,
+                        paper: data.pageInfo.paper,
+                        setStyle: data.setStyle,
                     });
                 }}
                 style={{
@@ -304,6 +341,44 @@ function Zoom(props) {
                 text={text}
             ></Select>
         </ZoomWrap>
+    );
+}
+
+const PaperDiv = styled.div`
+    box-shadow:
+        rgba(0, 0, 0, 0.05) 0px 2rem 8rem 0px,
+        rgba(0, 0, 0, 0.15) 0px 0.6rem 1.6rem,
+        rgba(0, 0, 0, 0.1) 0px 0.2rem 0.2rem;
+`;
+
+function Paper(props) {
+    const { style, children, onInited } = props;
+    const [rect, setStyle] = useState(style);
+    const cacheData = useRef({}).current;
+    cacheData.rect = rect;
+    useEffect(() => {
+        if (typeof onInited === 'function') {
+            onInited({
+                setStyle(datas) {
+                    setStyle({
+                        ...rect,
+                        ...datas,
+                    });
+                },
+                getStyle() {
+                    return cacheData.rect;
+                },
+            });
+        }
+    }, []);
+
+    return (
+        <PaperDiv
+            style={rect}
+            className={`${rect.exceededWidth ? 'exceededWidth' : ''}`}
+        >
+            {children}
+        </PaperDiv>
     );
 }
 
@@ -350,6 +425,7 @@ export default function (props) {
         inst,
         isShowToolbar = true,
         toolbar,
+        type = 'preview',
     } = props;
     if (license) {
         setLicense(license);
@@ -381,6 +457,7 @@ export default function (props) {
     });
 
     const el = useRef(null);
+    const paperWrapEl = useRef(null);
 
     const onActiveSheetChanged = (type, args) => {
         _onActiveSheetChanged && _onActiveSheetChanged(type, args);
@@ -624,6 +701,7 @@ export default function (props) {
     useEffect(() => {
         (async () => {
             const inited = await initSpread();
+            data.inited = inited;
             if (inited) {
                 /**
                  * 处理事件绑定必须在第一次spread初始才做，
@@ -637,7 +715,12 @@ export default function (props) {
                 if (onInited) {
                     const promise = onInited(data.spread, {
                         zoom(value) {
-                            zoom({ el, value, spread: data.spread });
+                            zoom({
+                                el: paperWrapEl,
+                                value,
+                                spread: data.spread,
+                                paper: data.pageInfo,
+                            });
                         },
                         zoomOptions: {
                             suitableToPage: 'suitableToPage',
@@ -647,9 +730,11 @@ export default function (props) {
                     });
                     dataSource &&
                         zoom({
-                            el,
+                            el: paperWrapEl,
                             value: 'suitableToPageWidth',
                             spread: data.spread,
+                            paper: data.pageInfo.paper,
+                            setStyle: data.setStyle,
                         });
                     if (promise && promise.then) {
                         promise.then((json) => {
@@ -675,11 +760,20 @@ export default function (props) {
         onRedo,
     ]);
 
+    const PaperStyls = {
+        width: '100%',
+        height: '100%',
+    };
+
     return (
         <Wrap>
             {isShowToolbar && (
                 <Toolbar>
-                    <Zoom zoomOptions={zoomOptions} el={el} data={data}></Zoom>
+                    <Zoom
+                        zoomOptions={zoomOptions}
+                        el={paperWrapEl}
+                        data={data}
+                    ></Zoom>
                     <ToolbarRight>
                         <Page
                             onInited={(datas) => {
@@ -696,18 +790,23 @@ export default function (props) {
             {data.showError ? (
                 <LicenseError></LicenseError>
             ) : (
-                <div
+                <PaperWrap
+                    ref={paperWrapEl}
                     style={{
-                        width: '100%',
-                        height: '100%',
-                        overflow: 'visible',
-                        userSelect: 'none',
-                        flex: 1,
-                        padding: '8px',
-                        boxSizing: 'border-box',
+                        backgroundColor: type === 'designer' ? '' : '#ddd',
+                        overflow: type === 'designer' ? 'visible' : 'auto',
                     }}
-                    ref={el}
-                ></div>
+                >
+                    <Paper
+                        style={PaperStyls}
+                        onInited={function (datas) {
+                            data.setStyle = datas.setStyle;
+                            data.getStyle = datas.getStyle;
+                        }}
+                    >
+                        <ExcelWrap ref={el}></ExcelWrap>
+                    </Paper>
+                </PaperWrap>
             )}
             {!data.showError && data.showWarn ? (
                 <LicenseWarn></LicenseWarn>
