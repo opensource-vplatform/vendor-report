@@ -24,6 +24,13 @@ const getPaperRect = function(unit){
     }
 }
 
+/**
+ * 设置
+ */
+const setHeader = function(sheet,){
+
+}
+
 export default function () {
     return new TOONE.Report.Dev({
         datasources:[],//添加需要加载的数据集编码

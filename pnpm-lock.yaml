@@ -271,6 +271,27 @@ importers:
         specifier: ^1.6.11
         version: 1.6.11
 
+  packages/integration/ieps-schedule:
+    devDependencies:
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/preset-env':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/runtime':
+        specifier: ^7.23.7
+        version: 7.23.7
+      '@rollup/plugin-babel':
+        specifier: ^6.0.4
+        version: 6.0.4(@babel/core@7.23.5)
+      terser:
+        specifier: ^5.26.0
+        version: 5.26.0
+      vite:
+        specifier: ^4.3.9
+        version: 4.3.9(@types/node@20.12.11)(sass@1.69.5)(terser@5.26.0)
+
   packages/integration/vdaas-console:
     dependencies:
       axios:
@@ -325,6 +346,27 @@ importers:
       xml-js:
         specifier: ^1.6.11
         version: 1.6.11
+
+  packages/integration/vdaas-console-dev-template:
+    devDependencies:
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/preset-env':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/runtime':
+        specifier: ^7.23.7
+        version: 7.23.7
+      '@rollup/plugin-babel':
+        specifier: ^6.0.4
+        version: 6.0.4(@babel/core@7.23.5)
+      terser:
+        specifier: ^5.26.0
+        version: 5.26.0
+      vite:
+        specifier: ^4.3.9
+        version: 4.3.9(@types/node@20.12.11)(sass@1.69.5)(terser@5.26.0)
 
   packages/integration/vdaas-service:
     dependencies:
@@ -447,6 +489,49 @@ importers:
       axios-mock-adapter:
         specifier: ^1.22.0
         version: 1.22.0(axios@1.6.8)
+      del:
+        specifier: ^6.1.1
+        version: 6.1.1
+      prettier:
+        specifier: ^3.1.0
+        version: 3.1.0
+      terser:
+        specifier: ^5.26.0
+        version: 5.26.0
+      vite:
+        specifier: ^4.3.9
+        version: 4.3.9(@types/node@20.12.11)(sass@1.69.5)(terser@5.26.0)
+      xml-js:
+        specifier: ^1.6.11
+        version: 1.6.11
+
+  packages/integration/wecost:
+    dependencies:
+      axios:
+        specifier: ^1.6.8
+        version: 1.6.8
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: ^18.2.0
+        version: 18.2.0(react@18.2.0)
+      styled-components:
+        specifier: ^6.1.1
+        version: 6.1.1(react-dom@18.2.0)(react@18.2.0)
+    devDependencies:
+      '@babel/plugin-transform-runtime':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/preset-env':
+        specifier: ^7.23.7
+        version: 7.23.7(@babel/core@7.23.5)
+      '@babel/runtime':
+        specifier: ^7.23.7
+        version: 7.23.7
+      '@rollup/plugin-babel':
+        specifier: ^6.0.4
+        version: 6.0.4(@babel/core@7.23.5)
       del:
         specifier: ^6.1.1
         version: 6.1.1
