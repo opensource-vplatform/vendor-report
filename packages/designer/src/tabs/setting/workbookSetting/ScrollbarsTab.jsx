@@ -74,7 +74,7 @@ function Index() {
                         ></CheckBox>
                         <CheckBox
                             style={checkboxStyle}
-                            title='动条最大对齐'
+                            title='滚动条最大对齐'
                             value={scrollbarMaxAlign}
                             onChange={(checked) => {
                                 dispatch(setScrollbarMaxAlign(checked));
