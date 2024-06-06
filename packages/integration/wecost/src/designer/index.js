@@ -246,21 +246,6 @@ document.title = getTitle('同望电子表格设计器');
               });
           },
       },
-      toolbar: [
-          {
-              title: '关闭',
-              type: 'warning',
-              onClick() {
-                  MSG.confirm('', '确定关闭设计器吗？', function (confirmed) {
-                      if (confirmed) {
-                          window.opener = null;
-                          window.open('', '_self');
-                          window.close();
-                      }
-                  });
-              },
-          },
-      ],
   });
   
   //设计器挂载到指定dom元素

@@ -30,11 +30,11 @@ if(distFilePath){
     buildUtils.importToHtmlByObject(result,reportHtmlPath);
 
     //designer.html
-    del.sync(["reportDist/designer.html"]);
+    del.sync(["viewDist/designer.html"]);
 
     //将build结果拷贝到spreadsheet目录
     buildUtils.copy(distPath,spreadsheetPath)
 
-    //删除reportDist目录
-    del.sync(["reportDist/**"]);
+    //删除viewDist目录
+    del.sync(["viewDist/**"]);
 }
