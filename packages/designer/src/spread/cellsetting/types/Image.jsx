@@ -7,6 +7,7 @@ import {
   Integer,
   Select,
 } from '@components/form/Index';
+import { isUndefined } from '@utils/objectUtil';
 import {
   applyToSelectedCell,
   withBatchUpdate,
@@ -24,6 +25,7 @@ import {
   Toolbar,
 } from '../Component';
 import {
+  getBindText,
   hasBindField,
   setIconDecoration,
 } from '../utils';
@@ -142,6 +144,14 @@ function paintCell(context, style, value) {
     const has = hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
     if (has) {
         setIconDecoration(style, 'image');
+        const bindingPath = sheet.getBindingPath(row,col);
+        const text = getBindText(
+            bindingPath,
+            sheet.getParent()
+        );
+        if (!isUndefined(text)) {
+            return text;
+        }
     }
     return value;
 }

@@ -67,7 +67,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                         if (rect && offset) {
                             const style = this._iconEle.style;
                             style.display = 'flex';
-                            style.left = rect.x + 2 + rect.width + 'px';
+                            style.left = rect.x + 3 + rect.width + 'px';
                             style.top = rect.y + 'px';
                             return;
                         }
