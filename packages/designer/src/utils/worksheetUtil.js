@@ -1,9 +1,6 @@
 import { genUUID } from './commonUtil';
 import { isObject } from './objectUtil';
-import {
-  getNamespace,
-  withBatchUpdate,
-} from './spreadUtil';
+import { getNamespace, withBatchUpdate } from './spreadUtil';
 
 export const getActiveIndexBySpread = function (spread) {
     const sheet = spread.getActiveSheet();
@@ -68,7 +65,7 @@ export function getCellTagPlugins(sheet, row, col) {
     return getCellTag(sheet, row, col, 'plugins');
 }
 
-export function hasCellTagPluginByIndex(sheet, row, col,pluginType){
+export function hasCellTagPluginByIndex(sheet, row, col, pluginType) {
     const plugins = getCellTagPlugins(sheet, row, col);
     if (plugins) {
         const pl = plugins.find((pl) => pl.type == pluginType);
@@ -79,7 +76,7 @@ export function hasCellTagPluginByIndex(sheet, row, col,pluginType){
 
 export function hasCellTagPlugin(sheet, pluginType) {
     const { row, col } = getActiveIndexBySheet(sheet);
-    return hasCellTagPluginByIndex(sheet,row,col,pluginType);
+    return hasCellTagPluginByIndex(sheet, row, col, pluginType);
 }
 
 /**
@@ -525,22 +522,40 @@ export function isFormula(text) {
     return false;
 }
 
-export function setOptions(sheet,options){
-    if(isObject(options)){
+export function setOptions(sheet, options) {
+    if (isObject(options)) {
         const spread = sheet.getParent();
-        const setValues = (target,values)=>{
-            for(let [key,val] of Object.entries(values)){
-                if(isObject(val)){
-                    const tgt = target[key]||{};
-                    setValues(tgt,val);
+        const setValues = (target, values) => {
+            for (let [key, val] of Object.entries(values)) {
+                if (isObject(val)) {
+                    const tgt = target[key] || {};
+                    setValues(tgt, val);
                     target[key] = tgt;
-                }else{
+                } else {
                     target[key] = val;
                 }
             }
-        }
-        withBatchUpdate(spread,()=>{
-            setValues(sheet.options,options);
+        };
+        withBatchUpdate(spread, () => {
+            setValues(sheet.options, options);
         });
     }
+}
+
+export function isSpanInSelections(spread) {
+    if (spread) {
+        const sheet = spread.getActiveSheet();
+        if (sheet) {
+            const selections = sheet.getSelections();
+            if (selections && selections.length > 0) {
+                for (let i = 0; i < selections.length; i++) {
+                    const selection = selections[i];
+                    if (sheet.getSpans(selection).length > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }

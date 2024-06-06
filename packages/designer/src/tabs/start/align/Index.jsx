@@ -1,14 +1,7 @@
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  HLayout,
-  ItemList,
-  VGroupItem,
-} from '@components/group/Index';
+import { HLayout, ItemList, VGroupItem } from '@components/group/Index';
 import LineSepatator from '@components/lineSeparator/lineSeparator';
 import Menu from '@components/menu/Index';
 import { VCard } from '@components/nav/Index';
@@ -25,20 +18,23 @@ import DecreaseIndent from '@icons/indent/DecreaseIndent.jsx';
 import IncreaseIndent from '@icons/indent/IncreaseIndent.jsx';
 import MergeCenter from '@icons/merge/MergeCenter';
 import {
-  directionToStyles,
-  getWordDirections,
-  valueToEnum,
+    directionToStyles,
+    getWordDirections,
+    valueToEnum,
 } from '@metadatas/direction';
 import { getMergeTypes } from '@metadatas/merge';
 import { fireCellEnter } from '@utils/eventUtil';
 import { exeCommand } from '@utils/spreadUtil';
 import {
-  exeStyleCommand,
-  genCellSettingVisibleHandler,
-  handleStyle,
+    exeStyleCommand,
+    genCellSettingVisibleHandler,
+    handleStyle,
 } from '@utils/styleUtil';
 
 import { Commands } from '../../../command';
+import { useEffect, useState } from 'react';
+import { EVENTS, bind } from '@event/EventManager';
+import { isSpanInSelections } from '@utils/worksheetUtil';
 
 const Label = styled.span`
     font-size: 12px;
@@ -49,6 +45,8 @@ export default function FontAlign() {
     const { vAlign, hAlign, wordWrap, textOrientation, isVerticalText } =
         useSelector(({ styleSlice }) => styleSlice);
     const { spread } = useSelector(({ appSlice }) => appSlice);
+
+    const [merged, setMerged] = useState(false);
 
     //顶端对齐
     const handleVTopAlign = function () {
@@ -98,14 +96,24 @@ export default function FontAlign() {
     const handleMerge = function (type) {
         exeCommand(spread, Commands.Style.Merge, { type });
         fireCellEnter(spread);
+        setMerged(isSpanInSelections(spread)); //更新合并居中状态
     };
 
     //合并居中
     const handleMergeCenter = () => {
-        handleMerge('mergeCenter');
+        if (merged) {
+            //已经合并居中，再次点击取消合并居中
+            handleMerge('unMergeCell');
+        } else {
+            handleMerge('mergeCenter');
+        }
     };
 
-    const showCellSetting = genCellSettingVisibleHandler(spread, dispatch, 'align');
+    const showCellSetting = genCellSettingVisibleHandler(
+        spread,
+        dispatch,
+        'align'
+    );
 
     //设置文字方向
     const handleTextOrientation = (value) => {
@@ -120,11 +128,17 @@ export default function FontAlign() {
     };
     const wordDirections = getWordDirections();
     const mergeTypes = getMergeTypes();
+    useEffect(() => {
+        setMerged(isSpanInSelections(spread)); //页面初始化时设置合并居中状态
+        return bind({
+            event: EVENTS.SelectionChanged,
+            handler: () => {
+                setMerged(isSpanInSelections(spread));
+            },
+        });
+    }, [spread]);
     return (
-        <VCard
-            title='对齐方式'
-            onMore={showCellSetting}
-        >
+        <VCard title='对齐方式' onMore={showCellSetting}>
             <HLayout>
                 <VGroupItem>
                     <ItemList>
@@ -195,12 +209,17 @@ export default function FontAlign() {
                     <ItemList>
                         <MergeCenter
                             tips='合并后居中'
+                            active={merged}
+                            style={{ marginRight: 0 }}
                             onClick={handleMergeCenter}
                         >
                             <Label>合并后居中</Label>
                         </MergeCenter>
                         <Menu datas={mergeTypes} onNodeClick={handleMerge}>
-                            <ArrowDown tips='合并后居中'></ArrowDown>
+                            <ArrowDown
+                                active={merged}
+                                tips='合并后居中'
+                            ></ArrowDown>
                         </Menu>
                     </ItemList>
                 </VGroupItem>

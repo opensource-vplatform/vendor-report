@@ -6,9 +6,13 @@
             "@components/card/Index": ["src/component/card/Index"],
             "@components/cellStyles/Index": ["src/component/cellStyles/Index"],
             "@components/color/Index": ["src/component/color/Index"],
-            "@components/conditionStyle/Index": ["src/component/conditionStyle/Index"],
+            "@components/conditionStyle/Index": [
+                "src/component/conditionStyle/Index"
+            ],
             "@components/confirm/Index": ["src/component/confirm/Index"],
-            "@components/defineDatasource/Index": ["src/component/defineDatasource/Index"],
+            "@components/defineDatasource/Index": [
+                "src/component/defineDatasource/Index"
+            ],
             "@components/dialog/Index": ["src/component/dialog/Index"],
             "@components/divider/Index": ["src/component/divider/Index"],
             "@components/error/Index": ["src/component/error/Index"],
@@ -19,12 +23,16 @@
             "@components/hyperlink/Index": ["src/component/hyperlink/Index"],
             "@components/icon/Index": ["src/component/icon/Index"],
             "@components/integer/Index": ["src/component/integer/Index"],
-            "@components/lineSeparator/Index": ["src/component/lineSeparator/Index"],
+            "@components/lineSeparator/Index": [
+                "src/component/lineSeparator/Index"
+            ],
             "@components/list/Index": ["src/component/list/Index"],
             "@components/loading/Index": ["src/component/loading/Index"],
             "@components/menu/Index": ["src/component/menu/Index"],
             "@components/nav/Index": ["src/component/nav/Index"],
-            "@components/pageSettings/Index": ["src/component/pageSettings/Index"],
+            "@components/pageSettings/Index": [
+                "src/component/pageSettings/Index"
+            ],
             "@components/popper/Index": ["src/component/popper/Index"],
             "@components/preview/Index": ["src/component/preview/Index"],
             "@components/range/Index": ["src/component/range/Index"],
@@ -38,7 +46,8 @@
             "@components/steps/Index": ["src/component/steps/Index"],
             "@components/tabs/Index": ["src/component/tabs/Index"],
             "@components/tree/Index": ["src/component/tree/Index"],
-            "@event/EventManager":["src/event/EventManager"],
+            "@event/EventManager": ["src/event/EventManager"],
+            "@metadatas/merge": ["src/metadatas/merge"],
             "@utils/chartUtil": ["src/utils/chartUtil"],
             "@utils/crossDatas": ["src/utils/crossDatas"],
             "@utils/formulaUtil": ["src/utils/formulaUtil"],
@@ -74,7 +83,9 @@
             "@utils/shapeUtil": ["src/utils/shapeUtil"],
             "@utils/worksheetUtil": ["src/utils/worksheetUtil"],
             "@store/appSlice/appSlice": ["src/store/appSlice/appSlice"],
-            "@store/borderSlice/borderSlice": ["src/store/borderSlice/borderSlice"],
+            "@store/borderSlice/borderSlice": [
+                "src/store/borderSlice/borderSlice"
+            ],
             "@store/cellSettingSlice": ["src/store/cellSettingSlice"],
             "@store/conditionStyleSlice": ["src/store/conditionStyleSlice"],
             "@store/datasourceSlice/datasourceSlice": [
@@ -83,7 +94,9 @@
             "@store/formulaEditorSlice/formulaEditorSlice": [
                 "src/store/formulaEditorSlice/formulaEditorSlice"
             ],
-            "@store/layoutSlice/layoutSlice": ["src/store/layoutSlice/layoutSlice"],
+            "@store/layoutSlice/layoutSlice": [
+                "src/store/layoutSlice/layoutSlice"
+            ],
             "@store/navSlice/navSlice": ["src/store/navSlice/navSlice"],
             "@store/rangeSlice": ["src/store/rangeSlice"],
             "@store/settingSlice/workbookSettingSlice": [
@@ -1365,7 +1378,7 @@
             "@icons/table/style/Medium8": ["src/icons/table/style/Medium8"],
             "@icons/table/style/Medium9": ["src/icons/table/style/Medium9"],
             "@icons/table/Style": ["src/icons/table/Style"],
-            "@commands/index":["src/command/index"],
+            "@commands/index": ["src/command/index"]
         }
     },
     "include": ["src/**/*.js", "src/**/*.jsx"],
