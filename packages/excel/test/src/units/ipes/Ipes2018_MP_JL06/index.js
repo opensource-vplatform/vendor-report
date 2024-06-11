@@ -3,9 +3,8 @@ import dataResponse from './dataResponse.json';
 import spreadJson from './spreadJson.json';
 
 export default {
-    title: '支表13 - 中间计量表 ( Ipes_MP_Middlepay )',
+    title: '计量进度表 ( Ipes2018_MP_JL06 )',
     configResponse,
     dataResponse,
     spreadJson,
-    ignorePaths: [],
 };
