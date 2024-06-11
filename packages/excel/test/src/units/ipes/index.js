@@ -39,7 +39,6 @@ export default function () {
     UNITS.forEach((unit) => {
         const { title, configResponse, dataResponse, spreadJson } = unit;
         //const reportJson = JSON.parse(configResponse.data.data.config);
-        debugger;
         const reportJson = JSON.parse(configResponse.data.config);
         units.push({
             title,
@@ -47,7 +46,10 @@ export default function () {
             test: spreadJson,
             //datas: dataResponse.data.data,
             datas: dataResponse.data,
-            setting: {},
+            setting: {
+                tempConfig: reportJson.context.wizardSlice.template,
+                setting: reportJson.context.datasourceSlice.setting,
+            },
         });
     });
     return units;
