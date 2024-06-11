@@ -114,11 +114,9 @@ const getSheetRect = function (sheet) {
 
 const afterRefresh = function ({ spread, el }) {
     setTimeout(() => {
-        /*  const { width: canvasWidth, height: canvasHeight } =
-            getSpreadCanvasRect(el); */
+        const { width: canvasWidth, height: canvasHeight } =
+            getSpreadCanvasRect(el);
         spread.sheets.forEach((sheet) => {
-            const canvasHeight = sheet.getViewportHeight(1);
-            const canvasWidth = sheet.getViewportWidth(1);
             const { sheetHeight, sheetWidth } = getSheetRect(sheet);
             let heightZoomFactor = 1;
             if (sheetHeight > 0) {
@@ -149,6 +147,7 @@ export const zoomToPage = function ({
     setStyle,
     el,
 }) {
+    debugger;
     const { paperWidth, paperHeight, zoomFactor } = genPaperHeight({
         spread,
         width,
@@ -166,21 +165,25 @@ export const zoomToPage = function ({
 };
 
 export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
-    const { paperWidth, paperHeight, zoomFactor } = genPaperHeight({
-        spread,
-        width,
-        paper,
-        isHandlePadding: false,
+    let paperHeight = 0;
+    let paperWidth = 0;
+    spread.sheets.forEach((sheet) => {
+        const { sheetHeight, sheetWidth } = getSheetRect(sheet);
+        paperHeight = sheetHeight;
+        paperWidth = sheetWidth;
     });
+    let zoomFactor = 1;
+    if (width) {
+        //10:预留滚动条
+        const widthZoomFactor = (width - 16 - 10) / paperWidth;
+        zoomFactor = widthZoomFactor;
+        paperWidth = paperWidth * zoomFactor - 5;
+        paperHeight = paperHeight * zoomFactor;
+    }
+
     setStyle({
         ...paper,
-        height:
-            paperHeight +
-            paper.paddingTop +
-            paper.paddingBottom +
-            (spread?.options?.tabStripVisible ? 100 : 50) -
-            paper.paddingLeft -
-            paper.paddingRight,
+        height: paperHeight + (spread?.options?.tabStripVisible ? 30 : 0),
         width: paperWidth,
         zoomFactor,
     });
@@ -188,7 +191,6 @@ export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
     setTimeout(() => {
         const { width: canvasWidth } = getSpreadCanvasRect(el);
         spread.sheets.forEach((sheet) => {
-            //const canvasWidth = sheet.getViewportWidth(1);
             const { sheetWidth } = getSheetRect(sheet);
             let zoomFactor = 1;
             if (sheetWidth > 0) {
@@ -203,10 +205,26 @@ export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
 };
 
 export const zoomToRecover = function ({ spread, setStyle, paper, el }) {
-    let { paperWidth, paperHeight } = genPaperHeight({
-        spread,
-        paper,
+    let paperHeight = 0;
+    let paperWidth = 0;
+    spread.sheets.forEach((sheet) => {
+        const { sheetHeight, sheetWidth } = getSheetRect(sheet);
+        paperHeight = sheetHeight;
+        paperWidth = sheetWidth;
     });
+
+    const verticalPadding = paper.paddingTop + paper.paddingBottom;
+    const horizontalPadding = paper.paddingLeft + paper.paddingRight;
+    if (spread?.options?.tabStripVisible) {
+        paperHeight += 35;
+    }
+    if (verticalPadding > 0) {
+        paperHeight += verticalPadding;
+    }
+
+    if (horizontalPadding > 0) {
+        paperWidth += horizontalPadding;
+    }
 
     setStyle({
         ...paper,
@@ -267,7 +285,7 @@ const genPaperHeight = function ({
             }
         }
 
-        paperWidth = paperWidth * zoomFactor;
+        paperWidth = paperWidth * zoomFactor - 5;
         paperHeight = paperHeight * zoomFactor;
     }
 
@@ -308,13 +326,28 @@ const zoomByNumber = function ({
         newValue = 0.5;
     }
 
-    const { paperWidth, paperHeight } = genPaperHeight({
-        spread,
-        paper,
-        zoomFactor: newValue,
+    let paperHeight = 0;
+    let paperWidth = 0;
+    spread.sheets.forEach((sheet) => {
+        const { sheetHeight, sheetWidth } = getSheetRect(sheet);
+        paperHeight = sheetHeight * newValue;
+        paperWidth = sheetWidth * newValue;
     });
 
-    let height = paperHeight + 10;
+    const verticalPadding = paper.paddingTop + paper.paddingBottom;
+    const horizontalPadding = paper.paddingLeft + paper.paddingRight;
+    if (spread?.options?.tabStripVisible) {
+        paperHeight += 35;
+    }
+    if (verticalPadding > 0) {
+        paperHeight += verticalPadding;
+    }
+
+    if (horizontalPadding > 0) {
+        paperWidth += horizontalPadding;
+    }
+
+    let height = paperHeight;
     let width = paperWidth;
 
     let exceededWidth = _width < width ? true : false;
