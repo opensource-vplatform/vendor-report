@@ -334,3 +334,31 @@ export default function () {
         </Wrap>
     );
 }
+
+window.tooneReport = {
+
+    exportExcel : function(){
+
+    },
+
+    exportPdf : function(){
+
+    },
+
+    print: function(){
+
+    },
+
+    nextPage: function(){
+
+    },
+
+    previousPage: function(){
+
+    },
+
+    specifyPage: function(index){
+
+    }
+    
+}

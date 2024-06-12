@@ -247,6 +247,19 @@ document.title = getTitle('同望电子表格设计器');
           },
       },
   });
+
+  tooneReport = {
+    
+    saveReport: function(){
+       const json = designer.getDesignReport();
+       return JSON.stringify(json);
+    },
+
+    previewReport: function(){
+        designer.preview();
+    }
+
+}
   
   //设计器挂载到指定dom元素
   designer.mount(document.getElementById('app'));
