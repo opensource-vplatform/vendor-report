@@ -42,6 +42,7 @@ export default function (props) {
         groupSumRange,
         isTemplate = false,
         totalRange,
+        singleRowFill = false,
     } = props;
 
     const [data, setData] = useState(() => {
@@ -53,6 +54,7 @@ export default function (props) {
             rangeError: false,
             rangeMessage: Default_Info,
             isFillData,
+            singleRowFill,
             groupSumRange,
             groupSumRangeError: false,
             groupSumRangeMessage: Default_Group_Sum_Range_Info,
@@ -102,6 +104,7 @@ export default function (props) {
                 groupSumRange: groupSumRangeStr,
                 totalRange: totalRangeStr,
                 isFillData: data.isFillData,
+                singleRowFill: data.singleRowFill,
             });
         }
     };
@@ -167,6 +170,24 @@ export default function (props) {
                     <InfoIcon
                         iconStyle={{ color: '#228ee5' }}
                         tips='数据不满一页时会填充满一页'
+                    ></InfoIcon>
+                </HLayout>
+                <HLayout>
+                    <Text>单行填充：</Text>
+                    <CheckBox
+                        value={data.singleRowFill}
+                        onChange={(checked) => {
+                            setData((data) => {
+                                return {
+                                    ...data,
+                                    singleRowFill: checked,
+                                };
+                            });
+                        }}
+                    ></CheckBox>
+                    <InfoIcon
+                        iconStyle={{ color: '#228ee5' }}
+                        tips='使用单行填充'
                     ></InfoIcon>
                 </HLayout>
                 <HLayout>

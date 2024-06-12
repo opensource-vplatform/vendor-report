@@ -112,6 +112,62 @@ const getSheetRect = function (sheet) {
     };
 };
 
+const recursionSheetZoom = function (sheet, el, _zoomFactor) {
+    let zoomFactor = _zoomFactor;
+    let hasScroll = true;
+    while (hasScroll) {
+        const scrollbarWrappers = el?.current?.querySelectorAll?.(
+            '.gc-scrollbar-wrapper'
+        );
+        let _hasScroll = false;
+        let maxDiff = 0;
+        scrollbarWrappers.forEach(function (scrollbarWrapper) {
+            const scrollbarWrapperCss =
+                window.getComputedStyle(scrollbarWrapper);
+            const scrollbarWrapperHeight = Number(
+                scrollbarWrapperCss.height.slice(0, -2)
+            );
+            const scrollbarWrapperWidth = Number(
+                scrollbarWrapperCss.width.slice(0, -2)
+            );
+
+            const scrollHandle =
+                scrollbarWrapper?.querySelector?.('.gc-scroll-handle');
+            const scrollHandleCss = window.getComputedStyle(scrollHandle);
+            const scrollHandleHeight = Number(
+                scrollHandleCss.height.slice(0, -2)
+            );
+            const scrollHandleWidth = Number(
+                scrollHandleCss.width.slice(0, -2)
+            );
+
+            const heightDiff = scrollbarWrapperHeight - scrollHandleHeight;
+            const widthDiff = scrollbarWrapperWidth - scrollHandleWidth;
+            if (
+                (scrollbarWrapperHeight && heightDiff > 2) ||
+                (scrollbarWrapperWidth && widthDiff > 2)
+            ) {
+                _hasScroll = true;
+                if (heightDiff > widthDiff) {
+                    maxDiff = heightDiff;
+                } else {
+                    maxDiff = widthDiff;
+                }
+                while (maxDiff >= 0.2) {
+                    maxDiff = maxDiff / 10;
+                }
+            }
+        });
+        zoomFactor -= zoomFactor <= 1 ? 0.01 : maxDiff;
+        if (!_hasScroll) {
+            zoomFactor -= 0.02;
+            hasScroll = false;
+        }
+
+        sheetZoom(sheet, zoomFactor);
+    }
+};
+
 const afterRefresh = function ({ spread, el }) {
     setTimeout(() => {
         const { width: canvasWidth, height: canvasHeight } =
@@ -131,10 +187,13 @@ const afterRefresh = function ({ spread, el }) {
                 zoomFactor = widthZoomFactor;
             }
 
+            //在现有，确保有滚动条
+            zoomFactor += 1;
             if (zoomFactor >= 4) {
                 zoomFactor = 4;
             }
             sheetZoom(sheet, zoomFactor);
+            recursionSheetZoom(sheet, el, zoomFactor);
         });
     }, 200);
 };
@@ -147,13 +206,23 @@ export const zoomToPage = function ({
     setStyle,
     el,
 }) {
-    debugger;
-    const { paperWidth, paperHeight, zoomFactor } = genPaperHeight({
+    let { paperWidth, paperHeight, zoomFactor, direction } = genPaperHeight({
         spread,
         width,
         height,
         paper,
     });
+    const verticalPadding = paper.paddingTop + paper.paddingBottom;
+    const horizontalPadding = paper.paddingLeft + paper.paddingRight;
+    if (direction === 'vertical') {
+        paperWidth =
+            paperWidth -
+            verticalPadding -
+            (spread?.options?.tabStripVisible ? 60 : 30);
+    } else {
+        paperHeight = paperHeight - horizontalPadding;
+    }
+
     setStyle({
         ...paper,
         height: paperHeight,
@@ -180,10 +249,14 @@ export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
         paperWidth = paperWidth * zoomFactor - 5;
         paperHeight = paperHeight * zoomFactor;
     }
-
+    const verticalPadding = paper.paddingTop + paper.paddingBottom;
+    const horizontalPadding = paper.paddingLeft + paper.paddingRight;
     setStyle({
         ...paper,
-        height: paperHeight + (spread?.options?.tabStripVisible ? 30 : 0),
+        height:
+            paperHeight +
+            (spread?.options?.tabStripVisible ? 100 : 50) +
+            verticalPadding,
         width: paperWidth,
         zoomFactor,
     });
@@ -200,6 +273,7 @@ export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
                 zoomFactor = 4;
             }
             sheetZoom(sheet, zoomFactor);
+            recursionSheetZoom(sheet, el, zoomFactor);
         });
     }, 200);
 };
@@ -273,20 +347,28 @@ const genPaperHeight = function ({
         paperWidth = sheetWidth;
     });
     let zoomFactor = 1;
+    let direction = 'horizontal';
     if (width) {
-        //10:预留滚动条
-        const widthZoomFactor = (width - 16 - 10) / paperWidth;
+        const widthZoomFactor = (width - 16) / paperWidth;
         zoomFactor = widthZoomFactor;
 
         if (height) {
             const heightZoomFactor = (height - 16) / paperHeight;
             if (heightZoomFactor < widthZoomFactor) {
                 zoomFactor = heightZoomFactor;
+                direction = 'vertical';
             }
         }
-
-        paperWidth = paperWidth * zoomFactor - 5;
-        paperHeight = paperHeight * zoomFactor;
+        if (direction === 'vertical') {
+            paperWidth = paperWidth * zoomFactor;
+        } else {
+            paperWidth = width - 16;
+        }
+        if (direction === 'vertical') {
+            paperHeight = paperHeight * zoomFactor;
+        } else {
+            paperHeight = height - 16;
+        }
     }
 
     if (isHandlePadding) {
@@ -307,6 +389,7 @@ const genPaperHeight = function ({
         paperWidth: paperWidth,
         paperHeight,
         zoomFactor,
+        direction,
     };
 };
 

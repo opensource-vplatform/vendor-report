@@ -371,6 +371,23 @@ export default class ParseReportJson {
                 if (isLastPage && !pageInfos.isFillData) {
                     endIndex = startIndex + lastContentTempCount;
                 }
+
+                //单行填充
+                let singleRowFill = false;
+                let fillCount = 0;
+                if (
+                    isLastPage &&
+                    pageInfos.isFillData &&
+                    pageInfos.singleRowFill
+                ) {
+                    if (lastContentTempCount > 0) {
+                        fillCount = contentTempCount - lastContentTempCount;
+                    }
+
+                    endIndex = startIndex + lastContentTempCount;
+                    singleRowFill = true;
+                }
+
                 this.genPageDataTables({
                     templates: contentTemplates,
                     pageInfos,
@@ -378,6 +395,8 @@ export default class ParseReportJson {
                     endIndex,
                     sheetPage,
                     sheetPrintPage: pageInfos.sheetPrintPage,
+                    singleRowFill,
+                    fillCount,
                 });
                 this.genPageDataTables({
                     templates: footerTemplates,
@@ -443,11 +462,13 @@ export default class ParseReportJson {
 
         const templateInfo = this.tempConfig?.[name];
         let isFillData = false;
+        let singleRowFill = false;
         const sheetTag = data?.defaultDataNode?.tag;
         let tag = {};
         if (sheetTag) {
             const res = JSON.parse(sheetTag);
             isFillData = res?.isFillData;
+            singleRowFill = res?.singleRowFill;
             tag = res;
         }
 
@@ -511,7 +532,7 @@ export default class ParseReportJson {
             pageArea: tag?.pageArea,
             pageTotalHeight,
             pageHeight: 0,
-
+            singleRowFill,
             isFillData,
             isCurrentSheet: templateInfo?.isCurrentSheet,
             isTemplate,
@@ -1081,6 +1102,8 @@ export default class ParseReportJson {
             endIndex = 0,
             sheetPage,
             sheetPrintPage,
+            singleRowFill = false,
+            fillCount = 0,
         } = params;
         templates.forEach((temp) => {
             const {
@@ -1104,6 +1127,8 @@ export default class ParseReportJson {
 
             let startRow = pageInfos.rowCount;
             let dataIndex = startIndex;
+            let lastSpans = [];
+            let lastDataTable = {};
             for (let i = startIndex; i < dataLen; i++) {
                 if (pageInfos.pageArea) {
                     if (
@@ -1129,6 +1154,9 @@ export default class ParseReportJson {
                         Object.entries(dataTable).forEach(
                             ([colStr, _colDataTable]) => {
                                 const colDataTable = { ..._colDataTable };
+                                lastDataTable[colStr] = {
+                                    style: colDataTable.style,
+                                };
                                 dataTable[colStr] = colDataTable;
                                 const col = Number(colStr);
                                 const { bindingPath, tag } = colDataTable;
@@ -1342,6 +1370,10 @@ export default class ParseReportJson {
                             }
 
                             //合并信息
+                            if (spans.length > 0) {
+                                lastSpans = spans;
+                            }
+
                             spans.forEach(function (span) {
                                 pageInfos.spans.push({
                                     ...span,
@@ -1446,6 +1478,60 @@ export default class ParseReportJson {
                         }
                     }
                 );
+            }
+            if (singleRowFill && pageInfos && fillCount > 0) {
+                const height = tempHeight * fillCount;
+                pageInfos.pageHeight += height;
+
+                pageInfos.dataTable[pageInfos.rowCount] = lastDataTable;
+
+                if (sheetPage) {
+                    sheetPage.dataTable[sheetPage.rowCount] = lastDataTable;
+                }
+
+                if (sheetPrintPage) {
+                    sheetPrintPage.dataTable[sheetPrintPage.rowCount] =
+                        lastDataTable;
+                }
+
+                //行高
+                pageInfos.rows[pageInfos.rowCount] = {
+                    size: height,
+                };
+                if (sheetPage) {
+                    sheetPage.rows[sheetPage.rowCount] = {
+                        size: height,
+                    };
+                }
+                if (sheetPrintPage) {
+                    sheetPrintPage.rows[sheetPrintPage.rowCount] = {
+                        size: height,
+                    };
+                }
+
+                lastSpans.forEach(function (span) {
+                    pageInfos.spans.push({
+                        ...span,
+                        rowCount: 1,
+                        row: pageInfos.rowCount,
+                    });
+                    sheetPage &&
+                        sheetPage.spans.push({
+                            ...span,
+                            rowCount: 1,
+                            row: sheetPage.rowCount,
+                        });
+                    sheetPrintPage &&
+                        sheetPrintPage.spans.push({
+                            ...span,
+                            rowCount: 1,
+                            row: sheetPrintPage.rowCount,
+                        });
+                });
+
+                pageInfos.rowCount += 1;
+                sheetPage && (sheetPage.rowCount += 1);
+                sheetPrintPage && (sheetPrintPage.rowCount += 1);
             }
             verticalAutoMergeRanges.forEach(function (item) {
                 item.range.rowCount = pageInfos.rowCount - item.range.row;

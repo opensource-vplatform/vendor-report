@@ -24,6 +24,7 @@ export default function Index(props) {
     const isFillData = getSheetTag(sheet, 'isFillData');
     const groupSumRange = getSheetTag(sheet, 'groupSumArea');
     const totalRange = getSheetTag(sheet, 'totalArea');
+    const singleRowFill = getSheetTag(sheet, 'singleRowFill');
 
     const { template } = useSelector(({ wizardSlice }) => wizardSlice);
     const activeSheetName = spread.getActiveSheet().name();
@@ -38,6 +39,7 @@ export default function Index(props) {
         setSheetTag(sheet, 'isFillData', datas.isFillData);
         setSheetTag(sheet, 'groupSumArea', datas.groupSumRange);
         setSheetTag(sheet, 'totalArea', datas.totalRange);
+        setSheetTag(sheet, 'singleRowFill', datas.singleRowFill);
 
         if (datas.range) {
             const rangeArr = datas.range.split(':');
@@ -79,6 +81,7 @@ export default function Index(props) {
                     isTemplate={isTemplate}
                     groupSumRange={groupSumRange}
                     totalRange={totalRange}
+                    singleRowFill={singleRowFill}
                 ></PageSettings>
             )}
             <HCard title='分页设置'>
