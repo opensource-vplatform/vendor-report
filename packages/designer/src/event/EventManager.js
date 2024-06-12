@@ -76,6 +76,10 @@ export const EVENTS = {
     TopRowChanged: 'TopRowChanged',
 
     ViewZoomed: 'ViewZoomed',
+
+    EditEnding : 'EditEnding',
+
+    CellDoubleClick : 'CellDoubleClick',
 };
 
 const check = function (params) {

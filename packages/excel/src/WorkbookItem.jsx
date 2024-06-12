@@ -424,6 +424,8 @@ export default function (props) {
         onLeftColumnChanged,
         onTopRowChanged,
         onViewZoomed,
+        onEditEnding,
+        onCellDoubleClick,
         inst,
         isShowToolbar = true,
         toolbar,
@@ -512,6 +514,8 @@ export default function (props) {
             LeftColumnChanged: onLeftColumnChanged,
             TopRowChanged: onTopRowChanged,
             ViewZoomed: onViewZoomed,
+            EditEnding:onEditEnding,
+            CellDoubleClick: onCellDoubleClick,
         });
     };
     //处理工作表生成，优先使用json

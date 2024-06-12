@@ -309,6 +309,7 @@ export default function () {
                 onInited={handleWorkbookInitialized}
                 onEnterCell={handleEnterCell}
                 onActiveSheetChanged={handleActiveSheetChanged}
+              
                 onValueChanged={handleValueChanged}
                 onSelectionChanged={handleSelectionChanged}
                 onSelectionChanging={handleSelectionChanging}
@@ -324,6 +325,8 @@ export default function () {
                 onLeftColumnChanged={genEventHandler('LeftColumnChanged')}
                 onTopRowChanged={genEventHandler('TopRowChanged')}
                 onViewZoomed={genEventHandler('ViewZoomed')}
+                onEditEnding={genEventHandler('EditEnding')}
+                onCellDoubleClick={genEventHandler('CellDoubleClick')}
                 isShowToolbar={false}
                 type='designer'
             >
