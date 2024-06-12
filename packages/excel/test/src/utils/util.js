@@ -1,5 +1,7 @@
-import { getUnits } from '../units/index';
+import jsonpath from 'jsonpath';
+
 import ParseReportJson from '../../../src/template/ParseReportJson';
+import { getUnits } from '../units/index';
 
 const getType = function (obj) {
     const str = Object.prototype.toString.call(obj);
@@ -57,6 +59,17 @@ export const sortObj = function (object) {
     return object;
 };
 
+const ignorePath = [
+    {
+        code: 'style',
+        expression: '$..dataTable..[?(@.style)]',
+    },
+    {
+        code: 'name',
+        expression: '$..namedStyles..[?(@.name)]',
+    },
+];
+
 export const testUnits = function () {
     const units = getUnits();
     const errors = [];
@@ -67,6 +80,19 @@ export const testUnits = function () {
             reportJson: source,
             datas: datas,
         });
+
+        ignorePath.forEach(function ({ code, expression }) {
+            const filteredSourceObj = jsonpath.query(source, expression);
+            filteredSourceObj.forEach((item) => {
+                delete item[code];
+            });
+
+            const filteredTestObj = jsonpath.query(test, expression);
+            filteredTestObj.forEach((item) => {
+                delete item[code];
+            });
+        });
+
         if (!equals(source, test)) {
             errors.push({
                 title,

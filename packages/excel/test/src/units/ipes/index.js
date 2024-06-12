@@ -38,13 +38,18 @@ export default function () {
     const units = [];
     UNITS.forEach((unit) => {
         const { title, configResponse, dataResponse, spreadJson } = unit;
-        const reportJson = JSON.parse(configResponse.data.data.config);
+        //const reportJson = JSON.parse(configResponse.data.data.config);
+        const reportJson = JSON.parse(configResponse.data.config);
         units.push({
             title,
             source: reportJson.reportJson,
             test: spreadJson,
-            datas: dataResponse.data.data,
-            setting: {},
+            //datas: dataResponse.data.data,
+            datas: dataResponse.data,
+            setting: {
+                tempConfig: reportJson.context.wizardSlice.template,
+                setting: reportJson.context.datasourceSlice.setting,
+            },
         });
     });
     return units;

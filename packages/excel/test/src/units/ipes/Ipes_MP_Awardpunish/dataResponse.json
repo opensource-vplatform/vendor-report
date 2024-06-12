@@ -1,6 +1,32 @@
 {
     "msg": "",
     "data": {
+        "Ipes_MP_Awardpunish_DetailCalc": [
+            {
+                "dataIndex": 1.0,
+                "emptyRow": false,
+                "groupId": "",
+                "totalRow": false,
+                "num": 1.0,
+                "periodName": "第1期",
+                "awardMoney": 0.0,
+                "punishMoney": 200.0,
+                "reason": "",
+                "code": "fa"
+            },
+            {
+                "dataIndex": 2.0,
+                "emptyRow": false,
+                "groupId": "",
+                "totalRow": false,
+                "num": 2.0,
+                "periodName": "第1期",
+                "awardMoney": 800.0,
+                "punishMoney": 0.0,
+                "reason": "",
+                "code": "jiang"
+            }
+        ],
         "IP_ContPeriods_ParamCalc": [
             {
                 "contPeriods_startDate": 1.7105184E12,
@@ -29,20 +55,6 @@
                 "contPeriods_sequenceStr": "01",
                 "contPeriods_endDate": 1.711296E12,
                 "contPeriods_class": "com.toone.report.calculator.ipes.business.model.ContPeriods"
-            }
-        ],
-        "Ipes_MP_Penalwork_DetailCalc": [
-            {
-                "dataIndex": 1.0,
-                "emptyRow": false,
-                "groupId": "",
-                "totalRow": false,
-                "code": "weiyue0325",
-                "name": "甲方违约",
-                "bqmMoney": 10000.0,
-                "sqMoney": 0.0,
-                "bqMoney": 10000.0,
-                "content": ""
             }
         ],
         "IP_Contract_ParamCalc": [

@@ -11,7 +11,7 @@ import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
 
-//salesData.data.length = 1;
+salesData.data.length = 20;
 /* salesData.data = salesData.data.filter(function (item) {
     return ['西北'].includes(item.sales_area);
 }); */

@@ -433,6 +433,8 @@ export default class ParseReportJson {
                 margin = {
                     bottom: 75,
                     top: 75,
+                    left: 75,
+                    right: 75,
                 },
                 showColumnHeader = 2,
             },
@@ -449,7 +451,12 @@ export default class ParseReportJson {
             tag = res;
         }
 
-        let { bottom: marginBottom, top: marginTop } = margin;
+        let {
+            bottom: marginBottom,
+            top: marginTop,
+            left: marginLeft,
+            right: marginRight,
+        } = margin;
 
         let pageTotalHeight = 0;
         const printConversionUnits = this.printConversionUnits;
@@ -457,8 +464,14 @@ export default class ParseReportJson {
         const _height = (printConversionUnits * (height || 1100)) / 100;
         marginBottom = (printConversionUnits * marginBottom) / 100;
         marginTop = (printConversionUnits * marginTop) / 100;
+        marginLeft = (printConversionUnits * marginLeft) / 100;
+        marginRight = (printConversionUnits * marginRight) / 100;
         this.paper.width = _width;
         this.paper.height = _height;
+        this.paper.paddingBottom = marginBottom;
+        this.paper.paddingTop = marginTop;
+        this.paper.paddingLeft = marginLeft;
+        this.paper.paddingRight = marginRight;
 
         let defaultHeaderHeight = 20;
         if (colHeaderRowInfos.length > 0) {
