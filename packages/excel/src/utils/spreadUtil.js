@@ -112,15 +112,16 @@ const getSheetRect = function (sheet) {
     };
 };
 
-const recursionSheetZoom = function (sheet, el, _zoomFactor) {
-    let zoomFactor = _zoomFactor;
-    let hasScroll = true;
-    while (hasScroll) {
+const recursionSheetZoom = function (sheet, el, spread) {
+    let flag = true;
+    function recursion() {
+        spread.options.showHorizontalScrollbar = true;
+        spread.options.showVerticalScrollbar = true;
+        let hasScroll = false;
+        let zoomFactor = sheet.zoom();
         const scrollbarWrappers = el?.current?.querySelectorAll?.(
             '.gc-scrollbar-wrapper'
         );
-        let _hasScroll = false;
-        let maxDiff = 0;
         scrollbarWrappers.forEach(function (scrollbarWrapper) {
             const scrollbarWrapperCss =
                 window.getComputedStyle(scrollbarWrapper);
@@ -147,29 +148,31 @@ const recursionSheetZoom = function (sheet, el, _zoomFactor) {
                 (scrollbarWrapperHeight && heightDiff > 2) ||
                 (scrollbarWrapperWidth && widthDiff > 2)
             ) {
-                _hasScroll = true;
-                if (heightDiff > widthDiff) {
-                    maxDiff = heightDiff;
-                } else {
-                    maxDiff = widthDiff;
-                }
-                while (maxDiff >= 0.2) {
-                    maxDiff = maxDiff / 10;
-                }
+                hasScroll = true;
             }
         });
-        zoomFactor -= zoomFactor <= 1 ? 0.01 : maxDiff;
-        if (!_hasScroll) {
-            zoomFactor -= 0.02;
-            hasScroll = false;
+        if (hasScroll) {
+            //缩放
+            flag = false;
+            zoomFactor -= 0.01;
+            sheetZoom(sheet, zoomFactor);
+            recursion();
+        } else if (flag) {
+            //如果没有滚动条，先放大到有滚动条为止再缩放
+            zoomFactor += 0.05;
+            sheetZoom(sheet, zoomFactor);
+            recursion();
         }
-
-        sheetZoom(sheet, zoomFactor);
+        spread.options.showHorizontalScrollbar = false;
+        spread.options.showVerticalScrollbar = false;
     }
+    recursion();
 };
 
 const afterRefresh = function ({ spread, el }) {
     setTimeout(() => {
+        spread.options.showHorizontalScrollbar = true;
+        spread.options.showVerticalScrollbar = true;
         const { width: canvasWidth, height: canvasHeight } =
             getSpreadCanvasRect(el);
         spread.sheets.forEach((sheet) => {
@@ -186,14 +189,11 @@ const afterRefresh = function ({ spread, el }) {
             if (heightZoomFactor >= widthZoomFactor) {
                 zoomFactor = widthZoomFactor;
             }
-
-            //在现有，确保有滚动条
-            zoomFactor += 1;
             if (zoomFactor >= 4) {
                 zoomFactor = 4;
             }
             sheetZoom(sheet, zoomFactor);
-            recursionSheetZoom(sheet, el, zoomFactor);
+            recursionSheetZoom(sheet, el, spread);
         });
     }, 200);
 };
@@ -216,11 +216,23 @@ export const zoomToPage = function ({
     const horizontalPadding = paper.paddingLeft + paper.paddingRight;
     if (direction === 'vertical') {
         paperWidth =
-            paperWidth -
-            verticalPadding -
-            (spread?.options?.tabStripVisible ? 60 : 30);
+            paperWidth +
+            horizontalPadding +
+            (spread?.options?.tabStripVisible ? 30 : 0) -
+            verticalPadding;
+        if (paperWidth >= width - 20) {
+            paperWidth = width - 20;
+        }
     } else {
-        paperHeight = paperHeight - horizontalPadding;
+        paperHeight =
+            paperHeight +
+            verticalPadding +
+            (spread?.options?.tabStripVisible ? 30 : 0) -
+            horizontalPadding -
+            horizontalPadding * 0.2; //30误差
+        if (paperHeight >= height - 20) {
+            paperHeight = height - 20;
+        }
     }
 
     setStyle({
@@ -273,12 +285,12 @@ export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
                 zoomFactor = 4;
             }
             sheetZoom(sheet, zoomFactor);
-            recursionSheetZoom(sheet, el, zoomFactor);
+            recursionSheetZoom(sheet, el, spread);
         });
     }, 200);
 };
 
-export const zoomToRecover = function ({ spread, setStyle, paper, el }) {
+export const zoomToRecover = function ({ spread, setStyle, paper, el, width }) {
     let paperHeight = 0;
     let paperWidth = 0;
     spread.sheets.forEach((sheet) => {
@@ -299,12 +311,13 @@ export const zoomToRecover = function ({ spread, setStyle, paper, el }) {
     if (horizontalPadding > 0) {
         paperWidth += horizontalPadding;
     }
-
+    let exceededWidth = width < paperWidth ? true : false;
     setStyle({
         ...paper,
         height: paperHeight,
         width: paperWidth,
         zoomFactor: 1,
+        exceededWidth,
     });
     setTimeout(() => spread.refresh(), 0);
     afterRefresh({ spread, el });
@@ -332,20 +345,14 @@ const getSpreadWrapRect = function (el) {
 };
 
 const genPaperHeight = function ({
-    spread,
     height,
     width,
     paper,
-    isHandlePadding = true,
     zoomFactor: _zoomFactor = 1,
 }) {
-    let paperHeight = 0;
-    let paperWidth = 0;
-    spread.sheets.forEach((sheet) => {
-        const { sheetHeight, sheetWidth } = getSheetRect(sheet);
-        paperHeight = sheetHeight;
-        paperWidth = sheetWidth;
-    });
+    let paperHeight = paper.height;
+    let paperWidth = paper.width;
+
     let zoomFactor = 1;
     let direction = 'horizontal';
     if (width) {
@@ -364,24 +371,10 @@ const genPaperHeight = function ({
         } else {
             paperWidth = width - 16;
         }
-        if (direction === 'vertical') {
+        if (direction === 'horizontal') {
             paperHeight = paperHeight * zoomFactor;
         } else {
             paperHeight = height - 16;
-        }
-    }
-
-    if (isHandlePadding) {
-        if (_zoomFactor) {
-            paperWidth = paperWidth * _zoomFactor;
-            paperHeight = paperHeight * _zoomFactor;
-        }
-        const verticalPadding = paper.paddingTop + paper.paddingBottom;
-        const horizontalPadding = paper.paddingLeft + paper.paddingRight;
-        if (verticalPadding > horizontalPadding) {
-            paperWidth = paperWidth - (verticalPadding - horizontalPadding);
-        } else if (horizontalPadding > verticalPadding) {
-            paperHeight = paperHeight - (horizontalPadding - verticalPadding);
         }
     }
 
@@ -409,14 +402,8 @@ const zoomByNumber = function ({
         newValue = 0.5;
     }
 
-    let paperHeight = 0;
-    let paperWidth = 0;
-    spread.sheets.forEach((sheet) => {
-        const { sheetHeight, sheetWidth } = getSheetRect(sheet);
-        paperHeight = sheetHeight * newValue;
-        paperWidth = sheetWidth * newValue;
-    });
-
+    let paperHeight = paper.height * newValue;
+    let paperWidth = paper.width * newValue;
     const verticalPadding = paper.paddingTop + paper.paddingBottom;
     const horizontalPadding = paper.paddingLeft + paper.paddingRight;
     if (spread?.options?.tabStripVisible) {
@@ -447,11 +434,12 @@ const zoomByNumber = function ({
 
 export const zoom = function (params) {
     const { el, value } = params;
+    const { height, width, isRender } = getSpreadWrapRect(el);
     if (value === 'actualSize') {
-        zoomToRecover(params);
+        zoomToRecover({ ...params, width });
         return;
     }
-    const { height, width, isRender } = getSpreadWrapRect(el);
+
     if (!isRender) {
         return;
     }
