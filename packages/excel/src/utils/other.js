@@ -2,6 +2,8 @@ import { getNamespace } from './spreadUtil';
 
 const GC = getNamespace();
 const spreadNS = GC.Spread.Sheets;
+
+
 function flatGrouped(datas, groupFields = [], fields = [], sumColumns = []) {
     const results = [];
     //求和字段
@@ -121,9 +123,10 @@ function flatGrouped(datas, groupFields = [], fields = [], sumColumns = []) {
                     });
                     let code = groupFields[index + 1];
                     if (index + 1 === groupFields.length) {
-                        code = commonFields[0].code;
+                        code = commonFields[0]?.code;
                     }
-
+                   if(!code)
+                       return
                     virtualData[groupCode] = groupName;
                     virtualData[code] = '小计';
 
@@ -343,7 +346,7 @@ export function genSpans(datas, row = 0, col = 0) {
                     }
                 }
 
-                if (subtotalSpan) {
+                if (subtotalSpan && (subtotalSpan.rowCount > 1 || subtotalSpan.colCount > 1)) {
                     spans.push({
                         row: rowStart + rowCount - 1,
                         col: subtotalSpan.col + parentCol,
