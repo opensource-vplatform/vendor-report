@@ -246,6 +246,9 @@ export default {
             tableOptions: true, //表格选项。默认值true
             tableStyle: true, //表格样式。默认值true
         }, //表设计
+        toolbar: {
+            isShow: true,
+        },
     },
     dataSource: {
         dataSourceDefinition: datasourceDefines, //数据源定义
@@ -405,7 +408,7 @@ export default {
             ],
         }, //数据源数据
         allowToView: true, //是否允许查看数据源
-        allowToEdit: true, //是否允许编辑数据源
+        allowToEdit: false, //是否允许编辑数据源
     },
     sheets: {
         newTabVisible: true, //是否显示添加选项卡按钮

@@ -430,6 +430,7 @@ export default function (props) {
         isShowToolbar = true,
         toolbar,
         type = 'preview',
+        isShowBtnToolbar = true,
     } = props;
     if (license) {
         setLicense(license);
@@ -666,6 +667,27 @@ export default function (props) {
             });
         };
 
+        const previousPage = () => {
+            return new Promise((resolve) => {
+                const sheet = data.spread.getActiveSheet();
+                const sheetJson = sheet.toJSON();
+                const sheetPage = inst.sheetPages[sheetJson.name];
+                const newPageIndex = sheetPage.pageIndex - 1;
+                if (newPageIndex >= 0) {
+                    sheetPage.pageIndex = newPageIndex;
+                    const newSheet = sheetPage.datas[newPageIndex];
+                    newSheet.sheet = sheetJson;
+                    inst.resetSheet(newSheet);
+                    sheet.setRowCount(0);
+                    sheet.fromJSON(sheetJson);
+                }
+                resolve({
+                    value: newPageIndex + 1,
+                    done: newPageIndex + 1 <= 1 ? true : false,
+                });
+            });
+        };
+
         if (onPageCompleted) {
             onPageCompleted((params) => {
                 return new Promise((resolve, reject) => {
@@ -677,6 +699,7 @@ export default function (props) {
                         resolve({
                             changePageIndex,
                             nextPage,
+                            previousPage,
                             isPage: sheetPage?.isPage,
                             pageIndex: (sheetPage?.pageIndex || 0) + 1,
                             total: sheetPage?.datas?.length || 1,
@@ -780,17 +803,19 @@ export default function (props) {
                         el={paperWrapEl}
                         data={data}
                     ></Zoom>
-                    <ToolbarRight>
-                        <Page
-                            onInited={(datas) => {
-                                data.setPageInfos = datas.setPageInfos;
-                                if (data.spread && data.pageOpt) {
-                                    data.setPageInfos(data.pageOpt);
-                                }
-                            }}
-                        ></Page>
-                        {toolbar}
-                    </ToolbarRight>
+                    {isShowBtnToolbar && (
+                        <ToolbarRight>
+                            <Page
+                                onInited={(datas) => {
+                                    data.setPageInfos = datas.setPageInfos;
+                                    if (data.spread && data.pageOpt) {
+                                        data.setPageInfos(data.pageOpt);
+                                    }
+                                }}
+                            ></Page>
+                            {toolbar}
+                        </ToolbarRight>
+                    )}
                 </Toolbar>
             )}
             {data.showError ? (

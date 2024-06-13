@@ -17,6 +17,7 @@ import {
 } from '@toone/report-excel';
 import {
   getLicense,
+  getNavToolbarIsShow,
   getToolbar,
   isLocalLicenseUnCheck,
 } from '@utils/configUtil';
@@ -163,6 +164,13 @@ export default function () {
         </>
     );
 
+    if (context.onDesignerInited) {
+        context.onDesignerInited({
+            edit: handleEdit,
+            print: handlePrint,
+        });
+    }
+    const isShowToolbar = !getNavToolbarIsShow(context, 'isShow');
     return (
         <Wrap>
             <ExcelWrap>
@@ -194,8 +202,21 @@ export default function () {
                             });
                         }
                     }} */
+                    onPageCompleted={(handler) => {
+                        handler().then((datas) => {
+                            console.log(datas);
+                            if (context.onDesignerInited) {
+                                context.onDesignerInited({
+                                    nextPage: datas.nextPage,
+                                    specifyPage: datas.changePageIndex,
+                                    previousPage: datas.previousPage,
+                                });
+                            }
+                        });
+                    }}
                     setting={setting}
                     toolbar={_toolbar}
+                    isShowBtnToolbar={isShowToolbar}
                 >
                     <Worksheet></Worksheet>
                 </Workbook>

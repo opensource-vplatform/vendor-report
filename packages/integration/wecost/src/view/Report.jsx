@@ -5,7 +5,7 @@ import {
 } from 'react';
 
 import axios from 'axios';
-import styled from 'styled-components';
+import styled, { __PRIVATE__ } from 'styled-components';
 
 import {
   getReportConfigUrl,
@@ -52,6 +52,8 @@ const ExcelHost = styled.div`
     padding: 2px;
 `;
 
+let _report = null;
+
 const getError = function (result) {
     if (result && result.data) {
         const data = result.data;
@@ -67,11 +69,6 @@ const getError = function (result) {
 export default function () {
     const ref = useRef(null);
     const progressRef = useRef(null);
-
-    const page = useRef({
-        pageCompletedHandler: null,
-        setPageInfos: null,
-    });
 
     const [data, setData] = useState({
         loadMsg: '初始化中，请稍候...',
@@ -128,27 +125,39 @@ export default function () {
                         } catch (e) {}
                         const initReport = (excelJson, datas) => {
                             const report = new TOONE.Report.Preview({
-                                localLicenseUnCheck:true,
+                                localLicenseUnCheck: true,
                                 enablePrint: isPrint,
                                 dataSource: datas,
                                 json: excelJson,
-                                ready:function(workbook){
+                                ready: function (workbook) {
                                     const sheet = workbook.getActiveSheet();
-                                    if(sheet){
+                                    if (sheet) {
                                         sheet.clearSelection();
                                     }
                                 },
                                 onPageCompleted(handler) {
-                                    page.pageCompletedHandler = handler;
-                                    if (page.setPageInfos) {
-                                        page.pageCompletedHandler().then(
-                                            (datas) => {
-                                                page.setPageInfos(datas);
-                                            }
-                                        );
-                                    }
+                                    handler().then((datas) => {
+                                        //总页数
+                                        if (
+                                            typeof window?.java === 'function'
+                                        ) {
+                                            const requestData = {
+                                                id: TOONE.Report.Utils.md5(),
+                                                action: 'updatePagecount',
+                                                pagecount: datas.total,
+                                            };
+                                            window?.java({
+                                                request:
+                                                    JSON.stringify(requestData),
+                                                onSuccess() {},
+                                                onFailure() {},
+                                            });
+                                        }
+                                    });
                                 },
+                                isShowBtnToolbar: false,
                             });
+                            _report = report;
                             //报表挂载到指定dom元素
                             report.mount(ref.current);
                             data.report = report;
@@ -336,29 +345,40 @@ export default function () {
 }
 
 window.tooneReport = {
-
-    exportExcel : function(){
-
+    //导出Excel
+    exportExcel: function (filename) {
+        if (typeof _report?.exportExcel === 'function') {
+            _report.exportExcel(filename);
+        }
     },
-
-    exportPdf : function(){
-
+    //导出PDF
+    exportPdf: function (filename) {
+        if (typeof _report?.exportPdf === 'function') {
+            _report?.exportPdf(filename);
+        }
     },
-
-    print: function(){
-
+    //打印
+    print: function () {
+        if (typeof _report?.print === 'function') {
+            _report.print();
+        }
     },
-
-    nextPage: function(){
-
+    //下一页
+    nextPage: function () {
+        if (typeof _report?.nextPage === 'function') {
+            _report.nextPage();
+        }
     },
-
-    previousPage: function(){
-
+    //上一页
+    previousPage: function () {
+        if (typeof _report?.previousPage === 'function') {
+            _report.previousPage();
+        }
     },
-
-    specifyPage: function(index){
-
-    }
-    
-}
+    //跳转指定页码
+    specifyPage: function (index) {
+        if (typeof _report?.specifyPage === 'function') {
+            _report.specifyPage(index);
+        }
+    },
+};

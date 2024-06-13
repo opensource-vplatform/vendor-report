@@ -53,6 +53,7 @@ import Formula from './tabs/formula/Index';
 import { saveAsImg } from './utils/canvas2image';
 import {
   getNavConfig,
+  getNavToolbarIsShow,
   getToolbar,
 } from './utils/configUtil';
 import { handleEventPrmiseResult } from './utils/eventUtil';
@@ -269,6 +270,49 @@ export default function () {
     //是否可以预览
     const isPreview = !getNavConfig(context, 'preview');
     const toolbar = getToolbar(context);
+
+    const isShowToolbar = !getNavToolbarIsShow(context, 'isShow');
+
+    if (context.onDesignerInited) {
+        context.onDesignerInited({
+            preview: handlePreview,
+            save() {
+                if (spread) {
+                    const define = parseUsedDatasource(spread, finalDsList);
+                    const json = {
+                        reportJson: spread.toJSON(),
+                        context: {
+                            datasourceSlice: {
+                                ...datasourceSlice,
+                                previewViewDatas: {},
+                                dsList: null,
+                                spread: null,
+                                finalDsList:
+                                    context?.conf?.dataSource?.allowToEdit &&
+                                    context?.conf?.dataSource?.allowToView
+                                        ? finalDsList
+                                        : null,
+                            },
+                            tableDesignSlice: {
+                                ...tableDesignSlice,
+                                spread: null,
+                            },
+                            wizardSlice: { ...wizardSlice, spread: null },
+                        },
+                        usedDatasources: define.map(({ code }) => code),
+                        datasourceSetting: datasourceSlice.setting,
+                        selectedDatasources: finalDsList.map(
+                            ({ code }) => code
+                        ),
+                        preview: saveAsImg(spread),
+                    };
+                    return json;
+                }
+                return '';
+            },
+        });
+    }
+
     useEffect(() => {
         if (spread) {
             spread.refresh();
@@ -367,39 +411,43 @@ export default function () {
                                 }}
                             ></VerticalAlignBottom>
                         )}
-                        <Button
-                            style={{
-                                marginRight: 8,
-                            }}
-                            type='primary'
-                            onClick={handleSave}
-                        >
-                            保存
-                        </Button>
-                        {isPreview && (
-                            <Button
-                                style={{ marginRight: 8 }}
-                                onClick={handlePreview}
-                            >
-                                预览
-                            </Button>
-                        )}
-                        {toolbar.map(function (
-                            { title, type, onClick, desc },
-                            index
-                        ) {
-                            return (
+                        {isShowToolbar && (
+                            <>
                                 <Button
-                                    style={{ marginRight: 8 }}
-                                    onClick={onClick}
-                                    key={index}
-                                    type={type}
-                                    title={desc}
+                                    style={{
+                                        marginRight: 8,
+                                    }}
+                                    type='primary'
+                                    onClick={handleSave}
                                 >
-                                    {title}
+                                    保存
                                 </Button>
-                            );
-                        })}
+                                {isPreview && (
+                                    <Button
+                                        style={{ marginRight: 8 }}
+                                        onClick={handlePreview}
+                                    >
+                                        预览
+                                    </Button>
+                                )}
+                                {toolbar.map(function (
+                                    { title, type, onClick, desc },
+                                    index
+                                ) {
+                                    return (
+                                        <Button
+                                            style={{ marginRight: 8 }}
+                                            onClick={onClick}
+                                            key={index}
+                                            type={type}
+                                            title={desc}
+                                        >
+                                            {title}
+                                        </Button>
+                                    );
+                                })}
+                            </>
+                        )}
                     </Fragment>
                 }
             >
