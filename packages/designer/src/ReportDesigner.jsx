@@ -12,6 +12,12 @@ import { bind } from './event/EventManager';
 import { genUUID } from './utils/commonUtil';
 import { showConfirm } from './utils/messageUtil';
 
+let tooneReport = {
+    isPreview: false,
+    save: null,
+    preview: null,
+};
+
 class ReportDesigner {
     conf = {};
 
@@ -30,7 +36,12 @@ class ReportDesigner {
         createRoot(el).render(
             /*  <StrictMode> */
             <Provider store={store}>
-                <Designer conf={this.conf} />
+                <Designer
+                    conf={this.conf}
+                    onDesignerInited={function (options) {
+                        tooneReport = { ...tooneReport, ...options };
+                    }}
+                />
             </Provider>
             /*  </StrictMode> */
         );
@@ -39,14 +50,63 @@ class ReportDesigner {
     toImage(width, height) {
         saveAsImg(width, height);
     }
+    getDesignReport() {
+        if (typeof tooneReport.save === 'function') {
+            return tooneReport.save();
+        }
+        return '';
+    }
+    //预览
+    preview() {
+        if (typeof tooneReport.preview === 'function') {
+            tooneReport.preview();
+            tooneReport.isPreview = true;
+        }
+    }
+
+    //编辑
+    edit() {
+        if (typeof tooneReport.edit === 'function') {
+            tooneReport.edit();
+            tooneReport.isPreview = false;
+        }
+    }
+
+    //打印
+    print() {
+        if (typeof tooneReport.print === 'function') {
+            tooneReport.print();
+        }
+    }
+
+    //下一页
+    nextPage() {
+        if (typeof tooneReport.nextPage === 'function') {
+            tooneReport.nextPage();
+        }
+    }
+
+    //上一页
+    previousPage() {
+        if (typeof tooneReport.previousPage === 'function') {
+            tooneReport.previousPage();
+        }
+    }
+
+    //跳转指定页数
+    specifyPage(index) {
+        if (typeof tooneReport.specifyPage === 'function') {
+            tooneReport.specifyPage(index);
+        }
+    }
 }
 
 ReportDesigner.Utils = {
     md5: genUUID,
     RPC: axios,
-    msg:{
-        confirm:showConfirm,
-    }
+    msg: {
+        confirm: showConfirm,
+    },
 };
 
 export default ReportDesigner;

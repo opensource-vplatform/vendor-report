@@ -3,6 +3,7 @@ import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import resourceManager from 'resource-manager-js';
 
+import { genUUID } from './utils/commonUtil';
 import { download } from './utils/fileUtil';
 import {
   getNamespace,
@@ -53,8 +54,16 @@ class Report {
     mount(el) {
         const GC = getNamespace();
         GC.Spread.Common.CultureManager.culture('zh-cn');
-        const { onInited, ready, dataSource, dev, license,localLicenseUnCheck, ...others } =
-            this.conf || {};
+        const {
+            onInited,
+            ready,
+            dataSource,
+            dev,
+            license,
+            localLicenseUnCheck,
+            onPageCompleted,
+            ...others
+        } = this.conf || {};
         const readyHandler = (spread) => {
             const hasReady = ready || dev?.getParams()?.ready;
             if (hasReady) {
@@ -104,6 +113,9 @@ class Report {
                     handler().then((datas) => {
                         this.pageInfos = datas;
                     });
+                    if (typeof onPageCompleted === 'function') {
+                        onPageCompleted(handler);
+                    }
                 },
                 baseUrl: this.conf?.baseUrl,
                 onFetchData,
@@ -324,6 +336,24 @@ class Report {
     isPaged() {
         return this.pageInfos.isPage;
     }
+
+    //上一页
+    previousPage() {
+        if (typeof this.pageInfos.previousPage === 'function') {
+            this.pageInfos.previousPage();
+        }
+    }
+
+    //跳转指定页数
+    specifyPage(index) {
+        if (typeof this.pageInfos.changePageIndex === 'function') {
+            this.pageInfos.changePageIndex(index);
+        }
+    }
 }
+
+Report.Utils = {
+    md5: genUUID,
+};
 
 export default Report;

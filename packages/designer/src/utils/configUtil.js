@@ -34,10 +34,14 @@ export const getLicense = function (context) {
     return context?.conf?.license;
 };
 
-export const isLocalLicenseUnCheck = function(context){
+export const isLocalLicenseUnCheck = function (context) {
     return context?.conf?.localLicenseUnCheck;
-}
+};
 
 export const getToolbar = function (context) {
     return Array.isArray(context?.conf?.toolbar) ? context?.conf?.toolbar : [];
+};
+
+export const getNavToolbarIsShow = function (context, attr) {
+    return context?.conf?.nav?.toolbar?.[attr] === false;
 };

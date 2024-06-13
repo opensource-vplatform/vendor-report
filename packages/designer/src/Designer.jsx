@@ -60,7 +60,7 @@ const SpreadWrap = styled.div`
 `;
 
 function Designer(props) {
-    const { conf } = props;
+    const { conf, onDesignerInited } = props;
     if (conf && conf.baseUrl) {
         setBaseUrl(conf.baseUrl);
     }
@@ -103,6 +103,7 @@ function Designer(props) {
             }
         },
         conf,
+        onDesignerInited,
     };
     useEffect(
         function () {
