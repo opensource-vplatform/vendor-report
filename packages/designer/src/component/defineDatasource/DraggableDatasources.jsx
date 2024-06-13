@@ -287,7 +287,7 @@ export default function Index() {
     dsList,
     tableNameIndex: 0,
     caretOffset: 0,
-    currentClickBar: false,
+    currentClickBar: true,
   });
 
   const [treeOpenTrigger, setTreeOpenTrigger] = useState(Promise.resolve(true));
@@ -351,7 +351,6 @@ export default function Index() {
               preCaretRange.selectNodeContents(element);
               preCaretRange.setEnd(range.endContainer, range.endOffset);
               caretOffset = preCaretRange.toString().length;
-
             }
             // IE
           } else if ((sel = doc.selection) && sel.type != 'Control') {
@@ -570,18 +569,35 @@ export default function Index() {
           } else if (char == '(') {
             formula += txt;
           } else {
-            let startStrHasComma =  formula.slice(cacheDatasRef.current.caretOffset-2,cacheDatasRef.current.caretOffset-1)  == ',';
-            let endStrHasComma = formula.slice(cacheDatasRef.current.caretOffset-1,cacheDatasRef.current.caretOffset)  == ',';
-           
+            let startStrHasComma =
+              formula.slice(
+                cacheDatasRef.current.caretOffset - 2,
+                cacheDatasRef.current.caretOffset - 1
+              ) == ',';
+            let endStrHasComma =
+              formula.slice(
+                cacheDatasRef.current.caretOffset - 1,
+                cacheDatasRef.current.caretOffset
+              ) == ',';
+
             //补全","
-            if(!startStrHasComma && formula.slice(cacheDatasRef.current.caretOffset-2,cacheDatasRef.current.caretOffset-1) !== '(') {
-              txt = ','+txt;
+            if (
+              !startStrHasComma &&
+              formula.slice(
+                cacheDatasRef.current.caretOffset - 2,
+                cacheDatasRef.current.caretOffset - 1
+              ) !== '('
+            ) {
+              txt = ',' + txt;
             }
-            if(!endStrHasComma && cacheDatasRef.current.caretOffset-1 !== formula.length) {
+            if (
+              !endStrHasComma &&
+              cacheDatasRef.current.caretOffset - 1 !== formula.length
+            ) {
               txt = txt + ',';
             }
             formula =
-              formula.slice(0, cacheDatasRef.current.caretOffset - 1 ) +
+              formula.slice(0, cacheDatasRef.current.caretOffset - 1) +
               txt +
               formula.slice(cacheDatasRef.current.caretOffset - 1);
           }
