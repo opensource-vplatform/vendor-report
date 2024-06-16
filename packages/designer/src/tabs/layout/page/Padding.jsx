@@ -14,7 +14,7 @@ import {
 import {
   isFunction,
   isString,
-} from '@utils/objectUtil';
+} from '@toone/report-util';
 import {
   getMargin,
   setPrintInfo,

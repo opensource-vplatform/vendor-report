@@ -5,8 +5,8 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { Select } from '@components/form/Index';
 import { setRuleType } from '@store/conditionStyleSlice';
+import { Select } from '@toone/report-ui';
 
 import { setEditorConfig } from '../../../../store/conditionStyleSlice';
 import {

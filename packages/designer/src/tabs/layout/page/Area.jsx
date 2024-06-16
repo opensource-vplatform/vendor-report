@@ -7,7 +7,7 @@ import { VIconTitleWithDropdown } from '@components/nav/Index';
 import EmptyIcon from '@icons/base/Empty';
 import AreaIcon from '@icons/layout/page/print/Area';
 import SetIcon from '@icons/layout/page/print/Set';
-import { isFunction } from '@utils/objectUtil';
+import { isFunction } from '@toone/report-util';
 import {
   clearPrintArea,
   setPrintArea,

@@ -6,12 +6,7 @@ import {
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { Search } from '@components/form/Index';
 import { DatasourceSelect } from '@components/select/Index';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
 import { Tree } from '@components/tree/Index';
 import {
   getCatalogs,
@@ -19,6 +14,12 @@ import {
   getFormulasByCatalog,
 } from '@metadatas/formula';
 import { insert } from '@store/formulaEditorSlice/formulaEditorSlice';
+import {
+  Search,
+  Tab,
+  Tabs,
+} from '@toone/report-ui';
+import { isArray } from '@toone/report-util';
 
 const Wrap = styled.div`
     height: 100%;
@@ -84,7 +85,7 @@ export default function () {
                 value.toLowerCase().includes(_searchKey) ||
                 label.toLowerCase().includes(_searchKey) ||
                 desc.toLowerCase().includes(_searchKey);
-            if (!result && Array.isArray(children) && children.length > 0) {
+            if (!result && isArray(children) && children.length > 0) {
                 item.children = [];
                 item.children = children.filter(function ({
                     value = '',

@@ -9,9 +9,6 @@ import {
 } from 'react-redux';
 
 import { Commands } from '@commands/index';
-import { Select } from '@components/form/Index';
-import { ItemList } from '@components/group/Index';
-import LineSepatator from '@components/lineSeparator/lineSeparator';
 import { VCard } from '@components/nav/Index';
 import {
   bind,
@@ -33,7 +30,12 @@ import ScientificFormatIcon from '@icons/number/ScientificFormat';
 import ShortDateFormatIcon from '@icons/number/ShortDateFormat';
 import TextFormatIcon from '@icons/number/TextFormat';
 import TimeFormatIcon from '@icons/number/TimeFormat';
-import { genUUID } from '@utils/commonUtil';
+import {
+  Divider,
+  ItemList,
+  Select,
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 import { exeCommand } from '@utils/spreadUtil';
 import { genCellSettingVisibleHandler } from '@utils/styleUtil';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
@@ -126,7 +128,7 @@ export default function () {
     const dispatch = useDispatch();
     const { spread } = useSelector(({ appSlice }) => appSlice);
     useEffect(() => {
-        const id = genUUID();
+        const id = uuid();
         const unBindHandler = bind({
             id,
             event: EVENTS.EnterCell,
@@ -187,7 +189,7 @@ export default function () {
                     tips='千分分隔样式'
                     onClick={handleCommaStyle}
                 ></CommaIcon>
-                <LineSepatator></LineSepatator>
+                <Divider></Divider>
                 <IncreaseDecimalIcon
                     tips='增加小数位数'
                     onClick={handleIncreaseDecimal}

@@ -1,24 +1,45 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import { bind, EVENTS } from '@event/EventManager';
-import { genUUID } from '@utils/commonUtil';
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { Commands } from '@commands/index';
 import Hyperlink from '@components/hyperlink';
+import {
+  bind,
+  EVENTS,
+} from '@event/EventManager';
 import DatasourceIcon from '@icons/data/datasource';
 import {
-    setDatasourceSelectorVisible,
-    setIsShowDatasource,
-    toggleBooleanValue,
-    updateActiveSheetTablePath,
+  setDatasourceSelectorVisible,
+  setIsShowDatasource,
+  toggleBooleanValue,
+  updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import {
-    findTreeNodeById,
-    getActiveSheetTablesPath,
+  isArray,
+  uuid,
+} from '@toone/report-util';
+import {
+  findTreeNodeById,
+  getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
-import { getDataSourceConfig, getNavConfig } from '@utils/configUtil';
-import { exeCommand, getNamespace } from '@utils/spreadUtil';
+import {
+  getDataSourceConfig,
+  getNavConfig,
+} from '@utils/configUtil';
+import {
+  exeCommand,
+  getNamespace,
+} from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
@@ -26,25 +47,24 @@ import DesignerContext from '../../DesignerContext.jsx';
 import DownIcon from '../../icons/arrow/Down';
 import RightIcon from '../../icons/arrow/Right';
 import AddIcon from '../../icons/shape/Add.jsx';
+import { isFormula } from '../../utils/formulaUtil.js';
 import Datasources from './Datasources.jsx';
 import DatasourceSelector from './DatasourceSelector.jsx';
 import DialogDatasourcesEdit from './DialogDatasourcesEdit.jsx';
 import {
-    DraggableDatasourcesBox,
-    DraggableDatasourcesContent,
-    DraggableDatasourcesFooter,
-    DraggableDatasourcesHeander,
+  DraggableDatasourcesBox,
+  DraggableDatasourcesContent,
+  DraggableDatasourcesFooter,
+  DraggableDatasourcesHeander,
 } from './ui.jsx';
 import {
-    bindingPath,
-    bindingTablePathHandler,
-    getCellInfo,
-    getPath,
-    highlightBlock,
-    removeHighlightOneBlock,
+  bindingPath,
+  bindingTablePathHandler,
+  getCellInfo,
+  getPath,
+  highlightBlock,
+  removeHighlightOneBlock,
 } from './utils/utils.js';
-
-import { isFormula } from '../../utils/formulaUtil.js';
 
 //删除表格
 function removeTable(params) {
@@ -99,7 +119,7 @@ function clearContents(params) {
         'gc.spread.contextMenu.clearContents',
         function ({ command: { ranges: selections } }) {
             const activeSheet = spread.getActiveSheet();
-            Array.isArray(selections) &&
+            isArray(selections) &&
                 selections.forEach(function ({ col, row, colCount, rowCount }) {
                     const endRow = row + rowCount;
                     const endCol = col + colCount;
@@ -346,7 +366,7 @@ export default function Index() {
     );
 
     useEffect(() => {
-        const id = genUUID();
+        const id = uuid();
         const unBindHandler = bind({
             id,
             event: EVENTS.EditEnding,
@@ -400,7 +420,7 @@ export default function Index() {
         return unBindHandler;
     }, []);
     useEffect(() => {
-        const id = genUUID();
+        const id = uuid();
         const unBindHandler = bind({
             id,
             event: EVENTS.CellDoubleClick,
@@ -411,7 +431,7 @@ export default function Index() {
         return unBindHandler;
     }, []);
     useEffect(() => {
-      const id = genUUID();
+      const id = uuid();
       const unBindHandler = bind({
           id,
           event: EVENTS.EditStarting,
@@ -573,7 +593,7 @@ export default function Index() {
                     let parent = null;
                     if (parentId) {
                         parent = findTreeNodeById(parentId, dsList);
-                        const children = Array.isArray(parent.children)
+                        const children = isArray(parent.children)
                             ? parent.children
                             : [];
                         current = children.find(function (item) {

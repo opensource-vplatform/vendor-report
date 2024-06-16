@@ -5,12 +5,12 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { Divider } from '@components/divider/Index';
 import { Range } from '@components/range/Index';
 import {
   setEditorConfig,
   setShowEditor,
 } from '@store/conditionStyleSlice';
+import { Divider } from '@toone/report-ui';
 
 import {
   Border,

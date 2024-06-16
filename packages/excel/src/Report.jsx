@@ -3,7 +3,8 @@ import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import resourceManager from 'resource-manager-js';
 
-import { genUUID } from './utils/commonUtil';
+import { uuid } from '@toone/report-util';
+
 import { download } from './utils/fileUtil';
 import {
   getNamespace,
@@ -447,7 +448,7 @@ class Report {
 }
 
 Report.Utils = {
-    md5: genUUID,
+    md5: uuid,
 };
 
 export default Report;

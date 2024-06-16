@@ -1,7 +1,5 @@
 import { useSelector } from 'react-redux';
 
-import { VItem } from '@components/group/Index';
-import Menu from '@components/menu/Index';
 import {
   HCard,
   VIconTitle,
@@ -12,6 +10,10 @@ import FirstRowIcon from '@icons/frozen/FirstRow';
 import LastColumnIcon from '@icons/frozen/LastColumn';
 import LastRowIcon from '@icons/frozen/LastRow';
 import FrozenWindowIcon from '@icons/frozen/Window';
+import {
+  Menu,
+  VItem,
+} from '@toone/report-ui';
 
 import {
   frozen,

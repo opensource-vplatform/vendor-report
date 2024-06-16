@@ -16,7 +16,7 @@ import {
   setSelectionType,
   setVisible,
 } from '@store/rangeSlice';
-import { genUUID } from '@utils/commonUtil';
+import { uuid } from '@toone/report-util';
 
 import InputBox from './InputBox';
 
@@ -48,14 +48,14 @@ export default function (props) {
         dispatcher(setAbsoluteReference(absoluteReference));
         dispatcher(setRangeSelectMode(rangeSelectMode));
         dispatcher(setSelectionType(selectionType));
-        const closeId = 'close_'+genUUID();
+        const closeId = 'close_'+uuid();
         window[closeId] = ()=>{
             delete window[closeId];
             dispatcher(setVisible(false));
             onEndSelect&&onEndSelect();
         }
         dispatcher(setOnCloseHandlerId(closeId));
-        const changeId = 'change_'+genUUID();
+        const changeId = 'change_'+uuid();
         window[changeId] = (val)=>{
             delete window[changeId];
             dispatcher(setVisible(false));

@@ -1,20 +1,35 @@
 import { Fragment } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import { Divider } from '@components/divider/Index';
-import { Select } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import {
-    setEditorConfig,
-    setRuleType,
-    setShowEditor,
+  setEditorConfig,
+  setRuleType,
+  setShowEditor,
 } from '@store/conditionStyleSlice';
+import {
+  Divider,
+  Select,
+} from '@toone/report-ui';
 import { getNamespace } from '@utils/spreadUtil';
 
-import { Border, HLayout, Item, Text, Title, VLayout } from '../../Components';
+import {
+  Border,
+  HLayout,
+  Item,
+  Text,
+  Title,
+  VLayout,
+} from '../../Components';
 import { itemStyle } from '../../Utils';
-import { CellPreview, FormatButton } from '../Components';
+import {
+  CellPreview,
+  FormatButton,
+} from '../Components';
 
 const Type_Options = [
     { value: 'cellValueRule', text: '单元格值' },

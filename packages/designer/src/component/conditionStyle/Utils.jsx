@@ -85,7 +85,7 @@ import TopBottomRulesBelowAverageIcon
   from '@icons/style/TopBottomRulesBelowAverage';
 import TopBottomRulesBottom10Icon from '@icons/style/TopBottomRulesBottom10';
 import TopBottomRulesTop10Icon from '@icons/style/TopBottomRulesTop10';
-import { isFunction } from '@utils/objectUtil';
+import { isFunction } from '@toone/report-util';
 
 export const itemStyle = {
     alignItems: 'center',

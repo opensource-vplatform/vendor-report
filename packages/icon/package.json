@@ -1,0 +1,20 @@
+{
+    "name": "@toone/report-icon",
+    "version": "1.0.0",
+    "description": "报表Icon",
+    "main": "src/index.jsx",
+    "scripts": {
+        "dev": "vite --host -c=vite.config.dev.js",
+        "postBuild": "node scripts/postBuild.js",
+        "build": "vite build -c=vite.config.build.js && npm run postBuild"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "styled-components": "^6.1.1"
+    },
+    "devDependencies": {
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

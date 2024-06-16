@@ -9,17 +9,17 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { Button } from '@components/form/Index';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
 import {
   setActive,
   setInfo,
 } from '@store/layoutSlice/layoutSlice';
-import { genUUID } from '@utils/commonUtil';
+import {
+  Button,
+  OperationDialog,
+  Tab,
+  Tabs,
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 import {
   parsePrintInfo,
   setPrintInfo,
@@ -63,7 +63,7 @@ export default function (props) {
         }
     };
     const [id] = useState(() => {
-        return genUUID();
+        return uuid();
     });
     useEffect(() => {
         const sheet = spread?.getActiveSheet();

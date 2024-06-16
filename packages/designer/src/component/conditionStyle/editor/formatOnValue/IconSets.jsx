@@ -8,14 +8,14 @@ import {
   useSelector,
 } from 'react-redux';
 
+import { Range } from '@components/range/Index';
+import { setEditorConfig } from '@store/conditionStyleSlice';
 import {
   CheckBox,
   Select,
-} from '@components/form/Index';
-import { Range } from '@components/range/Index';
-import { setEditorConfig } from '@store/conditionStyleSlice';
+} from '@toone/report-ui';
+import { isFunction } from '@toone/report-util';
 import { getAllIcons } from '@utils/conditionRuleUtil';
-import { isFunction } from '@utils/objectUtil';
 
 import { setShowEditor } from '../../../../store/conditionStyleSlice';
 import {

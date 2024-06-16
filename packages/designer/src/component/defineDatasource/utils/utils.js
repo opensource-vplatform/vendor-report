@@ -7,9 +7,9 @@ import {
   showTab,
 } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
+import { uuid } from '@toone/report-util';
 import {
   findTreeNodeById,
-  genUUID,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
 import { getNamespace } from '@utils/spreadUtil';
@@ -65,7 +65,7 @@ export function addTable(params) {
         sheet.addRows(row, rowCount - 1);
     }
 
-    const tableName = `tableName_${genUUID()}`;
+    const tableName = `tableName_${uuid()}`;
     const table = sheet.tables.add(tableName, row, col, 3, tableColumnsCount);
     table.style(undefined);
     table.allowAutoExpand(false);

@@ -4,12 +4,13 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { setConfirmMsg } from '../../store/appSlice/appSlice';
+import { setConfirmMsg } from '@store/appSlice/appSlice';
+import { OperationDialog } from '@toone/report-ui';
+
 import {
   handleCancel,
   handleConfirm,
 } from '../../utils/callbackUtil';
-import { OperationDialog } from '../dialog/Index';
 
 const Text = styled.div`
     margin: 16px;

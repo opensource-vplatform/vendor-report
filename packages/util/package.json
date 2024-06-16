@@ -1,0 +1,18 @@
+{
+    "name": "@toone/report-util",
+    "version": "1.0.0",
+    "description": "报表UTIL",
+    "main": "src/index.js",
+    "scripts": {
+        "dev": "vite --host -c=vite.config.dev.js",
+        "postBuild": "node scripts/postBuild.js",
+        "build": "vite build -c=vite.config.build.js && npm run postBuild"
+    },
+    "dependencies": {
+    },
+    "devDependencies": {
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

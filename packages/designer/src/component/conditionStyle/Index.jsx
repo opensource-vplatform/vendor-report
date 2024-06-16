@@ -31,7 +31,7 @@ import { ConditionRule } from '@toone/report-excel';
 import {
   isArray,
   isFunction,
-} from '@utils/objectUtil';
+} from '@toone/report-util';
 import { exeCommand } from '@utils/spreadUtil';
 
 import { Commands } from '../../command';

@@ -6,18 +6,18 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  CheckBox,
-  ColorPicker,
-  Select,
-} from '@components/form/Index';
-import { List } from '@components/list/Index';
 import { Preview } from '@components/preview/Index';
 import {
   getFontFamilies,
   getFontSizes,
 } from '@metadatas/font';
 import { setFontSetting } from '@store/cellSettingSlice';
+import {
+  CheckBox,
+  ColorPicker,
+  List,
+  Select,
+} from '@toone/report-ui';
 
 import {
   isLineThrough,

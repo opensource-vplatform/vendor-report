@@ -1,10 +1,12 @@
-import { genUUID } from './commonUtil';
-import { isFunction } from './objectUtil';
+import {
+  isFunction,
+  uuid,
+} from '@toone/report-util';
 
 const HANDLER_CONTIANER = {};
 
 export const addCallback = function(onConfirm,onCancel,autoDestroy=true){
-    const callbackId = genUUID();
+    const callbackId = uuid();
     const callback = {onConfirm,onCancel,autoDestroy};
     HANDLER_CONTIANER[callbackId] = callback;
     return callbackId;

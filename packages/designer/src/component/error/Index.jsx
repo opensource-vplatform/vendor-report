@@ -3,10 +3,12 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import ErrorIcon from '@icons/common/Error';
+import {
+  Button,
+  Dialog,
+} from '@toone/report-ui';
 import { copyToClipboard } from '@utils/commonUtil';
 
-import Button from '../button/Index';
-import Dialog from '../dialog/Index';
 import ErrorMessage from './ErrorMessage';
 
 const Wrap = styled.div`

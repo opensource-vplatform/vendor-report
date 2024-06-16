@@ -11,17 +11,17 @@ import {
   setSingleCell,
   setVisible,
 } from '@store/cellSettingSlice';
+import {
+  diff,
+  isNullOrUndef,
+  isObject,
+} from '@toone/report-util';
 
 import {
   addCallback,
   handleCancel,
   handleConfirm,
 } from './callbackUtil';
-import {
-  diff,
-  isNullOrUndef,
-  isObject,
-} from './objectUtil';
 import { getNamespace } from './spreadUtil';
 
 export const show = function (dispatch, options) {

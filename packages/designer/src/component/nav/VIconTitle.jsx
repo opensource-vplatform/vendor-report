@@ -1,4 +1,4 @@
-import { VItem } from '@components/group/Index';
+import { VItem } from '@toone/report-ui';
 
 /**
  * 图标

@@ -7,8 +7,11 @@ import {
 import resourceManager from 'resource-manager-js';
 import styled from 'styled-components';
 
-import Select from './component/form/Select';
-import Page from './component/page/Index';
+import {
+  Page,
+  Select,
+} from '@toone/report-ui';
+
 import {
   EVENTS,
   fire,

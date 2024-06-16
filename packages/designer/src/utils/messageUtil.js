@@ -2,10 +2,10 @@ import {
   setErrorMsg,
   setWaitMsg,
 } from '@store/appSlice/appSlice';
+import { isString } from '@toone/report-util';
 
 import { setConfirmMsg } from '../store/appSlice/appSlice';
 import { addCallback } from './callbackUtil';
-import { isString } from './objectUtil';
 
 let _dispatch = null;
 

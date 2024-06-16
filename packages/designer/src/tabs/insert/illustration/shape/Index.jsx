@@ -1,9 +1,11 @@
 import { useSelector } from 'react-redux';
 
-import { VItem } from '@components/group/Index';
-import Popper from '@components/popper/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
 import ShapeIcon from '@icons/illustration/Shape';
+import {
+  Popper,
+  VItem,
+} from '@toone/report-ui';
 import { insertShape } from '@utils/shapeUtil';
 
 import { ContentWrap } from '../../Component';

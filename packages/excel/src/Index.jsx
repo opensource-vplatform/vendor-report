@@ -1,7 +1,11 @@
+import {
+  ThemeContext,
+  ThemeContextProvider,
+} from '@toone/report-ui';
+
 import { ConditionRule } from './conditionRule/Index';
 import { init } from './Init';
 import Report from './Report';
-import ThemeContext, { ThemeContextProvider } from './ThemeContext';
 import {
   genAutoMergeRangeInfos,
   genSpans,

@@ -22,6 +22,7 @@ import {
   clear,
   clearGroups,
 } from '@store/wizardSlice';
+import { isArray } from '@toone/report-util';
 import { getNamespace } from '@utils/spreadUtil';
 
 import {
@@ -130,7 +131,7 @@ function genDatas(datas, activeSheetTablePath) {
             const { type, children, name, code } = item;
             if (
                 type === 'table' &&
-                Array.isArray(children) &&
+                isArray(children) &&
                 children.length > 0 &&
                 !activeSheetTablePath[code]
             ) {

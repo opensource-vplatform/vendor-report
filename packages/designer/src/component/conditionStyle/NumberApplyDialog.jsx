@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
 import { ConditionRule } from '@toone/report-excel';
+import { OperationDialog } from '@toone/report-ui';
 
 import { setNumberApplyConfig } from '../../store/conditionStyleSlice';
 import {

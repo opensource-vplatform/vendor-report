@@ -8,12 +8,6 @@ import {
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-//页脚
-import OperationDialog from '@components/dialog/OperationDialog';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
 import PageCountIcon from '@icons/layout/page/custom/Count';
 import DateIcon from '@icons/layout/page/custom/Date';
 import ImageIcon from '@icons/layout/page/custom/Image';
@@ -21,6 +15,12 @@ import PageIndexIcon from '@icons/layout/page/custom/Index';
 import SheetIcon from '@icons/layout/page/custom/Sheet';
 import TableIcon from '@icons/layout/page/custom/Table';
 import TimeIcon from '@icons/layout/page/custom/Time';
+//页脚
+import {
+  OperationDialog,
+  Tab,
+  Tabs,
+} from '@toone/report-ui';
 
 import {
   HLayout,

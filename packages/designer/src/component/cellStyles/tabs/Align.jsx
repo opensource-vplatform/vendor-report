@@ -6,12 +6,12 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
+import { setAlignSetting } from '@store/cellSettingSlice';
 import {
   CheckBox,
   Integer,
   Select,
-} from '@components/form/Index';
-import { setAlignSetting } from '@store/cellSettingSlice';
+} from '@toone/report-ui';
 
 import {
   TextAlignmentHorizontal,

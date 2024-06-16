@@ -22,16 +22,19 @@ import {
 import styled from 'styled-components';
 
 import {
-  CheckBox,
-  Select,
-} from '@components/form/Index';
-import {
   remove,
   save,
   sort,
   sortGroups,
 } from '@store/wizardSlice';
-import { getNext } from '@utils/zIndexUtil';
+import {
+  CheckBox,
+  Select,
+} from '@toone/report-ui';
+import {
+  getNext,
+  isArray,
+} from '@toone/report-util';
 
 const Wrap = styled.div`
     width: 320px;
@@ -281,7 +284,7 @@ const Groups = SortableContainer(function (props) {
         }),
     }));
 
-    const datas = Array.isArray(wizardSlice[groupType])
+    const datas = isArray(wizardSlice[groupType])
         ? wizardSlice[groupType]
         : [];
 

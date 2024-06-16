@@ -10,18 +10,21 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Button from '@components/button/Index';
-import Dialog from '@components/dialog/Index';
-import {
-  CheckBox,
-  Select,
-} from '@components/form/Index';
 import { toggleBooleanValue } from '@store/navSlice/navSlice';
 import {
   addTemplate,
   toggleBooleanValue as _toggleBooleanValue,
 } from '@store/wizardSlice';
-import { genUUID } from '@utils/commonUtil';
+import {
+  Button,
+  CheckBox,
+  Dialog,
+  Select,
+} from '@toone/report-ui';
+import {
+  isArray,
+  uuid,
+} from '@toone/report-util';
 import { getNamespace } from '@utils/spreadUtil';
 import { setSheetTag } from '@utils/worksheetUtil';
 
@@ -258,7 +261,7 @@ export default function Template(props) {
             const item = finalDsList.find(function (item) {
                 return item?.code === key0;
             });
-            res = Array.isArray(item?.children) ? item?.children : [];
+            res = isArray(item?.children) ? item?.children : [];
         }
         return res;
     });
@@ -308,7 +311,7 @@ export default function Template(props) {
                                 const item = finalDsList.find(function (item) {
                                     return item?.code === dsName;
                                 });
-                                res = Array.isArray(item?.children)
+                                res = isArray(item?.children)
                                     ? item?.children
                                     : [];
                             }
@@ -415,7 +418,7 @@ export default function Template(props) {
                                     setSheetTag(
                                         activeSheet,
                                         'instanceId',
-                                        genUUID()
+                                        uuid()
                                     );
                                 } else {
                                     activeSheet.setRowCount(20);

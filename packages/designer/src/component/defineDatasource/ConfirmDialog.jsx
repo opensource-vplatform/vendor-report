@@ -1,4 +1,4 @@
-import Dialog from '@components/dialog/Index.jsx';
+import { Dialog } from '@toone/report-ui';
 
 import { ConfirmDialogBox } from './ui';
 

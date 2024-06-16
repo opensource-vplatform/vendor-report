@@ -10,12 +10,15 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { Highlight } from '@components/highlight/Index';
 import {
   deleteDsList,
   pushDsList,
 } from '@store/datasourceSlice/datasourceSlice';
-import { genUUID } from '@utils/commonUtil.js';
+import { Highlight } from '@toone/report-ui';
+import {
+  isArray,
+  uuid,
+} from '@toone/report-util';
 import { getDataSourceConfig } from '@utils/configUtil';
 
 import DesignerContext from '../../DesignerContext.jsx';
@@ -94,7 +97,7 @@ function TreeItem(props) {
     const isTable = type === 'table';
 
     let childrenCount =
-        isTable && Array.isArray(children) ? children.length : 0;
+        isTable && isArray(children) ? children.length : 0;
 
     const listItemTextClass = `${
         id === activeId ? 'active' : ''
@@ -230,7 +233,7 @@ export default function Index(props) {
     if (searchKey) {
         _datas = datas.filter(function ({ name = '', children }) {
             let result = name.includes(searchKey);
-            if (!result && Array.isArray(children) && children.length > 0) {
+            if (!result && isArray(children) && children.length > 0) {
                 result = children.some(({ name = '' }) =>
                     name.includes(searchKey)
                 );
@@ -244,7 +247,7 @@ export default function Index(props) {
         isAllowToEdit = false;
     }
 
-    if (!Array.isArray(datas)) {
+    if (!isArray(datas)) {
         return '';
     }
     const listClickHandler = function (e) {
@@ -256,7 +259,7 @@ export default function Index(props) {
     };
     const addSubDatasourceClickHandler = function (e) {
         e.stopPropagation();
-        const id = genUUID();
+        const id = uuid();
         const target = e.target.closest('.listItem');
         const parentId = target.dataset.itemId;
         const newData = {
@@ -296,7 +299,7 @@ export default function Index(props) {
                     draggableClass = 'draggable';
                     if (
                         type === 'table' &&
-                        (!Array.isArray(children) ||
+                        (!isArray(children) ||
                             children.length === 0 ||
                             activeSheetTablePath[code])
                     ) {

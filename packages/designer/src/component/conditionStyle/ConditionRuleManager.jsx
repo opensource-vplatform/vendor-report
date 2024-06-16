@@ -10,18 +10,18 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
-import {
-  Button,
-  CheckBox,
-} from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import {
   setRuleManagerConfig,
   setRuleManagerVisible,
 } from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
-import { genUUID } from '@utils/commonUtil';
+import {
+  Button,
+  CheckBox,
+  OperationDialog,
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 import {
   getRuleTitle,
   RuleFormat,
@@ -205,7 +205,7 @@ export default function (props) {
     );
     const dispatch = useDispatch();
     const [data] = useState(() => {
-        return { domId: genUUID(), id2Rule: {} };
+        return { domId: uuid(), id2Rule: {} };
     });
     const handleAdd = () => {
         showAddConditionRule(dispatch, {
@@ -219,7 +219,7 @@ export default function (props) {
                         rules: [
                             ...rules,
                             {
-                                id: genUUID(),
+                                id: uuid(),
                                 config: {
                                     ...config,
                                     ranges: rangesToJson(selections),
@@ -313,7 +313,7 @@ export default function (props) {
             const conditionRules = sheet.conditionalFormats.getRules();
             const rules = [];
             conditionRules.forEach((rule) => {
-                const id = genUUID();
+                const id = uuid();
                 rules.push({ id, config: toJson(rule) });
             });
             dispatch(

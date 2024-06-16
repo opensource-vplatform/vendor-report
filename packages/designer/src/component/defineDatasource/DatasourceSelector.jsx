@@ -9,12 +9,6 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
-import {
-  CheckBox,
-  Search,
-} from '@components/form/Index';
-import { Highlight } from '@components/highlight/Index';
 import {
   EVENTS,
   fire,
@@ -27,6 +21,12 @@ import {
   setDatasourceSelectorVisible,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setDatasources } from '@store/datasourceSlice/datasourceSlice.js';
+import {
+  CheckBox,
+  Highlight,
+  OperationDialog,
+  Search,
+} from '@toone/report-ui';
 import { handleEventPrmiseResult } from '@utils/eventUtil';
 
 const Wrap = styled.div`

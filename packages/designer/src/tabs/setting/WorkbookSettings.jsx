@@ -6,10 +6,6 @@ import {
 } from 'react-redux';
 
 import {
-  ItemList,
-  VGroupItem,
-} from '@components/group/Index';
-import {
   HCard,
   VIconTitle,
 } from '@components/nav/Index';
@@ -21,6 +17,10 @@ import {
   setActive,
   setOpened,
 } from '@store/settingSlice/workbookSettingSlice';
+import {
+  ItemList,
+  VGroupItem,
+} from '@toone/report-ui';
 
 import { Label } from './Components';
 import WorkbookSettingDialog from './workbookSetting/Index';

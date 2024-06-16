@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-import { OperationDialog } from '@components/dialog/Index';
 import {
-  Group,
+  Legend,
+  OperationDialog,
   Radio,
   RadioGroup,
-} from '@components/form/Index';
+} from '@toone/report-ui';
 
 import { Wrapper } from '../Components';
 
@@ -27,7 +27,7 @@ export default function (props) {
             onConfirm= {handleConfirm}
             onCancel={handleCancel}
         >
-            <Group title='插入单元格' style={{ marginTop: 10 }} titleStyle={{backgroundColor:'transparent'}}>
+            <Legend title='插入单元格' style={{ marginTop: 10 }} titleStyle={{backgroundColor:'transparent'}}>
                 <Wrapper>
                     <RadioGroup
                         value={data}
@@ -41,7 +41,7 @@ export default function (props) {
                         <Radio label='整列' value='col'></Radio>
                     </RadioGroup>
                 </Wrapper>
-            </Group>
+            </Legend>
         </OperationDialog>
     );
 }

@@ -6,7 +6,7 @@ import {
 import {
   CheckBox,
   ColorPicker,
-} from '@components/form/Index';
+} from '@toone/report-ui';
 
 import {
   setGridlineColor,

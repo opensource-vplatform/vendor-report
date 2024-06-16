@@ -6,9 +6,9 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { GroupItem } from '@components/group/Index';
 import TableStyle from '@icons/table/Style';
 import { setStyleName } from '@store/tableDesignSlice/tableDesignSlice';
+import { GroupItem } from '@toone/report-ui';
 import { setTableStyleName } from '@utils/tableUtil';
 
 import { WithIconPopper } from '../../../utils/componentUtils';

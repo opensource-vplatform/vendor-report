@@ -1,7 +1,8 @@
 import {
   isFunction,
   isObject,
-} from '../utils/objectUtils';
+} from '@toone/report-util';
+
 import { getNamespace } from '../utils/spreadUtil';
 
 const STYLES = {

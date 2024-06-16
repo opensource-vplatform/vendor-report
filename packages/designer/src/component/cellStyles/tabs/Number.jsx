@@ -6,13 +6,13 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
+import { setNumberSetting } from '@store/cellSettingSlice';
 import {
   CheckBox,
   Integer,
+  List,
   Select,
-} from '@components/form/Index';
-import { List } from '@components/list/Index';
-import { setNumberSetting } from '@store/cellSettingSlice';
+} from '@toone/report-ui';
 
 import Example from '../components/Example';
 import {

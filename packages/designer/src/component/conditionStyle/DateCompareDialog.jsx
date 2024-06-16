@@ -3,10 +3,12 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { Select } from '@components/form/Index';
 import { setDateCompareConfig } from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
+import {
+  OperationDialog,
+  Select,
+} from '@toone/report-ui';
 
 import {
   HLayout,

@@ -4,11 +4,6 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import {
-  HLayout,
-  ItemList,
-  VGroupItem,
-} from '@components/group/Index';
-import {
   HCard,
   VIconTitle,
 } from '@components/nav/Index';
@@ -17,6 +12,11 @@ import DescIcon from '@icons/data/Desc';
 import FilterIcon from '@icons/data/filter';
 import FilterOffIcon from '@icons/data/filterOff';
 import SortIcon from '@icons/data/Sort';
+import {
+  HLayout,
+  ItemList,
+  VGroupItem,
+} from '@toone/report-ui';
 import { rgbStrToHex } from '@utils/colorUtil';
 import {
   clearRowFilter,

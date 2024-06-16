@@ -5,9 +5,11 @@ import {
 
 import styled from 'styled-components';
 
-import { Divider } from '@components/divider/Index';
-import { Select } from '@components/form/Index';
-import { isFunction } from '@utils/objectUtil';
+import {
+  Divider,
+  Select,
+} from '@toone/report-ui';
+import { isFunction } from '@toone/report-util';
 import {
   getActiveIndexBySheet,
   getCellTagPlugin,

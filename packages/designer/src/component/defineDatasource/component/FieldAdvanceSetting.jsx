@@ -5,9 +5,11 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { CheckBox } from '@components/form/Index';
 import { setSetting } from '@store/datasourceSlice/datasourceSlice';
+import {
+  CheckBox,
+  OperationDialog,
+} from '@toone/report-ui';
 
 import {
   Item,

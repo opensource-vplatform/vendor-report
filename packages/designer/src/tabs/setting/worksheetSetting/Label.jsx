@@ -3,7 +3,7 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { ColorPicker } from '@components/form/Index';
+import { ColorPicker } from '@toone/report-ui';
 
 import {
   setSheetTabColor,

@@ -5,12 +5,12 @@ import {
 
 import {
   CheckBox,
-  Group,
+  Integer,
+  Legend,
   Radio,
   RadioGroup,
-} from '@components/form/Index';
+} from '@toone/report-ui';
 
-import Integer from '../../../component/form/Integer';
 import {
   setColHeaderAutoText,
   setColHeaderAutoTextIndex,
@@ -52,7 +52,7 @@ export default function () {
     return (
         <Wrapper>
             <VGroupItem>
-                <Group title='列标题'>
+                <Legend title='列标题'>
                     <ItemList>
                         <WithTitleItem style={wrapStyle}>
                             <Title>列标题行数</Title>
@@ -116,8 +116,8 @@ export default function () {
                             }}
                         ></CheckBox>
                     </ItemList>
-                </Group>
-                <Group title='行标题' style={{ marginTop: 16 }}>
+                </Legend>
+                <Legend title='行标题' style={{ marginTop: 16 }}>
                     <ItemList>
                         <WithTitleItem style={wrapStyle}>
                             <Title>行标题行数</Title>
@@ -181,7 +181,7 @@ export default function () {
                             }}
                         ></CheckBox>
                     </ItemList>
-                </Group>
+                </Legend>
             </VGroupItem>
         </Wrapper>
     );

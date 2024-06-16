@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 
 import styled from 'styled-components';
 
-import { Highlight } from '@components/highlight/Index';
+import { Highlight } from '@toone/report-ui';
 
 const Wrap = styled.div`
     margin-left: 8px;

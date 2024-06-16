@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 
 import styled from 'styled-components';
 
-import { Highlight } from '@components/highlight/Index';
+import { Highlight } from '@toone/report-ui';
 
 import DownIcon from '../../icons/arrow/Down';
 import RightIcon from '../../icons/arrow/Right';

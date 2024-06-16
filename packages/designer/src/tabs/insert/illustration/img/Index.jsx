@@ -1,5 +1,5 @@
-import { VItem } from '@components/group/Index';
 import ImgIcon from '@icons/illustration/Img';
+import { VItem } from '@toone/report-ui';
 
 export default function () {
     const style = {

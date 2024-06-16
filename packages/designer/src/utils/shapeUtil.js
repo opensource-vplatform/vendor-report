@@ -1,10 +1,11 @@
 import resourceManager from 'resource-manager-js';
 
-import { toExcelPluginUrl } from './environmentUtil';
 import {
   isNullOrUndef,
   isUndefined,
-} from './objectUtil';
+} from '@toone/report-util';
+
+import { toExcelPluginUrl } from './environmentUtil';
 import {
   getNamespace,
   withBatchUpdate,

@@ -9,10 +9,6 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { Select } from '@components/form/Index';
-import Textarea from '@components/form/Textarea';
-import TextInput from '@components/form/TextInput';
-import LineSepatator from '@components/lineSeparator/lineSeparator';
 import {
   pushDsList,
   setIsShowDatasource,
@@ -21,7 +17,13 @@ import {
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import {
-  genUUID,
+  Divider,
+  Select,
+  TextArea,
+  TextInput,
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
+import {
   getActiveSheetTablesPath,
   hasSameNode,
 } from '@utils/commonUtil.js';
@@ -95,7 +97,7 @@ export default function Index(props) {
 
     //添加
     const addDatasourceClickHandler = function () {
-        const id = genUUID();
+        const id = uuid();
         const newData = {
             ...rawData,
             id,
@@ -227,10 +229,10 @@ export default function Index(props) {
                 ''
             )}
             <h2>数据集</h2>
-            <LineSepatator
+            <Divider
                 type='horizontal'
                 style={{ margin: 0 }}
-            ></LineSepatator>
+            ></Divider>
             <DatasourceOptBox>
                 <DatasourceOptBoxLeft>
                     {isAllowToEdit && (
@@ -314,13 +316,13 @@ export default function Index(props) {
                     </div>
                     <div>描述</div>
                     <div>
-                        <Textarea
+                        <TextArea
                             onChange={dataChangeHandler}
                             value={activeDs.desc}
                             itemType='desc'
                             maxLength={200}
                             disabled={disabled}
-                        ></Textarea>
+                        ></TextArea>
                     </div>
                     <AdvanceSetting datasource={activeDs}></AdvanceSetting>
                     {activeDs.type === 'table_该方案暂时放弃' && (

@@ -3,14 +3,14 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
+import { setEditorConfig } from '@store/conditionStyleSlice';
 import {
   ColorPicker,
-  Group,
+  Legend,
+  OperationDialog,
   Radio,
   RadioGroup,
-} from '@components/form/Index';
-import { setEditorConfig } from '@store/conditionStyleSlice';
+} from '@toone/report-ui';
 
 import {
   HLayout,
@@ -35,7 +35,7 @@ export default function (props) {
             onConfirm={onConfirm}
         >
             <Wrap style={{ gap: 12 }}>
-                <Group title='负值条形图填充颜色'>
+                <Legend title='负值条形图填充颜色'>
                     <RadioGroup
                         value={editorConfig.useNegativeFillColor}
                         onChange={(val) =>
@@ -66,8 +66,8 @@ export default function (props) {
                             label='应用与正值条形图相同的填充颜色'
                         ></Radio>
                     </RadioGroup>
-                </Group>
-                <Group
+                </Legend>
+                <Legend
                     title='负值条形图边框颜色'
                     disabled={!editorConfig.showBorder}
                 >
@@ -103,8 +103,8 @@ export default function (props) {
                             label='应用与正值条形图相同的边框颜色'
                         ></Radio>
                     </RadioGroup>
-                </Group>
-                <Group title='坐标轴设置'>
+                </Legend>
+                <Legend title='坐标轴设置'>
                     <Text style={{ marginBottom: 8, marginLeft: 8 }}>
                         选择单元格的坐标轴位置可更改负值条形图的外观
                     </Text>
@@ -150,7 +150,7 @@ export default function (props) {
                             }
                         ></ColorPicker>
                     </HLayout>
-                </Group>
+                </Legend>
             </Wrap>
         </OperationDialog>
     );

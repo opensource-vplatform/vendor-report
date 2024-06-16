@@ -1,4 +1,4 @@
-import { GroupItem } from '@components/group/Index';
+import { GroupItem } from '@toone/report-ui';
 
 export default function (props) {
     const { title, children,onMore } = props;

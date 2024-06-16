@@ -1,5 +1,5 @@
+import { isArray } from '@toone/report-util';
 import { error } from '@utils/consoleUtil';
-import { isArray } from '@utils/objectUtil';
 
 /**
  * 本文件中提供全局事件注册

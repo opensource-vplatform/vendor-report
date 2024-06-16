@@ -1,10 +1,19 @@
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
-import { HLayout, ItemList, VGroupItem } from '@components/group/Index';
-import LineSepatator from '@components/lineSeparator/lineSeparator';
-import Menu from '@components/menu/Index';
 import { VCard } from '@components/nav/Index';
+import {
+  bind,
+  EVENTS,
+} from '@event/EventManager';
 import AlignCenter from '@icons/align/AlignCenter';
 import AlignLeft from '@icons/align/AlignLeft';
 import AlignRight from '@icons/align/AlignRight';
@@ -18,23 +27,28 @@ import DecreaseIndent from '@icons/indent/DecreaseIndent.jsx';
 import IncreaseIndent from '@icons/indent/IncreaseIndent.jsx';
 import MergeCenter from '@icons/merge/MergeCenter';
 import {
-    directionToStyles,
-    getWordDirections,
-    valueToEnum,
+  directionToStyles,
+  getWordDirections,
+  valueToEnum,
 } from '@metadatas/direction';
 import { getMergeTypes } from '@metadatas/merge';
+import {
+  Divider,
+  HLayout,
+  ItemList,
+  Menu,
+  VGroupItem,
+} from '@toone/report-ui';
 import { fireCellEnter } from '@utils/eventUtil';
 import { exeCommand } from '@utils/spreadUtil';
 import {
-    exeStyleCommand,
-    genCellSettingVisibleHandler,
-    handleStyle,
+  exeStyleCommand,
+  genCellSettingVisibleHandler,
+  handleStyle,
 } from '@utils/styleUtil';
+import { isSpanInSelections } from '@utils/worksheetUtil';
 
 import { Commands } from '../../../command';
-import { useEffect, useState } from 'react';
-import { EVENTS, bind } from '@event/EventManager';
-import { isSpanInSelections } from '@utils/worksheetUtil';
 
 const Label = styled.span`
     font-size: 12px;
@@ -157,7 +171,7 @@ export default function FontAlign() {
                             active={vAlign === 2}
                             onClick={handleVBottomAlign}
                         ></VAlignBottom>
-                        <LineSepatator></LineSepatator>
+                        <Divider></Divider>
                         <Menu
                             datas={wordDirections}
                             value={valueToEnum(textOrientation, isVerticalText)}
@@ -187,7 +201,7 @@ export default function FontAlign() {
                             active={hAlign === 2}
                             onClick={handleHRightAlign}
                         ></AlignRight>
-                        <LineSepatator></LineSepatator>
+                        <Divider></Divider>
                         <DecreaseIndent
                             tips='减少缩进量'
                             onClick={handleDecreaseIndent}

@@ -1,7 +1,7 @@
 import {
   GroupItem,
   HLayout,
-} from '@components/group/Index';
+} from '@toone/report-ui';
 
 import Control from './control/Index';
 import Img from './img/Index';

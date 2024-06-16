@@ -5,13 +5,15 @@ import {
   useSelector,
 } from 'react-redux';
 
-import Button from '@components/button/Index';
-import { Dialog } from '@components/dialog/Index';
-import { Tabs } from '@components/tabs/Index';
 import {
   setActive,
   setOpened,
 } from '@store/settingSlice/workbookSettingSlice';
+import {
+  Button,
+  Dialog,
+  Tabs,
+} from '@toone/report-ui';
 
 import { init } from '../../../store/settingSlice/workbookSettingSlice';
 import { withBatchUpdate } from '../../../utils/spreadUtil';

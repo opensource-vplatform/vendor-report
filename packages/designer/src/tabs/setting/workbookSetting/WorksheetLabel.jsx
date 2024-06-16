@@ -6,11 +6,6 @@ import {
 } from 'react-redux';
 
 import {
-  CheckBox,
-  Integer,
-  Select,
-} from '@components/form/Index';
-import {
   setAllSheetsListVisible,
   setNewTabVisible,
   setTabEditable,
@@ -19,6 +14,11 @@ import {
   setTabStripVisible,
   setTabStripWidth,
 } from '@store/settingSlice/workbookSettingSlice';
+import {
+  CheckBox,
+  Integer,
+  Select,
+} from '@toone/report-ui';
 
 import {
   HLayout,

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Button from '@components/button/Index';
+import { Button } from '@toone/report-ui';
 import {
   IconMenu,
   WithIconMenu,

@@ -1,4 +1,5 @@
-import { isNullOrUndef } from '../../utils/objectUtils';
+import { isNullOrUndef } from '@toone/report-util';
+
 import { getNamespace } from '../../utils/spreadUtil';
 import Rule from './Rule';
 

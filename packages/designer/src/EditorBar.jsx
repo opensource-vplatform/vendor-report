@@ -8,17 +8,17 @@ import {
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
+import Formula from '@components/formula/Index';
 import FormulaIcon from '@icons/formula/Formula';
 import CheckIcon from '@icons/shape/Check';
 import CancelIcon from '@icons/shape/Close';
 import { ThemeContext } from '@toone/report-excel';
-import { getActiveIndexBySheet } from '@utils/worksheetUtil';
-
-import Formula from './component/formula/Index';
 import {
   Resizer,
   SplitPane,
-} from './component/splitpane/Index';
+} from '@toone/report-ui';
+import { getActiveIndexBySheet } from '@utils/worksheetUtil';
+
 import {
   bind,
   EVENTS,

@@ -1,9 +1,9 @@
 import { setPrintInfo as printInfoHandler } from '@toone/report-excel';
-
 import {
   deepClone,
   isNullOrUndef,
-} from './objectUtil';
+} from '@toone/report-util';
+
 import {
   getNamespace,
   isTableSheet,

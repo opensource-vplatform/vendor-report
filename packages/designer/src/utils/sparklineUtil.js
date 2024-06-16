@@ -4,6 +4,7 @@ import {
   setSetting,
   setVisible,
 } from '@store/sparklineSlice';
+import { isNullOrUndef } from '@toone/report-util';
 
 import { Commands } from '../command';
 import {
@@ -11,7 +12,6 @@ import {
   handleCancel as onCancel,
   handleConfirm as onConfirm,
 } from './callbackUtil';
-import { isNullOrUndef } from './objectUtil';
 import {
   applyToSelectedCell,
   exeCommand,

@@ -6,24 +6,23 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
-import {
-  Integer,
-  Select,
-} from '@components/form/Index';
 import { Range } from '@components/range/Index';
-import { genUUID } from '@utils/commonUtil';
-
 import {
   setConfig,
   setVisible,
-} from '../../store/sparklineSlice';
+} from '@store/sparklineSlice';
+import {
+  Integer,
+  OperationDialog,
+  Select,
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 import {
   handleCancel as onCancel,
   handleConfirm as onConfirm,
   isAlignDisabled,
   isRectDisabled,
-} from '../../utils/sparklineUtil';
+} from '@utils/sparklineUtil';
 
 const Wrapper = styled.div`
     background-color: white;
@@ -209,7 +208,7 @@ export default function (props) {
     );
     const dispatch = useDispatch();
     const [domId] = useState(() => {
-        return genUUID();
+        return uuid();
     });
     const rectDisabled = isRectDisabled(config);
     const alignDisabled = isAlignDisabled(config);

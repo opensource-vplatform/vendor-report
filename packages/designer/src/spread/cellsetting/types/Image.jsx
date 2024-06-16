@@ -6,8 +6,8 @@ import {
 import {
   Integer,
   Select,
-} from '@components/form/Index';
-import { isUndefined } from '@utils/objectUtil';
+} from '@toone/report-ui';
+import { isUndefined } from '@toone/report-util';
 import {
   applyToSelectedCell,
   withBatchUpdate,

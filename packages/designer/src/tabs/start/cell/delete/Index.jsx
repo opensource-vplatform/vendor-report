@@ -12,11 +12,11 @@ import DeleteCell from '@icons/cell/DeleteCell';
 import DeleteSheet from '@icons/cell/DeleteSheet';
 import DeleteSheetCol from '@icons/cell/DeleteSheetCol';
 import DeleteSheetRow from '@icons/cell/DeleteSheetRow';
+import { isFunction } from '@toone/report-util';
 import {
   deleteColumns,
   deleteRows,
 } from '@utils/cellUtil';
-import { isFunction } from '@utils/objectUtil';
 import { exeCommand } from '@utils/spreadUtil';
 
 import Dialog from './Dialog';

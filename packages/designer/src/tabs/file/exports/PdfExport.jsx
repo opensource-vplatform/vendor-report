@@ -7,7 +7,7 @@ import {
 import resourceManager from 'resource-manager-js';
 import styled from 'styled-components';
 
-import { Select } from '@components/form/Index';
+import { Select } from '@toone/report-ui';
 import { toExcelPluginUrl } from '@utils/environmentUtil';
 import { download } from '@utils/fileUtil';
 import {

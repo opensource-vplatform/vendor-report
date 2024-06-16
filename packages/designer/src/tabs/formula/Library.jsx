@@ -8,11 +8,6 @@ import styled from 'styled-components';
 
 import Formula from '@components/formula/Index';
 import {
-  HLayout,
-  VGroupItem,
-} from '@components/group/Index';
-import Menu from '@components/menu/Index';
-import {
   HCard,
   VIconTitle,
 } from '@components/nav/Index';
@@ -33,6 +28,11 @@ import StatisticalIcon from '@icons/formula/Statistical';
 import TextIcon from '@icons/formula/Text';
 import WebIcon from '@icons/formula/Web';
 import { getFormulaMetadata } from '@metadatas/formula';
+import {
+  HLayout,
+  Menu,
+  VGroupItem,
+} from '@toone/report-ui';
 import {
   getFormulaMetadatasByCatalog,
   getRecentFormulaMetadatas,

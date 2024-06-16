@@ -6,17 +6,17 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Button from '@components/button/Index';
-import ColorEditor from '@components/color/Index';
-import { Dialog } from '@components/dialog/Index';
-import CheckBox from '@components/form/CheckBox';
-import { Select } from '@components/form/Index';
-import TextInput from '@components/form/TextInput';
+import { toggleBooleanValue } from '@store/datasourceSlice/datasourceSlice';
 import {
+  Button,
+  CheckBox,
+  ColorEditor,
+  Dialog,
+  Select,
   Tab,
   Tabs,
-} from '@components/tabs/Index';
-import { toggleBooleanValue } from '@store/datasourceSlice/datasourceSlice';
+  TextInput,
+} from '@toone/report-ui';
 import {
   getActiveIndexBySheet,
   getCellTag,

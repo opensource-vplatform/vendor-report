@@ -1,10 +1,11 @@
+import { isObject } from '@toone/report-util';
+
 import {
   enhanceFormula,
   exePlugins,
   getTableCodesFromFormula,
 } from '../enhance/index';
 import Tool from '../enhance/Tool';
-import { isObject } from '../utils/objectUtils';
 import { getVarName } from '../utils/varUtil';
 import UnionDatasource from './UnionDatasource';
 

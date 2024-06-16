@@ -4,9 +4,9 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { Button } from '@components/form/Index';
 import { Preview } from '@components/preview/Index';
 import { setEditorConfig } from '@store/conditionStyleSlice';
+import { Button } from '@toone/report-ui';
 import {
   cellSettingToStyle,
   jsonStyleToCellSetting,

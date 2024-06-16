@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { Search } from '@components/form/Index';
+import { Search } from '@toone/report-ui';
+import { isArray } from '@toone/report-util';
 
 import Tree from './Tree.jsx';
 
@@ -39,7 +40,7 @@ export default function Index(props) {
     const datas = JSON.parse(JSON.stringify(dsList));
 
     datas.forEach(function (item) {
-        if (Array.isArray(item.children)) {
+        if (isArray(item.children)) {
             item.children.sort(function (cur, next) {
                 return cur.name.localeCompare(next.name, 'zh');
             });

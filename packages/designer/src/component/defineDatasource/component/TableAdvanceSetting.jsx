@@ -8,13 +8,13 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
-import {
-  CheckBox,
-  Select,
-} from '@components/form/Index';
 import Info from '@icons/shape/Info';
 import { setSetting } from '@store/datasourceSlice/datasourceSlice';
+import {
+  CheckBox,
+  OperationDialog,
+  Select,
+} from '@toone/report-ui';
 
 import {
   Item,

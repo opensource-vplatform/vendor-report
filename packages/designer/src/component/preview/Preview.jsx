@@ -5,15 +5,16 @@ import React, {
 
 import styled from 'styled-components';
 
+import {
+  isObject,
+  isString,
+} from '@toone/report-util';
 import { format as formatData } from '@utils/cellSettingUtil';
-import { isString } from '@utils/objectUtil';
 import {
   isDoubleUnderline,
   isLineThrough,
   isUnderline,
 } from '@utils/textDecorationUtil';
-
-import { isObject } from '../../../../excel/src/utils/objectUtils';
 
 const Wrap = styled.div`
     width: 180px;

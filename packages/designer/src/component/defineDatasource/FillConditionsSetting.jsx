@@ -5,15 +5,15 @@ import {
 
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
 import {
   Button,
   CheckBox,
   Integer,
+  OperationDialog,
   Select,
   TextInput,
-} from '@components/form/Index';
-import { genUUID } from '@utils/commonUtil';
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 
 const Buttons = styled.div`
     display: flex;
@@ -201,7 +201,7 @@ export default function (props) {
     const handleAddCondition = () => {
         const conditions = [...data.conditions];
         conditions.push({
-            id: genUUID(),
+            id: uuid(),
             field: '',
             operator: '=',
             value: '',
@@ -230,7 +230,7 @@ export default function (props) {
         const condition = conditions[data.current];
         if (condition) {
             const newCondition = { ...condition };
-            newCondition.id = genUUID();
+            newCondition.id = uuid();
             const newConditions = [...conditions, newCondition];
             setData({
                 ...data,

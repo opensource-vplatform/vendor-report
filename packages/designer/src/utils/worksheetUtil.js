@@ -1,6 +1,12 @@
-import { genUUID } from './commonUtil';
-import { isObject } from './objectUtil';
-import { getNamespace, withBatchUpdate } from './spreadUtil';
+import {
+  isObject,
+  uuid,
+} from '@toone/report-util';
+
+import {
+  getNamespace,
+  withBatchUpdate,
+} from './spreadUtil';
 
 export const getActiveIndexBySpread = function (spread) {
     const sheet = spread.getActiveSheet();
@@ -22,7 +28,7 @@ export function setSheetTag(sheetInstance, key, vlaue) {
     const _tagJson = _tag ? JSON.parse(_tag) : {};
     //生成表单的实例id
     if (!_tagJson.hasOwnProperty('instanceId')) {
-        _tagJson['instanceId'] = genUUID();
+        _tagJson['instanceId'] = uuid();
     }
 
     if (key) {
@@ -169,7 +175,7 @@ export function setCellTag(sheetInstance, row, col, key, value) {
     const _tagJson = _tag ? JSON.parse(_tag) : {};
     //生成表单的实例id
     if (!_tagJson.hasOwnProperty('instanceId')) {
-        _tagJson['instanceId'] = genUUID();
+        _tagJson['instanceId'] = uuid();
     }
 
     if (key) {

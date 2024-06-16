@@ -6,8 +6,11 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import CheckBox from '../../../../component/form/CheckBox';
-import { Float } from '../../../../component/form/Index';
+import {
+  CheckBox,
+  Float,
+} from '@toone/report-ui';
+
 import { setMargin } from '../../../../store/layoutSlice/layoutSlice';
 import {
   Divider,

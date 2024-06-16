@@ -5,14 +5,7 @@ import {
 
 import LandscapeIcon from '@icons/layout/page/direction/Landscape';
 import PortraitIcon from '@icons/layout/page/direction/Portrait';
-
-import {
-  Integer,
-  Radio,
-  RadioGroup,
-  Select,
-} from '../../../../component/form/Index';
-import { getAll } from '../../../../metadatas/paper';
+import { getAll } from '@metadatas/paper';
 import {
   setFirstPageNumber,
   setFitPagesTall,
@@ -22,7 +15,14 @@ import {
   setPrintQuality,
   setScaleType,
   setZoomFactor,
-} from '../../../../store/layoutSlice/layoutSlice';
+} from '@store/layoutSlice/layoutSlice';
+import {
+  Integer,
+  Radio,
+  RadioGroup,
+  Select,
+} from '@toone/report-ui';
+
 import {
   Divider,
   HItem,

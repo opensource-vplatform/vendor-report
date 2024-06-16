@@ -4,8 +4,10 @@ import {
   bind,
   EVENTS,
 } from '@event/EventManager';
-import { getOffsetFromBody } from '@utils/domUtil';
-import { isUndefined } from '@utils/objectUtil';
+import {
+  getOffsetFromBody,
+  isUndefined,
+} from '@toone/report-util';
 import {
   getNamespace,
   getSpecifiedRect,

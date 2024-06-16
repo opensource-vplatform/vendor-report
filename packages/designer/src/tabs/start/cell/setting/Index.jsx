@@ -11,7 +11,7 @@ import EmptyIcon from '@icons/base/Empty';
 import ColWidth from '@icons/cell/ColWidth';
 import RowHeight from '@icons/cell/RowHeight';
 import SettingIcon from '@icons/cell/Setting';
-import { isFunction } from '@utils/objectUtil';
+import { isFunction } from '@toone/report-util';
 import { exeCommand } from '@utils/spreadUtil';
 
 import Dialog from './Dialog';

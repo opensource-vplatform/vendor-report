@@ -6,7 +6,6 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { ColorPicker } from '@components/form/Index';
 import { Preview } from '@components/preview/Index';
 import BorderBottom from '@icons/border/BorderBottom';
 import BorderInside from '@icons/border/BorderInside';
@@ -20,6 +19,7 @@ import DiagonalUpLine from '@icons/border/DiagonalUpLine';
 import LineHorizontalInner from '@icons/border/LineHorizontalInner';
 import LineVerticalInner from '@icons/border/LineVerticalInner';
 import { setBorderSetting } from '@store/cellSettingSlice';
+import { ColorPicker } from '@toone/report-ui';
 
 import BorderStyle from '../components/BorderStyle';
 

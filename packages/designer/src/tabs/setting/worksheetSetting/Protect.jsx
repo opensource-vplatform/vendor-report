@@ -3,8 +3,8 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { CheckBox } from '@components/form/Index';
 import { setProtectOptions } from '@store/settingSlice/worksheetSettingSlice';
+import { CheckBox } from '@toone/report-ui';
 
 import {
   HLayout,

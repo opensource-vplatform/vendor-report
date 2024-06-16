@@ -6,19 +6,19 @@ import {
 } from 'react-redux';
 
 import {
-  CheckBox,
-  Float,
-  Integer,
-  Radio,
-  RadioGroup,
-} from '@components/form/Index';
-import {
   setCalcOnDemand,
   setIterativeCalculation,
   setIterativeCalculationMaximumChange,
   setIterativeCalculationMaximumIterations,
   setReferenceStyle,
 } from '@store/settingSlice/workbookSettingSlice';
+import {
+  CheckBox,
+  Float,
+  Integer,
+  Radio,
+  RadioGroup,
+} from '@toone/report-ui';
 
 import {
   HLayout,

@@ -1,5 +1,7 @@
-import { getOffsetFromBody } from './domUtil';
-import { isObject } from './objectUtil';
+import {
+  getOffsetFromBody,
+  isObject,
+} from '@toone/report-util';
 
 /**
  * 批量更新数据到spread

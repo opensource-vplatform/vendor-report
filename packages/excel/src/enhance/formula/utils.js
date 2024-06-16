@@ -1,6 +1,7 @@
-import { isNullOrUndef } from '../../utils/objectUtils';
-import { getNamespace } from '../../utils/spreadUtil';
+import { isNullOrUndef } from '@toone/report-util';
+
 import { formulaToAST as fatoAST } from '../../utils/formulaUtil';
+import { getNamespace } from '../../utils/spreadUtil';
 
 function _getType(type) {
     const GC = getNamespace();

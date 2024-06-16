@@ -7,10 +7,10 @@ import {
 
 import styled from 'styled-components';
 
-import { Dialog } from '@components/dialog/Index';
 import { DatasourceSelect } from '@components/select/Index';
 import DatasourceIcon from '@icons/data/datasource';
 import ToRangeIcon from '@icons/formula/ToRange';
+import { Dialog } from '@toone/report-ui';
 
 const Wrap = styled.div`
     display: flex;

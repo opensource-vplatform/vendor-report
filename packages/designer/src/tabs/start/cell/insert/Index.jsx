@@ -12,11 +12,11 @@ import InsertRowIcon from '@icons/cell/InsertRow';
 import InsertSheet from '@icons/cell/InsertSheet';
 import InsertSheetCol from '@icons/cell/InsertSheetCol';
 import InsertSheetRow from '@icons/cell/InsertSheetRow';
+import { isFunction } from '@toone/report-util';
 import {
   insertColumns,
   insertRows,
 } from '@utils/cellUtil';
-import { isFunction } from '@utils/objectUtil';
 import { exeCommand } from '@utils/spreadUtil';
 
 import Dialog from './Dialog';

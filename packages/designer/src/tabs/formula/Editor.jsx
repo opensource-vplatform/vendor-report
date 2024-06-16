@@ -6,11 +6,13 @@ import {
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { Dialog } from '@components/dialog/Index';
-import { ItemList } from '@components/group/Index';
 import { VCard } from '@components/nav/Index';
 import EditorIcon from '@icons/formula/Editor';
 import ShowIcon from '@icons/formula/Show';
+import {
+  Dialog,
+  ItemList,
+} from '@toone/report-ui';
 import { setShowFormulas } from '@utils/worksheetUtil';
 
 import Editor from './editor/Index';

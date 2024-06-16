@@ -1,4 +1,5 @@
-import { isNullOrUndef } from './objectUtils';
+import { isNullOrUndef } from '@toone/report-util';
+
 import { getNamespace } from './spreadUtil';
 
 export const setPrintInfo = function (sheet, printInfo) {

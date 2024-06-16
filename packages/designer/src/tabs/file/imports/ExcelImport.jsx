@@ -9,7 +9,7 @@ import {
 } from 'react-redux';
 import resourceManager from 'resource-manager-js';
 
-import { CheckBox } from '@components/form/Index';
+import { CheckBox } from '@toone/report-ui';
 import { error } from '@utils/consoleUtil';
 import { toExcelPluginUrl } from '@utils/environmentUtil';
 import {

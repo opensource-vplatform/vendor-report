@@ -4,11 +4,6 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  CheckBox,
-  Radio,
-  RadioGroup,
-} from '@components/form';
 import { Range } from '@components/range/Index';
 import {
   setArea,
@@ -19,6 +14,11 @@ import {
   setShowGridLine,
   setShowHeader,
 } from '@store/layoutSlice/layoutSlice';
+import {
+  CheckBox,
+  Radio,
+  RadioGroup,
+} from '@toone/report-ui';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { rangeToFormula } from '@utils/printUtil';
 import { getNamespace } from '@utils/spreadUtil';

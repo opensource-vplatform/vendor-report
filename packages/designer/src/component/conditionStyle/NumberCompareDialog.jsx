@@ -3,9 +3,11 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { Integer } from '@components/form/Index';
 import { ConditionRule } from '@toone/report-excel';
+import {
+  Integer,
+  OperationDialog,
+} from '@toone/report-ui';
 
 import { setNumberCompareConfig } from '../../store/conditionStyleSlice';
 import {

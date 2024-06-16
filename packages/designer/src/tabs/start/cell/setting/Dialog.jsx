@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { Integer } from '@components/form/Index';
+import {
+  Integer,
+  OperationDialog,
+} from '@toone/report-ui';
 
 import {
   HLayout,

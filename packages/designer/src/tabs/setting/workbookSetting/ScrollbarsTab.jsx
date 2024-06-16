@@ -5,7 +5,6 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { CheckBox } from '@components/form/Index';
 import {
   setScrollbarAppearance,
   setScrollbarMaxAlign,
@@ -13,6 +12,7 @@ import {
   setShowHorizontalScrollbar,
   setShowVerticalScrollbar,
 } from '@store/settingSlice/workbookSettingSlice';
+import { CheckBox } from '@toone/report-ui';
 
 import {
   HLayout,

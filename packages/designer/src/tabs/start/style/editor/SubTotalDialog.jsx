@@ -3,12 +3,16 @@ import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { Select } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import InfoIcon from '@icons/shape/Info';
-import { genUUID } from '@utils/commonUtil';
-import { isString } from '@utils/objectUtil';
+import {
+  OperationDialog,
+  Select,
+} from '@toone/report-ui';
+import {
+  isString,
+  uuid,
+} from '@toone/report-util';
 import { getNamespace } from '@utils/spreadUtil';
 import { getCellTag } from '@utils/worksheetUtil';
 
@@ -76,7 +80,7 @@ export default function (props) {
         return {
             functionNum,
             range,
-            domId: genUUID(),
+            domId: uuid(),
             visible: true,
             error: false,
             message: Default_Info

@@ -8,15 +8,15 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
 import { Range as RangSelector } from '@components/range/Index';
 import { ConditionRule } from '@toone/report-excel';
+import { OperationDialog } from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 
 import {
   setTextCompareConfig,
   setTextCompareVisible,
 } from '../../store/conditionStyleSlice';
-import { genUUID } from '../../utils/commonUtil';
 import {
   HLayout,
   StyleSelect,
@@ -32,7 +32,7 @@ export default function (props) {
         ({ conditionStyleSlice }) => conditionStyleSlice
     );
     const [data] = useState({
-        id: genUUID(),
+        id: uuid(),
     });
     const handleConfirm = (...args) => {
         const rule = new ConditionRule({

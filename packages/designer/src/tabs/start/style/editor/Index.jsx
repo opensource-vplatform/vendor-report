@@ -15,7 +15,7 @@ import CalculationIcon from '@icons/formula/Calculation';
 import ImageIcon from '@icons/shape/Image';
 import CellEditorsIcon from '@icons/style/cellEditors';
 import ClearCellTypeIcon from '@icons/style/ClearCellType';
-import { isFunction } from '@utils/objectUtil';
+import { isFunction } from '@toone/report-util';
 import { showEditorDialog } from '@utils/sparklineUtil';
 import { exeCommand } from '@utils/spreadUtil';
 import {

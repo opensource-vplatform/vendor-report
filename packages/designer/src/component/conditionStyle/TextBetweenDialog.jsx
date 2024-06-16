@@ -5,14 +5,14 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
 import { Range as RangSelector } from '@components/range/Index';
 import {
   setTextBetweenConfig,
   setTextBetweenVisible,
 } from '@store/conditionStyleSlice';
 import { ConditionRule } from '@toone/report-excel';
-import { genUUID } from '@utils/commonUtil';
+import { OperationDialog } from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 
 import {
   HLayout,
@@ -29,7 +29,7 @@ export default function (props) {
     );
     const dispatcher = useDispatch();
     const [data] = useState({
-        id: genUUID(),
+        id: uuid(),
     });
     const handleConfirm = () => {
         const rule = new ConditionRule({

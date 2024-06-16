@@ -5,11 +5,6 @@ import {
 import styled from 'styled-components';
 
 import { Commands } from '@commands/index';
-import ColorEditor from '@components/color/Index';
-import { Select } from '@components/form/Index';
-import { ItemList } from '@components/group/Index';
-import LineSepatator from '@components/lineSeparator/lineSeparator';
-import Menu from '@components/menu/Menu.jsx';
 import { VCard } from '@components/nav/Index';
 import ArrowDown from '@icons/arrow/ArrowDown';
 import BorderBottom from '@icons/border/BorderBottom';
@@ -26,6 +21,13 @@ import {
   getFontFamilies,
   getFontSizes,
 } from '@metadatas/font';
+import {
+  ColorEditor,
+  Divider,
+  ItemList,
+  Menu,
+  Select,
+} from '@toone/report-ui';
 import {
   isDoubleUnderline,
   isUnderline,
@@ -192,7 +194,7 @@ export default function () {
                     active={isDoubleUnderline(textDecoration)}
                     onClick={handleDoubleUnderline}
                 ></DoubleUnderline>
-                <LineSepatator></LineSepatator>
+                <Divider></Divider>
                 <BorderBottom
                     tips='边框'
                     onClick={() => {
@@ -202,7 +204,7 @@ export default function () {
                 <Menu datas={borders} onNodeClick={handleBorder}>
                     <ArrowDown tips='边框'></ArrowDown>
                 </Menu>
-                <LineSepatator></LineSepatator>
+                <Divider></Divider>
                 <ColorEditor onChange={handleBackColor} value={backColor}>
                     <BackColor tips='填充颜色'></BackColor>
                 </ColorEditor>

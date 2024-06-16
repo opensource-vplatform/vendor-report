@@ -1,6 +1,8 @@
-import { VItem } from '@components/group/Index';
-import Menu from '@components/menu/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
+import {
+  Menu,
+  VItem,
+} from '@toone/report-ui';
 
 /**
  * 图标

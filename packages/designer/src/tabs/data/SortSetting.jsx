@@ -7,13 +7,13 @@ import {
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
 import {
   Button,
+  Menu,
+  OperationDialog,
   Select,
-} from '@components/form/Index';
-import Menu from '@components/menu/Index';
-import { genUUID } from '@utils/commonUtil';
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
 
 const Buttons = styled.div`
     display: flex;
@@ -216,7 +216,7 @@ export default function (props) {
     const handleAddCondition = () => {
         const conditions = [...data.conditions];
         conditions.push({
-            id: genUUID(),
+            id: uuid(),
             index: data.sortType == 'sortByCol' ? data.col : data.row,
             sortBy: 'value',
             sort: 'asc',
@@ -243,7 +243,7 @@ export default function (props) {
         const condition = conditions[data.current];
         if (condition) {
             const newCondition = { ...condition };
-            newCondition.id = genUUID();
+            newCondition.id = uuid();
             const newConditions = [...conditions, newCondition];
             setData({
                 ...data,
@@ -325,7 +325,7 @@ export default function (props) {
             ...newData,
             conditions: [
                 {
-                    id: genUUID(),
+                    id: uuid(),
                     index: newData.sortType == 'sortByCol' ? newData.col : newData.row,
                     sortBy: 'value',
                     sort: 'asc',

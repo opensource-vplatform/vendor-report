@@ -1,16 +1,17 @@
 import { useDispatch } from 'react-redux';
 
-import Button from '@components/button/Index';
-import Color from '@components/color/Index';
-import { Group } from '@components/group/Index';
-import Integer from '@components/integer/Index';
-import Tab from '@components/tabs/Tab';
-import Tabs from '@components/tabs/Tabs';
 import BackColor from '@icons/font/BackColor';
 import {
   hideTab,
   showTab,
 } from '@store/navSlice/navSlice';
+import ColorEditor, {
+  Button,
+  Group,
+  Integer,
+  Tab,
+  Tabs,
+} from '@toone/report-ui';
 
 export default function(){
     const dispatch = useDispatch();
@@ -31,6 +32,6 @@ export default function(){
         <Tab code="tab1" title="页签1">页签1</Tab>
         <Tab code="tab2" title="页签2">页签2</Tab>
     </Tabs>
-    <Color><BackColor></BackColor></Color>
+    <ColorEditor><BackColor></BackColor></ColorEditor>
 </Group>
 }

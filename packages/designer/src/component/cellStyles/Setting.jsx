@@ -6,8 +6,6 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { Tabs } from '@components/tabs/Index';
 import {
   setActive,
   setAlignSetting,
@@ -16,6 +14,10 @@ import {
   setSingleCell,
   setVisible,
 } from '@store/cellSettingSlice';
+import {
+  OperationDialog,
+  Tabs,
+} from '@toone/report-ui';
 import {
   getSetting,
   onCancel,

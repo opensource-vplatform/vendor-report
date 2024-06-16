@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { Card } from '@components/card/Index';
+import { Card } from '@toone/report-ui';
 
 export const WithColorIcon = function (Icon) {
     return function (props) {

@@ -1,19 +1,32 @@
 import { useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { List } from '@components/list/Index';
-import { genUUID } from '@utils/commonUtil';
-import { isFunction } from '@utils/objectUtil';
+import { reset } from '@store/cellSettingSlice';
+import {
+  setEditorConfig,
+  setEditorType,
+  setRuleType,
+  setShowEditor,
+} from '@store/conditionStyleSlice';
+import {
+  List,
+  OperationDialog,
+} from '@toone/report-ui';
+import { uuid } from '@toone/report-util';
+import {
+  getDefaultScaleRuleEditConfig,
+  handleAddCancel,
+  handleAddConfirm,
+} from '@utils/conditionRuleUtil';
 
 import {
-    setEditorConfig,
-    setEditorType,
-    setRuleType,
-    setShowEditor,
-} from '@store/conditionStyleSlice';
-import { Title, Wrap } from '../Components';
+  Title,
+  Wrap,
+} from '../Components';
 import { getFormatTypes } from '../metadata';
 import FormatAbove from './formatAbove/Index';
 import FormatContain from './formatContain/Index';
@@ -22,9 +35,6 @@ import FormatRankedValue from './formatRankedValue/Index';
 import FormatUnique from './formatUnique/Index';
 import UseFormula from './useFormula/Index';
 import UseRowColumnStates from './useRowColumnStates/Index';
-import { getDefaultScaleRuleEditConfig } from '@utils/conditionRuleUtil';
-import { reset } from '@store/cellSettingSlice';
-import { handleAddCancel, handleAddConfirm } from '@utils/conditionRuleUtil';
 
 export default function (props) {
     const { onConfirm, onCancel } = props;
@@ -35,7 +45,7 @@ export default function (props) {
     const formatTypes = getFormatTypes();
     const [data] = useState(() => {
         return {
-            id: genUUID(),
+            id: uuid(),
         };
     });
     const clearCellSetting = () => {

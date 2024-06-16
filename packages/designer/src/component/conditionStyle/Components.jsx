@@ -6,13 +6,13 @@ import {
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
-import { Select } from '@components/form/Index';
+import { Select } from '@toone/report-ui';
+import { isObject } from '@toone/report-util';
 import {
   cellSettingToStyle,
   jsonStyleToCellSetting,
   show,
 } from '@utils/cellSettingUtil';
-import { isObject } from '@utils/objectUtil';
 
 import { getStyleDatas } from './metadata';
 

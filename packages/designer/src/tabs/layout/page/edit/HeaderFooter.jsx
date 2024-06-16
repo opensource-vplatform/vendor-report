@@ -9,8 +9,9 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Select from '../../../../component/form/Select';
-import { setHeaderAndFooter } from '../../../../store/layoutSlice/layoutSlice';
+import { setHeaderAndFooter } from '@store/layoutSlice/layoutSlice';
+import { Select } from '@toone/report-ui';
+
 import {
   HItem,
   HLayout,

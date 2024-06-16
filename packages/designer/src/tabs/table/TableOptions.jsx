@@ -5,13 +5,13 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { CheckBox } from '@components/form/Index';
 import {
+  CheckBox,
   GroupItem,
   HLayout,
+  ItemList,
   VGroupItem,
-} from '@components/group/Index';
-import ItemList from '@components/group/ItemList';
+} from '@toone/report-ui';
 import { setTableStyles } from '@utils/tableUtil';
 
 import {

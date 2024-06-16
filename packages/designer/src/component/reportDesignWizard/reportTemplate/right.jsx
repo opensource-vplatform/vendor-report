@@ -16,6 +16,7 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
+import { isArray } from '@toone/report-util';
 import { getLicense } from '@utils/configUtil';
 import CrossDatas from '@utils/crossDatas';
 import { getNamespace } from '@utils/spreadUtil';
@@ -75,7 +76,7 @@ function preview(params) {
         //如果sheet的行数小于当前表格所绑定的数据长度，需要增加sheet的行数
         const datas = datasource.getValue(value);
 
-        if (Array.isArray(datas)) {
+        if (isArray(datas)) {
             const sheetRowCount = sheet.getRowCount();
             rowCount = datas.length;
             sheetRowCount < rowCount && sheet.setRowCount(rowCount + 5);
@@ -150,7 +151,7 @@ function preview(params) {
 
     let spans = [];
     let dataTableStyle = {};
-    if (Array.isArray(spansTree)) {
+    if (isArray(spansTree)) {
         const res = genSpans(
             spansTree,
             reportType === 'crossStatement' ? 0 : 1,
@@ -251,7 +252,7 @@ export default function Index(props) {
         if (
             (groups.length > 0 || sumColumns.length > 0) &&
             reportType !== 'crossStatement' &&
-            Array.isArray(dataSource[value])
+            isArray(dataSource[value])
         ) {
             const { datas, spansTree } = sortData(
                 dataSource[value],

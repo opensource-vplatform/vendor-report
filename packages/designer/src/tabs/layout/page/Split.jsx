@@ -5,7 +5,7 @@ import {
 
 import { VIconTitleWithDropdown } from '@components/nav/Index';
 import SplitIcon from '@icons/layout/page/Split';
-import { isFunction } from '@utils/objectUtil';
+import { isFunction } from '@toone/report-util';
 import {
   insertPageSplit,
   removePageSplit,

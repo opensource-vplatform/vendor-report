@@ -39,15 +39,6 @@ export function hasSameNode(node, tree) {
     return false;
 }
 
-export function genUUID() {
-    const S1 = Math.random().toString(36).slice(2);
-    const S2 = Math.random().toString(36).slice(2);
-    const S3 = Math.random().toString(36).slice(2);
-    const S4 = Date.now().toString(36);
-    return S1 + S2 + S3 + S4;
-    //return crypto.randomUUID().replaceAll('-', '');
-}
-
 //内部函数，不对外提供
 function _deepCopy(obj, cache = new WeakMap()) {
     // 如果是基本类型或者null/undefined，直接返回

@@ -1,7 +1,7 @@
 import {
   GroupItem,
   HLayout,
-} from '@components/group/Index';
+} from '@toone/report-ui';
 
 export default function (props) {
     const { title, children } = props;

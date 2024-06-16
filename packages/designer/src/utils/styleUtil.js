@@ -1,17 +1,17 @@
 import { Commands } from '@commands/index';
 import { getFontSizeValues } from '@metadatas/font';
 import { getDefault } from '@metadatas/style';
+import {
+  isFunction,
+  isString,
+  isUndefined,
+} from '@toone/report-util';
 
 import {
   cellSettingToStyle,
   show,
 } from './cellSettingUtil';
 import { fireCellEnter } from './eventUtil';
-import {
-  isFunction,
-  isString,
-  isUndefined,
-} from './objectUtil';
 import {
   applyStyleToSelectedCell,
   exeCommand,

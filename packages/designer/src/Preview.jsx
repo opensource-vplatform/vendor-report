@@ -6,7 +6,6 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Button from '@components/button/Index';
 import {
   EVENTS,
   fire,
@@ -15,6 +14,8 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
+import { Button } from '@toone/report-ui';
+import { isArray } from '@toone/report-util';
 import {
   getLicense,
   getNavToolbarIsShow,
@@ -63,7 +64,7 @@ function handleDatas(params) {
         Object.keys(dataSource).forEach((key) => {
             if (
                 !originalDatasourceCodes[key] &&
-                Array.isArray(dataSource[key])
+                isArray(dataSource[key])
             ) {
                 if (rowMerge && columnMerge) {
                     dataSource[key] = dataSource.mergeDatas.rowColumn[key];

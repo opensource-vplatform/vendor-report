@@ -1,4 +1,5 @@
-import { isNotBlank } from '../../utils/objectUtils';
+import { isNotBlank } from '@toone/report-util';
+
 import { parse } from './parser/index';
 import Visitor from './parser/Visitor';
 import { formulaToAST } from './utils';

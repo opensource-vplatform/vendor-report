@@ -7,16 +7,16 @@ import {
 import styled from 'styled-components';
 
 import {
-  Pane,
-  Resizer,
-  SplitPane,
-} from '@components/splitpane/Index';
-import {
   clear,
   markHistory,
   setFormula,
   setSelection,
 } from '@store/formulaEditorSlice/formulaEditorSlice';
+import {
+  Pane,
+  Resizer,
+  SplitPane,
+} from '@toone/report-ui';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import LeftPane from './panes/LeftPane';

@@ -1,8 +1,8 @@
-import { getBaseUrl } from '@utils/environmentUtil';
 import {
   isFunction,
   isNullOrUndef,
-} from '@utils/objectUtil';
+} from '@toone/report-util';
+import { getBaseUrl } from '@utils/environmentUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
 export const getBindText = function (bindingPath, spread) {

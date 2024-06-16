@@ -11,6 +11,8 @@
     "dependencies": {
         "@reduxjs/toolkit": "^1.9.7",
         "@toone/report-excel": "workspace:^",
+        "@toone/report-ui":"workspace:^",
+        "@toone/report-util":"workspace:^",
         "array-move": "^4.0.0",
         "axios": "^1.6.8",
         "react": "^18.2.0",

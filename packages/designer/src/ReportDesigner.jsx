@@ -5,11 +5,11 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 
 import store from '@store/store';
+import { uuid } from '@toone/report-util';
 import { saveAsImg } from '@utils/canvas2image';
 
 import Designer from './Designer';
 import { bind } from './event/EventManager';
-import { genUUID } from './utils/commonUtil';
 import { showConfirm } from './utils/messageUtil';
 
 let tooneReport = {
@@ -102,7 +102,7 @@ class ReportDesigner {
 }
 
 ReportDesigner.Utils = {
-    md5: genUUID,
+    md5: uuid,
     RPC: axios,
     msg: {
         confirm: showConfirm,

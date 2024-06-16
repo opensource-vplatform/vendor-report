@@ -1,4 +1,4 @@
-import { Group } from '@components/group/Index';
+import { Group } from '@toone/report-ui';
 
 import WorkbookSettings from './WorkbookSettings';
 import WorksheetSettings from './WorksheetSettings';

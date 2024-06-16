@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { Button } from '@components/form/Index';
+
+import { Button } from '@toone/report-ui';
 
 export const ItemList = styled.div`
     display: flex;

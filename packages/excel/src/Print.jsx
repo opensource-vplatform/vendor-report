@@ -8,8 +8,11 @@ import JSZip from 'JSZip';
 import resourceManager from 'resource-manager-js';
 import styled from 'styled-components';
 
-import Dialog from './component/dialog';
-import Button from './component/form/Button';
+import {
+  Button,
+  Dialog,
+} from '@toone/report-ui';
+
 import ExcelEnhancer from './utils/ExcelEnhancer';
 import { download } from './utils/fileUtil';
 import {

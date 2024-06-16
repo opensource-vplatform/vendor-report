@@ -2,9 +2,9 @@ import { useState } from 'react';
 
 import styled from 'styled-components';
 
-import Popper from '@components/popper/Index';
+import { Popper } from '@toone/report-ui';
+import { isFunction } from '@toone/report-util';
 import { getBaseUrl } from '@utils/environmentUtil';
-import { isFunction } from '@utils/objectUtil';
 
 import Setting from './Setting';
 import formula from './types/Formula';

@@ -1,5 +1,6 @@
+import { isNullOrUndef } from '@toone/report-util';
+
 import { getBaseUrl } from './environmentUtil';
-import { isNullOrUndef } from './objectUtil';
 import {
   getNamespace,
   withBatchUpdate,

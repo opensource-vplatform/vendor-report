@@ -6,7 +6,7 @@ import {
 import styled from 'styled-components';
 
 import ToRangeIcon from '@icons/formula/ToRange';
-import { isNullOrUndef } from '@utils/objectUtil';
+import { isNullOrUndef } from '@toone/report-util';
 
 const InputArea = styled.div`
     width: 260px;

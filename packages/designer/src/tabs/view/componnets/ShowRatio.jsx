@@ -6,14 +6,14 @@ import {
 
 import { useSelector } from 'react-redux';
 
-import { OperationDialog } from '@components/dialog/Index';
-import {
-  Integer,
-  Radio,
-  RadioGroup,
-} from '@components/form/Index';
 import { VIconTitle } from '@components/nav/Index';
 import RatioIcon from '@icons/shape/Ratio';
+import {
+  Integer,
+  OperationDialog,
+  Radio,
+  RadioGroup,
+} from '@toone/report-ui';
 import { getRatioBySelection } from '@utils/worksheetUtil';
 
 import { zoom } from '../../../utils/worksheetUtil';

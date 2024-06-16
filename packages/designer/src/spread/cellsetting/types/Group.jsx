@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { isUndefined } from '@utils/objectUtil';
+import { isUndefined } from '@toone/report-util';
 import {
   applyToSelectedCell,
   withBatchUpdate,

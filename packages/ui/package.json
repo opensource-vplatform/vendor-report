@@ -1,0 +1,23 @@
+{
+    "name": "@toone/report-ui",
+    "version": "1.0.0",
+    "description": "报表UI",
+    "main": "src/index.jsx",
+    "scripts": {
+        "dev": "vite --host -c=vite.config.dev.js",
+        "postBuild": "node scripts/postBuild.js",
+        "build": "vite build -c=vite.config.build.js && npm run postBuild"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "styled-components": "^6.1.1",
+        "@toone/report-icon":"workspace:^",
+        "@toone/report-util":"workspace:^"
+    },
+    "devDependencies": {
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

@@ -11,11 +11,6 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Button from '@components/button/Index';
-import {
-  Tab,
-  Tabs,
-} from '@components/tabs/Index';
 import {
   bind,
   EVENTS,
@@ -36,6 +31,12 @@ import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
 import { ThemeContext } from '@toone/report-excel';
+import {
+  Button,
+  Tab,
+  Tabs,
+} from '@toone/report-ui';
+import { isArray } from '@toone/report-util';
 import { fireCellEnter } from '@utils/eventUtil';
 
 import DesignerContext from './DesignerContext';
@@ -106,7 +107,7 @@ function parseUsedDatasource(spread, finalDsList) {
     spread.sheets.forEach(function (sheet) {
         const sheetJson = sheet.toJSON();
         //收集表格已经绑定的数据源编码
-        if (Array.isArray(sheetJson.tables)) {
+        if (isArray(sheetJson.tables)) {
             sheetJson.tables.forEach(({ bindingPath }) => {
                 if (bindingPath && !dsCodes.includes(bindingPath)) {
                     dsCodes.push(bindingPath);

@@ -1,4 +1,4 @@
-import { genUUID } from '../utils/commonUtil';
+import { uuid } from '@toone/report-util';
 
 export const EVENTS = {
     /**
@@ -116,7 +116,7 @@ const EVENT_HANDLER_MAP = {};
  */
 export const bind = function (params) {
     check(params);
-    const { id = genUUID(), event, handler } = params;
+    const { id = uuid(), event, handler } = params;
     const handlers = EVENT_HANDLER_MAP[event] || {};
     handlers[id] = handler;
     EVENT_HANDLER_MAP[event] = handlers;

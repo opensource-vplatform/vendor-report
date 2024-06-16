@@ -1,4 +1,5 @@
-import { isNullOrUndef } from '../../../utils/objectUtils';
+import { isNullOrUndef } from '@toone/report-util';
+
 import Plugin from '../Plugin';
 
 const argList = [

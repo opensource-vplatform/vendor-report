@@ -10,9 +10,9 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Dialog from '@components/dialog/Index';
 import Step from '@components/steps/Index';
 import { toggleReportDesignWizard } from '@store/navSlice/navSlice';
+import { Dialog } from '@toone/report-ui';
 
 import ReportTypes from './nav/Index';
 import StatementDetail from './reportTemplate/Index';

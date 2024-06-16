@@ -3,8 +3,8 @@ import {
   useSelector,
 } from 'react-redux';
 
-import Button from '@components/button/Index';
 import { setError } from '@store/formulaEditorSlice/formulaEditorSlice';
+import { Button } from '@toone/report-ui';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import {

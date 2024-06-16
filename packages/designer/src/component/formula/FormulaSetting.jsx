@@ -9,12 +9,12 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Dialog from '@components/dialog/Index';
 import { getFormulaMetadata } from '@metadatas/formula';
+import { Dialog } from '@toone/report-ui';
 import { handleError } from '@utils/messageUtil';
+import { exeCommand } from '@utils/spreadUtil';
 
 import { Commands } from '../../command';
-import { exeCommand } from '../../utils/spreadUtil';
 import {
   ButtonWrap,
   FormulaButton,

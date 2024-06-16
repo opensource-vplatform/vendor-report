@@ -8,8 +8,8 @@ import {
   useSelector,
 } from 'react-redux';
 
-import { Group } from '@components/group/Index';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
+import { Group } from '@toone/report-ui';
 import {
   getNavConfig,
   getNavTableConfig,

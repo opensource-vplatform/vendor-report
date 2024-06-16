@@ -1,11 +1,13 @@
 import { useDispatch } from 'react-redux';
 
-import { VItem } from '@components/group/Index';
-import Menu from '@components/menu/Index';
 import { VIconTitleWithDropdown } from '@components/nav/Index';
-import Popper from '@components/popper/Index';
-import { Tab } from '@components/tabs/Index';
 import ArrowDownIcon from '@icons/arrow/ArrowDown';
+import {
+  Menu,
+  Popper,
+  Tab,
+  VItem,
+} from '@toone/report-ui';
 
 export const Icon = function (props) {
     const { title, icon: Icon } = props;

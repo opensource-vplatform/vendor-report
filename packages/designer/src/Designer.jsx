@@ -12,11 +12,6 @@ import {
 import styled from 'styled-components';
 
 import { DraggableDatasources } from '@components/defineDatasource/Index';
-import {
-  Pane,
-  Resizer,
-  SplitPane,
-} from '@components/splitpane/Index';
 import { initDatasource } from '@store/datasourceSlice/datasourceSlice';
 import {
   hideTab,
@@ -25,6 +20,11 @@ import {
 } from '@store/navSlice/navSlice';
 import { initWizardSlice } from '@store/wizardSlice';
 import { ThemeContext } from '@toone/report-excel';
+import {
+  Pane,
+  Resizer,
+  SplitPane,
+} from '@toone/report-ui';
 import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 

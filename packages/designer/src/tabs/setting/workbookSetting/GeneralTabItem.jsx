@@ -7,11 +7,6 @@ import {
 import styled from 'styled-components';
 
 import {
-  CheckBox,
-  Select,
-} from '@components/form/Index';
-import Integer from '@components/integer/Index';
-import {
   setAllowAutoCreateHyperlink,
   setAllowAutoExtendFilterRange,
   setAllowDynamicArray,
@@ -30,6 +25,11 @@ import {
   setScrollByPixel,
   setScrollPixel,
 } from '@store/settingSlice/workbookSettingSlice';
+import {
+  CheckBox,
+  Integer,
+  Select,
+} from '@toone/report-ui';
 
 import {
   HLayout,

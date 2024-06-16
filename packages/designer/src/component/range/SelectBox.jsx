@@ -10,10 +10,9 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import { Dialog } from '@components/dialog/Index';
 import ToSettingIcon from '@icons/formula/ToSetting';
-
-import { setVisible } from '../../store/rangeSlice';
+import { setVisible } from '@store/rangeSlice';
+import { Dialog } from '@toone/report-ui';
 
 const Wrap = styled.div`
     margin-top: 10px;

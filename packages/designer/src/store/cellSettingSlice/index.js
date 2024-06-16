@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { deepClone } from '@toone/report-util';
 import {
   getAlignSetting,
   getBorderSetting,
@@ -7,7 +8,6 @@ import {
   getNumberSetting,
   numberSettingToFormat,
 } from '@utils/cellSettingUtil';
-import { deepClone } from '@utils/objectUtil';
 
 export const cellSettingSlice = createSlice({
     name: 'cellSettingSlice',

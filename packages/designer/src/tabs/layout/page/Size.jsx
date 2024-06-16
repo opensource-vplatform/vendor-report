@@ -5,7 +5,7 @@ import {
 
 import { VIconTitleWithDropdown } from '@components/nav/Index';
 import SizeIcon from '@icons/layout/page/size/Size';
-import { isFunction } from '@utils/objectUtil';
+import { isFunction } from '@toone/report-util';
 import {
   getPageKind,
   setPrintInfo,

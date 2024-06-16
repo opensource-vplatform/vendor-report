@@ -4,11 +4,13 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Color from '@components/color/Index';
-import { Group } from '@components/form/Index';
 import { Preview } from '@components/preview/Index';
 import { setFillSetting } from '@store/cellSettingSlice';
-import { isString } from '@utils/objectUtil';
+import {
+  ColorEditor,
+  Legend,
+} from '@toone/report-ui';
+import { isString } from '@toone/report-util';
 
 const Wrap = styled.div`
     display: flex;
@@ -51,7 +53,7 @@ export default function () {
                 <HLayout style={{ height: 270 }}>
                     <Item>
                         <Text>背景色：</Text>
-                        <Color
+                        <ColorEditor
                             type='placeholder'
                             value={
                                 isString(fillSetting)
@@ -66,7 +68,7 @@ export default function () {
                                     })
                                 )
                             }
-                        ></Color>
+                        ></ColorEditor>
                     </Item>
                     <Item>
                         {/*<Text>图案颜色：</Text>
@@ -88,7 +90,7 @@ export default function () {
                     </Item>
                 </HLayout>
                 <HLayout style={{ marginTop: 98, width: '100%' }}>
-                    <Group title='示例' style={{ height: 100, width: '100%' }}>
+                    <Legend title='示例' style={{ height: 100, width: '100%' }}>
                         <Preview
                             style={{
                                 marginLeft: 10,
@@ -115,7 +117,7 @@ export default function () {
                             backColor={fillSetting}
                             text='文本'
                         ></Preview>
-                    </Group>
+                    </Legend>
                 </HLayout>
             </VLayout>
         </Wrap>

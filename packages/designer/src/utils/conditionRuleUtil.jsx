@@ -57,6 +57,10 @@ import Icon6 from '@icons/style/icons/detail/Icon6';
 import Icon7 from '@icons/style/icons/detail/Icon7';
 import Icon8 from '@icons/style/icons/detail/Icon8';
 import Icon9 from '@icons/style/icons/detail/Icon9';
+import {
+  isFunction,
+  isString,
+} from '@toone/report-util';
 
 import {
   setAddCallbackId,
@@ -71,10 +75,6 @@ import {
   handleCancel,
   handleConfirm,
 } from './callbackUtil';
-import {
-  isFunction,
-  isString,
-} from './objectUtil';
 import { getNamespace } from './spreadUtil';
 
 const ComparisonOperatorToTitle = {

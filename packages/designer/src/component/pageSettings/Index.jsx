@@ -2,12 +2,16 @@ import { useState } from 'react';
 
 import styled from 'styled-components';
 
-import { OperationDialog } from '@components/dialog/Index';
-import { CheckBox } from '@components/form/Index';
 import { Range } from '@components/range/Index';
 import InfoIcon from '@icons/shape/Info';
-import { genUUID } from '@utils/commonUtil';
-import { isString } from '@utils/objectUtil';
+import {
+  CheckBox,
+  OperationDialog,
+} from '@toone/report-ui';
+import {
+  isString,
+  uuid,
+} from '@toone/report-util';
 
 const Wrap = styled.div`
     padding: 10px;
@@ -49,7 +53,7 @@ export default function (props) {
         return {
             functionNum,
             range,
-            domId: genUUID(),
+            domId: uuid(),
             visible: true,
             rangeError: false,
             rangeMessage: Default_Info,

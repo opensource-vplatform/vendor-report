@@ -1,4 +1,4 @@
-import { Group } from '@components/group/Index';
+import { Group } from '@toone/report-ui';
 
 import PageSetting from './page/Index';
 

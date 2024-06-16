@@ -5,12 +5,12 @@ import {
   useSelector,
 } from 'react-redux';
 
+import SpreadGeneralIcon from '@icons/setting/spreadGeneral';
 import {
   GroupItem,
   HLayout,
   VItem,
-} from '@components/group/Index';
-import SpreadGeneralIcon from '@icons/setting/spreadGeneral';
+} from '@toone/report-ui';
 import { showEditorDialog } from '@utils/sparklineUtil';
 
 import context from '../../../DesignerContext';

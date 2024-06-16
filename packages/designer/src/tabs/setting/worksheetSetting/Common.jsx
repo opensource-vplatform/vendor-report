@@ -4,13 +4,6 @@ import {
 } from 'react-redux';
 
 import {
-  CheckBox,
-  Group,
-  Integer,
-  Radio,
-  RadioGroup,
-} from '@components/form/Index';
-import {
   setAllowCellOverflow,
   setColCount,
   setFrozenColumnCount,
@@ -25,6 +18,13 @@ import {
   setSelectionPolicy,
   setShowZeros,
 } from '@store/settingSlice/worksheetSettingSlice';
+import {
+  CheckBox,
+  Integer,
+  Legend,
+  Radio,
+  RadioGroup,
+} from '@toone/report-ui';
 
 import {
   HLayout,
@@ -212,7 +212,7 @@ export default function () {
                     </ItemList>
                 </VGroupItem>
                 <VGroupItem>
-                    <Group title='选择策略' style={{ marginTop: 10 }}>
+                    <Legend title='选择策略' style={{ marginTop: 10 }}>
                         <Wrapper>
                             <RadioGroup
                                 value={selectionPolicy}
@@ -225,7 +225,7 @@ export default function () {
                                 <Radio label='多区域选择' value={2}></Radio>
                             </RadioGroup>
                         </Wrapper>
-                    </Group>
+                    </Legend>
                     <CheckBox
                         style={{ ...checkboxStyle, marginTop: 8 }}
                         title='允许溢出'

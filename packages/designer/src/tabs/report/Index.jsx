@@ -1,4 +1,4 @@
-import { Group } from '@components/group/Index';
+import { Group } from '@toone/report-ui';
 
 import PagingSettings from './PagingSettings';
 import Template from './Template';
