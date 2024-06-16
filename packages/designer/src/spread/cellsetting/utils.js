@@ -1,7 +1,4 @@
-import {
-  isFunction,
-  isNullOrUndef,
-} from '@toone/report-util';
+import { isFunction, isNullOrUndef } from '@toone/report-util';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
@@ -49,13 +46,22 @@ export const getBindText = function (bindingPath, spread) {
 export const hasBindField = function (sheet, row, col) {
     const bindingPath = sheet.getBindingPath(row, col);
     //有绑定信息，且绑定的为实体字段
-    return bindingPath && bindingPath.split&& bindingPath.split('.').length == 2;
+    return (
+        bindingPath && bindingPath.split && bindingPath.split('.').length == 2
+    );
 };
 
 export const setIconDecoration = function (style, type) {
     const GC = getNamespace();
     style.decoration = {
         icons: [
+            {
+                src: getBaseUrl() + `/css/icons/design/arrowDown.svg`,
+                width: 8,
+                height: 16,
+                v_i: false,
+                position: GC.Spread.Sheets.IconPosition.left,
+            },
             {
                 src: getBaseUrl() + `/css/icons/design/${type}.svg`,
                 width: 16,
