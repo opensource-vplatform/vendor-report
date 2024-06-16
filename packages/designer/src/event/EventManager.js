@@ -80,6 +80,8 @@ export const EVENTS = {
     EditEnding : 'EditEnding',
 
     CellDoubleClick : 'CellDoubleClick',
+
+    EditStarting: 'EditStarting',
 };
 
 const check = function (params) {

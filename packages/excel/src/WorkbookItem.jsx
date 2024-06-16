@@ -425,6 +425,7 @@ export default function (props) {
         onTopRowChanged,
         onViewZoomed,
         onEditEnding,
+        onEditStarting,
         onCellDoubleClick,
         inst,
         isShowToolbar = true,
@@ -516,6 +517,7 @@ export default function (props) {
             TopRowChanged: onTopRowChanged,
             ViewZoomed: onViewZoomed,
             EditEnding:onEditEnding,
+            EditStarting: onEditStarting,
             CellDoubleClick: onCellDoubleClick,
         });
     };

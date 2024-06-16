@@ -326,6 +326,7 @@ export default function () {
                 onTopRowChanged={genEventHandler('TopRowChanged')}
                 onViewZoomed={genEventHandler('ViewZoomed')}
                 onEditEnding={genEventHandler('EditEnding')}
+                onEditStarting={genEventHandler('EditStarting')}
                 onCellDoubleClick={genEventHandler('CellDoubleClick')}
                 isShowToolbar={false}
                 type='designer'

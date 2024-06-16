@@ -1,18 +1,18 @@
 import {
-  getCatalogFormulaMap,
-  getCatalogs,
-  getFormulaMetadata,
-  getFormulaMetadatas,
-  getFormulasByCatalog,
+    getCatalogFormulaMap,
+    getCatalogs,
+    getFormulaMetadata,
+    getFormulaMetadatas,
+    getFormulasByCatalog,
 } from '../metadatas/formula';
 import { getSelectedChart } from './chartUtil';
 import { getSelectedShapes } from './shapeUtil';
 import { getSelectedSlicers } from './slicerUtil';
 import {
-  getNamespace,
-  getSelectionType,
-  SelectionTypes,
-  withBatchCalcUpdate,
+    getNamespace,
+    getSelectionType,
+    SelectionTypes,
+    withBatchCalcUpdate,
 } from './spreadUtil';
 import { getActiveIndexBySheet } from './worksheetUtil';
 
@@ -558,7 +558,13 @@ export const setAutoFormula = function (spread, formula) {
     });
 };
 
-export const parseFormulaSparkline = function (spread, sheet, row, col, formula) {
+export const parseFormulaSparkline = function (
+    spread,
+    sheet,
+    row,
+    col,
+    formula
+) {
     if (!sheet) {
         return null;
     }
@@ -587,7 +593,7 @@ export const isFormulaSparklineSelected = function (spread, sheet) {
         const chart = getSelectedChart(sheet);
         const shape = getSelectedShapes(sheet)[0];
         const plugin = slicer || chart || shape;
-        const {row,col} = getActiveIndexBySheet(sheet);
+        const { row, col } = getActiveIndexBySheet(sheet);
         //const selections = sheet.getSelections();
         //if (selections && selections.length >= 1) {
         let flag = false;
@@ -615,4 +621,17 @@ export const isFormulaSparklineSelected = function (spread, sheet) {
         return result;
     }
     return result;
+};
+
+export const isFormula = (text = '') => {
+    if (typeof text !== 'string') return false;
+
+    if (
+        text.startsWith('=') &&
+        !!getFormulaMetadatas()[
+            text.slice(1, text.indexOf('(')).toLocaleUpperCase()
+        ]
+    )
+        return true;
+    return false;
 };
