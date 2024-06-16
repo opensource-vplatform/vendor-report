@@ -14,6 +14,7 @@ export default function (props) {
         enablePrint = false,
         onPrintHandler,
         onExportExcelHandler,
+        onExportPDFHandler,
         license,
         dataSource,
         json: _json,
@@ -77,6 +78,15 @@ export default function (props) {
                 return new Promise((resolve, reject) => {
                     resolve({
                         exportExcel: printInfos.exportExcel,
+                    });
+                });
+            });
+        }
+        if (typeof onExportPDFHandler === 'function') {
+            onExportPDFHandler(() => {
+                return new Promise((resolve, reject) => {
+                    resolve({
+                        exportPDF: printInfos.exportPDF,
                     });
                 });
             });

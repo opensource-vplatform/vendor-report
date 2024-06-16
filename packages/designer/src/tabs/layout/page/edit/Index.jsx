@@ -25,6 +25,10 @@ import {
   setPrintInfo,
 } from '@utils/printUtil';
 import { getNamespace } from '@utils/spreadUtil';
+import {
+  getSheetTag,
+  setSheetTag,
+} from '@utils/worksheetUtil';
 
 import HeaderFooter from './HeaderFooter';
 import Padding from './Padding';
@@ -42,7 +46,7 @@ let pre_print_info = null;
 
 export default function (props) {
     const { onConfirm, onCancel } = props;
-    const { active,editorVisible, ...printInfo } = useSelector(
+    const { active, editorVisible, ...printInfo } = useSelector(
         ({ layoutSlice }) => layoutSlice
     );
     const { spread } = useSelector(({ appSlice }) => appSlice);
@@ -58,13 +62,17 @@ export default function (props) {
             spread.print();
         }
     };
-    const [id] = useState(()=>{
+    const [id] = useState(() => {
         return genUUID();
     });
     useEffect(() => {
         const sheet = spread?.getActiveSheet();
         if (sheet) {
             const printInfo = parsePrintInfo(spread);
+            const scaleType = getSheetTag(sheet, 'scaleType');
+            if (scaleType == 2) {
+                printInfo.scaleType = scaleType;
+            }
             dispatch(setInfo(printInfo));
         }
     }, []);
@@ -75,6 +83,8 @@ export default function (props) {
                 const sheet = spread.getActiveSheet();
                 if (sheet) {
                     setPrintInfo(sheet, printInfo);
+                    const scaleType = printInfo.scaleType;
+                    setSheetTag(sheet, 'scaleType', scaleType);
                     localStorage.setItem(
                         'TOONE_REPORT_DESIGNER_PAGE_CUSTOM_PADDING',
                         JSON.stringify(printInfo.margin)

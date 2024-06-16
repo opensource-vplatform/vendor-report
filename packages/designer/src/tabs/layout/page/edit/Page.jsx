@@ -87,6 +87,7 @@ export default function () {
                         onChange={(type) => dispatch(setScaleType(type))}
                     >
                         <VGroupItem>
+                            <Radio label='自动缩放' value={2}></Radio>
                             <Radio label='缩放比例：' value={1}>
                                 <Integer
                                     min={10}
@@ -103,7 +104,9 @@ export default function () {
                             </Radio>
                             <Radio label='调整为：' value={0}>
                                 <Integer
-                                    value={fitPagesWide==-1 ? null:fitPagesWide}
+                                    value={
+                                        fitPagesWide == -1 ? null : fitPagesWide
+                                    }
                                     min={1}
                                     style={{ ...integerStyle, marginLeft: 12 }}
                                     disabled={scaleType != 0}
@@ -113,7 +116,9 @@ export default function () {
                                 ></Integer>
                                 <Text>页宽</Text>
                                 <Integer
-                                    value={fitPagesTall==-1 ? null:fitPagesTall}
+                                    value={
+                                        fitPagesTall == -1 ? null : fitPagesTall
+                                    }
                                     min={1}
                                     style={integerStyle}
                                     disabled={scaleType != 0}

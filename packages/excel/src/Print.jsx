@@ -66,6 +66,70 @@ const Printed = styled.span`
     font-size: 12px;
 `;
 
+const zoomPrint = (sheetJson, inst) => {
+    let scaleType = null;
+    const sheetTag = sheetJson?.data?.defaultDataNode?.tag;
+    if (sheetTag) {
+        const sheetTagJson = JSON.parse(sheetTag);
+        scaleType = sheetTagJson?.scaleType;
+    }
+
+    if (scaleType != 2) {
+        return;
+    }
+
+    const rowHeaderVisible = sheetJson.rowHeaderVisible !== false;
+    const rowHeaderColInfos = sheetJson.rowHeaderColInfos || [];
+
+    const columnCount = sheetJson.columnCount;
+    let columns = sheetJson.columns || [];
+    let totalSize = 0;
+
+    if (rowHeaderVisible) {
+        if (rowHeaderColInfos.length) {
+            rowHeaderColInfos.forEach(function ({ size }) {
+                totalSize += size || 40;
+            });
+        } else {
+            totalSize += 40;
+        }
+    }
+
+    for (let i = 0; i < columnCount; i++) {
+        const size = columns?.[i]?.size || 60;
+        totalSize += size;
+    }
+    const width =
+        inst.paper.width - inst.paper.paddingLeft - inst.paper.paddingRight;
+    if (totalSize > width) {
+        const newColumns = [];
+        for (let i = 0; i < columnCount; i++) {
+            const datas = columns?.[i] || { size: 60 };
+            const size = datas.size || 60;
+            datas.size = Math.floor(width * (size / totalSize));
+            newColumns.push(datas);
+        }
+        if (rowHeaderVisible) {
+            let newRowHeaderColInfos = [];
+            if (rowHeaderColInfos.length) {
+                rowHeaderColInfos.forEach(function (item) {
+                    const size = item.size || 40;
+                    newRowHeaderColInfos.push({
+                        ...item,
+                        size: Math.floor((size / totalSize) * width),
+                    });
+                });
+            } else {
+                newRowHeaderColInfos.push({
+                    size: Math.floor((40 / totalSize) * width),
+                });
+            }
+            sheetJson.rowHeaderColInfos = newRowHeaderColInfos;
+        }
+        sheetJson.columns = newColumns;
+    }
+};
+
 export default function (props) {
     const { onInited, license, enablePrint, dataSource, json, inst } = props;
     const datas = useRef({
@@ -118,6 +182,7 @@ export default function (props) {
                             return new Promise((resolve) => {
                                 let newfilename = filename + (i + 1) + '.xlsx';
                                 const sheetJson = sheet.toJSON();
+                                zoomPrint(sheetJson, inst);
                                 const newSheet = pageDatas.datas[i];
                                 newSheet.sheet = sheetJson;
                                 inst.resetSheet(newSheet);
@@ -226,6 +291,99 @@ export default function (props) {
         return result;
     };
     window.exportExcel = exportExcel;
+    const exportPDF = (
+        filename,
+        options = {
+            //是否持久化(下载pdf)
+            persistence: true,
+            author: '',
+            creator: '',
+            keywords: '',
+            subject: '',
+            title: '',
+            sheet,
+            exportPdfHandler: null,
+        }
+    ) => {
+        return new Promise((_resolve) => {
+            const exportHandler = () => {
+                const {
+                    persistence = true,
+                    author,
+                    creator,
+                    keywords,
+                    subject,
+                    title,
+                    sheetIndex,
+                    exportPdfHandler,
+                } = options;
+
+                const { activeSheetName, sheetPrintPages } = inst;
+                const pageDatas = sheetPrintPages[activeSheetName];
+                const sheet = datas.spread.getActiveSheet();
+                const datasLen = pageDatas.datas.length;
+
+                const promiseFns = [];
+                for (let i = 0; i < datasLen; i++) {
+                    promiseFns.push(() => {
+                        return new Promise((resolve, reject) => {
+                            const sheetJson = sheet.toJSON();
+                            zoomPrint(sheetJson, inst);
+                            const newSheet = pageDatas.datas[i];
+                            newSheet.sheet = sheetJson;
+                            inst.resetSheet(newSheet);
+                            sheet.fromJSON(sheetJson);
+                            datas.spread.savePDF(
+                                (data) => {
+                                    if (persistence) {
+                                        download(data, filename);
+                                    }
+                                    if (
+                                        typeof exportPdfHandler === 'function'
+                                    ) {
+                                        exportPdfHandler(data);
+                                    }
+                                    resolve();
+                                },
+                                (err) => {
+                                    reject(err);
+                                },
+                                {
+                                    author,
+                                    creator,
+                                    keywords,
+                                    subject,
+                                    title,
+                                },
+                                sheetIndex == null ? undefined : sheetIndex
+                            );
+                        });
+                    });
+                }
+                promiseFns.push(() => {
+                    return new Promise(() => {
+                        _resolve(true);
+                    });
+                });
+                promiseFns.reduce((prev, cur) => {
+                    return prev.then((a) => {
+                        return cur().then(() => {});
+                    });
+                }, Promise.resolve());
+            };
+            const GC = getNamespace();
+            if (GC.Spread.Sheets.PDF) {
+                //已经加载了pdf插件,直接执行导出逻辑
+                exportHandler();
+            } else {
+                //先加载pdf插件，再进行导出
+                resourceManager
+                    .loadScript(getPluginSrc('pdf'))
+                    .then(exportHandler);
+            }
+        });
+    };
+    window.exportPDF = exportPDF;
     useEffect(() => {
         if (typeof onInited === 'function') {
             onInited({
@@ -236,6 +394,7 @@ export default function (props) {
                     setShow(false);
                 },
                 exportExcel,
+                exportPDF,
             });
         }
     });
@@ -265,12 +424,14 @@ export default function (props) {
             });
         }
     };
+
     const handlePrint = () => {
         if (datas.printHandler) {
             const sheet = datas.spread.getActiveSheet();
             const sheetJson = sheet.toJSON();
             const sheetPage = inst.sheetPrintPages[sheetJson.name];
             const newPageIndex = datas.printIndex - 1;
+            zoomPrint(sheetJson, inst);
             if (newPageIndex < sheetPage.datas.length) {
                 sheetPage.pageIndex = newPageIndex;
                 const newSheet = sheetPage.datas[newPageIndex];
@@ -278,7 +439,7 @@ export default function (props) {
                 inst.resetSheet(newSheet);
                 sheet.fromJSON(sheetJson);
             }
-
+            console.log(sheet.toJSON());
             setPrintInfos({
                 ...printInfos,
                 printed: {

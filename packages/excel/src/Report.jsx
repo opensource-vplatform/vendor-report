@@ -35,6 +35,8 @@ class Report {
 
     exportExcelHandler = null;
 
+    exportPDFHandler = null;
+
     /**
      * @constructor
      * @param {Object} conf 配置信息<br/>
@@ -116,6 +118,9 @@ class Report {
                     if (typeof onPageCompleted === 'function') {
                         onPageCompleted(handler);
                     }
+                },
+                onExportPDFHandler: (handler) => {
+                    this.exportPDFHandler = handler;
                 },
                 baseUrl: this.conf?.baseUrl,
                 onFetchData,
@@ -227,6 +232,95 @@ class Report {
             subject: '',
             title: '',
             sheetIndex: null,
+            exportPdfHandler: null,
+            test: false,
+        }
+    ) {
+        return new Promise((resolve, reject) => {
+            this.printHandler()
+                .then(() => {
+                    if (typeof filename == 'string' && filename.trim() !== '') {
+                        filename = filename.endsWith('.pdf')
+                            ? filename
+                            : filename + '.pdf';
+
+                        if (options?.test) {
+                            if (this.exportPDFHandler) {
+                                this.exportPDFHandler()
+                                    .then(({ exportPDF }) => {
+                                        exportPDF(filename, options).then(
+                                            () => {
+                                                resolve();
+                                            }
+                                        );
+                                    })
+                                    .catch(reject);
+                            } else {
+                                reject(
+                                    Error('导出PDF失败，原因：报表未初始化')
+                                );
+                            }
+                            return;
+                        }
+
+                        const exportHandler = () => {
+                            const {
+                                persistence,
+                                author,
+                                creator,
+                                keywords,
+                                subject,
+                                title,
+                                sheetIndex,
+                            } = options;
+                            this.spread.savePDF(
+                                (data) => {
+                                    if (persistence) {
+                                        download(data, filename);
+                                    }
+                                    resolve(data);
+                                },
+                                (err) => {
+                                    reject(err);
+                                },
+                                {
+                                    author,
+                                    creator,
+                                    keywords,
+                                    subject,
+                                    title,
+                                },
+                                sheetIndex == null ? undefined : sheetIndex
+                            );
+                        };
+                        const GC = getNamespace();
+                        if (GC.Spread.Sheets.PDF) {
+                            //已经加载了pdf插件,直接执行导出逻辑
+                            exportHandler();
+                        } else {
+                            //先加载pdf插件，再进行导出
+                            resourceManager
+                                .loadScript(getPluginSrc('pdf'))
+                                .then(exportHandler);
+                        }
+                    } else {
+                        reject(Error('导出pdf失败，原因:没有传递导出文件名'));
+                    }
+                })
+                .catch(reject);
+        });
+    }
+    /* exportPdf(
+        filename,
+        options = {
+            //是否持久化(下载pdf)
+            persistence: true,
+            author: '',
+            creator: '',
+            keywords: '',
+            subject: '',
+            title: '',
+            sheetIndex: null,
         }
     ) {
         return new Promise((resolve, reject) => {
@@ -282,7 +376,7 @@ class Report {
                 })
                 .catch(reject);
         });
-    }
+    } */
     /**
      * 打印
      * @description 报表打印，使用打印时，须在Preview初始化时将属性enablePrint设置为true

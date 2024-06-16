@@ -40,6 +40,10 @@ export const setPrintInfo = function (sheet, printInfo) {
             zoomFactor = zoomFactor / 100;
         } else if (scaleType == 0) {
             zoomFactor = 1;
+        } else if (scaleType == 2) {
+            zoomFactor = 1;
+            fitPagesTall = -1;
+            fitPagesWide = -1;
         }
         print.zoomFactor(zoomFactor);
         print.fitPagesWide(fitPagesWide);
