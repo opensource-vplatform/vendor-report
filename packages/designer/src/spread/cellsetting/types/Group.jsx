@@ -32,7 +32,7 @@ const Component = function (props) {
         const plugin = {
             type: PLUGIN_TYPE,
         };
-        withBatchUpdate(sheet.getParent(),()=>{
+        withBatchUpdate(sheet.getParent(), () => {
             applyToSelectedCell(sheet, (sheet, row, col) => {
                 //clearAllCellTagPlugin(sheet, row, col);
                 const bindingPath = sheet.getBindingPath(row, col);
@@ -69,9 +69,13 @@ const isShowIcon = function (sheet, row, col) {
     return hasBindField(sheet, row, col);
 };
 
+const isGroup = function(sheet, row, col){
+    return hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
+}
+
 const paintCell = function (context, style, value) {
     const { sheet, row, col } = context;
-    const has = hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
+    const has = isGroup(sheet, row, col);
     if (has) {
         setGroupDecoration(style);
         const bindingPath = sheet.getBindingPath(row, col);
@@ -84,16 +88,38 @@ const paintCell = function (context, style, value) {
     return value;
 };
 
-function getOptions(sheet){
-    const {row,col} = getActiveIndexBySheet(sheet);
+
+function getOptions(sheet) {
+    const { row, col } = getActiveIndexBySheet(sheet);
     const options = [];
-    if(hasBindField(sheet,row,col)){
+    if (hasBindField(sheet, row, col)) {
         options.push({
             value: PLUGIN_TYPE,
-            text: '分组'
+            text: '分组',
         });
-    }   
+    }
     return options;
 }
 
-export default { Component, isShowIcon, paintCell, PLUGIN_TYPE,getOptions };
+/**
+ * 获取单元格扩展方向
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @returns
+ */
+function getDirection(sheet, row, col) {
+    if (isGroup(sheet, row, col)) {
+        return 'v';
+    }
+    return null;
+}
+
+export default {
+    Component,
+    isShowIcon,
+    paintCell,
+    PLUGIN_TYPE,
+    getOptions,
+    getDirection,
+};

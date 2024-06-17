@@ -141,10 +141,22 @@ function getOptions(sheet){
     }];
 }
 
+/**
+ * 获取单元格扩展方向
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @returns
+ */
+function getDirection(sheet, row, col) {
+    return null;
+}
+
 export default {
     isShowIcon,
     paintCell,
     Component,
     PLUGIN_TYPE,
     getOptions,
+    getDirection,
 };

@@ -68,7 +68,7 @@ const Component = function (props) {
             type: PLUGIN_TYPE,
             config: { ...data.config },
         };
-        withBatchUpdate(sheet.getParent(),()=>{
+        withBatchUpdate(sheet.getParent(), () => {
             applyToSelectedCell(sheet, (sheet, row, col) => {
                 const bindingPath = sheet.getBindingPath(row, col);
                 if (bindingPath) {
@@ -139,16 +139,16 @@ const Component = function (props) {
     );
 };
 
+const isImage = function(sheet, row, col){
+    return hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
+}
+
 function paintCell(context, style, value) {
     const { sheet, row, col } = context;
-    const has = hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
-    if (has) {
+    if (isImage(sheet, row, col)) {
         setIconDecoration(style, 'image');
-        const bindingPath = sheet.getBindingPath(row,col);
-        const text = getBindText(
-            bindingPath,
-            sheet.getParent()
-        );
+        const bindingPath = sheet.getBindingPath(row, col);
+        const text = getBindText(bindingPath, sheet.getParent());
         if (!isUndefined(text)) {
             return text;
         }
@@ -156,10 +156,10 @@ function paintCell(context, style, value) {
     return value;
 }
 
-function getOptions(sheet){
-    const {row,col} = getActiveIndexBySheet(sheet);
+function getOptions(sheet) {
+    const { row, col } = getActiveIndexBySheet(sheet);
     const options = [];
-    if(hasBindField(sheet,row,col)){
+    if (hasBindField(sheet, row, col)) {
         options.push({
             value: PLUGIN_TYPE,
             text: '图片',
@@ -168,9 +168,24 @@ function getOptions(sheet){
     return options;
 }
 
+/**
+ * 获取单元格扩展方向
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @returns
+ */
+function getDirection(sheet, row, col) {
+    if (isImage(sheet, row, col)) {
+        return 'v';
+    }
+    return null;
+}
+
 export default {
     Component,
     paintCell,
     PLUGIN_TYPE,
     getOptions,
+    getDirection,
 };

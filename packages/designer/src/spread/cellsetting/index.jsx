@@ -50,6 +50,26 @@ export const isShowIcon = function (sheet, row, col) {
 };
 
 /**
+ * 获取单元格扩展方向
+ * @param {*} sheet 
+ * @param {*} row 
+ * @param {*} col 
+ */
+export const getDirection = function(sheet,row,col){
+    for (let i = 0; i < plugins.length; i++) {
+        const plugin = plugins[i];
+        const handler = plugin.getDirection;
+        if (isFunction(handler)) {
+            const direction = handler(sheet, row, col);
+            if (direction !== null) {
+                return direction;
+            }
+        }
+    }
+    return null;
+}
+
+/**
  * 绘制单元格
  * @param {*} context
  * @param {*} style

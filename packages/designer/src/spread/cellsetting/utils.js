@@ -57,15 +57,15 @@ export const hasBindField = function (sheet, row, col) {
 export const setIconDecoration = function (style, type, expandDirection) {
     const GC = getNamespace();
     const icons = [];
-    if(expandDirection=='vertical'){
+    /*if(expandDirection=='vertical'){
         icons.push({
-            src: getBaseUrl() + `/css/icons/design/arrowDown.svg`,
-            width: 5,
-            height: 10,
+            src: getBaseUrl() + `/css/icons/design/arrowRight.svg`,
+            width: 10,
+            height: 5,
             v_i: false,
             position: GC.Spread.Sheets.IconPosition.left,
         })
-    }
+    }*/
     icons.push({
         src: getBaseUrl() + `/css/icons/design/${type}.svg`,
         width: 16,
@@ -83,7 +83,7 @@ export const setIconDecoration = function (style, type, expandDirection) {
         hAlign == HorizontalAlign.general ||
         isNullOrUndef(hAlign)
     ) {
-        style.textIndent = style.textIndent || 1;
+        style.textIndent = style.textIndent || 2;
     }
 };
 

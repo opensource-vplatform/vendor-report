@@ -8,6 +8,7 @@ import {
   getOffsetFromBody,
   isUndefined,
 } from '@toone/report-util';
+import { getBaseUrl } from '@utils/environmentUtil';
 import {
   getNamespace,
   getSpecifiedRect,
@@ -15,6 +16,7 @@ import {
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
 import Setting, {
+  getDirection,
   isShowIcon,
   paintCell,
 } from './cellsetting/index';
@@ -22,12 +24,63 @@ import Setting, {
 const GC = getNamespace();
 
 export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
-
     provider = 'toone';
 
     constructor() {
         super();
         this._bindEvent();
+    }
+
+    _refreshDirectionIconPosition(item) {
+        if (isUndefined(item)) {
+            const icons = this.directionIcons;
+            if (icons) {
+                icons.forEach(item => {
+                    this._refreshDirectionIconPosition(item);
+                });
+            }
+        } else {
+            if (!item) {
+                return;
+            }
+            const spread = this.sheet.getParent();
+            if (spread && spread.getActiveSheet() === this.sheet&&item.sheet == this.sheet) {
+                const {row,col} = item;
+                const span = this.sheet.getSpan(row, col);
+                const rowIndex = row;
+                const colIndex = col;
+                const lastRowIndex = this.sheet.getLastFullyVisibleRow();
+                const lastColIndex = this.sheet.getLastFullyVisibleColumn();
+                if (rowIndex <= lastRowIndex && colIndex <= lastColIndex) {
+                    const rect = getSpecifiedRect(
+                        spread,
+                        new GC.Spread.Sheets.Range(
+                            row,
+                            col,
+                            span ? span.rowCount : 1,
+                            span ? span.colCount : 1
+                        ),
+                        undefined,
+                        this.sheet
+                    )[0];
+                    const ele = item.ele;
+                    const offset = getOffsetFromBody(ele);
+                    if (rect && offset) {
+                        const zoom = this.sheet.zoom()||1;
+                        const style = ele.style;
+                        style.display = 'flex';
+                        style.left = rect.x + 'px';
+                        style.top = rect.y + 'px';
+                        style.width = `${ele.dataset.width*zoom}px`;
+                        style.height = `${ele.dataset.height*zoom}px`;
+                        style.display = 'block';
+                        return;
+                    }
+                }
+            }else{
+                item.ele.style.display = 'none';
+            }
+        }
     }
 
     _refreshIconPosition(row, col) {
@@ -49,8 +102,8 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                         col = index.col;
                     }
                     const span = this.sheet.getSpan(row, col);
-                    const rowIndex = row;//span ? span.row + span.rowCount : row;
-                    const colIndex = col;//span ? span.col + span.colCount : col;
+                    const rowIndex = row; //span ? span.row + span.rowCount : row;
+                    const colIndex = col; //span ? span.col + span.colCount : col;
                     const lastRowIndex = this.sheet.getLastFullyVisibleRow();
                     const lastColIndex = this.sheet.getLastFullyVisibleColumn();
                     if (rowIndex <= lastRowIndex && colIndex <= lastColIndex) {
@@ -89,6 +142,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     _bindEvent() {
         const refreshIconPosition = () => {
             this._refreshIconPosition();
+            this._refreshDirectionIconPosition();
         };
         this._bindEvents(
             [
@@ -110,7 +164,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             },
         });
         this._bindEvents([EVENTS.onEditorVisible], () => {
-            if(this.sheet&&this.sheet.getParent()){
+            if (this.sheet && this.sheet.getParent()) {
                 const { sheet, row, col } = getActiveIndexBySheet(this.sheet);
                 if (this._couldShowIcon(sheet, row, col)) {
                     const icon = this._initIcon();
@@ -149,6 +203,71 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             this._hideIcon();
         }
     }
+    _initDirectionIcon(width, height, src) {
+        let iconEle = document.createElement('img');
+        const style = iconEle.style;
+        style.position = 'absolute';
+        iconEle.dataset.width = width;
+        iconEle.dataset.height = height;
+        style.backgroundColor = '#ffea37';
+        style.display = height;
+        iconEle.src = src;
+        document.body.append(iconEle);
+        return iconEle;
+    }
+    /**
+     * 绘画单元格扩展方向图标
+     * @param {*} sheet
+     * @param {*} row
+     * @param {*} col
+     */
+    _paintDirectionIcon(sheet, row, col) {
+        const direction = getDirection(sheet, row, col);
+        if (direction != null) {
+            const directionIcons = this.directionIcons || [];
+            let ele = null;
+            let item = directionIcons.find(
+                (item) =>
+                    item.row === row && item.col === col && item.sheet === sheet
+            );
+            if (!item) {
+                if (direction == 'v') {
+                    ele = this._initDirectionIcon(
+                        6,
+                        12,
+                        getBaseUrl() + '/css/icons/design/arrowDown.svg'
+                    );
+                } else if (direction == 'h') {
+                    ele = this._initDirectionIcon(
+                        12,
+                        6,
+                        getBaseUrl() + '/css/icons/design/arrowRight.svg'
+                    );
+                }
+                item = {
+                    row,
+                    col,
+                    sheet,
+                    ele,
+                };
+                directionIcons.push(item);
+            }
+            this._refreshDirectionIconPosition(item);
+            this.directionIcons = directionIcons;
+        } else {
+            const directionIcons = this.directionIcons;
+            if (directionIcons) {
+                const icon = directionIcons.find(
+                    (icon) => icon.row === row && icon.col === col
+                );
+                if (icon) {
+                    document.body.removeChild(icon);
+                    const index = directionIcons.indexOf(icon);
+                    directionIcons.splice(index, 1);
+                }
+            }
+        }
+    }
 
     paint(ctx, value, x, y, w, h, style, context) {
         this.sheet = context.sheet;
@@ -162,6 +281,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             //非绘制激活的单元格，隐藏设置图标
             //this._hideIcon();
         }
+        this._paintDirectionIcon(this.sheet, context.row, context.col);
         super.paint(ctx, value, x, y, w, h, style, context);
     }
 
@@ -187,6 +307,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                 style.backgroundColor = 'white';
                 style.alignItems = 'center';
                 style.justifyContent = 'center';
+                style.zIndex = 1;//防止被扩展方向箭头遮盖
                 this._iconEle = iconEle;
                 this.root = createRoot(iconEle);
                 this.root.render(<Setting sheet={this.sheet}></Setting>);
@@ -225,6 +346,13 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         document.body.removeChild(this._iconEle);
         this._iconEle = null;
         this.spread = null;
+        if (this.directionIcons) {
+            this.directionIcons.forEach((item) => {
+                const ele = item.ele;
+                document.body.removeChild(ele);
+            });
+            this.directionIcons = null;
+        }
     }
 
     toJSON() {
@@ -233,6 +361,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         delete json.root;
         delete json._iconEle;
         delete json.spread;
+        delete json.directionIcons;
         return json;
     }
 }

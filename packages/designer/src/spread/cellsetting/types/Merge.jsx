@@ -19,4 +19,15 @@ function paintCell(context, style, value) {
     return value;
 }
 
-export default { paintCell };
+/**
+ * 获取单元格扩展方向
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @returns
+ */
+function getDirection(sheet, row, col) {
+    return null;
+}
+
+export default { paintCell, getDirection };
