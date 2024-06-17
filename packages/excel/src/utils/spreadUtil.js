@@ -161,7 +161,9 @@ const recursionSheetZoom = function (sheet, el, spread) {
             //如果没有滚动条，先放大到有滚动条为止再缩放
             zoomFactor += 0.05;
             sheetZoom(sheet, zoomFactor);
-            recursion();
+            if (recursion < 4) {
+                recursion();
+            }
         }
         spread.options.showHorizontalScrollbar = false;
         spread.options.showVerticalScrollbar = false;
