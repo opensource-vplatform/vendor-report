@@ -266,10 +266,10 @@ export default function () {
     useEffect(() => {
         const unbind = bind({
             event: EVENTS.RowChanged,
-            handler: (event, datas) => {
-                RowChanged({ ...datas, type: 'pageArea' });
-                RowChanged({ ...datas, type: 'groupSumArea' });
-                RowChanged({ ...datas, type: 'totalArea' });
+            handler: (event) => {
+                RowChanged({ ...event, type: 'pageArea' });
+                RowChanged({ ...event, type: 'groupSumArea' });
+                RowChanged({ ...event, type: 'totalArea' });
             },
         });
         return () => {
@@ -309,7 +309,6 @@ export default function () {
                 onInited={handleWorkbookInitialized}
                 onEnterCell={handleEnterCell}
                 onActiveSheetChanged={handleActiveSheetChanged}
-              
                 onValueChanged={handleValueChanged}
                 onSelectionChanged={handleSelectionChanged}
                 onSelectionChanging={handleSelectionChanging}
