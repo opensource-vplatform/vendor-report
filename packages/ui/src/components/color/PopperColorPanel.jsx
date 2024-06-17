@@ -1,7 +1,6 @@
 import { Fragment } from 'react';
 
-import PalletIcon from '@icons/color/Pallet';
-
+import PalletIcon from '../../icons/Pallet';
 import {
   getCustomColors,
   getStandarColors,
@@ -17,7 +16,7 @@ import {
   Wrap,
 } from './Components';
 
-export default function(props) {
+export default function (props) {
     const { value, onChange, onOther, customColors, nonable = true } = props;
     const customerColors = getCustomColors();
     const standColors = getStandarColors();
@@ -108,7 +107,9 @@ export default function(props) {
                 </ColorButton>
             ) : null}
             <ColorButton onClick={() => onOther()}>
-                <PalletIcon style={{ marginLeft: 4 }}></PalletIcon>
+                <PalletIcon
+                    style={{ marginLeft: 4, width: 20, height: 20 }}
+                ></PalletIcon>
                 <Divider></Divider>
                 <span>其他颜色...</span>
             </ColorButton>

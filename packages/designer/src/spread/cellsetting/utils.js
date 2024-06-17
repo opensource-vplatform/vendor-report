@@ -1,4 +1,7 @@
-import { isFunction, isNullOrUndef } from '@toone/report-util';
+import {
+  isFunction,
+  isNullOrUndef,
+} from '@toone/report-util';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { getNamespace } from '@utils/spreadUtil';
 
@@ -51,25 +54,27 @@ export const hasBindField = function (sheet, row, col) {
     );
 };
 
-export const setIconDecoration = function (style, type) {
+export const setIconDecoration = function (style, type, expandDirection) {
     const GC = getNamespace();
+    const icons = [];
+    if(expandDirection=='vertical'){
+        icons.push({
+            src: getBaseUrl() + `/css/icons/design/arrowDown.svg`,
+            width: 5,
+            height: 10,
+            v_i: false,
+            position: GC.Spread.Sheets.IconPosition.left,
+        })
+    }
+    icons.push({
+        src: getBaseUrl() + `/css/icons/design/${type}.svg`,
+        width: 16,
+        height: 16,
+        v_i: true,
+        position: GC.Spread.Sheets.IconPosition.leftOfText,
+    });
     style.decoration = {
-        icons: [
-            {
-                src: getBaseUrl() + `/css/icons/design/arrowDown.svg`,
-                width: 8,
-                height: 16,
-                v_i: false,
-                position: GC.Spread.Sheets.IconPosition.left,
-            },
-            {
-                src: getBaseUrl() + `/css/icons/design/${type}.svg`,
-                width: 16,
-                height: 16,
-                v_i: true,
-                position: GC.Spread.Sheets.IconPosition.leftOfText,
-            },
-        ],
+        icons
     };
     const hAlign = style.hAlign;
     const HorizontalAlign = GC.Spread.Sheets.HorizontalAlign;
@@ -87,11 +92,11 @@ export const setFormulaDecoration = function (style) {
 };
 
 export const setListDecoration = function (style) {
-    setIconDecoration(style, 'list');
+    setIconDecoration(style, 'list','vertical');
 };
 
 export const setGroupDecoration = function (style) {
-    setIconDecoration(style, 'group');
+    setIconDecoration(style, 'group','vertical');
 };
 
 export const setSumDecoration = function (style) {
@@ -99,5 +104,5 @@ export const setSumDecoration = function (style) {
 };
 
 export const setImageDecoration = function (style) {
-    setIconDecoration(style, 'image');
+    setIconDecoration(style, 'image','vertical');
 };

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
-import FillCheckIcon from '@icons/shape/FillCheck';
-import FillUnCheckIcon from '@icons/shape/FillUnCheck';
+import FillCheckIcon from '../../icons/FillCheck';
+import FillUnCheckIcon from '../../icons/FillUnCheck';
 
 const Label = styled.label`
     display: flex;

@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 
-import ArrowDown from '@icons/arrow/ArrowDown';
-
+import ArrowDown from '../../icons/ArrowDown';
 import { ColorEditor } from '../color/Index';
 
 const FontColorSelector = styled.div`
