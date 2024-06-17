@@ -1,45 +1,25 @@
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Commands } from '@commands/index';
 import Hyperlink from '@components/hyperlink';
-import {
-  bind,
-  EVENTS,
-} from '@event/EventManager';
+import { bind, EVENTS } from '@event/EventManager';
 import DatasourceIcon from '@icons/data/datasource';
 import {
-  setDatasourceSelectorVisible,
-  setIsShowDatasource,
-  toggleBooleanValue,
-  updateActiveSheetTablePath,
+    setDatasourceSelectorVisible,
+    setIsShowDatasource,
+    toggleBooleanValue,
+    updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
+import { isArray, uuid } from '@toone/report-util';
 import {
-  isArray,
-  uuid,
-} from '@toone/report-util';
-import {
-  findTreeNodeById,
-  getActiveSheetTablesPath,
+    findTreeNodeById,
+    getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
-import {
-  getDataSourceConfig,
-  getNavConfig,
-} from '@utils/configUtil';
-import {
-  exeCommand,
-  getNamespace,
-} from '@utils/spreadUtil';
+import { getDataSourceConfig, getNavConfig } from '@utils/configUtil';
+import { exeCommand, getNamespace } from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
@@ -52,18 +32,18 @@ import Datasources from './Datasources.jsx';
 import DatasourceSelector from './DatasourceSelector.jsx';
 import DialogDatasourcesEdit from './DialogDatasourcesEdit.jsx';
 import {
-  DraggableDatasourcesBox,
-  DraggableDatasourcesContent,
-  DraggableDatasourcesFooter,
-  DraggableDatasourcesHeander,
+    DraggableDatasourcesBox,
+    DraggableDatasourcesContent,
+    DraggableDatasourcesFooter,
+    DraggableDatasourcesHeander,
 } from './ui.jsx';
 import {
-  bindingPath,
-  bindingTablePathHandler,
-  getCellInfo,
-  getPath,
-  highlightBlock,
-  removeHighlightOneBlock,
+    bindingPath,
+    bindingTablePathHandler,
+    getCellInfo,
+    getPath,
+    highlightBlock,
+    removeHighlightOneBlock,
 } from './utils/utils.js';
 
 //删除表格
@@ -326,6 +306,7 @@ export default function Index() {
         caretOffset: 0,
         currentClickBar: true,
         currentformulaValue: '',
+        notChangecurrentClickBar: false,
     });
 
     const [treeOpenTrigger, setTreeOpenTrigger] = useState(
@@ -413,7 +394,6 @@ export default function Index() {
                     }
 
                     cacheDatasRef.current.caretOffset = caretOffset;
-                    cacheDatasRef.current.currentClickBar = true;
                 }
             },
         });
@@ -424,25 +404,27 @@ export default function Index() {
         const unBindHandler = bind({
             id,
             event: EVENTS.CellDoubleClick,
-            handler: () => {  // 记录点击单元格编辑表达式
+            handler: () => {
+                // 记录点击单元格编辑表达式
                 cacheDatasRef.current.currentClickBar = false;
             },
         });
         return unBindHandler;
     }, []);
     useEffect(() => {
-      const id = uuid();
-      const unBindHandler = bind({
-          id,
-          event: EVENTS.EditStarting,
-          handler: () => {   // 记录点击表达式框
-              cacheDatasRef.current.currentClickBar = true;
-          },
-      });
-      return unBindHandler;
-  }, []);
+        const id = uuid();
+        const unBindHandler = bind({
+            id,
+            event: EVENTS.EditStarting,
+            handler: () => {
+                // 记录点击表达式框
+                if (!cacheDatasRef.current.notChangecurrentClickBar)
+                    cacheDatasRef.current.currentClickBar = true;
+            },
+        });
+        return unBindHandler;
+    }, []);
     const setCellBindPath = () => {};
-
 
     /**
      * 光标移动到指定位置
@@ -466,8 +448,21 @@ export default function Index() {
                     var selection = window.getSelection();
                     selection.removeAllRanges();
                     selection.addRange(range);
-
-                    editableDiv.focus();
+                    try {
+                        editableDiv.parentElement.parentElement.parentElement.focus();
+                        // Ensure the cursor is in the visible area
+                        const cursorRect = range.getBoundingClientRect();
+                        const divRect =
+                            editableDiv.parentElement.parentElement.parentElement.getBoundingClientRect();
+                        if (cursorRect.left < divRect.left) {
+                            editableDiv.parentElement.parentElement.parentElement.scrollLeft -=
+                                divRect.left - cursorRect.left;
+                        } else if (cursorRect.right > divRect.right) {
+                            editableDiv.parentElement.parentElement.parentElement.scrollLeft +=
+                                cursorRect.right - divRect.right;
+                        }
+                        editableDiv.parentElement.parentElement.parentElement.scrollLeft += 20;
+                    } catch (err) {}
                     return true;
                 } else {
                     charCount += textLength;
@@ -719,11 +714,13 @@ export default function Index() {
                 };
                 formula = handleFormula(formula);
                 cell.formula(formula);
+                cacheDatasRef.current.notChangecurrentClickBar = true;
                 sheet.startEdit(true);
                 // 获取编辑控件并设置光标位置
                 moveCursorToCharIndex(
                     cacheDatasRef.current.caretOffset + txt.length
                 );
+                cacheDatasRef.current.notChangecurrentClickBar = false;
             } else {
                 //单元格整个进行数据源绑定
                 let dataPath = node.code;
