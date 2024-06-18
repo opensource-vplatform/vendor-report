@@ -148,7 +148,7 @@ function Designer(props) {
             themeContext.editingZome.backgroundColor;
     }
     useEffect(()=>{
-        if(spread){
+        if(mode=='edit'&&spread){
             spread.refresh()
         }
     },[mode]);
