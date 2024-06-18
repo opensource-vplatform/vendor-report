@@ -147,7 +147,11 @@ function Designer(props) {
         SplitPaneStyles.backgroundColor =
             themeContext.editingZome.backgroundColor;
     }
-
+    useEffect(()=>{
+        if(spread){
+            spread.refresh()
+        }
+    },[mode]);
     return (
         <Fragment>
             <DesignerContext.Provider value={ctxValue}>
