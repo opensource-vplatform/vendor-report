@@ -12,6 +12,7 @@ import {
   handleError,
 } from '../utils/responseUtil';
 import {
+  getParameter,
   getReportId,
   getTitle,
 } from '../utils/utils';

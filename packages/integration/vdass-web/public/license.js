@@ -1,0 +1,1 @@
+var License_Key = "${LicenseKey}";
