@@ -60,7 +60,7 @@ const getErrorMsg = function (data, defMsg) {
     }
 };
 
-const getError = function (data, defMsg) {
+export const getError = function (data, defMsg) {
     if (hasError(data)) {
         return getErrorMsg(data, defMsg);
     } else if (data.data) {

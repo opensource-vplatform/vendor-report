@@ -31,6 +31,32 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         this._bindEvent();
     }
 
+    _showDirectionIcons(item){
+        if(isUndefined(item)){
+            const icons = this.directionIcons;
+            if (icons) {
+                icons.forEach(item => {
+                    this._showDirectionIcons(item);
+                });
+            }
+        }else{
+           item.ele.style.display = 'block'; 
+        }
+    }
+
+    _hideDirectionIcons(item){
+        if(isUndefined(item)){
+            const icons = this.directionIcons;
+            if (icons) {
+                icons.forEach(item => {
+                    this._showDirectionIcons(item);
+                });
+            }
+        }else{
+           item.ele.style.display = 'none'; 
+        }
+    }
+
     _refreshDirectionIconPosition(item) {
         if (isUndefined(item)) {
             const icons = this.directionIcons;
@@ -44,7 +70,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                 return;
             }
             const spread = this.sheet.getParent();
-            if (spread && spread.getActiveSheet() === this.sheet&&item.sheet == this.sheet) {
+            if (spread && this._isDesignMode(this.sheet) &&  spread.getActiveSheet() === this.sheet&&item.sheet == this.sheet) {
                 const {row,col} = item;
                 const span = this.sheet.getSpan(row, col);
                 const rowIndex = row;
@@ -77,9 +103,8 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                         return;
                     }
                 }
-            }else{
-                item.ele.style.display = 'none';
             }
+            item.ele.style.display = 'none'; 
         }
     }
 
@@ -161,6 +186,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             handler: () => {
                 //预览时隐藏设置图标
                 this._hideIcon();
+                this._hideDirectionIcons();
             },
         });
         this._bindEvents([EVENTS.onEditorVisible], () => {
@@ -170,6 +196,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
                     const icon = this._initIcon();
                     icon.style.display = 'flex';
                 }
+                this._showDirectionIcons();
             }
         });
     }
@@ -258,10 +285,10 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             const directionIcons = this.directionIcons;
             if (directionIcons) {
                 const icon = directionIcons.find(
-                    (icon) => icon.row === row && icon.col === col
+                    (icon) => icon.row === row && icon.col === col&&icon.sheet === this.sheet
                 );
                 if (icon) {
-                    document.body.removeChild(icon);
+                    document.body.removeChild(icon.ele);
                     const index = directionIcons.indexOf(icon);
                     directionIcons.splice(index, 1);
                 }

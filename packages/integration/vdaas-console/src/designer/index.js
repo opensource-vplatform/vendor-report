@@ -8,9 +8,11 @@ import { license } from '../utils/license';
 import {
   genResponseErrorCallback,
   getData,
+  getError,
   handleError,
 } from '../utils/responseUtil';
 import {
+  getParameter,
   getReportId,
   getTitle,
 } from '../utils/utils';
@@ -88,6 +90,24 @@ const enhanceMetadata = function (metadata) {
         }
     });
 };
+
+const toolbar = [];
+
+if(getParameter("closeAble")!='0'){
+    toolbar.push({
+        title: '关闭',
+        type: 'warning',
+        onClick() {
+            MSG.confirm('', '确定关闭设计器吗？', function (confirmed) {
+                if (confirmed) {
+                    window.opener = null;
+                    window.open('', '_self');
+                    window.close();
+                }
+            });
+        },
+    });
+}
 
 const designer = new Designer({
     //配置详情参考README.md
@@ -227,7 +247,10 @@ const designer = new Designer({
                 const usedDatasources = getUsedDatasources(context);
                 RPC.get(getTableDataUrl(usedDatasources.join(',')))
                     .then((data) => {
-                        if(!handleError(data,reject,'获取数据集数据失败！')){
+                        const err = getError(data,'');
+                        if(err){
+                            resolve({});
+                        }else{
                             resolve(getData(data.data,'data',true));
                         }
                     })
@@ -236,21 +259,7 @@ const designer = new Designer({
         },
     },
     license,
-    toolbar: [
-        {
-            title: '关闭',
-            type: 'warning',
-            onClick() {
-                MSG.confirm('', '确定关闭设计器吗？', function (confirmed) {
-                    if (confirmed) {
-                        window.opener = null;
-                        window.open('', '_self');
-                        window.close();
-                    }
-                });
-            },
-        },
-    ],
+    toolbar,
 });
 
 //设计器挂载到指定dom元素
