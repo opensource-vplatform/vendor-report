@@ -113,62 +113,78 @@ const getSheetRect = function (sheet) {
 };
 
 const recursionSheetZoom = function (sheet, el, spread) {
-    let flag = true;
-    function recursion() {
-        spread.options.showHorizontalScrollbar = true;
-        spread.options.showVerticalScrollbar = true;
-        let hasScroll = false;
-        let zoomFactor = sheet.zoom();
-        const scrollbarWrappers = el?.current?.querySelectorAll?.(
-            '.gc-scrollbar-wrapper'
-        );
-        scrollbarWrappers.forEach(function (scrollbarWrapper) {
-            const scrollbarWrapperCss =
-                window.getComputedStyle(scrollbarWrapper);
-            const scrollbarWrapperHeight = Number(
-                scrollbarWrapperCss.height.slice(0, -2)
-            );
-            const scrollbarWrapperWidth = Number(
-                scrollbarWrapperCss.width.slice(0, -2)
-            );
-
-            const scrollHandle =
-                scrollbarWrapper?.querySelector?.('.gc-scroll-handle');
-            const scrollHandleCss = window.getComputedStyle(scrollHandle);
-            const scrollHandleHeight = Number(
-                scrollHandleCss.height.slice(0, -2)
-            );
-            const scrollHandleWidth = Number(
-                scrollHandleCss.width.slice(0, -2)
-            );
-
-            const heightDiff = scrollbarWrapperHeight - scrollHandleHeight;
-            const widthDiff = scrollbarWrapperWidth - scrollHandleWidth;
-            if (
-                (scrollbarWrapperHeight && heightDiff > 2) ||
-                (scrollbarWrapperWidth && widthDiff > 2)
-            ) {
-                hasScroll = true;
+    spread.options.showHorizontalScrollbar = true;
+    spread.options.showVerticalScrollbar = true;
+    const result = new Promise(function (resolve) {
+        let flag = true;
+        function recursion() {
+            let zoomFactor = sheet.zoom();
+            if (zoomFactor <= 0.25 || zoomFactor >= 4) {
+                resolve();
+                return;
             }
-        });
-        if (hasScroll) {
-            //缩放
-            flag = false;
-            zoomFactor -= 0.01;
-            sheetZoom(sheet, zoomFactor);
-            recursion();
-        } else if (flag) {
-            //如果没有滚动条，先放大到有滚动条为止再缩放
-            zoomFactor += 0.05;
-            sheetZoom(sheet, zoomFactor);
-            if (zoomFactor < 4) {
+
+            let hasScroll = false;
+            const scrollbarWrappers = el?.current?.querySelectorAll?.(
+                '.gc-scrollbar-wrapper'
+            );
+            scrollbarWrappers.forEach(function (scrollbarWrapper) {
+                const scrollbarWrapperCss =
+                    window.getComputedStyle(scrollbarWrapper);
+                const scrollbarWrapperHeight = Number(
+                    scrollbarWrapperCss.height.slice(0, -2)
+                );
+                const scrollbarWrapperWidth = Number(
+                    scrollbarWrapperCss.width.slice(0, -2)
+                );
+
+                const scrollHandle =
+                    scrollbarWrapper?.querySelector?.('.gc-scroll-handle');
+                const scrollHandleCss = window.getComputedStyle(scrollHandle);
+                const scrollHandleHeight = Number(
+                    scrollHandleCss.height.slice(0, -2)
+                );
+                const scrollHandleWidth = Number(
+                    scrollHandleCss.width.slice(0, -2)
+                );
+
+                const heightDiff = Math.floor(
+                    scrollbarWrapperHeight - scrollHandleHeight
+                );
+                const widthDiff = Math.floor(
+                    scrollbarWrapperWidth - scrollHandleWidth
+                );
+                if (
+                    (scrollbarWrapperHeight && heightDiff > 2) ||
+                    (scrollbarWrapperWidth && widthDiff > 2)
+                ) {
+                    hasScroll = true;
+                }
+            });
+            if (hasScroll) {
+                //缩放
+                flag = false;
+                zoomFactor -= 0.01;
+                sheet.zoom(zoomFactor);
+                sheetZoom(sheet, zoomFactor);
                 recursion();
+            } else if (flag) {
+                //如果没有滚动条，先放大到有滚动条为止再缩放
+                zoomFactor += 0.05;
+                sheet.zoom(zoomFactor);
+                //sheetZoom(sheet, zoomFactor);
+                recursion();
+            } else {
+                resolve();
             }
         }
+        recursion();
+    });
+    result.then(function () {
         spread.options.showHorizontalScrollbar = false;
         spread.options.showVerticalScrollbar = false;
-    }
-    recursion();
+        spread.refresh();
+    });
 };
 
 const afterRefresh = function ({ spread, el }) {
@@ -527,5 +543,6 @@ export const zoomIn = function ({ spread, getStyle, setStyle, el, paper }) {
 };
 
 const sheetZoom = function (sheet, value) {
-    sheet.zoom(value / (window.devicePixelRatio || 1));
+    sheet.zoom(value);
+    //sheet.zoom(value / (window.devicePixelRatio || 1));
 };

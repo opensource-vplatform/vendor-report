@@ -234,7 +234,6 @@ class Report {
             title: '',
             sheetIndex: null,
             exportPdfHandler: null,
-            test: false,
         }
     ) {
         return new Promise((resolve, reject) => {
@@ -245,7 +244,7 @@ class Report {
                             ? filename
                             : filename + '.pdf';
 
-                        if (options?.test) {
+                        if (options?.exportPdfHandler) {
                             if (this.exportPDFHandler) {
                                 this.exportPDFHandler()
                                     .then(({ exportPDF }) => {

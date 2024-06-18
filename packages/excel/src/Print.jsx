@@ -336,30 +336,39 @@ export default function (props) {
                             newSheet.sheet = sheetJson;
                             inst.resetSheet(newSheet);
                             sheet.fromJSON(sheetJson);
-                            datas.spread.savePDF(
-                                (data) => {
-                                    if (persistence) {
-                                        download(data, filename);
-                                    }
-                                    if (
-                                        typeof exportPdfHandler === 'function'
-                                    ) {
-                                        exportPdfHandler(data);
-                                    }
-                                    resolve();
-                                },
-                                (err) => {
-                                    reject(err);
-                                },
-                                {
-                                    author,
-                                    creator,
-                                    keywords,
-                                    subject,
-                                    title,
-                                },
-                                sheetIndex == null ? undefined : sheetIndex
-                            );
+                            const enhancer = new ExcelEnhancer(datas.spread);
+                            enhancer
+                                .enhance()
+                                .then((result) => {
+                                    datas.spread.savePDF(
+                                        (data) => {
+                                            if (persistence) {
+                                                download(data, filename);
+                                            }
+                                            if (
+                                                typeof exportPdfHandler ===
+                                                'function'
+                                            ) {
+                                                exportPdfHandler(data);
+                                            }
+                                            resolve();
+                                        },
+                                        (err) => {
+                                            reject(err);
+                                        },
+                                        {
+                                            author,
+                                            creator,
+                                            keywords,
+                                            subject,
+                                            title,
+                                        },
+                                        sheetIndex == null
+                                            ? undefined
+                                            : sheetIndex
+                                    );
+                                })
+                                .catch(reject);
                         });
                     });
                 }
