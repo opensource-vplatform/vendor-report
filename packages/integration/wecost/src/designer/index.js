@@ -119,28 +119,8 @@ const designer = new Designer({
         allowToEdit: false, //不允许编辑数据源
     },
     event: {
-        onSave: function (json, context) {
-            return new Promise(function (resolve, reject) {
-                json.usedDatasources = getUsedDatasources(context);
-                json.selectedDatasources = getSelectedDatasources(context);
-                json.datasourceSetting = context.datasourceSetting;
-                const config = JSON.stringify(json);
-                //保存的参数
-                const params = {
-                    id: getReportId(),
-                    config,
-                    icon: null,
-                    preview: context.toImage(),
-                    requestTables: '',
-                };
-                RPC.post(getSaveReportUrl(), params)
-                    .then((response) => {
-                        if (!handleError(response, reject, '保存报表失败！')) {
-                            resolve({ success: true });
-                        }
-                    })
-                    .catch(genResponseErrorCallback(reject));
-            });
+        onSave: function () {
+            return window.tooneReport.saveReport();
         },
         onDatasourceSelectVisible: function () {
             return new Promise(function (resolve, reject) {
@@ -254,23 +234,25 @@ const designer = new Designer({
 window.tooneReport = {
     //保存
     saveReport: function () {
-        const json = designer.getDesignReport();
-        const config = JSON.stringify(json);
-        //保存的参数
-        const params = {
-            id: getReportId(),
-            config,
-            icon: null,
-            preview: json.preview,
-            requestTables: '',
-        };
-        RPC.post(getSaveReportUrl(), params)
-            .then((response) => {
-                if (!handleError(response, reject, '保存报表失败！')) {
-                    resolve({ success: true });
-                }
-            })
-            .catch(genResponseErrorCallback(reject));
+        return new Promise((resolve,reject)=>{
+            const json = designer.getDesignReport();
+            const config = JSON.stringify(json);
+            //保存的参数
+            const params = {
+                id: getReportId(),
+                config,
+                icon: null,
+                preview: json.preview,
+                requestTables: '',
+            };
+            RPC.post(getSaveReportUrl(), params)
+                .then((response) => {
+                    if (!handleError(response, reject, '保存报表失败！')) {
+                        resolve({ success: true });
+                    }
+                })
+                .catch(genResponseErrorCallback(reject));
+        });
     },
     //预览
     previewReport: function () {
