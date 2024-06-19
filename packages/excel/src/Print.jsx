@@ -304,7 +304,6 @@ export default function (props) {
             keywords: '',
             subject: '',
             title: '',
-            sheet,
             exportPdfHandler: null,
         }
     ) => {
@@ -349,7 +348,11 @@ export default function (props) {
                                                 typeof exportPdfHandler ===
                                                 'function'
                                             ) {
-                                                exportPdfHandler(data);
+                                                exportPdfHandler({
+                                                    total: datasLen,
+                                                    blob: data,
+                                                    index: i + 1,
+                                                });
                                             }
                                             resolve();
                                         },
