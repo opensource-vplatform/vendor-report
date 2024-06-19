@@ -30,10 +30,10 @@ const Wrap = styled.div`
         //border: solid 1px #5292f7;
         border: solid 1px #999999;
     }
-    &[data-error='true']{
+    &[data-error='true'] {
         border: 1px solid red !important;
     }
-    &[data-error='true']:hover{
+    &[data-error='true']:hover {
         border: 1px solid red !important;
     }
 `;
@@ -96,8 +96,9 @@ export default function (props) {
         disabled = false,
         //取消选择值
         cancelValue = undefined,
-        error=false,
+        error = false,
         value,
+        text,
     } = props;
     const [data, setData] = useState({ text: null, value });
     useEffect(() => {
@@ -133,7 +134,7 @@ export default function (props) {
                             alignItems: 'center',
                         }}
                     >
-                        {data.text}
+                        {data.text || text}
                     </Text>
                 )}
                 <ArrowDown
