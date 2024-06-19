@@ -34,6 +34,10 @@ export const isBoolean = function(obj){
     return is(obj,'boolean');
 }
 
+export const isNumber = function(obj){
+    return is(obj,'number');
+}
+
 export const isNotBlank = function (obj) {
     return typeof obj == 'string' && obj.trim().length > 0;
 };

@@ -149,6 +149,9 @@ function Designer(props) {
     }
     useEffect(()=>{
         if(mode=='edit'&&spread){
+            /**
+             * 解决预览时调整浏览器宽高再切回设计器，设计器画布大小异常问题
+             */
             spread.refresh()
         }
     },[mode]);

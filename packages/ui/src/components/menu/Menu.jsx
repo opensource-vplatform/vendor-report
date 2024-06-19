@@ -1,12 +1,34 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
-
 import { isFunction } from '@toone/report-util';
 
 import Popper from '../popper/Popper';
 import ItemsPanel from './ItemsPanel';
+
+function getNodePath(tree, targetValue) {
+    let path = [];
+    function traverse(node, currentPath) {
+        if (node.value === targetValue) {
+            path = currentPath.concat([node.value]);
+            return;
+        }
+        if (node.children) {
+            for (const child of node.children) {
+                traverse(child, currentPath.concat([node.value]));
+                if (path.length > 0) {
+                    return;
+                }
+            }
+        }
+    }
+    if(tree&&tree.length>0){
+        for (const node of tree) {
+            traverse(node, []);
+            if (path.length > 0) {
+                return path;
+            }
+        }
+    }
+    return path;
+}
 
 export default function (props) {
     const {
@@ -22,9 +44,10 @@ export default function (props) {
         //菜单项最大个数，超出此个数将出现竖向滚动条
         optionMaxSize = 10,
         disabled = false,
+        onVisibleChange = undefined,
         value,
     } = props;
-    let contentStyle = {
+    const contentStyle = {
         fontSize: 12,
         ...optionStyle,
         border: 'none',
@@ -32,40 +55,33 @@ export default function (props) {
         overflowX: 'visible',
         overflowY: 'visible',
     };
-    const [data, setData] = useState(() => {
-        return isFunction(value) ? null : value;
-    });
     const handleNodeClick = (val, item) => {
         if (cancelAble && val === value) {
             val = cancelValue;
         }
-        setData(val);
         onNodeClick(val, item);
     };
     const handleVisibleChange = isFunction(value)
         ? (visible) => {
               if (visible) {
                   const data = value();
-                  setData(data);
+                  setData(getNodePath(datas,data));
               }
           }
         : undefined;
-    useEffect(() => {
-        setData(value);
-    }, [value]);
     return (
         <Popper
             style={style}
             disabled={disabled}
             content={
                 <ItemsPanel
-                    value={data}
+                    value={getNodePath(datas,value)}
                     items={datas}
                     optionMaxSize={optionMaxSize}
                     onNodeClick={handleNodeClick}
                 ></ItemsPanel>
             }
-            onVisibleChange={handleVisibleChange}
+            onVisibleChange={onVisibleChange}
             contentStyle={contentStyle}
         >
             {children}

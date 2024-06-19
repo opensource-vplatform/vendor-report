@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   useDispatch,
   useSelector,
@@ -207,15 +209,20 @@ export default function () {
             handler(spread, dispatch, val);
         }
     };
+    const [value,setValue] = useState(null);
     return (
         <VIconTitleWithDropdown
             title='页边距'
             icon={PaddingIcon}
             menus={menus}
-            value={() => {
-                const margin = getMargin(spread);
-                return margin ? toPaddingType(margin) : null;
+            onVisibleChange={(visible) => {
+                if(visible){
+                    const margin = getMargin(spread);
+                    const val = margin ? toPaddingType(margin) : null;
+                    setValue(val);
+                }
             }}
+            value={value}
             onNodeClick={handleNodeClick}
         ></VIconTitleWithDropdown>
     );

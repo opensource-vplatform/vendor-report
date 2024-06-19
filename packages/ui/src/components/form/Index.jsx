@@ -13,6 +13,8 @@ import Select from './Select';
 import TextArea from './Textarea';
 import TextInput from './TextInput';
 
+export * from './Form'
+
 export {
   Button,
   CheckBox,

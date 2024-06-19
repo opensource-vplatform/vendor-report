@@ -61,10 +61,11 @@ const WithMenuItem = function (Component) {
             ...others
         } = props;
         let children = null;
+        const isFolder = hasChildren(datas);
         const [data, setData] = useState({ show: false, left: 0, top: 0 });
         if (type == 'group') {
             let childrenComp = [];
-            if (hasChildren(datas)) {
+            if (isFolder) {
                 childrenComp = datas.map((item) => {
                     return createMenuItem(value, item, onClick, optionMaxSize);
                 });
@@ -79,28 +80,35 @@ const WithMenuItem = function (Component) {
             );
         } else {
             const handleMouseEnter = (evt) => {
-                if (disabled) return;
+                if (disabled||!isFolder) return;
                 const target = evt.target;
                 const itemWrap = target.closest('.menuItemWrap');
                 const itemsWrap = target.closest('.menuItemsWrap');
                 const itemWrapRect = itemWrap.getBoundingClientRect();
                 const itemsWrapRect = itemsWrap.getBoundingClientRect();
+                const panelWidth = itemsWrapRect.width;
+                const itemWidth = itemWrapRect.width;
+                let left = itemsWrapRect.width - 3;
+                if(panelWidth-itemWidth>3){
+                    //菜单项面板出现滚动条
+                    left = itemWidth + 1;
+                }
                 setData({
                     show: true,
-                    left: itemsWrapRect.width - 3,
+                    left,
                     top: itemWrapRect.top - itemsWrapRect.top,
                 });
             };
 
             const handleMouseLeave = (evt) => {
-                if (disabled) return;
+                if (disabled||!isFolder) return;
                 setData({ show: false });
             };
             children = (
                 <MenuItemWrap
                     data-value={value}
                     className='menuItemWrap'
-                    data-selected={active == value}
+                    data-selected={active.indexOf(value) !== -1}
                     data-disabled={disabled}
                     style={{ height }}
                     data-type={isReactNode(text) ? 'custom' : 'text'}
@@ -150,6 +158,7 @@ export const MenuItem = WithMenuItem(function (props) {
             {!disabled && hasChildren(datas) ? (
                 <ArrowDownIcon
                     style={{ transform: 'rotate(270deg)' }}
+                    size="small"
                 ></ArrowDownIcon>
             ) : null}
         </Fragment>

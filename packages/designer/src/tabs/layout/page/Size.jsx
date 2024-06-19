@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import {
   useDispatch,
   useSelector,
@@ -135,13 +137,18 @@ export default function () {
             handler(spread, dispatch, val);
         }
     };
+    const [value,setValue] = useState(null);
     return (
         <VIconTitleWithDropdown
             title='纸张大小'
             icon={SizeIcon}
             menus={Menus}
             onNodeClick={handleNodeClick}
-            value={() => getPageKind(spread)}
+            onVisibleChange={() => {
+                const pageKind = getPageKind(spread);
+                setValue(pageKind+'');
+            }}
+            value={value}
         ></VIconTitleWithDropdown>
     );
 }

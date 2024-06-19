@@ -12,34 +12,47 @@ import {
  */
 
 const itemStyle = {
-    marginLeft: 4,
-    paddingLeft: 4,
-    paddingRight: 4,
-    paddingBottom: 4,
+  marginLeft: 4,
+  paddingLeft: 4,
+  paddingRight: 4,
+  paddingBottom: 4,
 };
 
 const iconStyle = {
-    width: 28,
-    height: 28,
+  width: 28,
+  height: 28,
 };
 
 export default function (props) {
-    const { icon: Icon, title, desc = '', menus, onNodeClick, value } = props;
-    return (
-        <Menu value={value} datas={menus} onNodeClick={onNodeClick}>
-            <VItem
-                title={title}
-                desc={desc}
-                style={itemStyle}
-                icon={<Icon iconStyle={iconStyle}></Icon>}
-            >
-                <ArrowDownIcon
-                    style={{
-                        width: 16,
-                        height: 16,
-                    }}
-                ></ArrowDownIcon>
-            </VItem>
-        </Menu>
-    );
+  const {
+    icon: Icon,
+    title,
+    desc = '',
+    menus,
+    onVisibleChange,
+    onNodeClick,
+    value,
+  } = props;
+  return (
+    <Menu
+      value={value}
+      datas={menus}
+      onNodeClick={onNodeClick}
+      onVisibleChange={onVisibleChange}
+    >
+      <VItem
+        title={title}
+        desc={desc}
+        style={itemStyle}
+        icon={<Icon iconStyle={iconStyle}></Icon>}
+      >
+        <ArrowDownIcon
+          style={{
+            width: 16,
+            height: 16,
+          }}
+        ></ArrowDownIcon>
+      </VItem>
+    </Menu>
+  );
 }

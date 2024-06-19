@@ -1,5 +1,9 @@
-import { Fragment } from 'react';
+import {
+  Fragment,
+  useState,
+} from 'react';
 
+import { FormItem } from '@toone/report-ui';
 import { isUndefined } from '@toone/report-util';
 import {
   applyToSelectedCell,
@@ -12,10 +16,8 @@ import {
 } from '@utils/worksheetUtil';
 
 import {
-  Item,
-  ItemList,
+  RowHeight,
   Text,
-  Title,
   Toolbar,
 } from '../Component';
 import {
@@ -27,35 +29,41 @@ import {
 const PLUGIN_TYPE = 'cellGroup';
 
 const Component = function (props) {
-    const { onConfirm, onCancel, sheet } = props;
-    const handleConfirm = () => {
-        const plugin = {
-            type: PLUGIN_TYPE,
-        };
-        withBatchUpdate(sheet.getParent(), () => {
-            applyToSelectedCell(sheet, (sheet, row, col) => {
-                //clearAllCellTagPlugin(sheet, row, col);
-                const bindingPath = sheet.getBindingPath(row, col);
-                if (bindingPath) {
-                    setCellTagPlugin(sheet, row, col, plugin);
-                }
-            });
-        });
-        onConfirm(plugin);
+  const { onConfirm, onCancel, sheet, plugin } = props;
+  const [config, setConfig] = useState(plugin.config || {});
+  const handleConfirm = () => {
+    const plugin = {
+      type: PLUGIN_TYPE,
+      config
     };
-    return (
-        <Fragment>
-            <ItemList>
-                <Item>
-                    <Title>扩展方向</Title>
-                </Item>
-                <Item>
-                    <Text>纵向</Text>
-                </Item>
-            </ItemList>
-            <Toolbar onConfirm={handleConfirm} onCancel={onCancel}></Toolbar>
-        </Fragment>
-    );
+    withBatchUpdate(sheet.getParent(), () => {
+      applyToSelectedCell(sheet, (sheet, row, col) => {
+        //clearAllCellTagPlugin(sheet, row, col);
+        const bindingPath = sheet.getBindingPath(row, col);
+        if (bindingPath) {
+          setCellTagPlugin(sheet, row, col, plugin);
+        }
+      });
+    });
+    onConfirm(plugin);
+  };
+  return (
+    <Fragment>
+      <FormItem label='扩展方向'>
+        <Text>纵向</Text>
+      </FormItem>
+      <RowHeight
+        value={config.rowHeight ? config.rowHeight : ''}
+        onChange={(val) => {
+          setConfig({
+            ...config,
+            rowHeight: val,
+          });
+        }}
+      ></RowHeight>
+      <Toolbar onConfirm={handleConfirm} onCancel={onCancel}></Toolbar>
+    </Fragment>
+  );
 };
 
 /**
@@ -66,39 +74,38 @@ const Component = function (props) {
  * @returns
  */
 const isShowIcon = function (sheet, row, col) {
-    return hasBindField(sheet, row, col);
+  return hasBindField(sheet, row, col);
 };
 
-const isGroup = function(sheet, row, col){
-    return hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
-}
+const isGroup = function (sheet, row, col) {
+  return hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE);
+};
 
 const paintCell = function (context, style, value) {
-    const { sheet, row, col } = context;
-    const has = isGroup(sheet, row, col);
-    if (has) {
-        setGroupDecoration(style);
-        const bindingPath = sheet.getBindingPath(row, col);
-        const spread = sheet.getParent();
-        const text = getBindText(bindingPath, spread);
-        if (!isUndefined(text)) {
-            value = text;
-        }
+  const { sheet, row, col } = context;
+  const has = isGroup(sheet, row, col);
+  if (has) {
+    setGroupDecoration(style);
+    const bindingPath = sheet.getBindingPath(row, col);
+    const spread = sheet.getParent();
+    const text = getBindText(bindingPath, spread);
+    if (!isUndefined(text)) {
+      value = text;
     }
-    return value;
+  }
+  return value;
 };
 
-
 function getOptions(sheet) {
-    const { row, col } = getActiveIndexBySheet(sheet);
-    const options = [];
-    if (hasBindField(sheet, row, col)) {
-        options.push({
-            value: PLUGIN_TYPE,
-            text: '分组',
-        });
-    }
-    return options;
+  const { row, col } = getActiveIndexBySheet(sheet);
+  const options = [];
+  if (hasBindField(sheet, row, col)) {
+    options.push({
+      value: PLUGIN_TYPE,
+      text: '分组',
+    });
+  }
+  return options;
 }
 
 /**
@@ -109,17 +116,17 @@ function getOptions(sheet) {
  * @returns
  */
 function getDirection(sheet, row, col) {
-    if (isGroup(sheet, row, col)) {
-        return 'v';
-    }
-    return null;
+  if (isGroup(sheet, row, col)) {
+    return 'v';
+  }
+  return null;
 }
 
 export default {
-    Component,
-    isShowIcon,
-    paintCell,
-    PLUGIN_TYPE,
-    getOptions,
-    getDirection,
+  Component,
+  isShowIcon,
+  paintCell,
+  PLUGIN_TYPE,
+  getOptions,
+  getDirection,
 };

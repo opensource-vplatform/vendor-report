@@ -10,6 +10,24 @@ const Icon = styled.svg`
     &[data-disabled='true'] {
         cursor: not-allowed;
     }
+    &[data-size='large'] {
+        padding: 0px;
+        margin: 0px;
+        height: 24px;
+        width: 24px;
+    }
+    &[data-size='middle'] {
+        padding: 0px;
+        margin: 0px;
+        height: 21px;
+        width: 21px;
+    }
+    &[data-size='small'] {
+        padding: 0px;
+        margin: 0px;
+        height: 18px;
+        width: 18px;
+    }
 `;
 
 const Path = styled.path`
@@ -30,6 +48,7 @@ function Index(pros) {
         svgAttrs = {},
         pathAttrs = {},
         iconStyle = {},
+        size,
         iconChildren = null,
         children,
     } = pros;
@@ -46,8 +65,20 @@ function Index(pros) {
             data-disabled={disabled}
             data-hoverable={hoverable}
         >
-            <Icon style={icSt} data-disabled={disabled} viewBox='0 0 24 24' {...svgAttrs}>
-                {icon||pathAttrs ? <Path data-disabled={disabled} d={icon} {...pathAttrs}></Path> : null}
+            <Icon
+                style={icSt}
+                data-size={size}
+                data-disabled={disabled}
+                viewBox='0 0 24 24'
+                {...svgAttrs}
+            >
+                {icon || pathAttrs ? (
+                    <Path
+                        data-disabled={disabled}
+                        d={icon}
+                        {...pathAttrs}
+                    ></Path>
+                ) : null}
                 {iconChildren}
             </Icon>
             {children}

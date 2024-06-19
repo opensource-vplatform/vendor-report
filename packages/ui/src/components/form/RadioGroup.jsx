@@ -32,7 +32,7 @@ const Label = styled.span`
 const Context = createContext(null);
 
 export const Radio = function (props) {
-    const { label, value, desc = '', children, style={} } = props;
+    const { label, value, desc = '', children, style={},labelStyle={} } = props;
     return (
         <Context.Consumer>
             {(ctx) => {
@@ -55,7 +55,7 @@ export const Radio = function (props) {
                         ) : (
                             <UnCheckRadio></UnCheckRadio>
                         )}
-                        {<Label>{label}</Label>}
+                        {<Label style={labelStyle}>{label}</Label>}
                         {children}
                     </RadioWrap>
                 );
