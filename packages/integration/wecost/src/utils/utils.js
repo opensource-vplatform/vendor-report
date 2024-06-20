@@ -136,3 +136,77 @@ export function download(data, filename) {
   }
 }
 
+/**
+ * 请求参数配置
+ */
+const getRequestParams = {
+  queryReportConfig: {
+    id: getReportId(),
+    bizParams: getParameter("bizParams") || "",
+    reportTitle: getTitle("报表"),
+  },
+  getTableData: {
+    id: getReportId(),
+    bizParams: getParameter("bizParams") || "",
+    reportTitle: getTitle("报表"),
+  },
+  queryMetadatas: {
+    id: getReportId(),
+    bizParams: getParameter("bizParams") || "",
+    reportTitle: getTitle("报表"),
+  },
+  saveReportConfig: {
+    id: getReportId(),
+    bizParams: getParameter("bizParams") || "",
+    reportTitle: getTitle("报表"),
+  }
+}
+
+/**
+ * 请求本地数据接口
+ * @param {*} action 请求类型
+ * @param {*} options 额外参数
+ * @returns 
+ */
+export const request = function (action, options = {}) {
+  return new Promise((resolve) => {
+    const requestJson = JSON.stringify({
+      action,
+      ...(getRequestParams[action] || {}),
+      ...options
+    });
+    java({
+      request: requestJson,
+      onSuccess: function (response) {
+        try {
+          resolve(JSON.parse(response));
+        } catch (e) {
+          console.log("请求失败：" + e);
+        }
+      }
+    })
+  })
+}
+
+/**
+ * 
+ * @param {*} name 注册字体名称
+ * @param {*} type 注册类型
+ * @returns 
+ */
+export const registerFont = function (name, type) {
+  return new Promise((resolve) => {
+    // const blob = data;
+    // //将Blob 对象转换成 ArrayBuffer
+    // const reader = new FileReader();
+    // reader.onload = function () {
+    //   const fontrrayBuffer = reader.result;
+    //   const fonts = GC.Spread.Sheets.PDF.PDFFontsManager.getFont(name) || {};
+    //   fonts[type] = fontrrayBuffer;
+    //   GC.Spread.Sheets.PDF.PDFFontsManager.registerFont(name, fonts);
+    //   resolve();
+    // }
+    // reader.readAsArrayBuffer(blob);
+    resolve();
+  })
+}

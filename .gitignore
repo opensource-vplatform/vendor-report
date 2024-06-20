@@ -18,3 +18,6 @@ org.eclipse.m2e.core.prefs
 packages/integration/vdaas-service/uploads/**
 packages/integration/vdaas-service/httpAccess.log
 packages/integration/vdaas-service/runLogs.log
+.vscode/launch.json
+pnpm-lock.yaml
+packages/integration/wecost/resources/static/wecost/spreadsheet/designer.html
