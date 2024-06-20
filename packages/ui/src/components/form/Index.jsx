@@ -1,6 +1,7 @@
 import Button from './Button';
 import CheckBox from './CheckBox';
 import ColorPicker from './ColorPicker';
+import Date from './date/Index';
 import Float from './Float';
 import Integer from './Integer';
 import { Legend } from './Legend';
@@ -19,6 +20,7 @@ export {
   Button,
   CheckBox,
   ColorPicker,
+  Date,
   Float,
   Integer,
   Legend,

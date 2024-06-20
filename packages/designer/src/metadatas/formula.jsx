@@ -8105,7 +8105,7 @@ export const getFormulaMetadatas = function () {
                     if(repeatable === true){
                         arg.dynamic = true;
                     }
-                    args.push();
+                    args.push(arg);
                 });
             }
             FORMULA_METADATAS[formulaCode] = {

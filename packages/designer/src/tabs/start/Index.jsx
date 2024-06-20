@@ -1,6 +1,9 @@
 import { useContext } from 'react';
 
-import { Group } from '@toone/report-ui';
+import {
+  Date,
+  Group,
+} from '@toone/report-ui';
 import {
   getNavConfig,
   getNavStartConfig,
@@ -40,6 +43,7 @@ function Index() {
             {isShowNumber && <Number></Number>}
             {isShowStyle && <Style></Style>}
             {isShowCell && <Cell></Cell>}
+            <Date></Date>
         </Group>
     );
 }
