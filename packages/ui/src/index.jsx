@@ -12,3 +12,4 @@ export * from './components/page/Index';
 export * from './components/highlight/Index';
 export * from './components/splitpane/Index';
 export * from './theme/Index';
+export * from './components/query/Index';
