@@ -20,7 +20,7 @@ let isDev = false;
 
 // 用于存储文件流的 Map
 const fileMap = new Map();
-const clientMap = new Map();
+// const clientMap = new Map();
 
 // 创建一个自定义的 silent logger 配置
 const logConfig = {
@@ -122,10 +122,10 @@ app.use('/font', (req, res) => {
 });
 
 // 通知对应客户端更新消息
-const notifyClient = (fileId, data) => {
-  if (!!clientMap.get(fileId))
-    clientMap.get(fileId).write(`data: ${JSON.stringify(data)}\n\n`);
-};
+// const notifyClient = (fileId, data) => {
+//   if (!!clientMap.get(fileId))
+//     clientMap.get(fileId).write(`data: ${JSON.stringify(data)}\n\n`);
+// };
 
 app.all('/reportapi/:appCode/report/reportExportProgress/:fileId', (req, res) => {
   const fileId = req.params.fileId;
@@ -155,44 +155,44 @@ app.all('/reportapi/:appCode/report/reportExportProgress/:fileId', (req, res) =>
 
 
 
-app.all('/reportapi/:appCode/report/reportExportStreamProgress/:fileId', (req, res) => {
-  const fileId = req.params.fileId;
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  clientMap.set(fileId, res);
-  if (fileMap.get(fileId))
-    try {
-      const data = {
-        curPageIndex: fileMap.get(fileId).curPageIndex,
-        pageCounts: fileMap.get(fileId).pageCounts,
-        progress: Math.round((fileMap.get(fileId).curPageIndex / fileMap.get(fileId).pageCounts).toFixed(2) * 100),
-        success: true
-      }
-      res.write(`data : ${JSON.stringify(data)}\n\n`)
-    } catch (err) {
-      const errData = {
-        message: `查询进度异常：${typeof err === 'string' ? err : err.message}`,
-        success: false
-      }
-      res.write(`data : ${JSON.stringify(errData)}\n\n`);
-      runLogs.error(`导出PDF失败:${err}`);
-      // res.end();
-    }
-  else {
-    const errData = {
-      message: '没找到fileId对应的导出进程,请检查参数是否正确',
-      success: false
-    }
-    res.write(`data : ${JSON.stringify(errData)}\n\n`);
-    // res.end();
-  }
-  // 处理客户端断开连接
-  req.on('close', () => {
-    res.end();
-    clientMap.delete(fileId);
-  });
-})
+// app.all('/reportapi/:appCode/report/reportExportStreamProgress/:fileId', (req, res) => {
+//   const fileId = req.params.fileId;
+//   res.setHeader('Content-Type', 'text/event-stream');
+//   res.setHeader('Cache-Control', 'no-cache');
+//   res.setHeader('Connection', 'keep-alive');
+//   clientMap.set(fileId, res);
+//   if (fileMap.get(fileId))
+//     try {
+//       const data = {
+//         curPageIndex: fileMap.get(fileId).curPageIndex,
+//         pageCounts: fileMap.get(fileId).pageCounts,
+//         progress: Math.round((fileMap.get(fileId).curPageIndex / fileMap.get(fileId).pageCounts).toFixed(2) * 100),
+//         success: true
+//       }
+//       res.write(`data : ${JSON.stringify(data)}\n\n`)
+//     } catch (err) {
+//       const errData = {
+//         message: `查询进度异常：${typeof err === 'string' ? err : err.message}`,
+//         success: false
+//       }
+//       res.write(`data : ${JSON.stringify(errData)}\n\n`);
+//       runLogs.error(`导出PDF失败:${err}`);
+//       // res.end();
+//     }
+//   else {
+//     const errData = {
+//       message: '没找到fileId对应的导出进程,请检查参数是否正确',
+//       success: false
+//     }
+//     res.write(`data : ${JSON.stringify(errData)}\n\n`);
+//     // res.end();
+//   }
+//   // 处理客户端断开连接
+//   req.on('close', () => {
+//     res.end();
+//     clientMap.delete(fileId);
+//   });
+// })
 
 /**
  * Middleware function that sets the necessary CORS headers for all requests.
@@ -249,13 +249,13 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.json({
     fileId,
   })
-  if (req.body.pageCounts !== req.body.pageIndex)
-    notifyClient(fileId, {
-      curPageIndex: fileMap.get(fileId).curPageIndex,
-      pageCounts: fileMap.get(fileId).pageCounts,
-      progress: Math.round((fileMap.get(fileId).curPageIndex / fileMap.get(fileId).pageCounts).toFixed(2) * 100),
-      success: true
-    })
+  // if (req.body.pageCounts !== req.body.pageIndex)
+  //   notifyClient(fileId, {
+  //     curPageIndex: fileMap.get(fileId).curPageIndex,
+  //     pageCounts: fileMap.get(fileId).pageCounts,
+  //     progress: Math.round((fileMap.get(fileId).curPageIndex / fileMap.get(fileId).pageCounts).toFixed(2) * 100),
+  //     success: true
+  //   })
 })
 
 
@@ -310,9 +310,9 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
       };
 
       //   添加方法
-      await page.exposeFunction("exportPDF", (path) => exportPDF(path));
+      await page.exposeFunction("exportPDFServer", (path) => exportPDF(path));
       await page.exposeFunction("getFileName", () => `${fileName}_${new Date().getTime()}`);;
-      await page.exposeFunction("exportPDFError", (err) => {
+      await page.exposeFunction("exportPDFServerError", (err) => {
         reject(err);
         runLogs.error(`导出PDF失败:${err}`);
       });
@@ -373,13 +373,13 @@ app.get('/reportapi/:appCode/report/exportPdf', async (req, res) => {
         // 在 'end' 事件触发后关闭可读流
         !isDev && page.close();
         stream.destroy();
-        notifyClient(fileId, {
-          curPageIndex: fileMap.get(fileId).curPageIndex,
-          pageCounts: fileMap.get(fileId).pageCounts,
-          progress: 100,
-          success: true
-        })
-        clientMap.get(fileId) && clientMap.get(fileId).end();
+        // notifyClient(fileId, {
+        //   curPageIndex: fileMap.get(fileId).curPageIndex,
+        //   pageCounts: fileMap.get(fileId).pageCounts,
+        //   progress: 100,
+        //   success: true
+        // })
+        // clientMap.get(fileId) && clientMap.get(fileId).end();
         fileMap.delete(fileId);
         fs.rmSync(lastPath);
         if (filePath.length > 1)
@@ -425,11 +425,11 @@ const handleError = (err, fileId) => {
       for (let item of filePath) {
         fs.rmSync(item)
       }
-    notifyClient(fileId, {
-      message: '导出PDF失败,请检查参数是否正确',
-      errDesc: typeof err === 'string' ? err : err.message,
-      success: false
-    })
+    // notifyClient(fileId, {
+    //   message: '导出PDF失败,请检查参数是否正确',
+    //   errDesc: typeof err === 'string' ? err : err.message,
+    //   success: false
+    // })
     fileMap.delete(fileId);
   }
   runLogs.error(`导出PDF失败:${err}`);

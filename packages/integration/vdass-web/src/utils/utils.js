@@ -136,3 +136,21 @@ export function download(data, filename) {
   }
 }
 
+/**
+ * 查询导出PDF进度
+ * @param {*} fileId 文件Id
+ * @returns 
+ */
+export const exportPdfProgress = function(fileId){
+  return new Promise((resolve, reject) => {
+    axios({
+      method: 'GET',
+      url: getExportPdfProgressUrl(fileId),
+      // responseType: 'application/json'
+    }).then(res => {
+      resolve(res.data)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}

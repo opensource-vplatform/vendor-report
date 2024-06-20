@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+		<groupId>com.toone.v3.platform</groupId>
+		<artifactId>platform-parent</artifactId>
+		<version>3.4.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<name>com.toone.v3.platform-v-daas-spreadsheet-service</name>
+	<groupId>com.toone.v3.platform</groupId>
+	<artifactId>v-daas-spreadsheet-service</artifactId>
+	<version>3.3.0</version>
+	<packaging>bundle</packaging>
+	<properties>
+		<bundle.name></bundle.name>
+		<bundle.description></bundle.description>
+		<bundle.attributeExtend description='example:[{"key":"akey","value":"aa"},{"key":"bkey","value":"bb"}]'></bundle.attributeExtend>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>
