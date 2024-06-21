@@ -1,20 +1,9 @@
-import styled from 'styled-components';
-
 import CheckBox from '../../form/CheckBox';
+import {
+  Label,
+  Wrap,
+} from '../ui';
 
-const Wrap = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const Label = styled.div`
-  height: 35px;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #ddd;
-  box-sizing: border-box;
-  padding-left: 10px;
-`;
 export function CheckBoxItem(props) {
   const {
     labelText = '',

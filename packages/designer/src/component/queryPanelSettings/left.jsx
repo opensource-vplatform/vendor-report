@@ -67,7 +67,7 @@ function ControlListItem(props) {
       }}
     >
       <div style={{ pointerEvents: 'none' }}>
-        <Component labelText={config.labelText}></Component>
+        <Component {...config}></Component>
       </div>
     </DragWrap>
   );

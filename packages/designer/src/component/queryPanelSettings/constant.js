@@ -1,6 +1,7 @@
 import {
   CheckBoxItem,
   IntegerItem,
+  RadioGroupItem,
   Selectitem,
   TextItem,
 } from '@toone/report-ui';
@@ -23,6 +24,22 @@ export const optionalControls = [
       labelText: '下拉框',
     },
   },
+  {
+    type: 'RadioGroup',
+    config: {
+      labelText: '单选组',
+      datas: [
+        {
+          value: '选项1',
+          text: '选项1',
+        },
+        {
+          value: '选项2',
+          text: '选项2',
+        },
+      ],
+    },
+  },
 ];
 
 //测试滚动条
@@ -38,6 +55,7 @@ export const optionalControlsMap = {
   Integer: IntegerItem,
   Boolean: CheckBoxItem,
   Select: Selectitem,
+  RadioGroup: RadioGroupItem,
 };
 
 export const dropdownDatasource = {
