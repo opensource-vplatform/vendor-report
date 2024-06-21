@@ -10,18 +10,27 @@ import {
 } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+import {
   SortableContainer,
   SortableElement,
 } from 'react-sortable-hoc';
 import styled from 'styled-components';
 
+import { saveQueryPanelSettings } from '@store/persistingDataSlice';
 import {
   Button,
   Dialog,
 } from '@toone/report-ui';
 import { uuid } from '@toone/report-util';
+import { getSheetInstanceId } from '@utils/worksheetUtil';
 
-import { optionalControlsMap } from './constant';
+import {
+  defaultQueryPanelSettings,
+  optionalControlsMap,
+} from './constant';
 import Left from './left';
 import Right from './right';
 
@@ -31,6 +40,11 @@ let textDatas = {
   colCount: 3,
   triggerMode: 'Click', //Click||Change
   items: [
+    {
+      id: 'Select1',
+      type: 'Select',
+      config: { labelText: '地区' },
+    },
     {
       id: 'A',
       type: 'Text',
@@ -72,9 +86,8 @@ for (let i = 1; i <= 10; i++) {
 }
 
 //textDatas.items = [];
-
-const Wrap = styled.div`
-  height: calc(100% - 50px);
+const DialogWrap = styled.div`
+  height: 100%;
   width: 100%;
   display: flex;
   user-select: none;
@@ -82,6 +95,19 @@ const Wrap = styled.div`
   border-top: 1px solid #ddd;
   font-size: 12px;
   flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+`;
+const Wrap = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  user-select: none;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  font-size: 12px;
+  flex: 1;
+  overflow: hidden;
 `;
 
 const MainBox = styled.div`
@@ -135,6 +161,38 @@ const DropTipWrap = styled.div`
   opacity: 0.6;
 `;
 
+const SaveBtn = styled.div`
+  cursor: pointer;
+  padding: 3px 3px 0px 3px;
+  border-radius: 4px;
+  &:hover {
+    background-color: #ddd;
+  }
+`;
+
+function SaveIcon(props) {
+  const { onClick } = props;
+  return (
+    <svg
+      t='1718938314429'
+      className='icon'
+      viewBox='0 0 1024 1024'
+      version='1.1'
+      xmlns='http://www.w3.org/2000/svg'
+      p-id='4264'
+      width='22'
+      height='22'
+      onClick={onClick}
+    >
+      <path
+        d='M925.248 356.928l-258.176-258.176a64 64 0 0 0-45.248-18.752H144a64 64 0 0 0-64 64v736a64 64 0 0 0 64 64h736a64 64 0 0 0 64-64V402.176a64 64 0 0 0-18.752-45.248zM288 144h192V256H288V144z m448 736H288V736h448v144z m144 0H800V704a32 32 0 0 0-32-32H256a32 32 0 0 0-32 32v176H144v-736H224V288a32 32 0 0 0 32 32h256a32 32 0 0 0 32-32V144h77.824l258.176 258.176V880z'
+        p-id='4265'
+        fill='#2c2c2c'
+      ></path>
+    </svg>
+  );
+}
+
 const MainItem = SortableElement((props) => {
   const { type, config = {}, active } = props;
   const el = useRef();
@@ -151,7 +209,7 @@ const MainItem = SortableElement((props) => {
 const Main = SortableContainer(function Main(props) {
   const {
     addControls,
-    config: { items: controls, colCount: column },
+    config: { items: controls = [], colCount: column },
     controlsIndex = 0,
   } = props;
 
@@ -207,9 +265,19 @@ const Main = SortableContainer(function Main(props) {
 
 export default function (props) {
   const { onClose } = props;
-  const [config, setConfig] = useState(textDatas);
+  const dispatch = useDispatch();
+  const { spread } = useSelector(({ appSlice }) => appSlice);
+  const sheet = spread.getActiveSheet();
+  const sheetId = getSheetInstanceId(sheet);
+  const persistingDataSlice = useSelector(
+    ({ persistingDataSlice }) => persistingDataSlice
+  );
+  let queryPanelSettings =
+    persistingDataSlice?.sheets?.[sheetId]?.queryPanelSettings ||
+    defaultQueryPanelSettings;
+  const [config, setConfig] = useState(queryPanelSettings);
 
-  const controls = config.items;
+  const controls = config.items || [];
   const [datas, setDatas] = useState({
     activeId: controls?.[0]?.id,
     controlsIndex: 0,
@@ -328,6 +396,42 @@ export default function (props) {
       };
     });
   };
+
+  const changeControlDropDownSource = (key, value) => {
+    setConfig((config) => {
+      const controls = config.items;
+      const newControls = [];
+      controls.forEach((control) => {
+        if (control.id === datas.activeId) {
+          newControls.push({
+            ...control,
+            config: {
+              ...control?.config,
+              dropDownSource: {
+                ...(control?.config?.dropDownSource || {}),
+                [key]: value,
+              },
+            },
+          });
+        } else {
+          newControls.push(control);
+        }
+      });
+
+      return { ...config, items: newControls };
+    });
+  };
+
+  const saveHandler = () => {
+    dispatch(
+      saveQueryPanelSettings({
+        sheetId,
+        datas: config,
+      })
+    );
+    console.log(sheetId, config);
+  };
+
   console.log(config, 'config');
   return (
     <Dialog
@@ -338,28 +442,46 @@ export default function (props) {
       onClose={onClose}
       style={{ marginTop: '-2px', flex: 1 }}
     >
-      <Wrap>
-        <DndProvider backend={HTML5Backend}>
-          <Left addControls={addControls}></Left>
-          <Main
-            axis='xy'
-            lockToContainerEdges={true}
-            lockOffset='1px'
-            onSortStart={onSortStartHandler}
-            onSortEnd={onSortEndHandler}
-            config={config}
-            addControls={addControls}
-            controlsIndex={datas.controlsIndex}
-          ></Main>
-          <Right
-            config={config}
-            removeControl={removeControl}
-            changeControlConfig={changeControlConfig}
-            datas={datas}
-            changePanelConfig={changePanelConfig}
-          ></Right>
-        </DndProvider>
-      </Wrap>
+      <DialogWrap>
+        <div
+          style={{
+            height: '36px',
+            display: 'flex',
+            padding: '4px 10px',
+            boxSizing: 'border-box',
+            justifyContent: 'right',
+          }}
+          title='保存'
+          onClick={saveHandler}
+        >
+          <SaveBtn>
+            <SaveIcon></SaveIcon>
+          </SaveBtn>
+        </div>
+        <Wrap>
+          <DndProvider backend={HTML5Backend}>
+            <Left addControls={addControls}></Left>
+            <Main
+              axis='xy'
+              lockToContainerEdges={true}
+              lockOffset='1px'
+              onSortStart={onSortStartHandler}
+              onSortEnd={onSortEndHandler}
+              config={config}
+              addControls={addControls}
+              controlsIndex={datas.controlsIndex}
+            ></Main>
+            <Right
+              config={config}
+              removeControl={removeControl}
+              changeControlConfig={changeControlConfig}
+              datas={datas}
+              changePanelConfig={changePanelConfig}
+              changeControlDropDownSource={changeControlDropDownSource}
+            ></Right>
+          </DndProvider>
+        </Wrap>
+      </DialogWrap>
     </Dialog>
   );
 }

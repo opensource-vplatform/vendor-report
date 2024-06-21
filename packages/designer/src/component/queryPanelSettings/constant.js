@@ -1,5 +1,7 @@
 import {
+  CheckBoxItem,
   IntegerItem,
+  Selectitem,
   TextItem,
 } from '@toone/report-ui';
 
@@ -8,6 +10,18 @@ export const optionalControls = [
   {
     type: 'Integer',
     config: { labelText: '整数' },
+  },
+  {
+    type: 'Boolean',
+    config: {
+      labelText: '布尔',
+    },
+  },
+  {
+    type: 'Select',
+    config: {
+      labelText: '下拉框',
+    },
   },
 ];
 
@@ -22,4 +36,18 @@ export const optionalControls = [
 export const optionalControlsMap = {
   Text: TextItem,
   Integer: IntegerItem,
+  Boolean: CheckBoxItem,
+  Select: Selectitem,
+};
+
+export const dropdownDatasource = {
+  Select: true,
+};
+
+export const defaultQueryPanelSettings = {
+  visible: true,
+  position: 'Top', //位置
+  colCount: 3,
+  triggerMode: 'Click', //Click||Change
+  items: [],
 };

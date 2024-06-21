@@ -16,6 +16,8 @@ import {
   TextInput,
 } from '@toone/report-ui';
 
+import { dropdownDatasource } from './constant';
+
 const fadeIn = keyframes`
   from {
     right: -100%;
@@ -60,6 +62,7 @@ const Tab = styled.div`
   }
   &.active {
     border-bottom: 1px solid #2d8cf0;
+    margin-bottom: -1px;
   }
 `;
 
@@ -71,23 +74,10 @@ function QueryPanelProperty(props) {
       triggerMode = 'Click',
       colCount = 3,
     },
-    isShowTitle = true,
     changePanelConfig,
   } = props;
   return (
     <PropertyWrap>
-      {isShowTitle && (
-        <PropertyItemWrap
-          style={{
-            fontWeight: 'bold',
-            justifyContent: 'right',
-            paddingRight: '10px',
-            height: '30px',
-          }}
-        >
-          面板属性
-        </PropertyItemWrap>
-      )}
       <PropertyItemWrap>
         <PropertyLable>是否显示</PropertyLable>
         <CheckBox
@@ -158,13 +148,18 @@ function ControlProperty(props) {
     datas: { activeId },
     changeControlConfig,
     removeControl,
+    changeControlDropDownSource,
   } = props;
   const controls = config.items;
+  if (!controls || controls.length <= 0) {
+    return null;
+  }
   const cacheDatas = useRef({
     ds: {},
   }).current;
-  const [propertyType, setPropertyType] = useState('panel');
+
   const [fields, setFields] = useState([]);
+  const [dropdownFields, setDropdownFields] = useState([]);
   const control = controls.find(({ id }) => id === activeId);
   const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
   const {
@@ -174,6 +169,9 @@ function ControlProperty(props) {
       datasource = '',
       fieldCode = '',
       defaultValue = '',
+      dropDownSource = {
+        type: 'datasource',
+      },
     },
   } = control;
   cacheDatas.ds = {};
@@ -194,10 +192,165 @@ function ControlProperty(props) {
     }
     return res;
   }, []);
+
+  console.log(control);
+  return (
+    <PropertyWrap>
+      <PropertyItemWrap>
+        <PropertyLable>标签</PropertyLable>
+        <TextInput
+          style={{ flex: 1 }}
+          value={labelText || ''}
+          onChange={(e) => {
+            changeControlConfig('labelText', e.target.value);
+          }}
+        ></TextInput>
+      </PropertyItemWrap>
+      <PropertyItemWrap>
+        <PropertyLable>标签宽度</PropertyLable>
+        <Float
+          style={{ flex: 1 }}
+          min={0}
+          max={220}
+          value={labelWidth}
+          onChange={(value) => {
+            let newValue = value;
+            if (newValue >= 220) {
+              newValue = 220;
+            }
+            changeControlConfig('labelWidth', newValue);
+          }}
+        ></Float>
+      </PropertyItemWrap>
+      <PropertyItemWrap>
+        <PropertyLable>数据集</PropertyLable>
+        <Select
+          wrapStyle={{ flex: 1 }}
+          value={datasource}
+          datas={ds}
+          onChange={(value) => {
+            changeControlConfig('datasource', value);
+            setFields(cacheDatas.ds[value].fields);
+          }}
+        ></Select>
+      </PropertyItemWrap>
+      <PropertyItemWrap>
+        <PropertyLable>字段</PropertyLable>
+        <Select
+          wrapStyle={{ flex: 1 }}
+          value={fieldCode}
+          datas={fields}
+          onChange={(value) => {
+            changeControlConfig('fieldCode', value);
+          }}
+        ></Select>
+      </PropertyItemWrap>
+      <PropertyItemWrap>
+        <PropertyLable>默认值</PropertyLable>
+        <TextInput
+          style={{ flex: 1 }}
+          value={defaultValue}
+          onChange={(e) => {
+            changeControlConfig('defaultValue', e.target.value);
+          }}
+        ></TextInput>
+      </PropertyItemWrap>
+      {dropdownDatasource[control?.type] && (
+        <>
+          <PropertyItemWrap>
+            <PropertyLable>数据来源类型</PropertyLable>
+            <Select
+              wrapStyle={{ flex: 1 }}
+              value={dropDownSource?.type || 'datasource'}
+              datas={[
+                {
+                  text: '数据集',
+                  value: 'datasource',
+                },
+                {
+                  text: '自定义',
+                  value: 'custom',
+                },
+              ]}
+              onChange={(value) => {
+                changeControlDropDownSource('type', value);
+              }}
+            ></Select>
+          </PropertyItemWrap>
+          {dropDownSource?.type !== 'custom' && (
+            <>
+              <PropertyItemWrap>
+                <PropertyLable>数据来源</PropertyLable>
+                <Select
+                  wrapStyle={{ flex: 1 }}
+                  value={dropDownSource?.datasource}
+                  datas={ds}
+                  onChange={(value) => {
+                    changeControlDropDownSource('datasource', value);
+                    setDropdownFields(cacheDatas.ds[value].fields);
+                  }}
+                ></Select>
+              </PropertyItemWrap>
+              <PropertyItemWrap>
+                <PropertyLable>显示字段</PropertyLable>
+                <Select
+                  wrapStyle={{ flex: 1 }}
+                  value={dropDownSource?.text}
+                  datas={dropdownFields}
+                  onChange={(value) => {
+                    changeControlDropDownSource('text', value);
+                  }}
+                ></Select>
+              </PropertyItemWrap>
+              <PropertyItemWrap>
+                <PropertyLable>标识字段</PropertyLable>
+                <Select
+                  wrapStyle={{ flex: 1 }}
+                  value={dropDownSource?.value}
+                  datas={dropdownFields}
+                  onChange={(value) => {
+                    changeControlDropDownSource('value', value);
+                  }}
+                ></Select>
+              </PropertyItemWrap>
+            </>
+          )}
+        </>
+      )}
+      <PropertyItemWrap>
+        <Button
+          style={{
+            backgroundColor: 'red',
+            borderColor: 'red',
+            color: '#fff',
+            marginLeft: 'auto',
+            height: '28px',
+          }}
+          onClick={() => {
+            removeControl();
+          }}
+        >
+          删除
+        </Button>
+      </PropertyItemWrap>
+    </PropertyWrap>
+  );
+}
+
+export default function (props) {
+  const {
+    datas: { activeId },
+    config: { items: controls = [] },
+  } = props;
+  const [propertyType, setPropertyType] = useState('panel');
   useEffect(() => setPropertyType('control'), [activeId]);
+  const isHiddenControl = !controls || controls.length <= 0;
+  if (propertyType === 'control' && isHiddenControl) {
+    setPropertyType('panel');
+  }
 
   return (
-    <div>
+    <Wrap>
       <div
         style={{
           display: 'flex',
@@ -206,6 +359,7 @@ function ControlProperty(props) {
           fontWeight: 'bold',
           marginBottom: '10px',
           borderBottom: '1px solid #ddd',
+          boxSizing: 'border-box',
         }}
       >
         <Tab
@@ -216,105 +370,19 @@ function ControlProperty(props) {
         >
           面板属性
         </Tab>
-        <Tab
-          className={propertyType !== 'panel' ? 'active' : "'"}
-          onClick={() => {
-            setPropertyType('control');
-          }}
-        >
-          控件属性
-        </Tab>
+        {!isHiddenControl && (
+          <Tab
+            className={propertyType !== 'panel' ? 'active' : "'"}
+            onClick={() => {
+              setPropertyType('control');
+            }}
+          >
+            控件属性
+          </Tab>
+        )}
       </div>
-      {propertyType === 'control' ? (
-        <PropertyWrap>
-          <PropertyItemWrap>
-            <PropertyLable>标签</PropertyLable>
-            <TextInput
-              style={{ flex: 1 }}
-              value={labelText || ''}
-              onChange={(e) => {
-                changeControlConfig('labelText', e.target.value);
-              }}
-            ></TextInput>
-          </PropertyItemWrap>
-          <PropertyItemWrap>
-            <PropertyLable>标签宽度</PropertyLable>
-            <Float
-              style={{ flex: 1 }}
-              min={0}
-              max={220}
-              value={labelWidth}
-              onChange={(value) => {
-                let newValue = value;
-                if (newValue >= 220) {
-                  newValue = 220;
-                }
-                changeControlConfig('labelWidth', newValue);
-              }}
-            ></Float>
-          </PropertyItemWrap>
-          <PropertyItemWrap>
-            <PropertyLable>数据集</PropertyLable>
-            <Select
-              wrapStyle={{ flex: 1 }}
-              value={datasource}
-              datas={ds}
-              onChange={(value) => {
-                changeControlConfig('datasource', value);
-                setFields(cacheDatas.ds[value].fields);
-              }}
-            ></Select>
-          </PropertyItemWrap>
-          <PropertyItemWrap>
-            <PropertyLable>字段</PropertyLable>
-            <Select
-              wrapStyle={{ flex: 1 }}
-              value={fieldCode}
-              datas={fields}
-              onChange={(value) => {
-                changeControlConfig('fieldCode', value);
-              }}
-            ></Select>
-          </PropertyItemWrap>
-          <PropertyItemWrap>
-            <PropertyLable>默认值</PropertyLable>
-            <TextInput
-              style={{ flex: 1 }}
-              value={defaultValue}
-              onChange={(e) => {
-                changeControlConfig('defaultValue', e.target.value);
-              }}
-            ></TextInput>
-          </PropertyItemWrap>
-          <PropertyItemWrap>
-            <Button
-              style={{
-                backgroundColor: 'red',
-                borderColor: 'red',
-                color: '#fff',
-                marginLeft: 'auto',
-                height: '28px',
-              }}
-              onClick={() => {
-                removeControl();
-              }}
-            >
-              删除
-            </Button>
-          </PropertyItemWrap>
-        </PropertyWrap>
-      ) : (
-        <QueryPanelProperty {...props} isShowTitle={false}></QueryPanelProperty>
-      )}
-    </div>
-  );
-}
 
-export default function (props) {
-  const { datas } = props;
-  return (
-    <Wrap>
-      {datas.type === 'panel' ? (
+      {propertyType === 'panel' ? (
         <QueryPanelProperty {...props}></QueryPanelProperty>
       ) : (
         <ControlProperty {...props}></ControlProperty>
