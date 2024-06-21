@@ -1,24 +1,28 @@
-import CheckBox from '../../form/CheckBox';
-import {
-  Label,
-  Wrap,
-} from '../ui';
+import styled from 'styled-components';
 
-export function CheckBoxItem(props) {
+import { CheckBox } from '../../form/Index';
+import { Title } from './Components';
+
+const Wrap = styled.div`
+  display: flex;
+  align-items: center;
+`;
+export default function (props) {
   const {
-    labelText = '',
+    label = '布尔',
     labelWidth = 80,
     disabled = false,
-    value = '',
+    value,
+    onChange,
   } = props;
-  const labelStyles = {
-    width: labelWidth,
-  };
-  console.log(labelText);
   return (
     <Wrap>
-      {labelText && <Label style={labelStyles}>{labelText}</Label>}
-      <CheckBox disabled={disabled}></CheckBox>
+      <Title width={labelWidth} title={label} height={30}></Title>
+      <CheckBox
+        disabled={disabled}
+        value={value}
+        onChange={(val)=>onChange&&onChange(val,val ? '是':'否')}
+      ></CheckBox>
     </Wrap>
   );
 }

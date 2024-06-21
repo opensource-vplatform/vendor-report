@@ -44,7 +44,7 @@ export const Radio = function (props) {
                         data-direction={ctx.direction}
                         style={style}
                         onClick={() =>
-                            !ctx.disabled && !checked && ctx.onChange(value)
+                            !ctx.disabled && !checked && ctx.onChange(value,label)
                         }
                     >
                         {checked ? (

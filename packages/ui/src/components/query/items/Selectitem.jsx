@@ -1,26 +1,33 @@
-import Select from '../../form/Select';
-import {
-  Label,
-  Wrap,
-} from '../ui';
+import styled from 'styled-components';
 
-export function Selectitem(props) {
+import { Select } from '../../form/Index';
+import { Title } from './Components';
+
+const Wrap = styled.div`
+  display: flex;
+  align-items: center;
+`;
+export default function (props) {
   const {
-    labelText = '',
+    label = '选择',
     labelWidth = 80,
     disabled = false,
-    value = '',
+    value,
+    onChange,
+    options = [],
   } = props;
-  const labelStyles = {
-    width: labelWidth,
-  };
   return (
     <Wrap>
-      {labelText && <Label style={labelStyles}>{labelText}</Label>}
+      <Title width={labelWidth} title={label} height={30}></Title>
       <Select
+        wrapStyle={{ flex: 1, borderRadius: 0, height: 30, width: '100%' }}
+        style={{height: 30}}
         disabled={disabled}
-        wrapStyle={{ flex: 1, height: '35px' }}
-        style={{ height: '35px' }}
+        value={value}
+        datas={options.map(({ value, label }) => {
+          return { value, text: label };
+        })}
+        onChange={(val,text) => onChange && onChange(val, text)}
       ></Select>
     </Wrap>
   );

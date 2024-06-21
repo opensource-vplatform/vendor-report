@@ -347,11 +347,11 @@ export default function (props) {
                     <TextInput
                         style={{ padding: '0' }}
                         value={value}
-                        onChange={function (e) {
+                        onChange={function (val) {
                             const conditions = updateCondition(
                                 row.id,
                                 'value',
-                                e.target.value,
+                                val,
                                 data.conditions
                             );
                             conditions && setData({ ...data, conditions });

@@ -107,7 +107,7 @@ export default function (props) {
     const handleChange = (val, node) => {
         if (val !== value) {
             setData(valueToData(val, node, datas));
-            onChange && onChange(val);
+            onChange && onChange(val,node.text);
         }
     };
     return (

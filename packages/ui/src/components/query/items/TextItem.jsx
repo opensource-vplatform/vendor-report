@@ -1,27 +1,29 @@
-import TextInput from '../../form/TextInput';
-import {
-  Label,
-  Wrap,
-} from '../ui';
+import styled from 'styled-components';
 
-export function TextItem(props) {
+import { TextInput } from '../../form/Index';
+import { Title } from './Components';
+
+const Wrap = styled.div`
+  display: flex;
+  align-items: center;
+`;
+export default function (props) {
   const {
-    labelText = '',
+    label = '文本',
     labelWidth = 80,
     disabled = false,
-    value = '',
+    value,
+    onChange,
   } = props;
-  const labelStyles = {
-    width: labelWidth,
-  };
   return (
     <Wrap>
-      {labelText && <Label style={labelStyles}>{labelText}</Label>}
+      <Title width={labelWidth} title={label} height={30}></Title>
       <TextInput
-        style={{ flex: 1, borderRadius: 0 }}
+        style={{ flex: 1, borderRadius: 0, height: 30 }}
         disabled={disabled}
-        value={value}
-        onChange={() => {}}
+        value={value==null ? '':value}
+        maxLength={99999}
+        onChange={(val)=>onChange&&onChange(val,val)}
       ></TextInput>
     </Wrap>
   );

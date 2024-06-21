@@ -106,7 +106,7 @@ export default function Index(props) {
     };
 
     //数据变化
-    const dataChangeHandler = function (e) {
+    const dataChangeHandler = function (val,e) {
         const key = e.target.dataset.itemType;
         const value = e.target.value;
         if (value === activeDs[key]) {

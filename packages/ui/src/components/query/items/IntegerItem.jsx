@@ -1,21 +1,30 @@
-import TextInput from '../../form/TextInput';
-import {
-  Label,
-  Wrap,
-} from '../ui';
+import styled from 'styled-components';
 
-export function IntegerItem(props) {
-  const { labelText = '', labelWidth = 80, disabled = false } = props;
-  const labelStyles = {
-    width: labelWidth,
-  };
+import { Integer } from '../../form/Index';
+import { Title } from './Components';
+
+const Wrap = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export default function(props) {
+  const {
+    label = '整数',
+    labelWidth = 80,
+    disabled = false,
+    value,
+    onChange,
+  } = props;
   return (
     <Wrap>
-      {labelText && <Label style={labelStyles}>{labelText}</Label>}
-      <TextInput
-        style={{ flex: 1, borderRadius: 0 }}
+      <Title width={labelWidth} title={label} height={30}></Title>
+      <Integer
+        value={value}
+        onChange={(val) => onChange && onChange(val, val)}
+        style={{ flex: 1, borderRadius: 0, height: 30 }}
         disabled={disabled}
-      ></TextInput>
+      ></Integer>
     </Wrap>
   );
 }

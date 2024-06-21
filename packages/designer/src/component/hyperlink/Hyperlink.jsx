@@ -236,10 +236,10 @@ export default function Index(props) {
                     <TextInput
                         style={{ flex: 1 }}
                         value={datas.text}
-                        onChange={function (e) {
+                        onChange={function (val) {
                             setDatas({
                                 ...datas,
-                                text: e.target.value,
+                                text: val,
                             });
                         }}
                     ></TextInput>
@@ -249,10 +249,10 @@ export default function Index(props) {
                     <TextInput
                         style={{ flex: 1 }}
                         value={datas.tooltip}
-                        onChange={function (e) {
+                        onChange={function (val) {
                             setDatas({
                                 ...datas,
-                                tooltip: e.target.value,
+                                tooltip: val,
                             });
                         }}
                     ></TextInput>
@@ -326,10 +326,10 @@ export default function Index(props) {
                             <div>链接到网页地址：</div>
                             <TextInput
                                 placeholder='URL, 例如 http://www.example.com'
-                                onChange={function (e) {
+                                onChange={function (val) {
                                     setDatas({
                                         ...datas,
-                                        url: e?.target?.value,
+                                        url: val,
                                     });
                                 }}
                                 value={datas.url}
@@ -408,20 +408,20 @@ export default function Index(props) {
                         <TabWrap>
                             <div>电子邮件地址：</div>
                             <TextInput
-                                onChange={function (e) {
+                                onChange={function (val) {
                                     setDatas({
                                         ...datas,
-                                        url: e.target.value,
+                                        url: val,
                                     });
                                 }}
                                 value={datas.url}
                             ></TextInput>
                             <div>主题：</div>
                             <TextInput
-                                onChange={function (e) {
+                                onChange={function (val) {
                                     setDatas({
                                         ...datas,
-                                        subject: e.target.value,
+                                        subject: val,
                                     });
                                 }}
                                 value={datas.subject}
