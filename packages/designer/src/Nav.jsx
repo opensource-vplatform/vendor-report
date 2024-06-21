@@ -144,6 +144,9 @@ export default function () {
   const { active, hideCodes } = useSelector(({ navSlice }) => navSlice);
   const { spread, navStyle } = useSelector(({ appSlice }) => appSlice);
   const datasourceSlice = useSelector(({ datasourceSlice }) => datasourceSlice);
+  const persistingDataSlice = useSelector(
+    ({ persistingDataSlice }) => persistingDataSlice
+  );
   const tableDesignSlice = useSelector(
     ({ tableDesignSlice }) => tableDesignSlice
   );
@@ -156,7 +159,12 @@ export default function () {
     if (spread) {
       const json = {
         reportJson: spread.toJSON(),
-        context: { datasourceSlice, tableDesignSlice, wizardSlice },
+        context: {
+          datasourceSlice,
+          tableDesignSlice,
+          wizardSlice,
+          persistingDataSlice,
+        },
       };
       const define = parseUsedDatasource(spread, finalDsList);
       const result = fire({
@@ -297,6 +305,7 @@ export default function () {
                 spread: null,
               },
               wizardSlice: { ...wizardSlice, spread: null },
+              persistingDataSlice: persistingDataSlice,
             },
             usedDatasources: define.map(({ code }) => code),
             datasourceSetting: datasourceSlice.setting,

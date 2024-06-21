@@ -1,14 +1,33 @@
-import React, { Fragment, useContext, useEffect, useState } from 'react';
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
 import { DraggableDatasources } from '@components/defineDatasource/Index';
 import { initDatasource } from '@store/datasourceSlice/datasourceSlice';
-import { hideTab, setActive, showTab } from '@store/navSlice/navSlice';
+import {
+  hideTab,
+  setActive,
+  showTab,
+} from '@store/navSlice/navSlice';
+import {
+  initSlice as initPersistingDataSlice,
+} from '@store/persistingDataSlice';
 import { initWizardSlice } from '@store/wizardSlice';
 import { ThemeContext } from '@toone/report-excel';
-import { Pane, Resizer, SplitPane } from '@toone/report-ui';
+import {
+  Pane,
+  Resizer,
+  SplitPane,
+} from '@toone/report-ui';
 import { setBaseUrl } from '@utils/environmentUtil';
 import { isBindingTable } from '@utils/worksheetUtil';
 
@@ -107,6 +126,11 @@ function Designer(props) {
       dispatch(
         initWizardSlice({
           wizardSlice: conf?.json?.context?.wizardSlice,
+        })
+      );
+      dispatch(
+        initPersistingDataSlice({
+          slice: conf?.json?.context?.persistingDataSlice,
         })
       );
     },

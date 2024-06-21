@@ -23,7 +23,16 @@ export const slice = createSlice({
       }
       state.sheets[sheetId].queryPanelSettings = datas;
     },
+    initSlice(state, { payload }) {
+      let { slice } = payload;
+      //从配置项json还原仓库数据
+      if (slice && typeof slice === 'object') {
+        Object.entries(slice).forEach(([key, value]) => {
+          state[key] = value;
+        });
+      }
+    },
   },
 });
-export const { saveQueryPanelSettings } = slice.actions;
+export const { saveQueryPanelSettings, initSlice } = slice.actions;
 export default slice.reducer;
