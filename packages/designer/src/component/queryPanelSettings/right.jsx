@@ -164,7 +164,7 @@ function ControlProperty(props) {
   const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
   const {
     config: {
-      labelText = '',
+      label = '',
       labelWidth = 80,
       datasource = '',
       fieldCode = '',
@@ -200,9 +200,9 @@ function ControlProperty(props) {
         <PropertyLable>标签</PropertyLable>
         <TextInput
           style={{ flex: 1 }}
-          value={labelText || ''}
-          onChange={(e) => {
-            changeControlConfig('labelText', e.target.value);
+          value={label || ''}
+          onChange={(value) => {
+            changeControlConfig('label', value);
           }}
         ></TextInput>
       </PropertyItemWrap>
@@ -250,8 +250,8 @@ function ControlProperty(props) {
         <TextInput
           style={{ flex: 1 }}
           value={defaultValue}
-          onChange={(e) => {
-            changeControlConfig('defaultValue', e.target.value);
+          onChange={(value) => {
+            changeControlConfig('defaultValue', value);
           }}
         ></TextInput>
       </PropertyItemWrap>

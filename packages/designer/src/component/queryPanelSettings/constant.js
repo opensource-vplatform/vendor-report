@@ -7,35 +7,35 @@ import {
 } from '@toone/report-ui';
 
 export const optionalControls = [
-  { type: 'Text', config: { labelText: '文本' } },
+  { type: 'Text', config: { label: '文本' } },
   {
     type: 'Integer',
-    config: { labelText: '整数' },
+    config: { label: '整数' },
   },
   {
     type: 'Boolean',
     config: {
-      labelText: '布尔',
+      label: '布尔',
     },
   },
   {
     type: 'Select',
     config: {
-      labelText: '下拉框',
+      label: '下拉框',
     },
   },
   {
     type: 'RadioGroup',
     config: {
-      labelText: '单选组',
-      datas: [
+      label: '单选组',
+      options: [
         {
           value: '选项1',
-          text: '选项1',
+          label: '选项1',
         },
         {
           value: '选项2',
-          text: '选项2',
+          label: '选项2',
         },
       ],
     },
@@ -46,7 +46,7 @@ export const optionalControls = [
 /* for (let i = 1; i < 30; i++) {
   optionalControls.push({
     type: 'Integer',
-    config: { labelText: `整数${i}` },
+    config: { label: `整数${i}` },
   });
 } */
 

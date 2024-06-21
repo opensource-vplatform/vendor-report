@@ -1,8 +1,15 @@
+import CheckBoxItem from './items/CheckBoxItem';
+import IntegerItem from './items/IntegerItem';
+import RadioGroupItem from './items/RadioGroupItem';
+import Selectitem from './items/Selectitem';
+import TextItem from './items/TextItem';
 import Query from './Query';
 
-export * from './items/TextItem';
-export * from './items/IntegerItem';
-export * from './items/CheckBoxItem';
-export * from './items/Selectitem';
-export * from './items/RadioGroupItem';
-export { Query };
+export {
+  CheckBoxItem,
+  IntegerItem,
+  Query,
+  RadioGroupItem,
+  Selectitem,
+  TextItem,
+};
