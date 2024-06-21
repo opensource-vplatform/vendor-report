@@ -188,6 +188,19 @@ export const request = function (action, options = {}) {
   })
 }
 
+let fontFamilies = {}
+
+export const getFontFamily = async () => {
+  if (Object.keys(fontFamilies).length == 0) {
+    const res = await request('queryAvailableFonts')
+    const fonts = res?.data?.fonts || [];
+    fontFamilies = {
+      fonts,
+      defaultFont: fonts[0]
+    }
+  }
+  return fontFamilies
+}
 /**
  * 
  * @param {*} name 注册字体名称
@@ -195,18 +208,41 @@ export const request = function (action, options = {}) {
  * @returns 
  */
 export const registerFont = function (name, type) {
-  return new Promise((resolve) => {
-    // const blob = data;
-    // //将Blob 对象转换成 ArrayBuffer
-    // const reader = new FileReader();
-    // reader.onload = function () {
-    //   const fontrrayBuffer = reader.result;
-    //   const fonts = GC.Spread.Sheets.PDF.PDFFontsManager.getFont(name) || {};
-    //   fonts[type] = fontrrayBuffer;
-    //   GC.Spread.Sheets.PDF.PDFFontsManager.registerFont(name, fonts);
-    //   resolve();
-    // }
-    // reader.readAsArrayBuffer(blob);
-    resolve();
+  let downloadFont = name;
+  if (fontFamilies.fonts.indexOf(name) == -1) {
+    downloadFont = fontFamilies.defaultFont
+  }
+  return new Promise(async (resolve) => {
+    try {
+      const fontContentRes = await request('getFontContent', { fontName: downloadFont })
+      const fontrrayBuffer = base64ToArrayBuffer(fontContentRes?.data?.content);
+      const fonts = GC.Spread.Sheets.PDF.PDFFontsManager.getFont(name) || {};
+      fonts[type] = fontrrayBuffer;
+      GC.Spread.Sheets.PDF.PDFFontsManager.registerFont(name, fonts);
+      resolve();
+    } catch (e) {
+      console.log(e);
+      resolve()
+    }
   })
+}
+
+/**
+ * base64 转 ArrayBuffer
+ * @param {*} base64 base64字符串
+ * @returns 
+ */
+const base64ToArrayBuffer = function (base64) {
+
+  const binaryString = atob(base64);
+
+
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes.buffer;
 }

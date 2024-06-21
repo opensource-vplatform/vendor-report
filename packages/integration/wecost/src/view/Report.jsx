@@ -14,6 +14,7 @@ import {
   request,
   download,
   registerFont,
+  getFontFamily,
 } from '../utils/utils';
 import { ErrorDialog, ErrorPage } from './components/error/Index';
 import WaitMsg from './components/loading/Index';
@@ -139,6 +140,7 @@ export default function () {
                 isShowBtnToolbar: false,
               });
               _report = report;
+              getFontFamily();
               //报表挂载到指定dom元素
               report.mount(ref.current);
               data.report = report;
@@ -329,12 +331,17 @@ window.tooneReport = {
             fontFamaly.add(style.fontFamily ?? 'Calibri');
           }
         }
+        // 获取内置样式字体
+        const namedStyles = sheet.namedStyles ?? [];
+        for (let namedStyle of namedStyles) {
+          fontFamaly.add(namedStyle.fontFamily ?? 'Calibri');
+        }
       }
-      // 获取内置样式字体
-      const namedStyles = _report.spread.toJSON().namedStyles ?? [];
-      for (let namedStyle of namedStyles) {
-        fontFamaly.add(namedStyle.fontFamily ?? 'Calibri');
-      }
+
+      // const res = await request('queryAvailableFonts')
+      // const fonts = res?.data?.fonts || [];
+
+
       // 注册字体...
       const requestFontFamily = [...fontFamaly].map((item) =>
         registerFont(item, 'normal')
