@@ -6,7 +6,6 @@ import {
 import { arrayMoveMutable } from 'array-move';
 import {
   DndProvider,
-  useDrag,
   useDrop,
 } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -17,353 +16,350 @@ import {
 import styled from 'styled-components';
 
 import {
+  Button,
   Dialog,
-  IntegerItem,
-  TextInput,
-  TextItem,
 } from '@toone/report-ui';
 import { uuid } from '@toone/report-util';
 
-const textDatas = [
+import { optionalControlsMap } from './constant';
+import Left from './left';
+import Right from './right';
+
+let textDatas = {
+  visible: true,
+  position: 'Top', //位置
+  colCount: 3,
+  triggerMode: 'Click', //Click||Change
+  items: [
     {
-        id: 'A',
-        type: 'Text',
-        Component: TextItem,
-        config: { labelText: '项目名称' },
+      id: 'A',
+      type: 'Text',
+      config: { labelText: '项目名称' },
     },
     {
-        id: 'B',
-        type: 'Integer',
-        Component: IntegerItem,
-        config: { labelText: '合同金额' },
+      id: 'B',
+      type: 'Integer',
+      config: { labelText: '合同金额' },
     },
     {
-        id: 'C',
-        type: 'Text',
-        Component: TextItem,
-        config: { labelText: '合同名称' },
+      id: 'C',
+      type: 'Text',
+      config: { labelText: '合同名称' },
     },
     {
-        id: 'D',
-        type: 'Text',
-        Component: TextItem,
-        config: { labelText: '负责人' },
+      id: 'D',
+      type: 'Text',
+      config: { labelText: '负责人' },
     },
     {
-        id: 'E',
-        type: 'Integer',
-        Component: IntegerItem,
-        config: { labelText: '项目周期' },
+      id: 'E',
+      type: 'Integer',
+      config: { labelText: '项目周期' },
     },
     {
-        id: 'F',
-        type: 'Integer',
-        Component: IntegerItem,
-        config: { labelText: '项目人数' },
+      id: 'F',
+      type: 'Integer',
+      config: { labelText: '项目人数' },
     },
-];
+  ],
+};
+for (let i = 1; i <= 10; i++) {
+  textDatas.items.push({
+    id: `F${i}`,
+    type: 'Integer',
+    config: { labelText: `项目人数${i}` },
+  });
+}
+
+//textDatas.items = [];
 
 const Wrap = styled.div`
-    height: 100%;
-    width: 100%;
-    display: flex;
-    user-select: none;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
-    font-size: 12px;
+  height: calc(100% - 50px);
+  width: 100%;
+  display: flex;
+  user-select: none;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  font-size: 12px;
+  flex: 1;
 `;
 
-const LeftWrap = styled.div`
-    width: 350px;
-    border-right: 1px solid #ddd;
-    height: 100%;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+const MainBox = styled.div`
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 `;
-const CenterWrap = styled.div`
-    width: 100%;
-    padding: 10px;
-    flex: 1;
-`;
-const RightWrap = styled.div`
-    width: 350px;
-    border-left: 1px solid #ddd;
-    padding: 10px;
+const MainBtnWrap = styled.div`
+  box-sizing: border-box;
+  height: 36px;
+  z-index: 3;
+  display: flex;
+  padding: 4px 10px 4px 4px;
+  gap: 10px;
+  justify-content: right;
 `;
 
 const MainWrap = styled.div`
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  box-sizing: border-box;
+  overflow-y: auto;
+  padding: 10px;
+  position: relative;
 `;
 
 const MainItemWrap = styled.div`
-    z-index: 999999;
-    cursor: move;
-    &[active='active'] {
-        outline: 1px dashed #2d8cf0;
-        outline-offset: 2px;
-    }
+  z-index: 999999;
+  cursor: move;
+  font-size: 12px;
+  &[active='active'] {
+    outline: 1px dashed #2d8cf0;
+    outline-offset: 2px;
+  }
 `;
 
-const PropertyWrap = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+const DropTipWrap = styled.div`
+  width: 100%;
+  height: 100%;
+  border: 4px dashed #ddd;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  flex-direction: column;
+  box-sizing: border-box;
+  opacity: 0.6;
 `;
-
-const PropertyItemWrap = styled.div`
-    display: flex;
-    align-items: center;
-`;
-
-const PropertyLable = styled.div`
-    width: 80px;
-`;
-
-const DragWrap = styled.div`
-    opacity: 1 !important;
-    cursor: move;
-`;
-
-function OptionalControlListItem(props) {
-    const { Component, type } = props;
-    const [collected, drag, dragPreview] = useDrag(() => ({
-        type: 'box',
-        item: { Component, type, config: {} },
-        collect(monitor) {
-            return {
-                isDragging: monitor.isDragging(),
-            };
-        },
-        canDrag(monitor) {
-            console.log(monitor);
-            return true;
-        },
-    }));
-    return (
-        <DragWrap ref={drag}>
-            <div style={{ pointerEvents: 'none' }}>
-                <Component></Component>
-            </div>
-        </DragWrap>
-    );
-}
-
-function OptionalControlList() {
-    const controls = [
-        { type: 'Text', Component: TextItem },
-        { type: 'Integer', Component: IntegerItem },
-    ];
-    return (
-        <>
-            {controls.map(({ type, Component }, index) => {
-                return (
-                    <OptionalControlListItem
-                        type={type}
-                        Component={Component}
-                        key={index}
-                    ></OptionalControlListItem>
-                );
-            })}
-        </>
-    );
-}
 
 const MainItem = SortableElement((props) => {
-    const { Component, config = {}, active } = props;
-    const el = useRef();
-    return (
-        <MainItemWrap ref={el} active={active ? 'active' : ''}>
-            <div style={{ pointerEvents: 'none' }}>
-                <Component {...config} value={config.labelText}></Component>
-            </div>
-        </MainItemWrap>
-    );
+  const { type, config = {}, active } = props;
+  const el = useRef();
+  const Component = optionalControlsMap[type];
+  return (
+    <MainItemWrap ref={el} active={active ? 'active' : ''}>
+      <div style={{ pointerEvents: 'none' }}>
+        <Component {...config} value={config.defaultValue}></Component>
+      </div>
+    </MainItemWrap>
+  );
 });
 
 const Main = SortableContainer(function Main(props) {
-    const { column = 2, setControls, controls, controlsIndex = 0 } = props;
+  const {
+    addControls,
+    config: { items: controls, colCount: column },
+    controlsIndex = 0,
+  } = props;
 
-    const drop = useDrop(() => ({
-        accept: 'box',
-        drop: (item, monitor) => {
-            if (item?.Component) {
-                setControls((controls) => {
-                    return [...controls, { ...item, id: uuid() }];
-                });
-            }
-        },
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-        }),
-    }))[1];
-
-    return (
-        <MainWrap ref={drop}>
-            <div
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: `repeat(${column}, 1fr)`,
-                    gap: '20px',
-                    zIndex: 9999999,
-                }}
-            >
-                {controls.map((item, index) => {
-                    return (
-                        <MainItem
-                            key={index}
-                            {...item}
-                            index={index}
-                            active={index === controlsIndex}
-                        ></MainItem>
-                    );
-                })}
-            </div>
-        </MainWrap>
-    );
+  const drop = useDrop(() => ({
+    accept: 'box',
+    drop: (item, monitor) => {
+      const control = { ...item, id: uuid() };
+      addControls(control);
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  }))[1];
+  return (
+    <MainBox>
+      <MainWrap ref={drop}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${column}, 1fr)`,
+            gap: '20px',
+            width: '100%',
+          }}
+        >
+          {controls.map((item, index) => {
+            return (
+              <MainItem
+                key={index}
+                {...item}
+                index={index}
+                active={index === controlsIndex}
+              ></MainItem>
+            );
+          })}
+        </div>
+        {controls.length <= 0 ? (
+          <DropTipWrap>
+            <div>1，从可选控件区域拖拽控件或双击控件到此处来添加查询控件</div>
+            <div>2，根据需求拖拽此处的控件进行排序</div>
+            <div>3，点击此处的控件编辑控件属性</div>
+          </DropTipWrap>
+        ) : null}
+      </MainWrap>
+      {props.config.triggerMode === 'Click' && (
+        <MainBtnWrap>
+          <Button style={{ pointerEvents: 'none' }}>查询</Button>
+          <Button style={{ pointerEvents: 'none' }}>重置</Button>
+        </MainBtnWrap>
+      )}
+    </MainBox>
+  );
 });
 
-function Property(props) {
-    const { controls, activeId, setControls } = props;
-    const control = controls.find(({ id }) => id === activeId);
-    const changeControlConfig = (key, value) => {
-        setControls((datas) => {
-            const newDatas = [...datas];
-            const index = newDatas.findIndex(({ id }) => id === activeId);
-            newDatas.splice(index, 1, {
-                ...control,
-                config: {
-                    ...control?.config,
-                    [key]: value,
-                },
-            });
-            return newDatas;
-        });
-    };
-    return (
-        <PropertyWrap>
-            <PropertyItemWrap>
-                <PropertyLable>标签</PropertyLable>
-                <TextInput
-                    style={{ flex: 1 }}
-                    value={control?.config?.labelText || ''}
-                    onChange={(e) => {
-                        changeControlConfig('labelText', e.target.value);
-                    }}
-                ></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>标签宽度</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>数据集</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>字段</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>默认值</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-        </PropertyWrap>
-    );
-}
-
 export default function (props) {
-    const {} = props;
+  const { onClose } = props;
+  const [config, setConfig] = useState(textDatas);
 
-    const handleCancel = () => {
-        onCancel && onCancel();
-    };
+  const controls = config.items;
+  const [datas, setDatas] = useState({
+    activeId: controls?.[0]?.id,
+    controlsIndex: 0,
+    type: 'control',
+  });
 
-    const [controls, setControls] = useState(textDatas);
-    const [datas, setDatas] = useState({
-        activeId: controls?.[0]?.id,
-        controlsIndex: 0,
+  const changePanelConfig = (key, value) => {
+    setConfig((config) => {
+      return { ...config, [key]: value };
     });
-    return (
-        <Dialog
-            title='查询面板设置'
-            width='100%'
-            height='100%'
-            id={uuid()}
-            onConfirm={() => {}}
-            onCancel={handleCancel}
-            style={{ marginTop: '-2px' }}
-        >
-            <Wrap>
-                <DndProvider backend={HTML5Backend}>
-                    <LeftWrap>
-                        <OptionalControlList></OptionalControlList>
-                    </LeftWrap>
-                    <CenterWrap>
-                        <Main
-                            axis='xy'
-                            lockToContainerEdges={true}
-                            lockOffset='1px'
-                            onSortStart={({ index }) => {
-                                const activeItem = controls.find(
-                                    (i, index) => index === datas?.controlsIndex
-                                );
+  };
 
-                                setDatas((datas) => {
-                                    return {
-                                        ...datas,
-                                        activeId: activeItem?.id,
-                                        controlsIndex: index,
-                                    };
-                                });
-                            }}
-                            onSortEnd={({ newIndex, oldIndex }) => {
-                                if (newIndex == oldIndex) {
-                                    setDatas((datas) => {
-                                        return {
-                                            ...datas,
-                                            activeId: controls?.[newIndex]?.id,
-                                        };
-                                    });
-                                    return;
-                                }
+  const changeControlConfig = (key, value) => {
+    setConfig((config) => {
+      const controls = config.items;
+      const newControls = [];
+      controls.forEach((control) => {
+        let keyValue = control?.config?.[key];
+        if (control.id === datas.activeId) {
+          keyValue = value;
+        }
+        newControls.push({
+          ...control,
+          config: {
+            ...control?.config,
+            [key]: keyValue,
+          },
+        });
+      });
 
-                                setControls((controls) => {
-                                    const newControls = [...controls];
-                                    arrayMoveMutable(
-                                        newControls,
-                                        oldIndex,
-                                        newIndex
-                                    );
-                                    const index = newControls.findIndex(
-                                        ({ id }) => id === datas.activeId
-                                    );
-                                    setDatas((datas) => {
-                                        return {
-                                            ...datas,
-                                            controlsIndex:
-                                                index >= 0 ? index : newIndex,
-                                        };
-                                    });
-                                    return newControls;
-                                });
-                            }}
-                            controls={controls}
-                            setControls={setControls}
-                            controlsIndex={datas.controlsIndex}
-                        ></Main>
-                    </CenterWrap>
-                    <RightWrap>
-                        <Property
-                            controls={controls}
-                            activeId={datas.activeId}
-                            setControls={setControls}
-                        ></Property>
-                    </RightWrap>
-                </DndProvider>
-            </Wrap>
-        </Dialog>
+      return { ...config, items: newControls };
+    });
+  };
+
+  const addControls = (control) => {
+    setConfig((config) => {
+      const controls = config.items;
+      setDatas((datas) => {
+        return {
+          ...datas,
+          activeId: control.id,
+          controlsIndex: controls.length,
+          type: 'control',
+        };
+      });
+      return {
+        ...config,
+        items: [...controls, control],
+      };
+    });
+  };
+
+  const removeControl = () => {
+    setConfig((config) => {
+      const controls = [];
+      config.items.forEach((item) => {
+        if (item.id != datas.activeId) {
+          controls.push(item);
+        }
+      });
+      setDatas((datas) => {
+        return {
+          ...datas,
+          activeId: controls?.[0]?.id || '',
+          controlsIndex: controls.length > 0 ? 0 : -1,
+          type: controls.length > 0 ? 'control' : 'panel',
+        };
+      });
+      return {
+        ...config,
+        items: controls,
+      };
+    });
+  };
+
+  const onSortEndHandler = ({ newIndex, oldIndex }) => {
+    if (newIndex == oldIndex) {
+      setDatas((datas) => {
+        return {
+          ...datas,
+          activeId: controls?.[newIndex]?.id,
+          type: 'control',
+        };
+      });
+      return;
+    }
+
+    setConfig((config) => {
+      const newControls = [...config.items];
+      arrayMoveMutable(newControls, oldIndex, newIndex);
+      const index = newControls.findIndex(({ id }) => id === datas.activeId);
+      setDatas((datas) => {
+        return {
+          ...datas,
+          controlsIndex: index >= 0 ? index : newIndex,
+        };
+      });
+
+      return {
+        ...config,
+        items: newControls,
+      };
+    });
+  };
+
+  const onSortStartHandler = ({ index }) => {
+    const activeItem = controls.find(
+      (i, index) => index === datas?.controlsIndex
     );
+
+    setDatas((datas) => {
+      return {
+        ...datas,
+        activeId: activeItem?.id,
+        controlsIndex: index,
+      };
+    });
+  };
+  console.log(config, 'config');
+  return (
+    <Dialog
+      title='查询面板设置'
+      width='100%'
+      height='100%'
+      id={uuid()}
+      onClose={onClose}
+      style={{ marginTop: '-2px', flex: 1 }}
+    >
+      <Wrap>
+        <DndProvider backend={HTML5Backend}>
+          <Left addControls={addControls}></Left>
+          <Main
+            axis='xy'
+            lockToContainerEdges={true}
+            lockOffset='1px'
+            onSortStart={onSortStartHandler}
+            onSortEnd={onSortEndHandler}
+            config={config}
+            addControls={addControls}
+            controlsIndex={datas.controlsIndex}
+          ></Main>
+          <Right
+            config={config}
+            removeControl={removeControl}
+            changeControlConfig={changeControlConfig}
+            datas={datas}
+            changePanelConfig={changePanelConfig}
+          ></Right>
+        </DndProvider>
+      </Wrap>
+    </Dialog>
+  );
 }

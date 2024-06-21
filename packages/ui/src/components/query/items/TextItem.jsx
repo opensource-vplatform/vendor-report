@@ -20,7 +20,7 @@ export function TextItem(props) {
         labelText = '文本',
         labelWidth = 80,
         disabled = false,
-        value,
+        value = '',
     } = props;
     const labelStyles = {
         width: labelWidth,
@@ -32,6 +32,7 @@ export function TextItem(props) {
                 style={{ flex: 1, borderRadius: 0 }}
                 disabled={disabled}
                 value={value}
+                onChange={() => {}}
             ></TextInput>
         </Wrap>
     );
