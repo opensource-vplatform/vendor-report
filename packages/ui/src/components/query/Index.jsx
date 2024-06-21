@@ -1,6 +1,5 @@
 import Query from './Query';
 
-export * from './QueryPanel';
 export * from './items/TextItem';
 export * from './items/IntegerItem';
 export * from './items/CheckBoxItem';
