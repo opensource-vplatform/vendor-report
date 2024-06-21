@@ -33,6 +33,7 @@ class ReportDesigner {
 
     mount(el) {
         GC.Spread.Common.CultureManager.culture('zh-cn');
+        GC.Spread.Sheets.Themes.Office.bodyFont("宋体")
         createRoot(el).render(
             /*  <StrictMode> */
             <Provider store={store}>
