@@ -415,6 +415,11 @@ export default {
     tabEditable: true, //选项卡是否可编辑
     tabStripVisible: true, //实现显示选项卡
   },
+  defaults: {
+    formatter: {
+      text: '#,##0',
+    },
+  },
   event: {
     onSave: function (a, b) {
       window.localStorage.setItem('spreadJSON1', JSON.stringify(a));
