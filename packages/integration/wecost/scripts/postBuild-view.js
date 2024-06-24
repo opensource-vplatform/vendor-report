@@ -25,6 +25,8 @@ if(distFilePath){
 
     //添加js到object中
     buildUtils.appendScript(result,distFilePath);
+    buildUtils.appendScript(result,'./vendor/excel/17.0.5/plugins/print.min.js');
+    buildUtils.appendScript(result,'./vendor/excel/17.0.5/plugins/pdf.min.js');
 
     //将导入信息写入到html中
     buildUtils.importToHtmlByObject(result,reportHtmlPath);

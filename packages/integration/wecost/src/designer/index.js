@@ -58,6 +58,7 @@ const Type_Map = {
   table: 'table',
   query: 'table',
   api: 'table',
+  bean: 'table',
   char: 'text',
   text: 'text',
   number: 'decimals',
@@ -70,7 +71,7 @@ const Type_Map = {
 };
 
 const enhanceType = function (type) {
-  return Type_Map[type];
+  return Type_Map[type?.toLocaleLowerCase()];
 };
 
 /**

@@ -196,7 +196,8 @@ export const getFontFamily = async () => {
     const fonts = res?.data?.fonts || [];
     fontFamilies = {
       fonts,
-      defaultFont: fonts[0]
+      defaultFont: fonts[0],
+      fontContent: {}
     }
   }
   return fontFamilies
@@ -214,12 +215,18 @@ export const registerFont = function (name, type) {
   }
   return new Promise(async (resolve) => {
     try {
+      if (!!fontFamilies['fontContent'][name]) {
+        resolve();
+        return;
+      }
       const fontContentRes = await request('getFontContent', { fontName: downloadFont })
       const fontrrayBuffer = base64ToArrayBuffer(fontContentRes?.data?.content);
       const fonts = GC.Spread.Sheets.PDF.PDFFontsManager.getFont(name) || {};
       fonts[type] = fontrrayBuffer;
+      fontFamilies['fontContent'][name] = fontContentRes?.data?.content;
       GC.Spread.Sheets.PDF.PDFFontsManager.registerFont(name, fonts);
       resolve();
+
     } catch (e) {
       console.log(e);
       resolve()
