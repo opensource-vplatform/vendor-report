@@ -4,7 +4,12 @@ const Wrap = styled.div`
     display: flex;
     flex-direction: column;
     margin: '18px 4px 8px 4px';
-    border: 1px solid #dadada;
+    &[data-type='outline'] {
+        border: 1px solid #dadada;
+    }
+    &[data-type='line'] {
+        border-top: 1px solid #dadada;
+    }
     &[data-disabled='true'] {
         opacity: 0.6;
     }
@@ -26,10 +31,11 @@ export const Legend = function (props) {
         title = '',
         children,
         titleStyle = {},
+        type='outline',
         disabled = false,
     } = props;
     return (
-        <Wrap style={style} data-disabled={disabled}>
+        <Wrap style={style} data-disabled={disabled} data-type={type}>
             <GroupTitle style={titleStyle}>{title}</GroupTitle>
             {children}
         </Wrap>

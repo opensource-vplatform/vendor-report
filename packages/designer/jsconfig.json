@@ -86,6 +86,7 @@
             "@store/borderSlice/borderSlice": [
                 "src/store/borderSlice/borderSlice"
             ],
+            "@store/chartSlice/index": ["src/store/chartSlice/index"],
             "@store/cellSettingSlice": ["src/store/cellSettingSlice"],
             "@store/conditionStyleSlice": ["src/store/conditionStyleSlice"],
             "@store/datasourceSlice/datasourceSlice": [
@@ -266,6 +267,7 @@
             ],
             "@icons/illustration/Control": ["src/icons/illustration/Control"],
             "@icons/illustration/Img": ["src/icons/illustration/Img"],
+            "@icons/illustration/Chart": ["src/icons/illustration/Chart"],
             "@icons/illustration/shape/arrow/BentArrow": [
                 "src/icons/illustration/shape/arrow/BentArrow"
             ],

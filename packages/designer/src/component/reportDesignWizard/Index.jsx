@@ -10,9 +10,11 @@ import {
 } from 'react-redux';
 import styled from 'styled-components';
 
-import Step from '@components/steps/Index';
 import { toggleReportDesignWizard } from '@store/navSlice/navSlice';
-import { Dialog } from '@toone/report-ui';
+import {
+  Dialog,
+  Steps,
+} from '@toone/report-ui';
 
 import ReportTypes from './nav/Index';
 import StatementDetail from './reportTemplate/Index';
@@ -97,7 +99,7 @@ export default function Index(props) {
             }}
         >
             <Wrap>
-                <Step
+                <Steps
                     datas={stepsDatas}
                     activeIndex={state.activeIndex}
                     style={{
@@ -106,7 +108,7 @@ export default function Index(props) {
                         height: '102px',
                         marginBottom: 'auto',
                     }}
-                ></Step>
+                ></Steps>
                 {reportType === 'none' && (
                     <>
                         <ReportTypes

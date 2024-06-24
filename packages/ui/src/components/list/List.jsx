@@ -73,14 +73,14 @@ const List = ({
     datas = null,
     width = 'auto',
     height = 'auto',
-    selectedValue,
+    value,
     onChange,
     disabled=false,
     isHasInput = false,
     onDoubleClick = () => {},
     style = {},
 }) => {
-    const [filterText, setFilterText] = useState(selectedValue);
+    const [filterText, setFilterText] = useState(value);
     const listDom = createRef(null);
     const handleItemClick = (value,text) => {
         onChange(value);
@@ -102,7 +102,7 @@ const List = ({
                 }
             }
         }
-    }, [selectedValue]);
+    }, [value]);
     return (
         <Wrap style={{ width, height, ...style }}>
             {isHasInput && (
@@ -113,22 +113,22 @@ const List = ({
                 />
             )}
             <ListWrap ref={listDom} data-disabled={disabled}>
-                {values?.map((value, index) => {
-                    const isSelected = selectedValue === value;
+                {values?.map((val, index) => {
+                    const isSelected = value === val;
                     return (
                         <ListItem
-                            key={value + index}
+                            key={val + index}
                             data-selected={isSelected}
-                            onClick={() => handleItemClick(value,value)}
+                            onClick={() => handleItemClick(val,val)}
                             onDoubleClick={onDoubleClick}
                         >
-                            {value}
+                            {val}
                         </ListItem>
                     );
                 })}
                 {objDatas &&
                     Object.keys(objDatas).map((key) => {
-                        const isSelected = selectedValue === key;
+                        const isSelected = value === key;
                         const text = objDatas[key];
                         return (
                             <ListItem
@@ -142,14 +142,14 @@ const List = ({
                         );
                     })}
                 {
-                    datas && datas.map(({value,text})=>{
-                        const isSelected = selectedValue === value;
+                    datas && datas.map(({value: val,text})=>{
+                        const isSelected = value === val;
                         return (
                             <ListItem
-                                key={value}
+                                key={val}
                                 data-selected={isSelected}
-                                data-style={String(value).includes('red') ? 'red' : ''}
-                                onClick={() => handleItemClick(value,text)}
+                                data-style={String(val).includes('red') ? 'red' : ''}
+                                onClick={() => handleItemClick(val,text)}
                             >
                                 {text}
                             </ListItem>

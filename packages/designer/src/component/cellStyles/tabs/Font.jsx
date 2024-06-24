@@ -161,7 +161,7 @@ export default function (props) {
                         height='150px'
                         isHasInput={true}
                         datas={Font_Family_Options}
-                        selectedValue={fontFamily}
+                        value={fontFamily}
                         disabled={setting?.font?.fontFamily === false}
                         onChange={(val) => changeHandler(val, 'fontFamily')}
                     />
@@ -174,7 +174,7 @@ export default function (props) {
                         isHasInput={true}
                         datas={Font_Style_Options}
                         disabled={setting?.font?.fontStyle === false}
-                        selectedValue={transformFontToselectedFontStyleKey(
+                        value={transformFontToselectedFontStyleKey(
                             fontWeight,
                             fontStyle
                         )}
@@ -206,7 +206,7 @@ export default function (props) {
                         height='150px'
                         isHasInput={true}
                         datas={Font_Size_Options}
-                        selectedValue={fontSize}
+                        value={fontSize}
                         disabled={setting?.font?.fontSize === false}
                         onChange={(val) => changeHandler(val, 'fontSize')}
                     />

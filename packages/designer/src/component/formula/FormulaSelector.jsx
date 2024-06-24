@@ -214,7 +214,7 @@ export default function (props) {
                         margin: 0,
                         marginLeft: 8,
                     }}
-                    selectedValue={data.formula}
+                    value={data.formula}
                     onChange={handleFormulaChange}
                     onDoubleClick={handleFormulaSelect}
                 ></List>

@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import appSlice from './appSlice/appSlice';
 import borderSlice from './borderSlice/borderSlice';
 import cellSettingSlice from './cellSettingSlice';
+import chartSlice from './chartSlice';
 import conditionStyleSlice from './conditionStyleSlice';
 import datasourceSlice from './datasourceSlice/datasourceSlice';
 import formulaEditorSlice from './formulaEditorSlice/formulaEditorSlice';
@@ -61,6 +62,7 @@ export default configureStore({
     sparklineSlice,
     styleSlice,
     persistingDataSlice,
+    chartSlice,
   },
   middleware: function (getDefaultMiddleware) {
     return getDefaultMiddleware({ serializableCheck });

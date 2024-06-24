@@ -78,7 +78,7 @@ export default function (props) {
             <Wrap>
                 <Title>选择规则类型：</Title>
                 <List
-                    selectedValue={editorType}
+                    value={editorType}
                     datas={formatTypes}
                     style={{ backgroundColor: 'white' }}
                     onChange={(val) => {

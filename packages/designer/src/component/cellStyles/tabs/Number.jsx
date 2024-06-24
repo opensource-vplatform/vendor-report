@@ -136,7 +136,7 @@ export default function () {
                 <List
                     height='423px'
                     datas={Category_Options}
-                    selectedValue={category}
+                    value={category}
                     onChange={(val) => {
                         const def = getDefaultFormat(val,numberSetting.locale);
                         let values = {category:val};
@@ -207,7 +207,7 @@ export default function () {
                             width='480px'
                             height='130px'
                             objDatas={CurrencyNegativeNumbers}
-                            selectedValue={numberSetting.format}
+                            value={numberSetting.format}
                             onChange={(val) => changeHandler(val, 'format')}
                         />
                     </div>
@@ -223,7 +223,7 @@ export default function () {
                                 width='480px'
                                 height='130px'
                                 datas={Times_Options}
-                                selectedValue={numberSetting.format}
+                                value={numberSetting.format}
                                 onChange={(val) => changeHandler(val, 'format')}
                             />
                         )}
@@ -236,7 +236,7 @@ export default function () {
                                         ? Object.values(DateFormats)
                                         : Object.values(DateFormatsChina)
                                 }
-                                selectedValue={numberSetting.format}
+                                value={numberSetting.format}
                                 onChange={(val) => changeHandler(val, 'format')}
                             />
                         )}
@@ -245,7 +245,7 @@ export default function () {
                                 width='480px'
                                 height='130px'
                                 values={Object.values(FractionType)}
-                                selectedValue={numberSetting.format}
+                                value={numberSetting.format}
                                 onChange={(val) => changeHandler(val, 'format')}
                             />
                         )}
@@ -255,7 +255,7 @@ export default function () {
                                 width='480px'
                                 height='120px'
                                 values={Object.values(SpecialFormats)}
-                                selectedValue={numberSetting.format}
+                                value={numberSetting.format}
                                 onChange={(val) => changeHandler(val, 'format')}
                             />
                         )}
@@ -265,7 +265,7 @@ export default function () {
                                 height='130px'
                                 values={Object.values(CustomFormats)}
                                 isHasInput={true}
-                                selectedValue={numberSetting.format}
+                                value={numberSetting.format}
                                 onChange={(val) => changeHandler(val, 'format')}
                             />
                         )}

@@ -22,7 +22,7 @@ import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
 import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
-//import InsertTab from '@tabs/insert/Index';
+import InsertTab from '@tabs/insert/Index';
 import LayoutTab from '@tabs/layout/Index';
 import ReportTab from '@tabs/report/Index';
 import SettingTab from '@tabs/setting/Index';
@@ -99,7 +99,7 @@ const FormulaNavItem = WithNavItem(FormulaTab);
 const SettingNavItem = WithNavItem(SettingTab);
 const ReportNavItem = WithNavItem(ReportTab);
 const SparklinesNavItem = WithNavItem(SparklinesTab);
-//const InsertNavItem = WithNavItem(InsertTab);
+const InsertNavItem = WithNavItem(InsertTab);
 const LayoutNavItem = WithNavItem(LayoutTab);
 
 function parseUsedDatasource(spread, finalDsList) {
@@ -269,7 +269,7 @@ export default function () {
   //是否隐藏设置导航
   const isHiddenSetting = getNavConfig(context, 'setting');
   //是否隐藏插入导航
-  //const isHiddenInsert = getNavConfig(context, 'insert');
+  const isHiddenInsert = getNavConfig(context, 'insert');
   //是否隐藏迷你图导航
   const isHiddenSparklines = getNavConfig(context, 'sparklines');
   //是否隐藏页面布局
@@ -465,11 +465,11 @@ export default function () {
           title='开始'
           tabProps={{ hidden: isHiddenStart }}
         ></StartNavItem>
-        {/*<InsertNavItem
+        <InsertNavItem
           code='insert'
           title='插入'
           tabProps={{ hidden: isHiddenInsert }}
-        ></InsertNavItem>*/}
+        ></InsertNavItem>
         <LayoutNavItem
           code='layout'
           title='页面布局'

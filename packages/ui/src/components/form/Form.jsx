@@ -38,10 +38,10 @@ const Title = styled.label`
 const FormContext = createContext(null);
 
 export function Form(props) {
-  const { labelWidth, children } = props;
+  const { labelWidth, children,style={} } = props;
   return (
     <FormContext.Provider value={labelWidth}>
-      <FormWrap>{children}</FormWrap>
+      <FormWrap style={style}>{children}</FormWrap>
     </FormContext.Provider>
   );
 }
