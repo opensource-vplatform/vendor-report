@@ -198,7 +198,11 @@ const MainItem = SortableElement((props) => {
   const el = useRef();
   const Component = optionalControlsMap[type];
   return (
-    <MainItemWrap ref={el} active={active ? 'active' : ''}>
+    <MainItemWrap
+      ref={el}
+      active={active ? 'active' : ''}
+      style={{ gridColumn: `span ${config?.colSpan || 1}` }}
+    >
       <div style={{ pointerEvents: 'none' }}>
         <Component {...config} value={config.defaultValue}></Component>
       </div>
@@ -263,55 +267,6 @@ const Main = SortableContainer(function Main(props) {
   );
 });
 
-function Property(props) {
-    const { controls, activeId, setControls } = props;
-    const control = controls.find(({ id }) => id === activeId);
-    const changeControlConfig = (key, value) => {
-        setControls((datas) => {
-            const newDatas = [...datas];
-            const index = newDatas.findIndex(({ id }) => id === activeId);
-            newDatas.splice(index, 1, {
-                ...control,
-                config: {
-                    ...control?.config,
-                    [key]: value,
-                },
-            });
-            return newDatas;
-        });
-    };
-    return (
-        <PropertyWrap>
-            <PropertyItemWrap>
-                <PropertyLable>标签</PropertyLable>
-                <TextInput
-                    style={{ flex: 1 }}
-                    value={control?.config?.labelText || ''}
-                    onChange={(val) => {
-                        changeControlConfig('labelText', val);
-                    }}
-                ></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>标签宽度</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>数据集</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>字段</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-            <PropertyItemWrap>
-                <PropertyLable>默认值</PropertyLable>
-                <TextInput style={{ flex: 1 }}></TextInput>
-            </PropertyItemWrap>
-        </PropertyWrap>
-    );
-}
-
 export default function (props) {
   const { onClose } = props;
   const dispatch = useDispatch();
@@ -335,7 +290,27 @@ export default function (props) {
 
   const changePanelConfig = (key, value) => {
     setConfig((config) => {
-      return { ...config, [key]: value };
+      const result = { ...config, [key]: value };
+      const newControls = [];
+      if (key === 'colCount') {
+        const controls = config.items;
+        controls.forEach((control) => {
+          let colSpan = control?.config?.colSpan || 1;
+          if (value < colSpan) {
+            colSpan = value;
+          }
+          newControls.push({
+            ...control,
+            config: {
+              ...control?.config,
+              colSpan,
+            },
+          });
+        });
+        result.items = newControls;
+      }
+
+      return result;
     });
   };
 
@@ -526,7 +501,6 @@ export default function (props) {
               changeControlConfig={changeControlConfig}
               datas={datas}
               changePanelConfig={changePanelConfig}
-              changeControlDropDownSource={changeControlDropDownSource}
             ></Right>
           </DndProvider>
         </Wrap>

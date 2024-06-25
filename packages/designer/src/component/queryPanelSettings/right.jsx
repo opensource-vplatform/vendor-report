@@ -144,12 +144,13 @@ function QueryPanelProperty(props) {
 }
 function ControlProperty(props) {
   const {
-    config,
+    config = {},
     datas: { activeId },
     changeControlConfig,
     removeControl,
-    changeControlDropDownSource,
   } = props;
+
+  const { colCount = 3 } = config;
   const controls = config.items;
   if (!controls || controls.length <= 0) {
     return null;
@@ -169,9 +170,11 @@ function ControlProperty(props) {
       datasource = '',
       fieldCode = '',
       defaultValue = '',
-      dropDownSource = {
-        type: 'datasource',
-      },
+      optionType = 'datasource',
+      optionText = '',
+      optionValue,
+      optionDatasource,
+      colSpan = 1,
     },
   } = control;
   cacheDatas.ds = {};
@@ -246,6 +249,18 @@ function ControlProperty(props) {
         ></Select>
       </PropertyItemWrap>
       <PropertyItemWrap>
+        <PropertyLable>列数</PropertyLable>
+        <Integer
+          style={{ flex: 1 }}
+          min={1}
+          value={colSpan}
+          max={colCount}
+          onChange={(value) => {
+            changeControlConfig('colSpan', value);
+          }}
+        ></Integer>
+      </PropertyItemWrap>
+      <PropertyItemWrap>
         <PropertyLable>默认值</PropertyLable>
         <TextInput
           style={{ flex: 1 }}
@@ -261,7 +276,7 @@ function ControlProperty(props) {
             <PropertyLable>数据来源类型</PropertyLable>
             <Select
               wrapStyle={{ flex: 1 }}
-              value={dropDownSource?.type || 'datasource'}
+              value={optionType || 'datasource'}
               datas={[
                 {
                   text: '数据集',
@@ -273,20 +288,20 @@ function ControlProperty(props) {
                 },
               ]}
               onChange={(value) => {
-                changeControlDropDownSource('type', value);
+                changeControlConfig('optionType', value);
               }}
             ></Select>
           </PropertyItemWrap>
-          {dropDownSource?.type !== 'custom' && (
+          {optionType !== 'custom' && (
             <>
               <PropertyItemWrap>
                 <PropertyLable>数据来源</PropertyLable>
                 <Select
                   wrapStyle={{ flex: 1 }}
-                  value={dropDownSource?.datasource}
+                  value={optionDatasource}
                   datas={ds}
                   onChange={(value) => {
-                    changeControlDropDownSource('datasource', value);
+                    changeControlConfig('optionDatasource', value);
                     setDropdownFields(cacheDatas.ds[value].fields);
                   }}
                 ></Select>
@@ -295,10 +310,10 @@ function ControlProperty(props) {
                 <PropertyLable>显示字段</PropertyLable>
                 <Select
                   wrapStyle={{ flex: 1 }}
-                  value={dropDownSource?.text}
+                  value={optionText}
                   datas={dropdownFields}
                   onChange={(value) => {
-                    changeControlDropDownSource('text', value);
+                    changeControlConfig('optionText', value);
                   }}
                 ></Select>
               </PropertyItemWrap>
@@ -306,10 +321,10 @@ function ControlProperty(props) {
                 <PropertyLable>标识字段</PropertyLable>
                 <Select
                   wrapStyle={{ flex: 1 }}
-                  value={dropDownSource?.value}
+                  value={optionValue}
                   datas={dropdownFields}
                   onChange={(value) => {
-                    changeControlDropDownSource('value', value);
+                    changeControlConfig('optionValue', value);
                   }}
                 ></Select>
               </PropertyItemWrap>

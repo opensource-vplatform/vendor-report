@@ -1,5 +1,6 @@
 import {
   CheckBoxItem,
+  FloatItem,
   IntegerItem,
   RadioGroupItem,
   Selectitem,
@@ -7,25 +8,29 @@ import {
 } from '@toone/report-ui';
 
 export const optionalControls = [
-  { type: 'Text', config: { label: '文本' } },
+  { type: 'text', config: { label: '文本' } },
   {
-    type: 'Integer',
+    type: 'integer',
     config: { label: '整数' },
   },
   {
-    type: 'Boolean',
+    type: 'float',
+    config: { label: '小数' },
+  },
+  {
+    type: 'boolean',
     config: {
       label: '布尔',
     },
   },
   {
-    type: 'Select',
+    type: 'select',
     config: {
       label: '下拉框',
     },
   },
   {
-    type: 'RadioGroup',
+    type: 'radioGroup',
     config: {
       label: '单选组',
       options: [
@@ -51,11 +56,12 @@ export const optionalControls = [
 } */
 
 export const optionalControlsMap = {
-  Text: TextItem,
-  Integer: IntegerItem,
-  Boolean: CheckBoxItem,
-  Select: Selectitem,
-  RadioGroup: RadioGroupItem,
+  text: TextItem,
+  integer: IntegerItem,
+  boolean: CheckBoxItem,
+  select: Selectitem,
+  radioGroup: RadioGroupItem,
+  float: FloatItem,
 };
 
 export const dropdownDatasource = {
