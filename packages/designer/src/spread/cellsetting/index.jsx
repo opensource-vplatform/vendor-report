@@ -7,6 +7,7 @@ import { isFunction } from '@toone/report-util';
 import { getBaseUrl } from '@utils/environmentUtil';
 
 import Setting from './Setting';
+import chart from './types/Chart';
 import formula from './types/Formula';
 import group from './types/Group';
 import image from './types/Image';
@@ -28,7 +29,7 @@ const Img = styled.img`
     cursor: pointer;
 `;
 
-const plugins = [formula, group, list, image, sum, merge];
+const plugins = [formula, group, list, image, sum, merge, chart];
 
 /**
  * 是否显示设置图标
@@ -75,11 +76,11 @@ export const getDirection = function(sheet,row,col){
  * @param {*} style
  * @param {*} value
  */
-export const paintCell = function (context, style, value) {
+export const paintCell = function (context, style, value, params) {
     plugins.forEach((plugin) => {
         const handler = plugin.paintCell;
         if (isFunction(handler)) {
-            value = handler(context, style, value);
+            value = handler(context, style, value, params);
         }
     });
     return value;

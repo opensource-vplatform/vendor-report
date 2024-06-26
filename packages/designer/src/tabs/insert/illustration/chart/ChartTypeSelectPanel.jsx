@@ -3,11 +3,23 @@ import {
   useState,
 } from 'react';
 
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
+import {
+  setConfig,
+  setType,
+} from '@store/chartSlice';
+import {
+  setIcon,
+  setStep,
+} from '@store/chartSlice/index';
 import { List } from '@toone/report-ui';
 
-import { ClassifyChart } from './Components';
+import { GroupedChart } from './Components';
 import {
   CATALOGS,
   CLASSIFY_CHARTS,
@@ -37,7 +49,7 @@ const ChartListWrap = styled.div`
   padding: 20px;
 `;
 
-function getClassifyCharts(type) {
+function getGroupedCharts(type) {
   let result = [];
   if (type == null) {
     result = [...CLASSIFY_CHARTS];
@@ -51,32 +63,48 @@ function getClassifyCharts(type) {
 }
 
 export default function (props) {
-  const { style = {},onClick } = props;
-  const [type, setType] = useState(null);
-  const [classifyCharts, setClassifyCharts] = useState([]);
+  const { style = {} } = props;
+  const [group, setGroup] = useState(null);
+  const [groupedCharts, setGroupedCharts] = useState([]);
+  const { type, config } = useSelector(({ chartSlice }) => chartSlice);
+  const dispatch = useDispatch();
   useEffect(() => {
-    const classifyCharts = getClassifyCharts(type);
-    setClassifyCharts(classifyCharts);
-  }, [type]);
+    const classifyCharts = getGroupedCharts(group);
+    setGroupedCharts(classifyCharts);
+  }, [group]);
   return (
     <Wrap style={style}>
       <CatalogWrap>
         <List
           datas={CATALOGS}
-          value={type}
+          value={group}
           style={{ height: '100%' }}
-          onChange={(val) => setType(val)}
+          onChange={(val) => setGroup(val)}
         ></List>
       </CatalogWrap>
       <ChartListWrap>
-        {classifyCharts.map(({ value, title, charts }) => {
+        {groupedCharts.map(({ value, title, charts }) => {
           return (
-            <ClassifyChart
+            <GroupedChart
               key={value}
               title={title}
               charts={charts}
-              onClick={onClick}
-            ></ClassifyChart>
+              selected={{ config, type }}
+              onClick={({ icon, config: cfg }) => {
+                const { type, ...others } = cfg;
+                dispatch(setType(type));
+                let config = null;
+                if (cfg.type !== type) {
+                  config = others;
+                } else {
+                  //选择的图表类型相同，则复用其原有配置
+                  config = { ...config, ...others };
+                }
+                dispatch(setConfig(config));
+                dispatch(setIcon(icon));
+                dispatch(setStep('config'));
+              }}
+            ></GroupedChart>
           );
         })}
       </ChartListWrap>

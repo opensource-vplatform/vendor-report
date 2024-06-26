@@ -22,6 +22,9 @@ const ChartItemWrap = styled.div`
   &:hover {
     background-color: #dadada;
   }
+  &[data-selected='true'] {
+    background-color: #dadada;
+  }
 `;
 
 const ChartIcon = styled.div`
@@ -44,9 +47,9 @@ const ChartItemList = styled.div`
 `;
 
 export function ChartItem(props) {
-  const { title, icon, onClick } = props;
+  const { title, icon, selected = false, onClick } = props;
   return (
-    <ChartItemWrap onClick={onClick}>
+    <ChartItemWrap data-selected={selected} onClick={onClick}>
       <ChartIcon
         style={{
           backgroundImage: `url(${getBaseUrl()}/css/icons/chart/${icon}.png)`,
@@ -61,11 +64,27 @@ export function ChartItem(props) {
   );
 }
 
+const isEquals = function (source, target) {
+  const keys = Object.keys(target);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    if (source[key] !== target[key]) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const isSelected = function (chartDefine, state) {
+  const { config:{type:type,...others} } = chartDefine;
+  return type == state.type && isEquals(state.config, others);
+};
+
 /**
  * 分类后的图表
  */
-export function ClassifyChart(props) {
-  const { title, charts = [], onClick } = props;
+export function GroupedChart(props) {
+  const { title, charts = [], selected, onClick } = props;
   return (
     <Legend title={title} type='line'>
       <ChartItemList>
@@ -75,6 +94,7 @@ export function ClassifyChart(props) {
               key={def.value}
               title={def.title}
               icon={def.icon}
+              selected={isSelected(def, selected)}
               onClick={() => onClick && onClick(def)}
             ></ChartItem>
           );

@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 
+import { Legend } from '@toone/report-ui';
+
 import ChartProperties from './ChartProperties';
+import DatasourcePreview from './DatasourcePreview';
 
 const Wrap = styled.div`
     display: flex;
@@ -21,10 +24,12 @@ const LeftPanel = styled.div`
     height: 100%;
     display: flex;
     flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+    box-sizing: border-box;
 `;
 
 const SplitPanel = styled.div`
-    width: 100%;
     height: 50%;
 `;
 
@@ -34,8 +39,14 @@ const SplitPanel = styled.div`
 export default function(){
     return <Wrap>
         <LeftPanel>
-            <SplitPanel></SplitPanel>
-            <SplitPanel></SplitPanel>
+            <SplitPanel>
+                <Legend title="图表预览" style={{height:'100%'}}></Legend>
+            </SplitPanel>
+            <SplitPanel>
+                <Legend title="数据预览" style={{height:'100%'}}>
+                    <DatasourcePreview></DatasourcePreview>
+                </Legend>
+            </SplitPanel>
         </LeftPanel>
         <PropertyPanel>
             <ChartProperties></ChartProperties>

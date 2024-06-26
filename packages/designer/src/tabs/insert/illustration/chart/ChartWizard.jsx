@@ -13,14 +13,17 @@ import {
   setConfig,
   setType,
 } from '@store/chartSlice';
+import { setStep } from '@store/chartSlice/index';
 import {
   Button,
   OperationDialog,
   Steps,
 } from '@toone/report-ui';
 import {
+  clearAllCellTagPlugin,
   getActiveIndexBySpread,
   getCellTagPlugin,
+  setCellTagPlugin,
 } from '@utils/worksheetUtil';
 
 import ChartConfigPanel from './ChartConfigPanel';
@@ -57,8 +60,8 @@ export const ButtonText = styled.span`
  * @returns
  */
 export default function Index(props) {
-  const { onCancel } = props;
-  const { type, config } = useSelector(({ chartSlice }) => chartSlice);
+  const { onClose } = props;
+  const { step, icon,type,config } = useSelector(({ chartSlice }) => chartSlice);
   const { spread } = useSelector(({ appSlice }) => appSlice);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -69,9 +72,11 @@ export default function Index(props) {
         const { type, config } = plugin.config;
         dispatch(setType(type));
         dispatch(setConfig(config));
+        dispatch(setStep('config'));
       } else {
         dispatch(setType(null));
         dispatch(setConfig({}));
+        dispatch(setStep('choose'));
       }
     }
   }, []);
@@ -81,35 +86,54 @@ export default function Index(props) {
       height='90%'
       title='图表配置向导'
       onCancel={() => {
-        onCancel && onCancel();
+        onClose && onClose();
       }}
-      tools = {
-        <Fragment>{type ? <Button title="返回">返回</Button>:null}</Fragment>
+      onConfirm={
+        ()=>{
+          const {sheet,row,col} = getActiveIndexBySpread(spread);
+          clearAllCellTagPlugin(sheet,row,col);//先清空当前单元格中所有插件设置
+          setCellTagPlugin(sheet,row,col,{
+            type:'cellChart',
+            config:{type,icon,config}
+          });
+          onClose && onClose();
+        }
       }
-      showConfirmButton={type ? true : false}
-
+      beforeTools={
+        <Fragment>
+          {step == 'config' ? (
+            <Button
+              title='返回'
+              style={{ marginRight: 8 }}
+              onClick={() => {
+                dispatch(setStep('choose'));
+              }}
+            >
+              返回
+            </Button>
+          ) : null}
+        </Fragment>
+      }
+      showConfirmButton={step == 'config' ? true : false}
     >
       <Wrap>
         <Steps
           datas={stepsDatas}
-          activeIndex={type ? 1:0}
+          activeIndex={step == 'config' ? 1 : 0}
           style={{
+            padding: '10px 0px',
             borderBottom: '1px solid #ddd',
             borderTop: '1px solid #ddd',
             height: '102px',
             marginBottom: 'auto',
           }}
         ></Steps>
-        {type ? null : (
+        {step == 'config' ? null : (
           <ChartTypeSelectPanel
-            style={{ height: 'calc(100% - 102px)' }}
-            onClick={({ type, dimension, style, orientation }) => {
-              dispatch(setType(type));
-              dispatch(setConfig({ ...config, style, orientation, dimension }));
-            }}
+            style={{ height: 'calc(100% - 82px)' }}
           ></ChartTypeSelectPanel>
         )}
-        {type ? <ChartConfigPanel></ChartConfigPanel> : null}
+        {step == 'config' ? <ChartConfigPanel></ChartConfigPanel> : null}
       </Wrap>
     </OperationDialog>
   );

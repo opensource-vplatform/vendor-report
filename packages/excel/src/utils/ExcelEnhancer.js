@@ -1,4 +1,5 @@
-import { base64DataURLToImageData } from './imageUtil';
+import { base64DataURLToImageData } from '@toone/report-util';
+
 import { getNamespace } from './spreadUtil';
 
 /**

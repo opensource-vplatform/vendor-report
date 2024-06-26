@@ -13,7 +13,7 @@ export default function () {
   return (
     <Fragment>
       {wizardVisible ? (
-        <ChartWizard onCancel={() => setWizardVisible(false)}></ChartWizard>
+        <ChartWizard onClose={() => setWizardVisible(false)}></ChartWizard>
       ) : null}
       <VIconTitle
         title='图表'

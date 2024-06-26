@@ -132,6 +132,9 @@ export default function (props) {
                             height: '100%',
                             display: 'flex',
                             alignItems: 'center',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis',
                         }}
                     >
                         {data.text || text}

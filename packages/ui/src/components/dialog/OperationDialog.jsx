@@ -48,6 +48,7 @@ export default function (props) {
     confirmTitle = '确定',
     children,
     tools = null,
+    beforeTools = null,
     ...others
   } = props;
   return (
@@ -73,6 +74,7 @@ export default function (props) {
                   {confirmTitle}
                 </DialogButton>
               ) : null}
+              {beforeTools}
             </ButtonWrap>
           )}
         </Content>

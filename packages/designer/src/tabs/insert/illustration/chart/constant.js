@@ -36,53 +36,80 @@ export const CLASSIFY_CHARTS = [
     charts: [
       {
         value: 'bar-v-2d',
-        type: 'bar',
-        orientation: 'portrait',
         icon: 'bar-v-2d',
         title: '竖向柱状图2D',
+        config:{
+          type: 'bar',
+          orientation: 'portrait',
+          dimension: '2d',
+        },
       },
       {
         value: 'bar-h-2d',
-        type: 'bar',
-        orientation: 'landscape',
         icon: 'bar-h-2d',
         title: '横向柱状图2D',
+        config:{
+          type: 'bar',
+          orientation: 'landscape',
+        }
       },
       /*{
           value: 'bar-v-3d',
           icon: 'bar-v-3d',
-          dimension: '3d',
-          title: '竖向柱状图3D'
+          title: '竖向柱状图3D',
+          config:{
+            type: 'bar',
+            orientation: 'portrait',
+            dimension: '3d',
+          }
       },{
           value: 'bar-h-3d',
           icon: 'bar-h-3d',
-          dimension: '3d',
           title: '横向柱状图3D'
+          config:{
+            type: 'bar',
+            orientation: 'landscape',
+            dimension: '3d',
+          },
       },*/ {
         value: 'bar-v-stack-2d',
         icon: 'bar-v-stack-2d',
-        orientation: 'portrait',
-        style: 'stack',
         title: '竖向堆叠柱状图2D',
+        config:{
+          type: 'bar',
+          orientation: 'portrait',
+          style: 'stack',
+        }
       },
       {
         value: 'bar-h-stack-2d',
         icon: 'bar-h-stack-2d',
-        orientation: 'landscape',
-        style: 'stack',
         title: '横向堆叠柱状图2D',
+        config:{
+          type: 'bar',
+          orientation: 'landscape',
+          style: 'stack',
+        }
       } /*{
           value: 'bar-v-stack-3d',
           icon: 'bar-v-stack-3d',
-          style: 'stack',
-          dimension: '3d',
-          title: '竖向堆叠柱状图3D'
+          title: '竖向堆叠柱状图3D',
+          config:{
+            type: 'bar',
+            orientation: 'portrait',
+            style: 'stack',
+            dimension: '3d',
+          }
       },{
           value: 'bar-h-stack-3d',
           icon: 'bar-h-stack-3d',
-          style: 'stack',
-          dimension: '3d',
-          title: '横向堆叠柱状图3D'
+          title: '横向堆叠柱状图3D',
+          config:{
+            type: 'bar',
+            orientation: 'landscape',
+            style: 'stack',
+            dimension: '3d',
+          }
       },*/,
     ],
   },
@@ -92,29 +119,41 @@ export const CLASSIFY_CHARTS = [
     charts: [
       {
         value: 'pie-2d',
-        type: 'pie',
-        icon: 'pie-2d',
         title: '饼图2D',
+        icon: 'pie-2d',
+        config:{
+          type: 'pie',
+          dimension: '2d',
+        }
       },
       {
         value: 'pie-3d',
-        icon: 'pie-3d',
-        dimension: '3d',
         title: '饼图3D',
+        icon: 'pie-3d',
+        config:{
+          type: 'pie',
+          dimension: '3d',
+        }
       },
       {
         value: 'pie-cycle-2d',
         icon: 'pie-cycle-2d',
-        type: 'pie',
-        style: 'cycle',
         title: '环形图2D',
+        config:{
+          type: 'pie',
+          dimension: '2d',
+          style: 'cycle',
+        },
       },
       {
         value: 'pie-cycle-3d',
         icon: 'pie-cycle-3d',
-        style: 'cycle',
-        dimension: '3d',
         title: '环形图3D',
+        config:{
+          type: 'pie',
+          style: 'cycle',
+          dimension: '3d',
+        }
       },
     ],
   },
@@ -126,7 +165,27 @@ export const CLASSIFY_CHARTS = [
         value: 'line',
         icon: 'line',
         title: '折线图',
+        config:{
+          type: 'line',
+        }
       },
     ],
   },
 ];
+
+export const SUM_TYPES = [{
+  value: 'sum',
+  text: '求和',
+},{
+  value: 'average',
+  text: '平均值',
+},{
+  value: 'count',
+  text: '计数',
+},{
+  value: 'min',
+  text: '最小值',
+},{
+  value: 'max',
+  text: '最大值',
+},];

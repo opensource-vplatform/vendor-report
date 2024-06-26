@@ -14,3 +14,4 @@ export * from './components/splitpane/Index';
 export * from './theme/Index';
 export * from './components/query/Index';
 export * from './components/steps/Index';
+export * from './components/table/Index';
