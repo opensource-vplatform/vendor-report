@@ -189,6 +189,7 @@ export default function (props) {
                 const newSheet = pageDatas.datas[i];
                 newSheet.sheet = sheetJson;
                 inst.resetSheet(newSheet);
+                sheet.setRowCount(0);
                 sheet.fromJSON(sheetJson);
 
                 const enhancer = new ExcelEnhancer(datas.spread);
@@ -312,6 +313,7 @@ export default function (props) {
               const newSheet = pageDatas.datas[i];
               newSheet.sheet = sheetJson;
               inst.resetSheet(newSheet);
+              sheet.setRowCount(0);
               sheet.fromJSON(sheetJson);
               const enhancer = new ExcelEnhancer(datas.spread);
               enhancer
@@ -423,6 +425,7 @@ export default function (props) {
         const newSheet = sheetPage.datas[newPageIndex];
         newSheet.sheet = sheetJson;
         inst.resetSheet(newSheet);
+        sheet.setRowCount(0);
         sheet.fromJSON(sheetJson);
       }
       console.log(sheet.toJSON());
