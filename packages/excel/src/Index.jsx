@@ -14,6 +14,7 @@ import {
 import { setPrintInfo } from './utils/printUtil';
 import Workbook from './Workbook';
 import Worksheet from './Worksheet';
+import Chart from './chart'
 
 init();
 
@@ -28,4 +29,5 @@ export {
   ThemeContextProvider,
   Workbook,
   Worksheet,
+  Chart,
 };

@@ -23,7 +23,7 @@ import {
         <Select
           wrapStyle={{ width: '100%' }}
           value={config.datasource}
-          datas={dsList.map((ds) => {
+          datas={dsList.filter(ds=> ds.type == 'table').map((ds) => {
             return { value: ds.code, text: ds.name };
           })}
           onChange={(val) => dispath(setConfig({ ...config, datasource: val }))}

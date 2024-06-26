@@ -1,29 +1,14 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  setConfig,
-  setType,
-} from '@store/chartSlice';
-import {
-  setIcon,
-  setStep,
-} from '@store/chartSlice/index';
+import { setConfig, setType } from '@store/chartSlice';
+import { setIcon, setStep } from '@store/chartSlice/index';
 import { List } from '@toone/report-ui';
 
 import { GroupedChart } from './Components';
-import {
-  CATALOGS,
-  CLASSIFY_CHARTS,
-} from './constant';
+import { CATALOGS, CLASSIFY_CHARTS } from './constant';
 
 const Wrap = styled.div`
   display: flex;
@@ -93,14 +78,14 @@ export default function (props) {
               onClick={({ icon, config: cfg }) => {
                 const { type, ...others } = cfg;
                 dispatch(setType(type));
-                let config = null;
+                let config_new = null;
                 if (cfg.type !== type) {
-                  config = others;
+                  config_new = others;
                 } else {
                   //选择的图表类型相同，则复用其原有配置
-                  config = { ...config, ...others };
+                  config_new = { ...config, ...others };
                 }
-                dispatch(setConfig(config));
+                dispatch(setConfig(config_new));
                 dispatch(setIcon(icon));
                 dispatch(setStep('config'));
               }}

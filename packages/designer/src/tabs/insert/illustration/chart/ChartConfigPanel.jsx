@@ -4,6 +4,7 @@ import { Legend } from '@toone/report-ui';
 
 import ChartProperties from './ChartProperties';
 import DatasourcePreview from './DatasourcePreview';
+import ChartPreview from './ChartPreview';
 
 const Wrap = styled.div`
     display: flex;
@@ -40,7 +41,9 @@ export default function(){
     return <Wrap>
         <LeftPanel>
             <SplitPanel>
-                <Legend title="图表预览" style={{height:'100%'}}></Legend>
+                <Legend title="图表预览" style={{height:'100%'}}>
+                  <ChartPreview></ChartPreview>
+                </Legend>
             </SplitPanel>
             <SplitPanel>
                 <Legend title="数据预览" style={{height:'100%'}}>

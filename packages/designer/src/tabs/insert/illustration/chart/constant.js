@@ -38,19 +38,21 @@ export const CLASSIFY_CHARTS = [
         value: 'bar-v-2d',
         icon: 'bar-v-2d',
         title: '竖向柱状图2D',
-        config:{
+        config: {
           type: 'bar',
           orientation: 'portrait',
           dimension: '2d',
+          style: '',
         },
       },
       {
         value: 'bar-h-2d',
         icon: 'bar-h-2d',
         title: '横向柱状图2D',
-        config:{
+        config: {
           type: 'bar',
           orientation: 'landscape',
+          style: '',
         }
       },
       /*{
@@ -75,7 +77,7 @@ export const CLASSIFY_CHARTS = [
         value: 'bar-v-stack-2d',
         icon: 'bar-v-stack-2d',
         title: '竖向堆叠柱状图2D',
-        config:{
+        config: {
           type: 'bar',
           orientation: 'portrait',
           style: 'stack',
@@ -85,7 +87,7 @@ export const CLASSIFY_CHARTS = [
         value: 'bar-h-stack-2d',
         icon: 'bar-h-stack-2d',
         title: '横向堆叠柱状图2D',
-        config:{
+        config: {
           type: 'bar',
           orientation: 'landscape',
           style: 'stack',
@@ -121,7 +123,7 @@ export const CLASSIFY_CHARTS = [
         value: 'pie-2d',
         title: '饼图2D',
         icon: 'pie-2d',
-        config:{
+        config: {
           type: 'pie',
           dimension: '2d',
         }
@@ -130,7 +132,7 @@ export const CLASSIFY_CHARTS = [
         value: 'pie-3d',
         title: '饼图3D',
         icon: 'pie-3d',
-        config:{
+        config: {
           type: 'pie',
           dimension: '3d',
         }
@@ -139,7 +141,7 @@ export const CLASSIFY_CHARTS = [
         value: 'pie-cycle-2d',
         icon: 'pie-cycle-2d',
         title: '环形图2D',
-        config:{
+        config: {
           type: 'pie',
           dimension: '2d',
           style: 'cycle',
@@ -149,7 +151,7 @@ export const CLASSIFY_CHARTS = [
         value: 'pie-cycle-3d',
         icon: 'pie-cycle-3d',
         title: '环形图3D',
-        config:{
+        config: {
           type: 'pie',
           style: 'cycle',
           dimension: '3d',
@@ -165,7 +167,7 @@ export const CLASSIFY_CHARTS = [
         value: 'line',
         icon: 'line',
         title: '折线图',
-        config:{
+        config: {
           type: 'line',
         }
       },
@@ -176,16 +178,16 @@ export const CLASSIFY_CHARTS = [
 export const SUM_TYPES = [{
   value: 'sum',
   text: '求和',
-},{
+}, {
   value: 'average',
   text: '平均值',
-},{
+}, {
   value: 'count',
   text: '计数',
-},{
+}, {
   value: 'min',
   text: '最小值',
-},{
+}, {
   value: 'max',
   text: '最大值',
 },];

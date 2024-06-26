@@ -1,19 +1,9 @@
-import {
-  Fragment,
-  useEffect,
-  useState,
-} from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { setConfig } from '@store/chartSlice/index';
-import {
-  FormItem,
-  Select,
-} from '@toone/report-ui';
+import { FormItem, Select } from '@toone/report-ui';
 
 import { toSelectOptions } from './utils';
 
@@ -23,8 +13,8 @@ import { toSelectOptions } from './utils';
 export default function () {
   const { config } = useSelector(({ chartSlice }) => chartSlice);
   const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
-  const [datas, setDatas] = useState(()=>{
-    return config.datasource ? toSelectOptions(dsList, config.datasource):[];
+  const [datas, setDatas] = useState(() => {
+    return config.datasource ? toSelectOptions(dsList, config.datasource) : [];
   });
   const dispatch = useDispatch();
   useEffect(() => {
@@ -42,9 +32,7 @@ export default function () {
           }
           datas={datas}
           onChange={(val) => {
-            const groups = config.groups ? config.groups : [];
-            groups[0]= val;
-            dispatch(setConfig({ ...config, groups }));
+            dispatch(setConfig({ ...config, groups: [val] }));
           }}
         ></Select>
         {/*<AddIcon></AddIcon>*/}
