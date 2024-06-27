@@ -286,7 +286,6 @@ export default class ParseReportJson {
       pageInfos.hasHandleLastPage = false;
 
       while (pageInfos.flag) {
-        debugger;
         //用于存储当前页内容
         const sheetPage = {
           sheet: pageInfos.sheet,
@@ -448,13 +447,15 @@ export default class ParseReportJson {
       }
 
       //行高
-      sheetPage.rows[sheetPage.rowCount] = {
-        size: tempHeight,
-      };
-      if (sheetPrintPage) {
-        sheetPrintPage.rows[sheetPrintPage.rowCount] = {
+      if (tempHeight != 20) {
+        sheetPage.rows[sheetPage.rowCount] = {
           size: tempHeight,
         };
+        if (sheetPrintPage) {
+          sheetPrintPage.rows[sheetPrintPage.rowCount] = {
+            size: tempHeight,
+          };
+        }
       }
 
       lastSpans.forEach(function (span) {
@@ -1135,7 +1136,7 @@ export default class ParseReportJson {
   }
 
   handleDataTable(params) {
-    const { pageInfos, sheetPage, sheetPrintPage, temp, i } = params;
+    const { pageInfos, sheetPage, sheetPrintPage, temp, i, type } = params;
     const { page, lastDataTable, dataIndex } = pageInfos;
     const {
       dataTables,
@@ -1162,9 +1163,12 @@ export default class ParseReportJson {
         Object.entries(dataTable).forEach(([colStr, _colDataTable]) => {
           const colDataTable = { ..._colDataTable };
           const printColDataTable = { ..._colDataTable };
-          lastDataTable[colStr] = {
-            style: colDataTable.style,
-          };
+          if (type === 'content') {
+            lastDataTable[colStr] = {
+              style: colDataTable.style,
+            };
+          }
+
           dataTable[colStr] = colDataTable;
           printDataTalbe[colStr] = printColDataTable;
           const col = Number(colStr);
@@ -1412,7 +1416,7 @@ export default class ParseReportJson {
           });
 
           //合并信息
-          if (spans.length > 0) {
+          if (spans.length > 0 && type === 'content') {
             pageInfos.lastSpans = spans;
           }
 
@@ -1442,18 +1446,23 @@ export default class ParseReportJson {
           //行高
           let size = rows?.size || 20;
           size = size > rowHeight ? size : rowHeight;
-          sheetPage.rows[sheetPageRowCount] = {
-            ...(sheetPage.rows[sheetPageRowCount] || {}),
-            ...rows,
-            size,
-          };
-
-          if (sheetPrintPage) {
-            sheetPrintPage.rows[sheetPrintPage.rowCount] = {
-              ...(sheetPrintPage.rows[sheetPrintPage.rowCount] || {}),
+          const newRows = { ...rows, size };
+          const rowsKeys = Object.keys(newRows);
+          const hasSizeKey = newRows.hasOwnProperty('size');
+          if (!(hasSizeKey && rowsKeys.length === 1 && newRows.size == 20)) {
+            sheetPage.rows[sheetPageRowCount] = {
+              ...(sheetPage.rows[sheetPageRowCount] || {}),
               ...rows,
               size,
             };
+
+            if (sheetPrintPage) {
+              sheetPrintPage.rows[sheetPrintPage.rowCount] = {
+                ...(sheetPrintPage.rows[sheetPrintPage.rowCount] || {}),
+                ...rows,
+                size,
+              };
+            }
           }
 
           //横向上的自动合并区域(在纵向上不连续)
@@ -1659,6 +1668,7 @@ export default class ParseReportJson {
           ...params,
           temp,
           i,
+          type: 'content',
         });
       }
       //标识内容处理结束
