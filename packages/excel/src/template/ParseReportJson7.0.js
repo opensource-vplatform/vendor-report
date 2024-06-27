@@ -1,7 +1,4 @@
-import {
-  getFitHeight,
-  isObject,
-} from '@toone/report-util';
+import { isObject } from '@toone/report-util';
 
 import {
   enhanceFormula,
@@ -245,7 +242,10 @@ export default class ParseReportJson {
     const { header, footer, content } = templates;
     //需要分页
     if (pageInfos.pageArea) {
-      function calculate(header, footer, content) {
+      let index = 0;
+      let startIndex = 0;
+
+      function calculate(header, footer, content, contentDatasLen) {
         let { height: headerHeight } = header;
         let { height: footerHeight } = footer;
         let { height: contentTempHeight } = content;
@@ -265,8 +265,16 @@ export default class ParseReportJson {
           }
         }
         contentHeight -= 5;
+        //当前页可以渲染多少个内容模板
+        const contentTempCount = Math.floor(contentHeight / contentTempHeight);
+
+        //分页小计。分页小计不等于总页数
+        const pageSubtotal = Math.ceil(contentDatasLen / contentTempCount);
+        const lastContentTempCount = contentDatasLen % contentTempCount;
         return {
-          contentHeight,
+          pageSubtotal,
+          lastContentTempCount,
+          contentTempCount,
         };
       }
 
@@ -274,23 +282,15 @@ export default class ParseReportJson {
       let { template: footerTemplates } = footer[3];
       let { template: contentTemplates } = content[3];
 
-      //计算内容区域的可用高度，不包含章合计和总计
-      let { contentHeight } = calculate(header[3], footer[3], content[3]);
+      let { pageSubtotal, lastContentTempCount, contentTempCount } = calculate(
+        header[3],
+        footer[3],
+        content[3],
+        content[3].template[0].unionDatasource.getCount()
+      );
+      pageSubtotal = pageSubtotal || 1; //处理分页区域绑定的实体无数据时，整个报表不显示问题 add by xiedh
 
-      //内容总高度，不包括头部和底部
-      pageInfos.contentTotalHeight = contentHeight;
-      //已经消耗的内容高度
-      pageInfos.contentHeight = 0;
-      //内容所用到的数据的起始索引
-      pageInfos.contentDataIndex = 0;
-      //标识内容是否已经循环处理完。true表示还未处理完
-      pageInfos.flag = true;
-      //内容所用到的数据的长度
-      pageInfos.dataLen = undefined;
-
-      while (pageInfos.flag) {
-        debugger;
-        //用于存储当前页内容
+      while (index < pageSubtotal) {
         const sheetPage = {
           sheet: pageInfos.sheet,
           spans: [],
@@ -302,7 +302,6 @@ export default class ParseReportJson {
         };
 
         if (!pageInfos.sheetPrintPage) {
-          //用于存储打印内容，例如次打印20页
           pageInfos.sheetPrintPage = {
             sheet: pageInfos.sheet,
             spans: [],
@@ -313,94 +312,93 @@ export default class ParseReportJson {
             rowCount: 0,
           };
         }
+        const isLastPage = index + 1 >= pageSubtotal;
+        if (isLastPage) {
+          let {
+            pageSubtotal: _pageSubtotal,
+            lastContentTempCount: _lastContentTempCount,
+            contentTempCount: _contentTempCount,
+          } = calculate(header[2], footer[2], content[2], lastContentTempCount);
 
-        //处理头部区域
+          if (_pageSubtotal <= 1) {
+            if (pageInfos.isLastGroup) {
+              const {
+                pageSubtotal: _pageSubtotal,
+                lastContentTempCount: _lastContentTempCount_,
+                contentTempCount: _contentTempCount_,
+              } = calculate(
+                header[1],
+                footer[1],
+                content[1],
+                _lastContentTempCount
+              );
+              if (_pageSubtotal <= 1) {
+                headerTemplates = header[1].template;
+                footerTemplates = footer[1].template;
+                lastContentTempCount = _lastContentTempCount_;
+                contentTempCount = _contentTempCount_;
+              } else {
+                pageSubtotal += 1;
+              }
+            } else {
+              headerTemplates = header[2].template;
+              footerTemplates = footer[2].template;
+              lastContentTempCount = _lastContentTempCount;
+              contentTempCount = _contentTempCount;
+            }
+          } else {
+            pageSubtotal += 1;
+          }
+        }
+
         this.genPageDataTables({
           templates: headerTemplates,
           pageInfos,
           sheetPage,
           sheetPrintPage: pageInfos.sheetPrintPage,
         });
+        let endIndex = startIndex + contentTempCount;
+        //最后一页
+        if (isLastPage && !pageInfos.isFillData) {
+          endIndex = startIndex + lastContentTempCount;
+        }
 
-        //处理内容区域
-        this.genContentPageDataTables({
+        //单行填充
+        let singleRowFill = false;
+        let fillCount = 0;
+        if (isLastPage && pageInfos.isFillData && pageInfos.singleRowFill) {
+          if (lastContentTempCount > 0) {
+            fillCount = contentTempCount - lastContentTempCount;
+          }
+
+          endIndex = startIndex + lastContentTempCount;
+          singleRowFill = true;
+        }
+
+        this.genPageDataTables({
           templates: contentTemplates,
           pageInfos,
+          startIndex,
+          endIndex,
           sheetPage,
           sheetPrintPage: pageInfos.sheetPrintPage,
+          singleRowFill,
+          fillCount,
         });
-
-        let diffHeight = 0;
-        //判断是否已经是最后一页
-        if (!pageInfos.flag) {
-          //只包含章合计
-          let tempInfo = footer[2];
-          if (pageInfos.isLastGroup) {
-            //最后一组的最后一页的底部包含章合计和总计
-            tempInfo = footer[1];
-          }
-
-          const { height, template } = tempInfo;
-          diffHeight =
-            pageInfos.pageTotalHeight - pageInfos.pageHeight - height;
-          if (diffHeight > 0) {
-            //如果剩余高度能渲染包含章合计的底部，则用包含章合计的底部模板渲染
-            footerTemplates = template;
-          } else {
-            //如果剩余高度不能渲染包含章合计的底部，则继续循环
-            pageInfos.dataLen += 1;
-            pageInfos.flag = true;
-          }
-        }
-
-        //最后一页，填充数据
-        if (!pageInfos.flag) {
-          const { lastSpans, lastDataTable } = pageInfos;
-          if (pageInfos.isFillData && pageInfos.singleRowFill) {
-            //1，单行填充
-            const height = diffHeight - 10;
-            if (height > 0) {
-              this.fillData({
-                tempHeight: height,
-                fillCount: 1,
-                lastSpans,
-                lastDataTable,
-                pageInfos,
-                sheetPage,
-              });
-            }
-          } else if (pageInfos.isFillData) {
-            //2，多行填充
-            const height = diffHeight - 10;
-            if (height > 0) {
-              const tempHeight = content[3].height;
-              const fillCount = Math.floor(height / tempHeight);
-              this.fillData({
-                tempHeight,
-                fillCount,
-                lastSpans,
-                lastDataTable,
-                pageInfos,
-                sheetPage,
-              });
-            }
-          }
-        }
-
-        //底部
         this.genPageDataTables({
           templates: footerTemplates,
           pageInfos,
           sheetPage,
           sheetPrintPage: pageInfos.sheetPrintPage,
         });
-        if (pageInfos.flag) {
+
+        if (index + 1 < pageSubtotal) {
           this.onAfterPage(pageInfos);
         }
-        this.onAfterPage(pageInfos.sheetPrintPage);
-
         pageInfos.pageHeight = 0;
-        pageInfos.contentHeight = 0;
+
+        startIndex += contentTempCount;
+        index++;
         this.sheetPages[pageInfos.sheet.name].datas.push(sheetPage);
         if (pageInfos.showPageCount % this.showPageCount === 0) {
           this.sheetPrintPages[pageInfos.sheet.name].datas.push(
@@ -431,51 +429,6 @@ export default class ParseReportJson {
       pageInfos.sheetPrintPage = null;
     }
   }
-  fillData({
-    fillCount,
-    tempHeight,
-    pageInfos,
-    sheetPage,
-    lastSpans,
-    lastDataTable,
-  }) {
-    for (let i = 0; i < fillCount; i++) {
-      pageInfos.pageHeight += tempHeight;
-      let dataTable = JSON.parse(JSON.stringify(lastDataTable));
-      sheetPage.dataTable[sheetPage.rowCount] = dataTable;
-      const sheetPrintPage = pageInfos.sheetPrintPage;
-      if (sheetPrintPage) {
-        sheetPrintPage.dataTable[sheetPrintPage.rowCount] = dataTable;
-      }
-
-      //行高
-      sheetPage.rows[sheetPage.rowCount] = {
-        size: tempHeight,
-      };
-      if (sheetPrintPage) {
-        sheetPrintPage.rows[sheetPrintPage.rowCount] = {
-          size: tempHeight,
-        };
-      }
-
-      lastSpans.forEach(function (span) {
-        sheetPage.spans.push({
-          ...span,
-          rowCount: 1,
-          row: sheetPage.rowCount,
-        });
-        sheetPrintPage &&
-          sheetPrintPage.spans.push({
-            ...span,
-            rowCount: 1,
-            row: sheetPrintPage.rowCount,
-          });
-      });
-
-      sheetPage.rowCount += 1;
-      sheetPrintPage && (sheetPrintPage.rowCount += 1);
-    }
-  }
   genPageInfos({ sheet }) {
     const {
       name,
@@ -492,7 +445,6 @@ export default class ParseReportJson {
         showColumnHeader = 2,
       },
       colHeaderRowInfos = [],
-      columns,
     } = sheet;
 
     const templateInfo = this.tempConfig?.[name];
@@ -569,15 +521,11 @@ export default class ParseReportJson {
       isCurrentSheet: templateInfo?.isCurrentSheet,
       isTemplate,
       page: {},
-      columns,
-      lastSpans: [],
-      lastDataTable: {},
-      dataIndex: 0,
     };
 
     return pageInfos;
   }
-  collectTemplate(temp, type, columns = []) {
+  collectTemplate(temp, type) {
     const { tableCodes, datas, allDatas, dataTables, dataPath, cellPlugins } =
       temp;
 
@@ -607,20 +555,13 @@ export default class ParseReportJson {
     const dataLen = type === 'content' ? 1 : unionDatasource.getCount() || 1;
 
     for (let i = 0; i < dataLen; i++) {
-      //计算高度
-      /* dataTables.forEach(function ({ rows = {} }) {
+      dataTables.forEach(function ({ rows = {} }) {
         //计算高度
         if (rows.hasOwnProperty('size')) {
           height += rows?.size;
         } else {
           height += 20;
         }
-      }); */
-      height += this.calcTempAfterRenderHeight({
-        dataTables,
-        unionDatasource,
-        pageInfos: { columns },
-        dataIndex: i,
       });
     }
 
@@ -662,7 +603,7 @@ export default class ParseReportJson {
   }
   genTemplateFromSheet(sheet) {
     this.namedStyles = [];
-    const { rowCount = 200, data, columns } = sheet;
+    const { rowCount = 200, data } = sheet;
 
     this.initTempates();
 
@@ -799,11 +740,11 @@ export default class ParseReportJson {
         });
 
         if (template.row < pageAreaStartRow) {
-          this.collectTemplate(template, 'header', columns);
+          this.collectTemplate(template, 'header');
         } else if (template.row >= pageAreaEndRow) {
-          this.collectTemplate(template, 'footer', columns);
+          this.collectTemplate(template, 'footer');
         } else {
-          this.collectTemplate(template, 'content', columns);
+          this.collectTemplate(template, 'content');
         }
         template = null;
       }
@@ -912,19 +853,13 @@ export default class ParseReportJson {
                 const dataLen = unionDatasource.getCount() || 1;
 
                 for (let i = 0; i < dataLen; i++) {
-                  /*  dataTables.forEach(function ({ rows = {} }) {
+                  dataTables.forEach(function ({ rows = {} }) {
                     //计算高度
                     if (rows.hasOwnProperty('size')) {
                       height += rows?.size;
                     } else {
                       height += 20;
                     }
-                  }); */
-                  height += this.calcTempAfterRenderHeight({
-                    dataTables,
-                    unionDatasource,
-                    pageInfos,
-                    dataIndex: i,
                   });
                 }
 
@@ -933,10 +868,12 @@ export default class ParseReportJson {
             });
           });
         }
+
         if (index > 0) {
           //强制打印时在当前行换页
           this.onAfterPage(pageInfos);
         }
+
         this.render(pageInfos, templates);
       });
       if (pageInfos.sheetPrintPage) {
@@ -945,8 +882,8 @@ export default class ParseReportJson {
         );
       }
       pageInfos.sheet.namedStyles = this.namedStyles;
+      //this.resetSheet(pageInfos);
       this.resetSheet(this.sheetPages[name].datas[0]);
-      //this.resetSheet(this.sheetPrintPages[name].datas[0]);
     });
   }
   parseRowDataTable(params) {
@@ -1005,19 +942,6 @@ export default class ParseReportJson {
 
     Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
       const { bindingPath, tag, formula, style = {} } = _colDataTable;
-      if (tag) {
-        const jsonTag = JSON.parse(tag);
-        const plugins = jsonTag?.plugins;
-        if (Array.isArray(plugins)) {
-          const cellList = plugins.find(({ type }) => {
-            return type === 'cellList';
-          });
-
-          if (cellList?.config?.rowHeight === 'autoFitByContent') {
-            style.wordWrap = true;
-          }
-        }
-      }
       //样式采用命名空间
       if (
         _colDataTable.style &&
@@ -1029,7 +953,6 @@ export default class ParseReportJson {
           ...style,
           name: namedStyles,
         });
-        _colDataTable._style = _colDataTable.style;
         _colDataTable.style = namedStyles;
       }
 
@@ -1136,550 +1059,385 @@ export default class ParseReportJson {
     return { sheetDatas, groupNames: temp.groupNames, tableCode };
   }
 
-  handleDataTable(params) {
-    const { pageInfos, sheetPage, sheetPrintPage, temp, i } = params;
-    const { page, lastDataTable, dataIndex } = pageInfos;
-    const {
-      dataTables,
-      isGroupSumArea,
-      isTotalArea,
-      unionDatasource,
-      unionDatasourceAll,
-    } = temp;
-
-    const sheetPageRowCount = sheetPage.rowCount;
-    const sheetPrintPageRowCount = sheetPrintPage?.rowCount;
-
-    dataTables.forEach(
-      ({
-        rows = {},
-        rowDataTable,
-        spans = [],
-        rules = [],
-        autoMergeRanges = [],
-      }) => {
-        const dataTable = { ...rowDataTable };
-        const printDataTalbe = { ...rowDataTable };
-        let rowHeight = 0;
-        Object.entries(dataTable).forEach(([colStr, _colDataTable]) => {
-          const colDataTable = { ..._colDataTable };
-          const printColDataTable = { ..._colDataTable };
-          lastDataTable[colStr] = {
-            style: colDataTable.style,
-          };
-          dataTable[colStr] = colDataTable;
-          printDataTalbe[colStr] = printColDataTable;
-          const col = Number(colStr);
-          const { bindingPath, tag, _style } = colDataTable;
-          if (bindingPath?.includes?.('.')) {
-            const [tableCode, fieldCode] = bindingPath.split('.');
-            delete colDataTable.bindingPath;
-            delete printColDataTable.bindingPath;
-            const { type, value: newVlaue } = unionDatasource.getValue(
-              tableCode,
-              fieldCode,
-              i
-            );
-            if (type === 'text') {
-              colDataTable.value = newVlaue;
-              printColDataTable.value = newVlaue;
-            }
-          }
-
-          const height = this.getFitHeight({
-            tag,
-            _style,
-            pageInfos,
-            colDataTable,
-            colStr,
-          });
-          if (height > rowHeight) {
-            rowHeight = height;
-          }
-
-          const tool = new Tool();
-          const printTool = new Tool();
-          const groupName = pageInfos.groupName;
-          tool.setGroupNameHandler(() => groupName);
-          printTool.setGroupNameHandler(() => groupName);
-
-          tool.setIsGroupSumAreaHandler(() => isGroupSumArea || isTotalArea);
-          printTool.setIsGroupSumAreaHandler(
-            () => isGroupSumArea || isTotalArea
-          );
-
-          let hasRuntimePlugins = false;
-          if (tag) {
-            const tagObj = JSON.parse(tag);
-
-            const instanceId = tagObj.instanceId;
-            //当前单元格在当前页中的起始行，记录数等信息
-            page[pageInfos.pageIndex] = page[pageInfos.pageIndex] || {};
-            page[pageInfos.pageIndex][instanceId] =
-              page[pageInfos.pageIndex][instanceId] || {};
-            const targetCell = page[pageInfos.pageIndex][instanceId];
-            //内容区域在当前页的起始行
-            targetCell['row'] = targetCell['row'] ?? sheetPageRowCount;
-            //打印的内容区域在当前页的起始行
-            targetCell['printRow'] =
-              targetCell['printRow'] ?? sheetPrintPageRowCount;
-            targetCell['col'] = col;
-            //当前分组的联合数据源在当前页的记录数
-            targetCell['count'] = targetCell['count'] || 0;
-            targetCell['count'] += 1;
-            //当前分组的联合数据源在当前页的起始索引
-            targetCell['dataStartIndex'] = dataIndex;
-            //当前分组的联合数据源
-            targetCell['unionDatasource'] = unionDatasource;
-            //未分组的联合数据源
-            targetCell['unionDatasourceAll'] = unionDatasourceAll;
-
-            //处理超链接信息
-            const hyperlinkInfo = tagObj.hyperlinkInfo || {};
-            if (
-              hyperlinkInfo?.type === 'document' &&
-              hyperlinkInfo?.isAutoDoc
-            ) {
-              colDataTable.hyperlink.url = `sjs://${colDataTable.value}!A1`;
-              if (colDataTable.hyperlink.tooltip) {
-                colDataTable.hyperlink.tooltip = colDataTable.value;
-              }
-            }
-
-            //执行插件
-            const plugins = tagObj.plugins;
-            if (Array.isArray(plugins)) {
-              let targetInstanceId = '';
-              const isDelay = plugins.some(function ({ type, config }) {
-                if (type === 'cellSubTotal') {
-                  targetInstanceId = config?.instanceId;
-                }
-                return ['cellSubTotal'].includes(type);
-              });
-              hasRuntimePlugins = plugins.some(
-                ({ retention }) => retention === 'runtime'
-              );
-
-              const pageIndex = pageInfos.pageIndex;
-              const groupName = pageInfos.groupName;
-              function pluginHandler() {
-                //汇总
-                const targetCell = page?.[pageIndex]?.[targetInstanceId];
-                tool.setFieldIndexHandler(() => {
-                  return {
-                    row: targetCell?.['row'],
-                    col: targetCell?.['col'],
-                  };
-                });
-
-                printTool.setFieldIndexHandler(() => {
-                  return {
-                    row: targetCell?.['printRow'],
-                    col: targetCell?.['col'],
-                  };
-                });
-
-                tool.setDataCountHandler(() => {
-                  return targetCell?.['count'];
-                });
-
-                printTool.setDataCountHandler(() => {
-                  return targetCell?.['count'];
-                });
-
-                tool.setDataIndex(() => {
-                  return targetCell?.['dataStartIndex'];
-                });
-
-                printTool.setDataIndex(() => {
-                  return targetCell?.['dataStartIndex'];
-                });
-
-                tool.setUnionDatasourceHandler(() => {
-                  if (isTotalArea) {
-                    return targetCell?.['unionDatasourceAll'];
-                  }
-                  const unionDatasource = targetCell?.['unionDatasource'];
-                  const datas = pageInfos.unionDatasourceDatas[groupName];
-                  if (datas) {
-                    unionDatasource.load(datas);
-                  }
-                  return unionDatasource;
-                });
-
-                printTool.setUnionDatasourceHandler(() => {
-                  if (isTotalArea) {
-                    return targetCell?.['unionDatasourceAll'];
-                  }
-                  const unionDatasource = targetCell?.['unionDatasource'];
-                  const datas = pageInfos.unionDatasourceDatas[groupName];
-                  if (datas) {
-                    unionDatasource.load(datas);
-                  }
-                  return unionDatasource;
-                });
-
-                let res = exePlugins(
-                  {
-                    type: 'text',
-                    value: colDataTable.value,
-                  },
-                  plugins,
-                  tool
-                );
-
-                enhance(colDataTable, res);
-
-                let res1 = exePlugins(
-                  {
-                    type: 'text',
-                    value: printColDataTable.value,
-                  },
-                  plugins,
-                  printTool
-                );
-
-                enhance(printColDataTable, res1);
-              }
-
-              if (isDelay) {
-                this.delayPlugins.push(pluginHandler);
-              } else {
-                pluginHandler();
-              }
-            }
-          }
-
-          let pageIndex = pageInfos.pageIndex;
-
-          //先执行插件，后执行函数
-          const pageHandler = genPageIndexHandler(pageIndex);
-
-          if (colDataTable.formula) {
-            const formulaHandler = () => {
-              //当前页
-              tool.setPageHandler(pageHandler);
-              //总页数
-              tool.setTotalPagesHandler(() => pageInfos.pageTotal);
-
-              tool.setValueHandler((...args) => {
-                if (args.length === 1) {
-                  return {
-                    type: 'text',
-                    value: this.datas[args[0]],
-                  };
-                } else {
-                  return unionDatasource.getValue(args[0], args[1], i);
-                }
-              });
-
-              let res = enhanceFormula(
-                {
-                  type: 'formula',
-                  value: colDataTable.formula,
-                },
-                tool
-              );
-              enhance(colDataTable, res);
-              enhance(printColDataTable, res);
-            };
-            this.delayFormula.push(formulaHandler);
-          }
-          if (!hasRuntimePlugins) {
-            delete colDataTable.tag;
-            delete printColDataTable.tag;
-          }
-        });
-
-        if (pageInfos) {
-          let sheetPageRowCount = sheetPage.rowCount;
-          sheetPage.dataTable[sheetPageRowCount] = dataTable;
-          if (sheetPrintPage) {
-            sheetPrintPage.dataTable[sheetPrintPage.rowCount] = printDataTalbe;
-          }
-
-          //合并信息
-          spans.forEach(function (span) {
-            sheetPage.spans.push({
-              ...span,
-              row: sheetPageRowCount,
-            });
-
-            if (sheetPrintPage) {
-              sheetPrintPage.spans.push({
-                ...span,
-                row: sheetPrintPage.rowCount,
-              });
-            }
-          });
-
-          //合并信息
-          if (spans.length > 0) {
-            pageInfos.lastSpans = spans;
-          }
-
-          //条件规则
-          rules.forEach(function (rule) {
-            sheetPage.rules.push({
-              ...rule,
-              ranges: [
-                {
-                  ...rule.ranges[0],
-                  row: sheetPageRowCount,
-                },
-              ],
-            });
-            sheetPrintPage &&
-              sheetPrintPage.rules.push({
-                ...rule,
-                ranges: [
-                  {
-                    ...rule.ranges[0],
-                    row: sheetPrintPage.rowCount,
-                  },
-                ],
-              });
-          });
-
-          //行高
-          let size = rows?.size || 20;
-          size = size > rowHeight ? size : rowHeight;
-          sheetPage.rows[sheetPageRowCount] = {
-            ...(sheetPage.rows[sheetPageRowCount] || {}),
-            ...rows,
-            size,
-          };
-
-          if (sheetPrintPage) {
-            sheetPrintPage.rows[sheetPrintPage.rowCount] = {
-              ...(sheetPrintPage.rows[sheetPrintPage.rowCount] || {}),
-              ...rows,
-              size,
-            };
-          }
-
-          //横向上的自动合并区域(在纵向上不连续)
-          autoMergeRanges.forEach(function (item) {
-            sheetPage.autoMergeRanges.push({
-              ...item,
-              range: {
-                ...item.range,
-                row: sheetPageRowCount,
-              },
-            });
-
-            sheetPrintPage &&
-              sheetPrintPage.autoMergeRanges.push({
-                ...item,
-                range: {
-                  ...item.range,
-                  row: sheetPrintPage.rowCount,
-                },
-              });
-          });
-
-          pageInfos.rowCount += 1;
-          sheetPage && (sheetPage.rowCount += 1);
-          sheetPrintPage && (sheetPrintPage.rowCount += 1);
-        }
-      }
-    );
-  }
-
   genPageDataTables(params) {
-    const { templates, pageInfos, sheetPage, sheetPrintPage } = params;
+    const {
+      templates,
+      pageInfos,
+      startIndex = 0,
+      endIndex = 0,
+      sheetPage,
+      sheetPrintPage,
+      singleRowFill = false,
+      fillCount = 0,
+    } = params;
     templates.forEach((temp) => {
       const {
+        dataTables,
         height: tempHeight,
+        isGroupSumArea,
+        isTotalArea,
         unionDatasource,
-        verticalAutoMergeRanges,
+        unionDatasourceAll,
       } = temp;
 
-      const dataLen = unionDatasource.getCount() || 1;
+      let { verticalAutoMergeRanges } = temp;
 
-      const sheetPageRowCount = sheetPage.rowCount;
-      const sheetPrintPageRowCount = sheetPrintPage?.rowCount;
+      const dataLen = endIndex || unionDatasource.getCount() || 1;
+      verticalAutoMergeRanges = Copy(verticalAutoMergeRanges);
+      verticalAutoMergeRanges.forEach(function (item) {
+        item.range.row = pageInfos.rowCount;
+      });
 
-      for (let i = 0; i < dataLen; i++) {
+      const page = pageInfos.page;
+
+      let startRow = pageInfos.rowCount;
+      let dataIndex = startIndex;
+      let lastSpans = [];
+      let lastDataTable = {};
+      for (let i = startIndex; i < dataLen; i++) {
         if (pageInfos.pageArea) {
           if (pageInfos.pageHeight + tempHeight > pageInfos.pageTotalHeight) {
-            pageInfos.dataIndex = i;
+            startRow = pageInfos.rowCount;
+            dataIndex = i;
             this.onAfterPage(pageInfos, tempHeight);
-            this.onAfterPage(sheetPage, tempHeight);
           } else {
             pageInfos.pageHeight += tempHeight;
           }
         }
-        this.handleDataTable({
-          ...params,
-          temp,
-          i,
-        });
-      }
-      //纵向上自动合并信息(在纵向上连续，只需修改起始行号和行号数)
-      verticalAutoMergeRanges.forEach(function (item) {
-        //当前页的纵向合并
-        sheetPage.autoMergeRanges.push({
-          ...item,
-          range: {
-            ...item.range,
-            rowCount: sheetPage.rowCount - sheetPageRowCount,
-            row: sheetPageRowCount,
-          },
-        });
+        dataTables.forEach(
+          ({
+            rows = {},
+            rowDataTable,
+            spans = [],
+            rules = [],
+            autoMergeRanges = [],
+          }) => {
+            const dataTable = { ...rowDataTable };
+            Object.entries(dataTable).forEach(([colStr, _colDataTable]) => {
+              const colDataTable = { ..._colDataTable };
+              lastDataTable[colStr] = {
+                style: colDataTable.style,
+              };
+              dataTable[colStr] = colDataTable;
+              const col = Number(colStr);
+              const { bindingPath, tag } = colDataTable;
+              if (bindingPath?.includes?.('.')) {
+                const [tableCode, fieldCode] = bindingPath.split('.');
+                delete colDataTable.bindingPath;
+                const { type, value: newVlaue } = unionDatasource.getValue(
+                  tableCode,
+                  fieldCode,
+                  i
+                );
+                if (type === 'text') {
+                  colDataTable.value = newVlaue;
+                }
+              }
 
-        //打印区域页面纵向合并
-        sheetPrintPage &&
-          sheetPrintPage.autoMergeRanges.push({
-            ...item,
-            range: {
-              ...item.range,
-              rowCount: sheetPrintPage.rowCount - sheetPrintPageRowCount,
-              row: sheetPrintPageRowCount,
-            },
+              const tool = new Tool();
+              const groupName = pageInfos.groupName;
+              tool.setGroupNameHandler(() => groupName);
+
+              tool.setIsGroupSumAreaHandler(
+                () => isGroupSumArea || isTotalArea
+              );
+              if (tag) {
+                const tagObj = JSON.parse(tag);
+
+                const instanceId = tagObj.instanceId;
+                //当前单元格在当前页中的起始行，记录数等信息
+                page[pageInfos.pageIndex] = page[pageInfos.pageIndex] || {};
+                page[pageInfos.pageIndex][instanceId] =
+                  page[pageInfos.pageIndex][instanceId] || {};
+                const targetCell = page[pageInfos.pageIndex][instanceId];
+                targetCell['row'] = startRow;
+                targetCell['col'] = col;
+                targetCell['count'] = targetCell['count'] || 0;
+                targetCell['count'] += 1;
+                targetCell['dataIndex'] = dataIndex;
+                targetCell['unionDatasource'] = unionDatasource;
+                targetCell['unionDatasourceAll'] = unionDatasourceAll;
+
+                //处理超链接信息
+                const hyperlinkInfo = tagObj.hyperlinkInfo || {};
+                if (
+                  hyperlinkInfo?.type === 'document' &&
+                  hyperlinkInfo?.isAutoDoc
+                ) {
+                  colDataTable.hyperlink.url = `sjs://${colDataTable.value}!A1`;
+                  if (colDataTable.hyperlink.tooltip) {
+                    colDataTable.hyperlink.tooltip = colDataTable.value;
+                  }
+                }
+
+                //执行插件
+                const plugins = tagObj.plugins;
+                if (Array.isArray(plugins)) {
+                  let targetInstanceId = '';
+                  const isDelay = plugins.some(function ({ type, config }) {
+                    if (type === 'cellSubTotal') {
+                      targetInstanceId = config?.instanceId;
+                    }
+                    return ['cellSubTotal'].includes(type);
+                  });
+
+                  const pageIndex = pageInfos.pageIndex;
+                  const groupName = pageInfos.groupName;
+                  function pluginHandler() {
+                    //汇总
+                    const targetCell = page?.[pageIndex]?.[targetInstanceId];
+                    tool.setFieldIndexHandler(() => {
+                      return {
+                        row: targetCell?.['row'],
+                        col: targetCell?.['col'],
+                      };
+                    });
+
+                    tool.setDataCountHandler(() => {
+                      return targetCell?.['count'];
+                    });
+
+                    tool.setDataIndex(() => {
+                      return targetCell?.['dataIndex'];
+                    });
+
+                    tool.setUnionDatasourceHandler(() => {
+                      if (isTotalArea) {
+                        return targetCell?.['unionDatasourceAll'];
+                      }
+                      const unionDatasource = targetCell?.['unionDatasource'];
+                      const datas = pageInfos.unionDatasourceDatas[groupName];
+                      if (datas) {
+                        unionDatasource.load(datas);
+                      }
+                      return unionDatasource;
+                    });
+
+                    let res = exePlugins(
+                      {
+                        type: 'text',
+                        value: colDataTable.value,
+                      },
+                      plugins,
+                      tool
+                    );
+                    enhance(colDataTable, res);
+                  }
+
+                  if (isDelay) {
+                    this.delayPlugins.push(pluginHandler);
+                  } else {
+                    pluginHandler();
+                  }
+                }
+              }
+
+              let pageIndex = pageInfos.pageIndex;
+
+              //先执行插件，后执行函数
+              const pageHandler = genPageIndexHandler(pageIndex);
+
+              if (colDataTable.formula) {
+                const formulaHandler = () => {
+                  //当前页
+                  tool.setPageHandler(pageHandler);
+                  //总页数
+                  tool.setTotalPagesHandler(() => pageInfos.pageTotal);
+
+                  tool.setValueHandler((...args) => {
+                    if (args.length === 1) {
+                      return {
+                        type: 'text',
+                        value: this.datas[args[0]],
+                      };
+                    } else {
+                      return unionDatasource.getValue(args[0], args[1], i);
+                    }
+                  });
+
+                  let res = enhanceFormula(
+                    {
+                      type: 'formula',
+                      value: colDataTable.formula,
+                    },
+                    tool
+                  );
+                  enhance(colDataTable, res);
+                };
+                this.delayFormula.push(formulaHandler);
+              }
+              delete colDataTable.tag;
+            });
+
+            if (pageInfos) {
+              const { rowCount } = pageInfos;
+              pageInfos.dataTable[rowCount] = dataTable;
+
+              let sheetPageRowCount = 0;
+              if (sheetPage) {
+                sheetPageRowCount = sheetPage.rowCount;
+                sheetPage.dataTable[sheetPageRowCount] = dataTable;
+              }
+
+              if (sheetPrintPage) {
+                sheetPrintPage.dataTable[sheetPrintPage.rowCount] = dataTable;
+              }
+
+              //合并信息
+              if (spans.length > 0) {
+                lastSpans = spans;
+              }
+
+              spans.forEach(function (span) {
+                pageInfos.spans.push({
+                  ...span,
+                  row: rowCount,
+                });
+                sheetPage &&
+                  sheetPage.spans.push({
+                    ...span,
+                    row: sheetPageRowCount,
+                  });
+                sheetPrintPage &&
+                  sheetPrintPage.spans.push({
+                    ...span,
+                    row: sheetPrintPage.rowCount,
+                  });
+              });
+
+              //条件规则
+              rules.forEach(function (rule) {
+                pageInfos.rules.push({
+                  ...rule,
+                  ranges: [
+                    {
+                      ...rule.ranges[0],
+                      row: rowCount,
+                    },
+                  ],
+                });
+
+                sheetPage &&
+                  sheetPage.rules.push({
+                    ...rule,
+                    ranges: [
+                      {
+                        ...rule.ranges[0],
+                        row: sheetPageRowCount,
+                      },
+                    ],
+                  });
+                sheetPrintPage &&
+                  sheetPrintPage.rules.push({
+                    ...rule,
+                    ranges: [
+                      {
+                        ...rule.ranges[0],
+                        row: sheetPrintPage.rowCount,
+                      },
+                    ],
+                  });
+              });
+
+              //行高
+              const rowsKeys = Object.keys(rows);
+              const hasSizeKey = rows.hasOwnProperty('size');
+              if (!(hasSizeKey && rowsKeys.length === 1 && rows.size === 20)) {
+                pageInfos.rows[rowCount] = {
+                  ...(pageInfos.rows[rowCount] || {}),
+                  ...rows,
+                };
+                if (sheetPage) {
+                  sheetPage.rows[sheetPageRowCount] = {
+                    ...(pageInfos.rows[sheetPageRowCount] || {}),
+                    ...rows,
+                  };
+                }
+
+                if (sheetPrintPage) {
+                  sheetPrintPage.rows[sheetPrintPage.rowCount] = {
+                    ...(pageInfos.rows[sheetPageRowCount] || {}),
+                    ...rows,
+                  };
+                }
+              }
+
+              //自动合并区域
+              autoMergeRanges.forEach(function (item) {
+                const cobyItem = Copy(item);
+                cobyItem.range.row = rowCount;
+                pageInfos.autoMergeRanges.push(cobyItem);
+                sheetPage && sheetPage.autoMergeRanges.push(cobyItem);
+
+                sheetPrintPage && sheetPrintPage.autoMergeRanges.push(cobyItem);
+              });
+
+              pageInfos.rowCount += 1;
+              sheetPage && (sheetPage.rowCount += 1);
+              sheetPrintPage && (sheetPrintPage.rowCount += 1);
+            }
+          }
+        );
+      }
+      if (singleRowFill && pageInfos && fillCount > 0) {
+        const height = tempHeight * fillCount;
+        pageInfos.pageHeight += height;
+
+        pageInfos.dataTable[pageInfos.rowCount] = lastDataTable;
+
+        if (sheetPage) {
+          sheetPage.dataTable[sheetPage.rowCount] = lastDataTable;
+        }
+
+        if (sheetPrintPage) {
+          sheetPrintPage.dataTable[sheetPrintPage.rowCount] = lastDataTable;
+        }
+
+        //行高
+        pageInfos.rows[pageInfos.rowCount] = {
+          size: height,
+        };
+        if (sheetPage) {
+          sheetPage.rows[sheetPage.rowCount] = {
+            size: height,
+          };
+        }
+        if (sheetPrintPage) {
+          sheetPrintPage.rows[sheetPrintPage.rowCount] = {
+            size: height,
+          };
+        }
+
+        lastSpans.forEach(function (span) {
+          pageInfos.spans.push({
+            ...span,
+            rowCount: 1,
+            row: pageInfos.rowCount,
           });
-      });
-    });
-  }
-  getFitHeight({ tag, _style, pageInfos, colDataTable, colStr }) {
-    let rowHeight = 0;
-    if (tag) {
-      const jsonTag = JSON.parse(tag);
-      const plugins = jsonTag?.plugins;
-      if (Array.isArray(plugins)) {
-        const cellList = plugins.find(({ type }) => {
-          return type === 'cellList';
+          sheetPage &&
+            sheetPage.spans.push({
+              ...span,
+              rowCount: 1,
+              row: sheetPage.rowCount,
+            });
+          sheetPrintPage &&
+            sheetPrintPage.spans.push({
+              ...span,
+              rowCount: 1,
+              row: sheetPrintPage.rowCount,
+            });
         });
 
-        if (cellList?.config?.rowHeight === 'autoFitByContent') {
-          const height = getFitHeight(
-            colDataTable.value,
-            pageInfos?.columns?.[colStr]?.size || 64,
-            _style?.fontSize || '11pt'
-          );
-          if (height > rowHeight) {
-            rowHeight = height;
-          }
-        }
+        pageInfos.rowCount += 1;
+        sheetPage && (sheetPage.rowCount += 1);
+        sheetPrintPage && (sheetPrintPage.rowCount += 1);
       }
-    }
-    return rowHeight;
-  }
-  calcTempAfterRenderHeight({
-    dataTables,
-    unionDatasource,
-    pageInfos,
-    dataIndex,
-  }) {
-    let tempRowsHeight = 0;
-    dataTables.forEach(({ rows = {}, rowDataTable }) => {
-      const dataTable = { ...rowDataTable };
-      let rowHeight = 0;
-      Object.entries(dataTable).forEach(([colStr, _colDataTable]) => {
-        const colDataTable = { ..._colDataTable };
-        dataTable[colStr] = colDataTable;
-        const { bindingPath, tag, _style } = colDataTable;
-        if (bindingPath?.includes?.('.')) {
-          const [tableCode, fieldCode] = bindingPath.split('.');
-          const { type, value: newVlaue } = unionDatasource.getValue(
-            tableCode,
-            fieldCode,
-            dataIndex
-          );
-          if (type === 'text') {
-            colDataTable.value = newVlaue;
-          }
-        }
-
-        //
-        const height = this.getFitHeight({
-          tag,
-          _style,
-          pageInfos,
-          colDataTable,
-          colStr,
-        });
-        if (height > rowHeight) {
-          rowHeight = height;
-        }
-      });
-
-      let size = rows.size > rowHeight ? rows.size : rowHeight;
-      tempRowsHeight += size;
-    });
-    return tempRowsHeight;
-  }
-  genContentPageDataTables(params) {
-    const { templates, pageInfos, sheetPage, sheetPrintPage } = params;
-    const startIndex = pageInfos.contentDataIndex;
-    if (templates.length <= 0) {
-      pageInfos.flag = false;
-    }
-    templates.forEach((temp) => {
-      const { dataTables, unionDatasource, verticalAutoMergeRanges } = temp;
-      const dataLen = pageInfos.dataLen || unionDatasource.getCount() || 1;
-      pageInfos.dataLen = dataLen;
-      pageInfos.dataIndex = startIndex;
-
-      //处理内容前先缓存内容在当前页起始行
-      const sheetPageRowCount = sheetPage.rowCount;
-      const sheetPrintPageRowCount = sheetPrintPage?.rowCount;
-
-      for (let i = startIndex; i < dataLen; i++) {
-        //计算当前渲染后的高度
-        const tempRowsHeight = this.calcTempAfterRenderHeight({
-          dataTables,
-          unionDatasource,
-          pageInfos,
-          dataIndex: i,
-        });
-
-        //当前页剩余高度不足以渲染内容
-        if (pageInfos.pageArea) {
-          if (
-            pageInfos.contentHeight + tempRowsHeight >
-            pageInfos.contentTotalHeight
-          ) {
-            break;
-          } else {
-            pageInfos.contentHeight += tempRowsHeight;
-            pageInfos.pageHeight += tempRowsHeight;
-          }
-        }
-        pageInfos.contentDataIndex += 1;
-        this.handleDataTable({
-          ...params,
-          temp,
-          i,
-        });
-      }
-      //标识内容处理结束
-      if (pageInfos.contentDataIndex >= dataLen) {
-        pageInfos.flag = false;
-      }
-
-      //纵向上自动合并信息(在纵向上连续，只需修改起始行号和行号数)
       verticalAutoMergeRanges.forEach(function (item) {
-        //当前页的纵向合并
-        sheetPage.autoMergeRanges.push({
-          ...item,
-          range: {
-            ...item.range,
-            rowCount: sheetPage.rowCount - sheetPageRowCount,
-            row: sheetPageRowCount, //使用缓存起始行
-          },
-        });
+        item.range.rowCount = pageInfos.rowCount - item.range.row;
+        pageInfos.autoMergeRanges.push(item);
+        sheetPage && sheetPage.autoMergeRanges.push(item);
 
-        //打印区域页面纵向合并
-        sheetPrintPage &&
-          sheetPrintPage.autoMergeRanges.push({
-            ...item,
-            range: {
-              ...item.range,
-              rowCount: sheetPrintPage.rowCount - sheetPrintPageRowCount,
-              row: sheetPrintPageRowCount, //使用缓存起始行
-            },
-          });
+        sheetPrintPage && sheetPrintPage.autoMergeRanges.push(item);
       });
     });
   }

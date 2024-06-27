@@ -50,7 +50,10 @@ export function getFitHeight(text, width, fontSize, fontFamily) {
   style.display = 'block';
   style.overflow = 'visible';
   style.width = width + 'px';
-  style.fontSize = fontSize + 'px';
+  //style.fontSize = fontSize + 'px';
+  style.fontSize = Number.isFinite(Number(fontSize))
+    ? fontSize + 'px'
+    : fontSize;
   style.fontFamily = fontFamily;
   dom.innerText = text;
   const height = dom.getBoundingClientRect().height;
