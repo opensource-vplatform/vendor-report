@@ -1,0 +1,440 @@
+{
+  "description": {
+    "name": "销量",
+    "fields": {
+      "id": "id",
+      "area": "地区",
+      "saleName": "销售员",
+      "type": "产品类型",
+      "productName": "产品名称",
+      "sale": "销量"
+    }
+  },
+  "ds": {
+    "id": "sale",
+    "type": "table",
+    "typeName": "表",
+    "desc": "销量",
+    "code": "sale",
+    "name": "销量",
+    "children": [
+      {
+        "id": "id",
+        "type": "integer",
+        "typeName": "整数",
+        "desc": "id",
+        "code": "id",
+        "name": "id",
+        "parentId": "sale"
+      },
+      {
+        "id": "area",
+        "type": "text",
+        "typeName": "文本",
+        "desc": "地区",
+        "code": "area",
+        "name": "地区",
+        "parentId": "sale"
+      },
+      {
+        "id": "saleName",
+        "type": "text",
+        "typeName": "文本",
+        "desc": "销售员",
+        "code": "saleName",
+        "name": "销售员",
+        "parentId": "sale"
+      },
+      {
+        "id": "type",
+        "type": "text",
+        "typeName": "文本",
+        "desc": "产品类型",
+        "code": "type",
+        "name": "产品类型",
+        "parentId": "sale"
+      },
+      {
+        "id": "productName",
+        "type": "text",
+        "typeName": "文本",
+        "desc": "产品名称",
+        "code": "productName",
+        "name": "产品名称",
+        "parentId": "sale"
+      },
+      {
+        "id": "sale",
+        "type": "integer",
+        "typeName": "整数",
+        "desc": "销量",
+        "code": "sale",
+        "name": "销量",
+        "parentId": "sale"
+      }
+    ]
+  },
+  "length": 45,
+  "data": [
+    {
+      "id": 1,
+      "area": "华东",
+      "saleName": "孙林",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 140
+    },
+    {
+      "id": 2,
+      "area": "华东",
+      "saleName": "金士鹏",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 290
+    },
+    {
+      "id": 3,
+      "area": "华东",
+      "saleName": "张珊",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 300
+    },
+    {
+      "id": 4,
+      "area": "华东",
+      "saleName": "孙阳",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 120
+    },
+    {
+      "id": 5,
+      "area": "华东",
+      "saleName": "袁成洁",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 220
+    },
+    {
+      "id": 6,
+      "area": "华北",
+      "saleName": "张颖",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 250
+    },
+    {
+      "id": 7,
+      "area": "华北",
+      "saleName": "王伟",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 180
+    },
+    {
+      "id": 8,
+      "area": "华北",
+      "saleName": "张武",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 233
+    },
+    {
+      "id": 9,
+      "area": "华北",
+      "saleName": "韩文",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 123
+    },
+    {
+      "id": 10,
+      "area": "华东",
+      "saleName": "孙林",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 431
+    },
+    {
+      "id": 11,
+      "area": "华东",
+      "saleName": "金士鹏",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 635
+    },
+    {
+      "id": 12,
+      "area": "华东",
+      "saleName": "张珊",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 324
+    },
+    {
+      "id": 13,
+      "area": "华东",
+      "saleName": "孙阳",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 644
+    },
+    {
+      "id": 14,
+      "area": "华东",
+      "saleName": "袁成洁",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 343
+    },
+    {
+      "id": 15,
+      "area": "华北",
+      "saleName": "张颖",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 234
+    },
+    {
+      "id": 16,
+      "area": "华北",
+      "saleName": "王伟",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 666
+    },
+    {
+      "id": 17,
+      "area": "华北",
+      "saleName": "张武",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 700
+    },
+    {
+      "id": 18,
+      "area": "华北",
+      "saleName": "韩文",
+      "type": "饮料",
+      "productName": "苹果汁",
+      "sale": 111
+    },
+    {
+      "id": 19,
+      "area": "华东",
+      "saleName": "孙林",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 176
+    },
+    {
+      "id": 20,
+      "area": "华东",
+      "saleName": "金士鹏",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 500
+    },
+    {
+      "id": 21,
+      "area": "华东",
+      "saleName": "张珊",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 340
+    },
+    {
+      "id": 22,
+      "area": "华东",
+      "saleName": "孙阳",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 540
+    },
+    {
+      "id": 23,
+      "area": "华东",
+      "saleName": "袁成洁",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 563
+    },
+    {
+      "id": 24,
+      "area": "华北",
+      "saleName": "张颖",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 300
+    },
+    {
+      "id": 25,
+      "area": "华北",
+      "saleName": "王伟",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 490
+    },
+    {
+      "id": 26,
+      "area": "华北",
+      "saleName": "张武",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 233
+    },
+    {
+      "id": 27,
+      "area": "华北",
+      "saleName": "韩文",
+      "type": "饮料",
+      "productName": "柳橙汁",
+      "sale": 760
+    },
+    {
+      "id": 28,
+      "area": "华东",
+      "saleName": "孙林",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 333
+    },
+    {
+      "id": 29,
+      "area": "华东",
+      "saleName": "金士鹏",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 420
+    },
+    {
+      "id": 30,
+      "area": "华东",
+      "saleName": "张珊",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 318
+    },
+    {
+      "id": 31,
+      "area": "华东",
+      "saleName": "孙阳",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 256
+    },
+    {
+      "id": 32,
+      "area": "华东",
+      "saleName": "袁成洁",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 583
+    },
+    {
+      "id": 33,
+      "area": "华北",
+      "saleName": "张颖",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 352
+    },
+    {
+      "id": 34,
+      "area": "华北",
+      "saleName": "王伟",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 384
+    },
+    {
+      "id": 35,
+      "area": "华北",
+      "saleName": "张武",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 435
+    },
+    {
+      "id": 36,
+      "area": "华北",
+      "saleName": "韩文",
+      "type": "点心",
+      "productName": "巧克力",
+      "sale": 356
+    },
+    {
+      "id": 37,
+      "area": "华东",
+      "saleName": "孙林",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 789
+    },
+    {
+      "id": 38,
+      "area": "华东",
+      "saleName": "金士鹏",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 156
+    },
+    {
+      "id": 39,
+      "area": "华东",
+      "saleName": "张珊",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 289
+    },
+    {
+      "id": 40,
+      "area": "华东",
+      "saleName": "孙阳",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 562
+    },
+    {
+      "id": 41,
+      "area": "华东",
+      "saleName": "袁成洁",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 546
+    },
+    {
+      "id": 42,
+      "area": "华北",
+      "saleName": "张颖",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 218
+    },
+    {
+      "id": 43,
+      "area": "华北",
+      "saleName": "王伟",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 541
+    },
+    {
+      "id": 44,
+      "area": "华北",
+      "saleName": "张武",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 219
+    },
+    {
+      "id": 45,
+      "area": "华北",
+      "saleName": "韩文",
+      "type": "点心",
+      "productName": "牛肉干",
+      "sale": 345
+    }
+  ]
+}

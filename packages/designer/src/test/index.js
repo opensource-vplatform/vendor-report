@@ -6,6 +6,7 @@ import image from './jsonData/image.json';
 import merge from './jsonData/merge';
 import otherData from './jsonData/otherData.json';
 import jsonStr from './jsonData/reportJsonData';
+import sale from './jsonData/sale.json';
 import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
 
@@ -20,6 +21,7 @@ tourismData.data = tourismData.data.filter(function (item) {
 });
 
 const datasourceDefines = [
+  sale.ds,
   {
     id: 'zonaTree',
     type: 'table',
@@ -253,6 +255,7 @@ export default {
   dataSource: {
     dataSourceDefinition: datasourceDefines, //数据源定义
     datas: {
+      sale:sale.data,
       ...otherData.data,
       ...zqzfzs.datas,
       ...qdzfbb.datas,
