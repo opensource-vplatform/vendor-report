@@ -97,6 +97,8 @@ export default function Index(props) {
             retention:'runtime',
             config:{type,icon,config}
           });
+          //重新绘制，显示图表图片
+          sheet.repaint();
           onClose && onClose();
         }
       }

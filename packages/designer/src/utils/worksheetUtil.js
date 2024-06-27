@@ -1,28 +1,44 @@
 import {
+  clearAllCellTagPlugin,
+  clearCellTagPlugin,
+  getActiveIndexBySheet,
+  getActiveIndexBySpread,
+  getCellInstanceId,
+  getCellTag,
+  getCellTagPlugin,
+  getCellTagPlugins,
+  getSheetInstanceId,
+  getSheetTag,
+  hasCellTagPlugin,
+  hasCellTagPluginByIndex,
   isObject,
+  setCellTag,
+  setCellTagPlugin,
+  setSheetTag,
 } from '@toone/report-util';
 
 import {
   getNamespace,
   withBatchUpdate,
 } from './spreadUtil';
+
 export {
-  getActiveIndexBySpread,
-  getActiveIndexBySheet,
-  setSheetTag,
-  getSheetTag,
-  getSheetInstanceId,
-  getCellTagPlugins,
-  hasCellTagPluginByIndex,
-  hasCellTagPlugin,
-  clearCellTagPlugin,
   clearAllCellTagPlugin,
-  setCellTagPlugin,
-  getCellTagPlugin,
-  setCellTag,
-  getCellTag,
+  clearCellTagPlugin,
+  getActiveIndexBySheet,
+  getActiveIndexBySpread,
   getCellInstanceId,
-} from '@toone/report-util'
+  getCellTag,
+  getCellTagPlugin,
+  getCellTagPlugins,
+  getSheetInstanceId,
+  getSheetTag,
+  hasCellTagPlugin,
+  hasCellTagPluginByIndex,
+  setCellTag,
+  setCellTagPlugin,
+  setSheetTag,
+};
 
 /**
  * 是否在表格区域

@@ -1,4 +1,3 @@
-import { base64DataURLToImageData } from '@toone/report-util';
 import { getBaseUrl } from '@utils/environmentUtil';
 import {
   getCellTagPlugin,
@@ -20,7 +19,8 @@ const paintCell = function (context, style, value, params) {
         const plugin = getCellTagPlugin(sheet, row, col, PLUGIN_TYPE);
         const config = plugin.config;
         const icon = config.icon;
-        const data = CACHCE[icon];
+        const url = `${getBaseUrl()}/css/icons/chart/${icon}.png`;
+        /*const data = null;//CACHCE[icon];
         const drawImage = (data)=>{
             let img = document.createElement("img")
             img.src = data;
@@ -29,19 +29,15 @@ const paintCell = function (context, style, value, params) {
         if(data){
             drawImage(data);
         }else{
-            const url = `${getBaseUrl()}/css/icons/chart/${icon}.png`;
             base64DataURLToImageData(url).then((res)=>{
                 CACHCE[icon] = res.data;
                 drawImage(CACHCE[icon]);
                 sheet.repaint();
             });
-        }
-        /*const formula = `IMAGE("${url}","",1)`;
-        const fmla = sheet.getFormula(row,col);
-        if(formula!=fmla){
-            sheet.setFormula(row,col,formula);
         }*/
-        return;
+        //const style = new GC.Spread.Sheets.Style();
+        style.backgroundImage = url;
+        return '';
     }
     return value;
 };
