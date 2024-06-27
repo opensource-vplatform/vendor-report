@@ -250,19 +250,14 @@ export default class ParseReportJson {
         let { height: footerHeight } = footer;
         let { height: contentTempHeight } = content;
 
-        const _height = headerHeight + footerHeight;
+        const { pageTotalHeight } = pageInfos;
 
+        const _height = headerHeight + footerHeight;
+        const remainderHeight = _height % pageTotalHeight;
+        const diffHeight = pageTotalHeight - remainderHeight;
         let contentHeight = pageInfos.pageTotalHeight;
-        if (_height > pageInfos.pageTotalHeight) {
-          const diff = _height % pageInfos.pageTotalHeight;
-          if (diff >= contentTempHeight) {
-            contentHeight = diff;
-          }
-        } else if (_height < pageInfos.pageTotalHeight) {
-          const diff = pageInfos.pageTotalHeight - _height;
-          if (diff >= contentTempHeight) {
-            contentHeight = diff;
-          }
+        if (diffHeight >= contentTempHeight) {
+          contentHeight = diffHeight;
         }
         contentHeight -= 5;
         return {
@@ -287,6 +282,8 @@ export default class ParseReportJson {
       pageInfos.flag = true;
       //内容所用到的数据的长度
       pageInfos.dataLen = undefined;
+      //标识是否在最后一页已经处理过章合计
+      pageInfos.hasHandleLastPage = false;
 
       while (pageInfos.flag) {
         debugger;
@@ -340,16 +337,18 @@ export default class ParseReportJson {
             tempInfo = footer[1];
           }
 
+          const { pageTotalHeight, pageHeight } = pageInfos;
           const { height, template } = tempInfo;
-          diffHeight =
-            pageInfos.pageTotalHeight - pageInfos.pageHeight - height;
-          if (diffHeight > 0) {
+          const remainderHeight = height % pageTotalHeight;
+          diffHeight = pageTotalHeight - pageHeight - remainderHeight;
+          if (diffHeight > 0 || pageInfos.hasHandleLastPage) {
             //如果剩余高度能渲染包含章合计的底部，则用包含章合计的底部模板渲染
             footerTemplates = template;
           } else {
             //如果剩余高度不能渲染包含章合计的底部，则继续循环
             pageInfos.dataLen += 1;
             pageInfos.flag = true;
+            pageInfos.hasHandleLastPage = true;
           }
         }
 

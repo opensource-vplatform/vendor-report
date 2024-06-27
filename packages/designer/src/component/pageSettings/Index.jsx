@@ -34,6 +34,11 @@ const HLayout = styled.div`
 const Default_Info = '选择需要分页的区域';
 const Default_Group_Sum_Range_Info = '选择分组汇总区域';
 const Default_Total_Range_Info = '选择总计区域';
+
+const Group_Sum_Range_Info_Before_Range_info =
+  '分组汇总区域应该位于分页区域后面';
+const Total_Range_Info_Before_Range_info = '总计区域应该位于分页区域后面';
+
 const REG = /^\d+:\d+$/;
 
 export default function (props) {
@@ -73,23 +78,43 @@ export default function (props) {
     let checkedResult = {};
     //校验分页区域正确性
     const rangeStr = data.range;
+    let rangeEndRow = -1;
     if (rangeStr && !REG.test(rangeStr)) {
       checkedResult.rangeError = true;
       isError = true;
+    } else {
+      rangeEndRow = Number(rangeStr.split(':')[1]);
     }
 
     //校验分组汇总区域正确性
     const groupSumRangeStr = data.groupSumRange;
+    let groupSumRangeStartRow = -1;
     if (groupSumRangeStr && !REG.test(groupSumRangeStr)) {
       checkedResult.groupSumRangeError = true;
       isError = true;
+    } else if (groupSumRangeStr) {
+      groupSumRangeStartRow = Number(groupSumRangeStr.split(':')[0]);
+      if (groupSumRangeStartRow <= rangeEndRow) {
+        checkedResult.groupSumRangeError = true;
+        checkedResult.groupSumRangeMessage =
+          Group_Sum_Range_Info_Before_Range_info;
+        isError = true;
+      }
     }
 
     //校验总计区域正确性
     const totalRangeStr = data.totalRange;
+    let totalRangeStartRow = -1;
     if (totalRangeStr && !REG.test(totalRangeStr)) {
       checkedResult.totalRangeError = true;
       isError = true;
+    } else if (totalRangeStr) {
+      totalRangeStartRow = Number(totalRangeStr.split(':')[0]);
+      if (totalRangeStartRow <= rangeEndRow) {
+        checkedResult.totalRangeError = true;
+        checkedResult.totalRangeMessage = Total_Range_Info_Before_Range_info;
+        isError = true;
+      }
     }
 
     if (isError) {
@@ -116,16 +141,56 @@ export default function (props) {
     onCancel && onCancel();
   };
 
-  const handleRangeOnChange = function (key, val) {
+  const handleRangeOnChange = function (key, val, message) {
     if (isString(val)) {
       val = val.trim();
       val = val.startsWith('=') ? val.substring(1) : val;
       let isError = REG.test(val);
+      if ((key === 'groupSumRange' || key === 'totalRange') && data.range) {
+        const rangeEndRow = Number(data.range.split(':')[1]);
+        const startRow = Number(val.split(':')[0]);
+        if (startRow <= rangeEndRow) {
+          isError = false;
+          if (key === 'groupSumRange') {
+            message = Group_Sum_Range_Info_Before_Range_info;
+          } else {
+            message = Total_Range_Info_Before_Range_info;
+          }
+        }
+      }
+
+      if (key === 'range') {
+        if (data.groupSumRange) {
+          const startRow = Number(data.groupSumRange.split(':')[0]);
+          const endRow = Number(val.split(':')[1]);
+          if (startRow <= endRow) {
+            isError = false;
+            message = '分页区域应该位于分组区域前面';
+          }
+        } else if (data.totalRange) {
+          const startRow = Number(data.totalRange.split(':')[0]);
+          const endRow = Number(val.split(':')[1]);
+          if (startRow <= endRow) {
+            isError = false;
+            message = '分页区域应该位于总计区域前面';
+          }
+        }
+      }
+      const result = {
+        [`${key}Error`]: !isError,
+        [key]: val,
+        [`${key}Message`]: message,
+      };
+
+      if ((key === 'groupSumRange' || key === 'totalRange') && isError) {
+        result.rangeError = false;
+        result.rangeMessage = Default_Info;
+      }
+
       setData((data) => {
         return {
           ...data,
-          [`${key}Error`]: !isError,
-          [key]: val,
+          ...result,
         };
       });
     }
@@ -204,7 +269,7 @@ export default function (props) {
             onStartSelect={onRangeStartSelect}
             onEndSelect={onRangeEndSelect}
             onChange={(val) => {
-              handleRangeOnChange('range', val);
+              handleRangeOnChange('range', val, Default_Info);
             }}
           ></Range>
           <InfoIcon
@@ -227,7 +292,11 @@ export default function (props) {
                 onStartSelect={onRangeStartSelect}
                 onEndSelect={onRangeEndSelect}
                 onChange={(val) => {
-                  handleRangeOnChange('groupSumRange', val);
+                  handleRangeOnChange(
+                    'groupSumRange',
+                    val,
+                    Default_Group_Sum_Range_Info
+                  );
                 }}
               ></Range>
               <InfoIcon
@@ -247,7 +316,11 @@ export default function (props) {
                 onStartSelect={onRangeStartSelect}
                 onEndSelect={onRangeEndSelect}
                 onChange={(val) => {
-                  handleRangeOnChange('totalRange', val);
+                  handleRangeOnChange(
+                    'totalRange',
+                    val,
+                    Default_Total_Range_Info
+                  );
                 }}
               ></Range>
               <InfoIcon
