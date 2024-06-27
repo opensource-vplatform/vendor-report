@@ -94,6 +94,7 @@ export default function Index(props) {
           clearAllCellTagPlugin(sheet,row,col);//先清空当前单元格中所有插件设置
           setCellTagPlugin(sheet,row,col,{
             type:'cellChart',
+            retention:'runtime',
             config:{type,icon,config}
           });
           onClose && onClose();
