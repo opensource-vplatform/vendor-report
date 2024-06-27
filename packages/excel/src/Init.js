@@ -1,4 +1,7 @@
-import { registerFuncs } from './custom';
+import {
+  DefaultCell,
+  registerFuncs,
+} from './custom';
 import {
   bind,
   EVENTS,
@@ -33,6 +36,9 @@ export const init = function () {
                 left: 1,
                 top: 1,
             };
+            const defaultStyle = sheet.getDefaultStyle();
+            defaultStyle.cellType = new DefaultCell();
+            sheet.setDefaultStyle(defaultStyle);
         },
     });
 };
