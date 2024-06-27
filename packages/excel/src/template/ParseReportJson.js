@@ -902,7 +902,7 @@ export default class ParseReportJson {
           //如果头部和尾部用到了分组数据，则重新计算头部和尾部高度
           Object.keys(heightChangeInfos).forEach((key) => {
             const tempInfos = this.templates[key];
-            Object.values(tempInfos).forEach(function (infos) {
+            Object.values(tempInfos).forEach((infos) => {
               infos.height = 0;
               infos.template.forEach((temp) => {
                 const { dataTables, unionDatasource } = temp;
