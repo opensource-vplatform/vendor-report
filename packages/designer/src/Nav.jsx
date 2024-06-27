@@ -48,6 +48,7 @@ import {
   listenSave,
   listenUndo,
 } from './Listener';
+import { getBindingPaths } from './spread';
 import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
 import FormulaTab from './tabs/formula/Index';
@@ -104,14 +105,26 @@ const LayoutNavItem = WithNavItem(LayoutTab);
 
 function parseUsedDatasource(spread, finalDsList) {
   const dsCodes = [];
+  const appendUsedDatasource = (bindingPath)=>{
+    if(bindingPath){
+      let code = bindingPath;
+      if (bindingPath.includes('.')) {
+        code = bindingPath.split('.')[0];
+      }
+      if(!dsCodes.includes(code)){
+        dsCodes.push(code);
+      }
+    }
+  }
   spread.sheets.forEach(function (sheet) {
     const sheetJson = sheet.toJSON();
     //收集表格已经绑定的数据源编码
     if (isArray(sheetJson.tables)) {
       sheetJson.tables.forEach(({ bindingPath }) => {
-        if (bindingPath && !dsCodes.includes(bindingPath)) {
+        appendUsedDatasource(bindingPath);
+        /*if (bindingPath && !dsCodes.includes(bindingPath)) {
           dsCodes.push(bindingPath);
-        }
+        }*/
       });
     }
     //收集单元格已经绑定的数据源编码
@@ -119,13 +132,24 @@ function parseUsedDatasource(spread, finalDsList) {
     if (dataTable && typeof dataTable === 'object') {
       Object.values(dataTable).forEach((cols) => {
         if (cols) {
-          Object.values(cols).forEach(({ bindingPath }) => {
-            if (bindingPath && !dsCodes.includes(bindingPath)) {
+          Object.values(cols).forEach(({ bindingPath,tag }) => {
+            appendUsedDatasource(bindingPath);
+            /*if (bindingPath && !dsCodes.includes(bindingPath)) {
               let code = bindingPath;
               if (bindingPath.includes('.')) {
                 code = bindingPath.split('.')[0];
               }
               dsCodes.push(code);
+            }*/
+            if(tag){//从插件配置中收集绑定信息
+              try{
+                const obj = JSON.parse(tag);
+                const plugins = obj.plugins;
+                const paths = getBindingPaths(plugins);
+                paths.forEach(bindingPath=>{
+                  appendUsedDatasource(bindingPath);
+                });
+              }catch(e){}
             }
           });
         }

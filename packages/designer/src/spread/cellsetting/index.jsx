@@ -116,3 +116,19 @@ export default function (props) {
         </Popper>
     );
 }
+
+/**
+ * 从插件配置信息中获取数据绑定信息
+ * @param {*} plugins 
+ * @returns 
+ */
+export const getBindingPaths = function(pluginConfigs){
+    let paths = [];
+    pluginConfigs.forEach(cfg=>{
+        const plugin = plugins.find(({PLUGIN_TYPE})=> cfg.type === PLUGIN_TYPE);
+        if(plugin&&isFunction(plugin.getBindingPaths)){
+            paths = paths.concat(plugin.getBindingPaths(cfg));
+        }
+    });
+    return paths;
+}

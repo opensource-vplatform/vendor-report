@@ -6,8 +6,6 @@ import {
 
 const PLUGIN_TYPE = 'cellChart';
 
-const CACHCE = {};
-
 const paintCell = function (context, style, value, params) {
     const {canvasCtx,x,y,w,h} = params;
     if (!canvasCtx) {
@@ -42,7 +40,17 @@ const paintCell = function (context, style, value, params) {
     return value;
 };
 
+const getBindingPaths = function(config){
+    const paths = [];
+    const datasource = config?.config?.config?.datasource;
+    if(datasource){
+        paths.push(datasource);
+    }
+    return paths;
+}
+
 export default {
     PLUGIN_TYPE,
     paintCell,
+    getBindingPaths,
 }
