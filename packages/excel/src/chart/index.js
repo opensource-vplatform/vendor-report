@@ -208,6 +208,9 @@ const generateEChartsOption = (config) => {
 
   // 构造 ECharts 配置项
   const option = {
+    legend: {
+      bottom: 0  // 将图例放在底部
+    },
     title: {
       text: title,
       show: titleVisible
