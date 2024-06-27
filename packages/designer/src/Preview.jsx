@@ -36,18 +36,6 @@ const Wrap = styled.div`
   margin: 0;
 `;
 
-const Toolbar = styled.div`
-  border-bottom: solid 1px lightgray;
-  background-color: white;
-  margin: 0px;
-  padding: 0px;
-  display: flex;
-  height: 35px;
-  flex-shrink: 0;
-  justify-content: flex-end;
-  align-items: center;
-`;
-
 const ExcelWrap = styled.div`
   padding: 0px;
   box-sizing: border-box;
@@ -99,9 +87,7 @@ export default function () {
     originalDatasourceCodes,
   });
   const { spread: sourceSpread } = useSelector(({ appSlice }) => appSlice);
-  const sourceJson = JSON.stringify(
-    sourceSpread ? sourceSpread?.toJSON?.() : ''
-  );
+  const sourceJson = JSON.stringify(sourceSpread?.toJSON?.() || '');
   const json = JSON.parse(sourceJson);
   //许可证
   const license = getLicense(context);
@@ -127,21 +113,8 @@ export default function () {
     });
   };
 
-  /*     let pageCompletedHandler = null;
-    let setPageInfos = null; */
-
   const _toolbar = (
     <>
-      {/*  <Page
-                onInited={(datas) => {
-                    setPageInfos = datas.setPageInfos;
-                    if (pageCompletedHandler) {
-                        pageCompletedHandler().then((datas) => {
-                            setPageInfos(datas);
-                        });
-                    }
-                }}
-            ></Page> */}
       <Button type='primary' onClick={handlePrint}>
         打印
       </Button>
@@ -172,9 +145,7 @@ export default function () {
           json={json}
           enablePrint={true}
           baseUrl={getBaseUrl()}
-          onPrintHandler={(handler) => {
-            printHandler = handler;
-          }}
+          onPrintHandler={(handler) => (printHandler = handler)}
           rowMerge={rowMerge}
           columnMerge={columnMerge}
           dataSource={previewViewDatas}
@@ -183,20 +154,9 @@ export default function () {
           rowMergeColumns={rowMergeColumns}
           colMergeColumns={colMergeColumns}
           template={template}
-          onInited={function (a) {
-            window.mapTest = a;
-          }}
-          /*  onPageCompleted={(handler) => {
-                        pageCompletedHandler = handler;
-                        if (setPageInfos) {
-                            pageCompletedHandler().then((datas) => {
-                                setPageInfos(datas);
-                            });
-                        }
-                    }} */
+          onInited={(spread) => (window.previewSpread = spread)}
           onPageCompleted={(handler) => {
             handler().then((datas) => {
-              console.log(datas);
               if (context.onDesignerInited) {
                 context.onDesignerInited({
                   nextPage: datas.nextPage,
