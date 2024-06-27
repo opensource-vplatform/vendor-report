@@ -1028,7 +1028,6 @@ export default class ParseReportJson {
           ...style,
           name: namedStyles,
         });
-        _colDataTable._style = _colDataTable.style;
         _colDataTable.style = namedStyles;
       }
 
@@ -1169,7 +1168,7 @@ export default class ParseReportJson {
           dataTable[colStr] = colDataTable;
           printDataTalbe[colStr] = printColDataTable;
           const col = Number(colStr);
-          const { bindingPath, tag, _style } = colDataTable;
+          const { bindingPath, tag, style } = colDataTable;
           if (bindingPath?.includes?.('.')) {
             const [tableCode, fieldCode] = bindingPath.split('.');
             delete colDataTable.bindingPath;
@@ -1187,7 +1186,7 @@ export default class ParseReportJson {
 
           const height = this.getFitHeight({
             tag,
-            _style,
+            style,
             pageInfos,
             colDataTable,
             colStr,
@@ -1540,7 +1539,17 @@ export default class ParseReportJson {
       });
     });
   }
-  getFitHeight({ tag, _style, pageInfos, colDataTable, colStr }) {
+  getFitHeight({ tag, style, pageInfos, colDataTable, colStr }) {
+    let _style = {};
+    if (typeof style === 'string') {
+      const res = this.namedStyles.find(({ name }) => name === style);
+      if (res) {
+        _style = res;
+      }
+    } else if (style) {
+      _style = style;
+    }
+
     let rowHeight = 0;
     if (tag) {
       const jsonTag = JSON.parse(tag);
@@ -1577,7 +1586,7 @@ export default class ParseReportJson {
       Object.entries(dataTable).forEach(([colStr, _colDataTable]) => {
         const colDataTable = { ..._colDataTable };
         dataTable[colStr] = colDataTable;
-        const { bindingPath, tag, _style } = colDataTable;
+        const { bindingPath, tag, style } = colDataTable;
         if (bindingPath?.includes?.('.')) {
           const [tableCode, fieldCode] = bindingPath.split('.');
           const { type, value: newVlaue } = unionDatasource.getValue(
@@ -1593,7 +1602,7 @@ export default class ParseReportJson {
         //
         const height = this.getFitHeight({
           tag,
-          _style,
+          style,
           pageInfos,
           colDataTable,
           colStr,
