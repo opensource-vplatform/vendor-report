@@ -21,11 +21,10 @@ import styled from 'styled-components';
 
 import { saveQueryPanelSettings } from '@store/persistingDataSlice';
 import {
-  Button,
   Dialog,
+  OperationDialog,
 } from '@toone/report-ui';
 import { uuid } from '@toone/report-util';
-import { getSheetInstanceId } from '@utils/worksheetUtil';
 
 import {
   defaultQueryPanelSettings,
@@ -34,58 +33,6 @@ import {
 import Left from './left';
 import Right from './right';
 
-let textDatas = {
-  visible: true,
-  position: 'Top', //位置
-  colCount: 3,
-  triggerMode: 'Click', //Click||Change
-  items: [
-    {
-      id: 'Select1',
-      type: 'Select',
-      config: { labelText: '地区' },
-    },
-    {
-      id: 'A',
-      type: 'Text',
-      config: { labelText: '项目名称' },
-    },
-    {
-      id: 'B',
-      type: 'Integer',
-      config: { labelText: '合同金额' },
-    },
-    {
-      id: 'C',
-      type: 'Text',
-      config: { labelText: '合同名称' },
-    },
-    {
-      id: 'D',
-      type: 'Text',
-      config: { labelText: '负责人' },
-    },
-    {
-      id: 'E',
-      type: 'Integer',
-      config: { labelText: '项目周期' },
-    },
-    {
-      id: 'F',
-      type: 'Integer',
-      config: { labelText: '项目人数' },
-    },
-  ],
-};
-for (let i = 1; i <= 10; i++) {
-  textDatas.items.push({
-    id: `F${i}`,
-    type: 'Integer',
-    config: { labelText: `项目人数${i}` },
-  });
-}
-
-//textDatas.items = [];
 const DialogWrap = styled.div`
   height: 100%;
   width: 100%;
@@ -219,7 +166,7 @@ const Main = SortableContainer(function Main(props) {
 
   const drop = useDrop(() => ({
     accept: 'box',
-    drop: (item, monitor) => {
+    drop: (item) => {
       const control = { ...item, id: uuid() };
       addControls(control);
     },
@@ -251,18 +198,18 @@ const Main = SortableContainer(function Main(props) {
         </div>
         {controls.length <= 0 ? (
           <DropTipWrap>
-            <div>1，从可选控件区域拖拽控件或双击控件到此处来添加查询控件</div>
-            <div>2，根据需求拖拽此处的控件进行排序</div>
-            <div>3，点击此处的控件编辑控件属性</div>
+            <div>1，双击可选参数可添加查询参数</div>
+            <div>2，拖拽查询参数进行排序</div>
+            <div>3，点击编辑查询参数属性</div>
           </DropTipWrap>
         ) : null}
       </MainWrap>
-      {props.config.triggerMode === 'Click' && (
+      {/*  {props.config.triggerMode === 'Click' && (
         <MainBtnWrap>
           <Button style={{ pointerEvents: 'none' }}>查询</Button>
           <Button style={{ pointerEvents: 'none' }}>重置</Button>
         </MainBtnWrap>
-      )}
+      )} */}
     </MainBox>
   );
 });
@@ -270,14 +217,11 @@ const Main = SortableContainer(function Main(props) {
 export default function (props) {
   const { onClose } = props;
   const dispatch = useDispatch();
-  const { spread } = useSelector(({ appSlice }) => appSlice);
-  const sheet = spread.getActiveSheet();
-  const sheetId = getSheetInstanceId(sheet);
   const persistingDataSlice = useSelector(
     ({ persistingDataSlice }) => persistingDataSlice
   );
   let queryPanelSettings =
-    persistingDataSlice?.sheets?.[sheetId]?.queryPanelSettings ||
+    persistingDataSlice?.sheets?.queryPanelSettings ||
     defaultQueryPanelSettings;
   const [config, setConfig] = useState(queryPanelSettings);
 
@@ -286,6 +230,7 @@ export default function (props) {
     activeId: controls?.[0]?.id,
     controlsIndex: 0,
     type: 'control',
+    isShowOperationDialog: false,
   });
 
   const changePanelConfig = (key, value) => {
@@ -421,42 +366,15 @@ export default function (props) {
     });
   };
 
-  const changeControlDropDownSource = (key, value) => {
-    setConfig((config) => {
-      const controls = config.items;
-      const newControls = [];
-      controls.forEach((control) => {
-        if (control.id === datas.activeId) {
-          newControls.push({
-            ...control,
-            config: {
-              ...control?.config,
-              dropDownSource: {
-                ...(control?.config?.dropDownSource || {}),
-                [key]: value,
-              },
-            },
-          });
-        } else {
-          newControls.push(control);
-        }
-      });
-
-      return { ...config, items: newControls };
-    });
-  };
-
   const saveHandler = () => {
     dispatch(
       saveQueryPanelSettings({
-        sheetId,
         datas: config,
       })
     );
-    console.log(sheetId, config);
+    typeof onClose === 'function' && onClose();
   };
 
-  console.log(config, 'config');
   return (
     <Dialog
       title='查询面板设置'
@@ -466,6 +384,30 @@ export default function (props) {
       onClose={onClose}
       style={{ marginTop: '-2px', flex: 1 }}
     >
+      {datas.isShowOperationDialog && (
+        <OperationDialog
+          title='提示'
+          onConfirm={saveHandler}
+          onCancel={() => {
+            setDatas((datas) => {
+              return { ...datas, isShowOperationDialog: false };
+            });
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+              marginBottom: '10px',
+              height: '36px',
+            }}
+          >
+            确定保存吗？
+          </div>
+        </OperationDialog>
+      )}
       <DialogWrap>
         <div
           style={{
@@ -476,7 +418,11 @@ export default function (props) {
             justifyContent: 'right',
           }}
           title='保存'
-          onClick={saveHandler}
+          onClick={() => {
+            setDatas((datas) => {
+              return { ...datas, isShowOperationDialog: true };
+            });
+          }}
         >
           <SaveBtn>
             <SaveIcon></SaveIcon>
