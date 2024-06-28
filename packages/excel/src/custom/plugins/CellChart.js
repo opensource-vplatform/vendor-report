@@ -19,6 +19,15 @@ const paintCell = function (context, value, x, y, w, h, style, options) {
   // console.log('=====================', chartConfig)
   // 初始化浮动对象
   const uuId = `echart-${row}-${col}`;
+  let span = sheet.getSpan(row, col)
+  if (!span) {
+    span = {
+      row: row,
+      col: col,
+      rowCount: row + 1,
+      colCount: col + 1
+    }
+  }
   if (!!sheet.floatingObjects.get(uuId)) {
     // console.log('++++++++++++++++', sheet.getDataSource()?.getValue("Ipes_MP_Certificate_DetailCalc"))
     // console.log(ChartInstanceMap)
@@ -33,11 +42,11 @@ const paintCell = function (context, value, x, y, w, h, style, options) {
     return
   }
   var customFloatingObject = new GC.Spread.Sheets.FloatingObjects.FloatingObject(uuId);
-  //  GC.Spread.Sheets.Range(row, col, 1, 1)
-  customFloatingObject.startRow(row);
-  customFloatingObject.startColumn(col);
-  customFloatingObject.endRow(row + 1);
-  customFloatingObject.endColumn(col + 1);
+
+  customFloatingObject.startRow(span.row);
+  customFloatingObject.startColumn(span.col);
+  customFloatingObject.endRow(span.rowCount);
+  customFloatingObject.endColumn(span.colCount);
   // if (!sheet.getBindingPath(row, col) && !!chartConfig?.config?.config?.datasource)
   //   sheet.setBindingPath(row, col, chartConfig?.config?.config?.datasource);
 
