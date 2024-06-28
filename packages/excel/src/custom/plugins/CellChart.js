@@ -8,62 +8,60 @@ const GC = getNamespace();
 
 const PLUGIN_TYPE = 'cellChart';
 
+const ChartInstanceMap = new Map();
+
 const paintCell = function (context, value, x, y, w, h, style, options) {
   const { sheet, row, col } = options;
+  // 清空单元格内容
+  context.clearRect(x, y, w, h);
 
   const chartConfig = getCellTagPlugin(sheet, row, col, PLUGIN_TYPE);
   console.log('=====================', chartConfig)
   // 初始化浮动对象
-  const uuId = `echart-${row}${col}`;
+  const uuId = `echart-${row}-${col}`;
   if (!!sheet.floatingObjects.get(uuId)) {
-    // document.getElementById(uuId).style.width = w;
-    // if (!echarts) return
-    // var myChart = echarts.getInstanceByDom(document.querySelectorAll('.'+uuId)[1]);
-    // myChart.resize()
+    console.log('++++++++++++++++', sheet.getDataSource()?.getValue("Ipes_MP_Certificate_DetailCalc"))
+    console.log(ChartInstanceMap)
+    ChartInstanceMap.get(uuId) && ChartInstanceMap.get(uuId).updateConfig({
+      type: chartConfig.config.type,
+      config: {
+        ...chartConfig.config.config,
+        datasource: sheet.getDataSource()?.getValue(chartConfig.config.config.datasource) || []
+      }
+    })
+
+    !!ChartInstanceMap.get(uuId) && ChartInstanceMap.get(uuId).ChartInstance?.resize()
     return
   }
   var customFloatingObject = new GC.Spread.Sheets.FloatingObjects.FloatingObject(uuId);
-  // GC.Spread.Sheets.Range(row, col, 1, 1)
+  //  GC.Spread.Sheets.Range(row, col, 1, 1)
   customFloatingObject.startRow(row);
   customFloatingObject.startColumn(col);
-  customFloatingObject.endColumn(row + 1);
-  customFloatingObject.endRow(col + 1);
+  customFloatingObject.endRow(row + 1);
+  customFloatingObject.endColumn(col + 1);
+  // if (!sheet.getBindingPath(row, col) && !!chartConfig?.config?.config?.datasource)
+  //   sheet.setBindingPath(row, col, chartConfig?.config?.config?.datasource);
 
-  const dataSource = [
-    { name: 'A', depart: 'a', sex: '男', value: 10 },
-    { name: 'B', depart: 'a', sex: '女', value: 20 },
-    { name: 'C', depart: 'b', sex: '女', value: 30 },
-    { name: 'D', depart: 'b', sex: '男', value: 80 },
-    { name: 'E', depart: 'c', sex: '女', value: 12 },
-    { name: 'F', depart: 'c', sex: '男', value: 5 },
-    { name: 'G', depart: 'c', sex: '男', value: 8 }
-  ];
   // 创建ECharts容器
   var div = document.createElement('div');
-  div.innerHTML = `<div class="${uuId}" style="width:100%;height:100%; ">123456</div>`;
-  // console.log('=====================', sheet.getDataSource().getValue("Ipes_MP_Certificate_DetailCalc"))
-  setTimeout(() => {
-    // const chart = new Chart({
-    //   ...chartConfig.config,
-    //   // datasource: sheet.getDataSource().getValue(chartConfig.config.datasource) || []
-    // });
+  div.innerHTML = `<div class="${uuId}" style="width:100%;height:100%; "></div>`;
+
+  setTimeout(async () => {
     const chart = new Chart({
-      type: 'bar',
+      type: chartConfig.config.type,
       config: {
-        titleVisible: true,
-        title: '地区类别销售量统计柱状图',
-        datasource: dataSource,
-        groups: ['depart'],
-        seriesType: 'fieldValue',
-        valueSeriesConfig: {
-          seriesName: 'sex',
-          value: 'value',
-          sumType: 'count',
-        },
-      },
-    })
-    document.querySelectorAll('.' + uuId)[2] && chart.mount(document.querySelectorAll('.' + uuId)[2]);
+        ...chartConfig.config.config,
+        datasource: sheet.getDataSource()?.getValue(chartConfig.config.datasource) || []
+      }
+
+    });
+    for (let dom of document.querySelectorAll('.' + uuId)) {
+      await chart.mount(dom);
+    }
+    ChartInstanceMap.set(uuId, chart)
   }, 0)
+
+
   // 将ECharts添加到浮动层中
   customFloatingObject.content(div);
   sheet.floatingObjects.add(customFloatingObject);
