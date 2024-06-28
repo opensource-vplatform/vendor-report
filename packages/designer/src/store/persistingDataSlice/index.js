@@ -8,20 +8,17 @@ export const slice = createSlice({
   initialState: {
     //保存sheet相关的数据
     sheets: {
-      /*
+      /*   queryPanelSettings:查询面板配置,
             sheetId:{
-                queryPanelSettings:查询面板配置
+               //其它
             }
         */
     },
   },
   reducers: {
     saveQueryPanelSettings(state, { payload }) {
-      const { sheetId, datas } = payload;
-      if (!state.sheets[sheetId]) {
-        state.sheets[sheetId] = {};
-      }
-      state.sheets[sheetId].queryPanelSettings = datas;
+      const { datas } = payload;
+      state.sheets.queryPanelSettings = datas;
     },
     initSlice(state, { payload }) {
       let { slice } = payload;

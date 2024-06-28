@@ -159,24 +159,9 @@ function ControlProperty(props) {
     ds: {},
   }).current;
 
-  const [fields, setFields] = useState([]);
   const [dropdownFields, setDropdownFields] = useState([]);
   const control = controls.find(({ id }) => id === activeId);
   const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
-  const {
-    config: {
-      label = '',
-      labelWidth = 80,
-      datasource = '',
-      fieldCode = '',
-      defaultValue = '',
-      optionType = 'datasource',
-      optionText = '',
-      optionValue,
-      optionDatasource,
-      colSpan = 1,
-    },
-  } = control;
   cacheDatas.ds = {};
   const ds = finalDsList.reduce((res, item) => {
     if (item.type === 'table') {
@@ -195,10 +180,32 @@ function ControlProperty(props) {
     }
     return res;
   }, []);
+  const {
+    config: {
+      label = '',
+      labelWidth = 80,
+      datasourceName = '',
+      code = '',
+      fieldName = '',
+      defaultValue = '',
+      optionType = 'datasource',
+      optionText = '',
+      optionValue,
+      optionDatasource,
+      colSpan = 1,
+    },
+  } = control;
 
-  console.log(control);
   return (
     <PropertyWrap>
+      <PropertyItemWrap>
+        <PropertyLable>数据集</PropertyLable>
+        <PropertyLable>{datasourceName}</PropertyLable>
+      </PropertyItemWrap>
+      <PropertyItemWrap>
+        <PropertyLable>参数名称</PropertyLable>
+        <PropertyLable>{fieldName || code}</PropertyLable>
+      </PropertyItemWrap>
       <PropertyItemWrap>
         <PropertyLable>标签</PropertyLable>
         <TextInput
@@ -224,29 +231,6 @@ function ControlProperty(props) {
             changeControlConfig('labelWidth', newValue);
           }}
         ></Float>
-      </PropertyItemWrap>
-      <PropertyItemWrap>
-        <PropertyLable>数据集</PropertyLable>
-        <Select
-          wrapStyle={{ flex: 1 }}
-          value={datasource}
-          datas={ds}
-          onChange={(value) => {
-            changeControlConfig('datasource', value);
-            setFields(cacheDatas.ds[value].fields);
-          }}
-        ></Select>
-      </PropertyItemWrap>
-      <PropertyItemWrap>
-        <PropertyLable>字段</PropertyLable>
-        <Select
-          wrapStyle={{ flex: 1 }}
-          value={fieldCode}
-          datas={fields}
-          onChange={(value) => {
-            changeControlConfig('fieldCode', value);
-          }}
-        ></Select>
       </PropertyItemWrap>
       <PropertyItemWrap>
         <PropertyLable>列数</PropertyLable>

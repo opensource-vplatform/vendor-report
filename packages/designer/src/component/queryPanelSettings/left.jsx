@@ -1,12 +1,8 @@
 import { useDrag } from 'react-dnd';
+import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 import { uuid } from '@toone/report-util';
-
-import {
-  optionalControls,
-  optionalControlsMap,
-} from './constant.js';
 
 const Wrap = styled.div`
   width: 350px;
@@ -18,13 +14,16 @@ const Wrap = styled.div`
 
 const DragWrap = styled.div`
   opacity: 1 !important;
-  cursor: move;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  /* cursor: move; */
 `;
 
 const ControlListWrap = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 10px 0;
   gap: 10px;
   flex: 1;
   overflow-y: auto;
@@ -39,50 +38,91 @@ const Title = styled.div`
   font-weight: bold;
 `;
 
+const DragWrapTitle = styled.div`
+  display: flex;
+  height: 30px;
+  align-items: center;
+  font-weight: bold;
+`;
+
+const DragWrapContent = styled.div``;
+
+const DragWrapContentItem = styled.div`
+  display: flex;
+  height: 26px;
+  align-items: center;
+  cursor: pointer;
+  padding: 0 16px;
+  &:hover {
+    background-color: #ddd;
+  }
+`;
+
 function ControlListItem(props) {
-  const { type, config, addControls } = props;
+  const { item, addControls } = props;
   const drag = useDrag(() => ({
     type: 'box',
-    item: { type, config },
+    item: {},
     collect(monitor) {
       return {
         isDragging: monitor.isDragging(),
       };
     },
-    canDrag(monitor) {
-      console.log(monitor);
-      return true;
-    },
+    canDrag: () => false,
   }))[1];
-  const Component = optionalControlsMap[type];
+
+  const { children = [], code, name } = item;
+
   return (
     <DragWrap
       ref={drag}
-      onDoubleClick={() => {
-        addControls({
-          type,
-          config,
+      onDoubleClick={(e) => {
+        const { fieldCode, fieldName, fieldType } = e?.target?.dataset || {};
+        const control = {
+          config: {
+            code: fieldCode,
+            label: fieldName,
+            fieldName,
+            datasource: code,
+            datasourceName: name,
+          },
+          type: fieldType,
           id: uuid(),
-        });
+        };
+        debugger;
+        addControls(control);
       }}
     >
-      <div style={{ pointerEvents: 'none' }}>
-        <Component {...config}></Component>
-      </div>
+      <DragWrapTitle>{name}</DragWrapTitle>
+      <DragWrapContent>
+        {children.map((data) => {
+          return (
+            <DragWrapContentItem
+              key={data.code}
+              data-field-code={data.code}
+              data-field-name={data.name}
+              data-field-type={data.type}
+            >
+              {data.name}
+            </DragWrapContentItem>
+          );
+        })}
+      </DragWrapContent>
     </DragWrap>
   );
 }
 
 function ControlList(props) {
+  const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
+  const queryParameterList = finalDsList.filter(({ type }) => type === 'table');
   return (
     <ControlListWrap>
-      {optionalControls.map(({ type, config }, index) => {
+      {queryParameterList.map((item) => {
         return (
           <ControlListItem
             {...props}
-            type={type}
-            key={index}
-            config={config}
+            key={item.code}
+            item={item}
           ></ControlListItem>
         );
       })}
@@ -93,7 +133,7 @@ function ControlList(props) {
 export default function (props) {
   return (
     <Wrap>
-      <Title>可选控件</Title>
+      <Title>可选参数</Title>
       <ControlList {...props}></ControlList>
     </Wrap>
   );

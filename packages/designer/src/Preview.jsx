@@ -75,7 +75,9 @@ export default function () {
     setting,
   } = useSelector(({ datasourceSlice }) => datasourceSlice);
   const { template } = useSelector(({ wizardSlice }) => wizardSlice);
-
+  const persistingDataSlice = useSelector(
+    ({ persistingDataSlice }) => persistingDataSlice
+  );
   const { rowMerge, columnMerge } = useSelector(
     ({ tableDesignSlice }) => tableDesignSlice
   );
@@ -169,6 +171,7 @@ export default function () {
           setting={setting}
           toolbar={_toolbar}
           isShowBtnToolbar={isShowToolbar}
+          persistingDataSlice={persistingDataSlice}
         >
           <Worksheet></Worksheet>
         </Workbook>
