@@ -13,15 +13,15 @@ const ChartInstanceMap = new Map();
 const paintCell = function (context, value, x, y, w, h, style, options) {
   const { sheet, row, col } = options;
   // 清空单元格内容
-  context.clearRect(x, y, w, h);
+  // context.clearRect(x, y, w, h);
 
   const chartConfig = getCellTagPlugin(sheet, row, col, PLUGIN_TYPE);
-  console.log('=====================', chartConfig)
+  // console.log('=====================', chartConfig)
   // 初始化浮动对象
   const uuId = `echart-${row}-${col}`;
   if (!!sheet.floatingObjects.get(uuId)) {
-    console.log('++++++++++++++++', sheet.getDataSource()?.getValue("Ipes_MP_Certificate_DetailCalc"))
-    console.log(ChartInstanceMap)
+    // console.log('++++++++++++++++', sheet.getDataSource()?.getValue("Ipes_MP_Certificate_DetailCalc"))
+    // console.log(ChartInstanceMap)
     ChartInstanceMap.get(uuId) && ChartInstanceMap.get(uuId).updateConfig({
       type: chartConfig.config.type,
       config: {
@@ -29,7 +29,6 @@ const paintCell = function (context, value, x, y, w, h, style, options) {
         datasource: sheet.getDataSource()?.getValue(chartConfig.config.config.datasource) || []
       }
     })
-
     !!ChartInstanceMap.get(uuId) && ChartInstanceMap.get(uuId).ChartInstance?.resize()
     return
   }
