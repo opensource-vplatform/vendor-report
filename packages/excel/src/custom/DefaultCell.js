@@ -11,4 +11,5 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             super.paint(ctx, res.value, x, y, w, h, style, context);
         }
     }
+
 }

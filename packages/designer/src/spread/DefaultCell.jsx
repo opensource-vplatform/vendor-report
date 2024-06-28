@@ -181,11 +181,21 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         EVENTS.LeftColumnChanged,
         EVENTS.TopRowChanged,
         EVENTS.ViewZoomed,
-        EVENTS.SheetChanged,
+        //EVENTS.SheetChanged,
         EVENTS.ActiveSheetChanged,
       ],
       refreshIconPosition
     );
+    bind({
+      event: EVENTS.SheetChanged,
+      handler: (info)=>{
+        if(info&&info.propertyName=="deleteSheet"){
+          this.destory();
+        }else{
+          refreshIconPosition();
+        }
+      }
+    });
     bind({
       event: EVENTS.onPreviewVisible,
       handler: () => {
@@ -390,13 +400,13 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
   }
 
   toJSON() {
-    const json = { ...super.toJSON() };
-    delete json.sheet;
-    delete json.root;
-    delete json._iconEle;
-    delete json.spread;
-    delete json.directionIcons;
-    return json;
+    //const json = { ...super.toJSON() };
+    //delete json.sheet;
+    //delete json.root;
+    //delete json._iconEle;
+    //delete json.spread;
+    //delete json.directionIcons;
+    return undefined;
   }
 }
 
