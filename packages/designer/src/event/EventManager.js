@@ -1,100 +1,100 @@
 import { uuid } from '@toone/report-util';
 
 export const EVENTS = {
-    /**
-     * 选择变更事件
-     */
-    SelectionChanging: 'SelectionChanging',
-    /**
-     * 选择变更后事件
-     */
-    SelectionChanged: 'SelectionChanged',
-    /**
-     * 保存
-     */
-    onSave: 'onSave',
-    /**
-     * 设计器初始化完成
-     */
-    onDesignerInited: 'onDesignerInited',
-    /**
-     * 数据集选择界面显示事件
-     */
-    onDatasourceSelectVisible: 'onDatasourceSelectVisible',
-    /**
-     * 预览事件
-     */
-    onPreview: 'onPreview',
+  /**
+   * 选择变更事件
+   */
+  SelectionChanging: 'SelectionChanging',
+  /**
+   * 选择变更后事件
+   */
+  SelectionChanged: 'SelectionChanged',
+  /**
+   * 保存
+   */
+  onSave: 'onSave',
+  /**
+   * 设计器初始化完成
+   */
+  onDesignerInited: 'onDesignerInited',
+  /**
+   * 数据集选择界面显示事件
+   */
+  onDatasourceSelectVisible: 'onDatasourceSelectVisible',
+  /**
+   * 预览事件
+   */
+  onPreview: 'onPreview',
 
-    /**
-     * 设计器预览事件
-     */
-    onPreviewVisible: 'onPreviewVisible',
+  /**
+   * 设计器预览事件
+   */
+  onPreviewVisible: 'onPreviewVisible',
 
-    /**
-     * 设计器编辑事件
-     */
-    onEditorVisible: 'onEditorVisible',
-    /**
-     * 激活工作表变更事件
-     */
-    ActiveSheetChanged: 'ActiveSheetChanged',
+  /**
+   * 设计器编辑事件
+   */
+  onEditorVisible: 'onEditorVisible',
+  /**
+   * 激活工作表变更事件
+   */
+  ActiveSheetChanged: 'ActiveSheetChanged',
 
-    EditorStatusChanged: 'EditorStatusChanged',
+  EditorStatusChanged: 'EditorStatusChanged',
 
-    EnterCell: 'EnterCell',
-    /**
-     * 撤销
-     */
-    Undo: 'Undo',
-    /**
-     * 重做
-     */
-    Redo: 'Redo',
+  EnterCell: 'EnterCell',
+  /**
+   * 撤销
+   */
+  Undo: 'Undo',
+  /**
+   * 重做
+   */
+  Redo: 'Redo',
 
-    /**
-     * 初始化后事件
-     */
-    Inited: 'Inited',
-    /**
-     * 当对此表单中的行或行区域进行更改，可能需要重新绘制行或行区域时触发
-     */
-    RowChanged: 'RowChanged',
-    /**
-     * 数据源双击事件
-     */
-    onDatasourceDBClick: 'onDatasourceDBClick',
+  /**
+   * 初始化后事件
+   */
+  Inited: 'Inited',
+  /**
+   * 当对此表单中的行或行区域进行更改，可能需要重新绘制行或行区域时触发
+   */
+  RowChanged: 'RowChanged',
+  /**
+   * 数据源双击事件
+   */
+  onDatasourceDBClick: 'onDatasourceDBClick',
 
-    SheetChanged: 'SheetChanged',
+  SheetChanged: 'SheetChanged',
 
-    ColumnWidthChanged: 'ColumnWidthChanged',
+  ColumnWidthChanged: 'ColumnWidthChanged',
 
-    RowHeightChanged: 'RowHeightChanged',
+  RowHeightChanged: 'RowHeightChanged',
 
-    LeftColumnChanged: 'LeftColumnChanged',
+  LeftColumnChanged: 'LeftColumnChanged',
 
-    TopRowChanged: 'TopRowChanged',
+  TopRowChanged: 'TopRowChanged',
 
-    ViewZoomed: 'ViewZoomed',
+  ViewZoomed: 'ViewZoomed',
 
-    EditEnding : 'EditEnding',
+  EditEnding: 'EditEnding',
 
-    CellDoubleClick : 'CellDoubleClick',
+  CellDoubleClick: 'CellDoubleClick',
 
-    EditStarting: 'EditStarting',
+  EditStarting: 'EditStarting',
 };
 
 const check = function (params) {
-    const { event } = params;
-    if (!EVENTS[event]) {
-        throw Error(`不支持[${event}]事件，请检查！`);
-    }
+  const { event } = params;
+  if (!EVENTS[event]) {
+    throw Error(`不支持[${event}]事件，请检查！`);
+  }
 };
 const checkId = function (params) {
-    const { id } = params;
-    if (id === undefined) {
-        throw Error(`未传递id值，请检查！`);
-    }
+  const { id } = params;
+  if (id === undefined) {
+    throw Error(`未传递id值，请检查！`);
+  }
 };
 
 /**
@@ -115,21 +115,21 @@ const EVENT_HANDLER_MAP = {};
  *  } params
  */
 export const bind = function (params) {
-    check(params);
-    const { id = uuid(), event, handler } = params;
-    const handlers = EVENT_HANDLER_MAP[event] || {};
-    handlers[id] = handler;
-    EVENT_HANDLER_MAP[event] = handlers;
-    if (SPREAD_INITED && event === EVENTS.Inited) {
-        //解决热更新时，Inited事件不再触发引发的一系列问题
-        handler(SPREAD);
-    }
-    return () => {
-        unbind({
-            id,
-            event,
-        });
-    };
+  check(params);
+  const { id = uuid(), event, handler } = params;
+  const handlers = EVENT_HANDLER_MAP[event] || {};
+  handlers[id] = handler;
+  EVENT_HANDLER_MAP[event] = handlers;
+  if (SPREAD_INITED && event === EVENTS.Inited) {
+    //解决热更新时，Inited事件不再触发引发的一系列问题
+    handler(SPREAD);
+  }
+  return () => {
+    unbind({
+      id,
+      event,
+    });
+  };
 };
 
 /**
@@ -140,14 +140,14 @@ export const bind = function (params) {
  * } params
  */
 export const unbind = function (params) {
-    check(params);
-    checkId(params);
-    const { id, event } = params;
-    const handlers = EVENT_HANDLER_MAP[event];
-    if (handlers) {
-        handlers[id] = undefined;
-        delete handlers[id];
-    }
+  check(params);
+  checkId(params);
+  const { id, event } = params;
+  const handlers = EVENT_HANDLER_MAP[event];
+  if (handlers) {
+    handlers[id] = undefined;
+    delete handlers[id];
+  }
 };
 
 let SPREAD_INITED = false;
@@ -159,24 +159,24 @@ let SPREAD = null;
  * @param {event:事件名称,args:事件参数} params
  */
 export const fire = function (params) {
-    check(params);
-    const { event, args } = params;
-    const handlers = EVENT_HANDLER_MAP[event];
-    const result = [];
-    if (handlers) {
-        for (let [id, handler] of Object.entries(handlers)) {
-            try {
-                result.push(handler.apply(handler, args));
-            } catch (e) {
-                handler(null, e);
-            }
-        }
+  check(params);
+  const { event, args } = params;
+  const handlers = EVENT_HANDLER_MAP[event];
+  const result = [];
+  if (handlers) {
+    for (let [id, handler] of Object.entries(handlers)) {
+      try {
+        result.push(handler.apply(handler, args));
+      } catch (e) {
+        handler(null, e);
+      }
     }
-    if (event == EVENTS.Inited) {
-        SPREAD_INITED = true;
-        SPREAD = args[0];
-    }
-    return result;
+  }
+  if (event == EVENTS.Inited) {
+    SPREAD_INITED = true;
+    SPREAD = args[0];
+  }
+  return result;
 };
 
 /**
@@ -184,8 +184,8 @@ export const fire = function (params) {
  * @param {*} params
  */
 export const hasBind = function (params) {
-    check(params);
-    const { event } = params;
-    const handlers = EVENT_HANDLER_MAP[event];
-    return handlers && Object.values(handlers).length > 0;
+  check(params);
+  const { event } = params;
+  const handlers = EVENT_HANDLER_MAP[event];
+  return handlers && Object.values(handlers).length > 0;
 };
