@@ -7,7 +7,7 @@ import {
 import styled from 'styled-components';
 
 const Wrap = styled.div`
-  padding: 8px;
+  padding: 4px;
   width: 100%;
   min-height: 26px;
   display: flex;
@@ -15,18 +15,15 @@ const Wrap = styled.div`
   align-items: center;
   border: 1px solid #ddd;
   background-color: #fff;
-  border-radius: 4px;
   box-sizing: border-box;
   cursor: pointer;
-  &:hover {
-    outline: 2px solid #ddd;
-  }
-  &:focus-within {
-    outline: 2px solid #ddd;
+  &[data-disabled='false']:hover {
+      border: solid 1px #999999;
   }
   &[data-disabled='true'] {
     outline: none !important;
     cursor: not-allowed;
+    background-color: #f3f3f3;
   }
 `;
 
@@ -38,8 +35,8 @@ const Input = styled.input`
   caret-color: #777;
   outline: none !important ;
   flex: 1;
-  &:focus {
-    outline: 2px solid #ddd;
+  &:focus-visible {
+      outline: none;
   }
   &:disabled {
     cursor: not-allowed;
@@ -51,6 +48,7 @@ export default function Index(props) {
   const {
     value,
     onChange = () => {},
+    onInput,
     onBlur = () => {},
     itemType = '',
     disabled = false,
@@ -85,6 +83,7 @@ export default function Index(props) {
   };
   const handleInput = (evt) => {
     setVal(evt.target.value);
+    onInput&&onInput(evt.target.value);
   };
   const handleBlur = (evt) => {
     const newVal = evt.target.value;

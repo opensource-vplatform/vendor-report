@@ -83,7 +83,7 @@ export default function(){
         }
     },[datasource,spread]);
     return <Wrap>
-        <Workbook onInited={(spread)=>{
+        <Workbook isShowToolbar={false} onInited={(spread)=>{
             setSpread(spread);
         }}></Workbook>
     </Wrap>

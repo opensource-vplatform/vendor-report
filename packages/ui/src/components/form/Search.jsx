@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import styled from 'styled-components';
 
+import ClearIcon from '../../icons/Clear';
 import Search from '../../icons/Search';
 import TextInput from './TextInput';
 
@@ -23,17 +24,16 @@ function CloseIcon(props) {
             onClick();
         }
     };
-    return <CIcon onClick={clickHandler}></CIcon>;
+    return <ClearIcon style={{width:24,height:24}} hoverable={false} onClick={clickHandler}></ClearIcon>;
 }
 
 export default function Index(props) {
     const { value = '', onInput, onClear } = props;
     const [_value, setValue] = useState(value);
-    const inputHandler = function (e) {
+    const inputHandler = function (val) {
         if (typeof onInput === 'function') {
-            const newValue = e?.target?.value;
-            setValue(newValue);
-            onInput(newValue);
+            setValue(val);
+            onInput(val);
         }
     };
     const clearHandler = function () {
@@ -56,7 +56,7 @@ export default function Index(props) {
             placeholder='搜索'
             width='100%'
             SuffixIcon={SuffixIcon}
-            onChange={inputHandler}
+            onInput={inputHandler}
             style={{
                 border: 'none',
                 outline: 'none',

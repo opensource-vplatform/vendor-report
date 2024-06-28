@@ -8,7 +8,6 @@ import { license } from '../utils/license';
 import {
   genResponseErrorCallback,
   getData,
-  getError,
   handleError,
 } from '../utils/responseUtil';
 import {
@@ -242,17 +241,18 @@ const designer = new Designer({
         },
         onPreview: function (context) {
             return new Promise(function (resolve, reject) {
-                const usedDatasources = getUsedDatasources(context);
-                RPC.get(getTableDataUrl(usedDatasources.join(',')))
-                    .then((data) => {
-                        const err = getError(data,'');
-                        if(err){
-                            resolve({});
-                        }else{
-                            resolve(getData(data.data, 'data', true));
-                        }
-                    })
-                    .catch(genResponseErrorCallback(reject));
+                if(getParameter("previewOnly")=='true'){
+                    resolve({});
+                }else{
+                    const usedDatasources = getUsedDatasources(context);
+                    RPC.get(getTableDataUrl(usedDatasources.join(',')))
+                        .then((data) => {
+                            if(!handleError(data,reject,'获取数据集数据失败！')){
+                                resolve(getData(data.data,'data',true));
+                            }
+                        })
+                        .catch(genResponseErrorCallback(reject));
+                }
             });
         },
     },
