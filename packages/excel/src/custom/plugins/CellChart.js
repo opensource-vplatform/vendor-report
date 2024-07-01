@@ -54,6 +54,8 @@ const paintCell = function (context, value, x, y, w, h, style, options) {
   customFloatingObject.startColumn(span.col);
   customFloatingObject.endRow(span.rowCount);
   customFloatingObject.endColumn(span.colCount);
+  customFloatingObject.allowResize(false);
+  customFloatingObject.allowMove(false);
   // if (!sheet.getBindingPath(row, col) && !!chartConfig?.config?.config?.datasource)
   //   sheet.setBindingPath(row, col, chartConfig?.config?.config?.datasource);
 

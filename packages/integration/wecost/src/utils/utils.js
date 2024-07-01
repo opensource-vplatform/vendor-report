@@ -170,7 +170,7 @@ let callback_index = 0;
  * @param {*} resolve promise返回值
  */
 const call = (requestJson, resolve) => {
-  if (typeof java !== undefined)
+  if (typeof java !== 'undefined')
     java({
       request: requestJson,
       onSuccess: function (response) {
