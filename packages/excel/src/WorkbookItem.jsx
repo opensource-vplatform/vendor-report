@@ -859,6 +859,8 @@ export default function (props) {
 
   useEffect(() => {
     if (data.spread) {
+      data.pageInfo = inst;
+      handlePage();
       data.spread.fromJSON(json);
       if (dataSource) {
         zoom({
