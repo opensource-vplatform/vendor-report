@@ -192,6 +192,24 @@
                 "name": "购买数量",
                 "parentId": "salesId"
             }
+        ],
+        "params": [
+            {
+                "paramsType": "text",
+                "paramName": "sales_area",
+                "defaultValue": "",
+                "description": "",
+                "paramNameCn": "销售地区",
+                "position": ""
+            },
+            {
+                "paramsType": "select",
+                "paramName": "province",
+                "defaultValue": "",
+                "description": "",
+                "paramNameCn": "销售城市",
+                "position": ""
+            }
         ]
     },
     "length": 399,

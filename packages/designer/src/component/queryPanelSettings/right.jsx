@@ -10,13 +10,13 @@ import styled, { keyframes } from 'styled-components';
 import {
   Button,
   CheckBox,
-  Float,
   Integer,
   Select,
   TextInput,
 } from '@toone/report-ui';
 
 import { dropdownDatasource } from './constant';
+import CustomOptions from './customOptions';
 
 const fadeIn = keyframes`
   from {
@@ -31,6 +31,8 @@ const Wrap = styled.div`
   width: 350px;
   border-left: 1px solid #ddd;
   padding: 0 10px 10px 10px;
+  display: flex;
+  flex-direction: column;
 `;
 
 const PropertyWrap = styled.div`
@@ -39,6 +41,8 @@ const PropertyWrap = styled.div`
   gap: 20px;
   position: relative;
   animation: ${fadeIn} 0.3s ease-in;
+  overflow: auto;
+  flex: 1;
 `;
 
 const PropertyItemWrap = styled.div`
@@ -97,10 +101,10 @@ function QueryPanelProperty(props) {
               value: 'Top',
               text: '顶部',
             },
-            {
+            /*    {
               value: 'Right',
               text: '右边',
-            },
+            }, */
           ]}
           onChange={(value) => {
             changePanelConfig('position', value);
@@ -147,6 +151,7 @@ function ControlProperty(props) {
     config = {},
     datas: { activeId },
     changeControlConfig,
+    changeControlType,
     removeControl,
   } = props;
 
@@ -188,12 +193,14 @@ function ControlProperty(props) {
       code = '',
       fieldName = '',
       defaultValue = '',
-      optionType = 'datasource',
+      optionType = 'custom',
       optionText = '',
       optionValue,
       optionDatasource,
       colSpan = 1,
+      options = [],
     },
+    type,
   } = control;
 
   return (
@@ -207,6 +214,30 @@ function ControlProperty(props) {
         <PropertyLable>{fieldName || code}</PropertyLable>
       </PropertyItemWrap>
       <PropertyItemWrap>
+        <PropertyLable>控件类型</PropertyLable>
+        <Select
+          wrapStyle={{ flex: 1 }}
+          value={type}
+          datas={[
+            {
+              text: '文本',
+              value: 'text',
+            },
+            {
+              text: '下拉框',
+              value: 'select',
+            },
+            {
+              text: '整数',
+              value: 'integer',
+            },
+          ]}
+          onChange={(value) => {
+            changeControlType(value);
+          }}
+        ></Select>
+      </PropertyItemWrap>
+      <PropertyItemWrap>
         <PropertyLable>标签</PropertyLable>
         <TextInput
           style={{ flex: 1 }}
@@ -216,7 +247,7 @@ function ControlProperty(props) {
           }}
         ></TextInput>
       </PropertyItemWrap>
-      <PropertyItemWrap>
+      {/* <PropertyItemWrap>
         <PropertyLable>标签宽度</PropertyLable>
         <Float
           style={{ flex: 1 }}
@@ -231,7 +262,7 @@ function ControlProperty(props) {
             changeControlConfig('labelWidth', newValue);
           }}
         ></Float>
-      </PropertyItemWrap>
+      </PropertyItemWrap> */}
       <PropertyItemWrap>
         <PropertyLable>列数</PropertyLable>
         <Integer
@@ -256,7 +287,7 @@ function ControlProperty(props) {
       </PropertyItemWrap>
       {dropdownDatasource[control?.type] && (
         <>
-          <PropertyItemWrap>
+          {/* <PropertyItemWrap>
             <PropertyLable>数据来源类型</PropertyLable>
             <Select
               wrapStyle={{ flex: 1 }}
@@ -275,7 +306,7 @@ function ControlProperty(props) {
                 changeControlConfig('optionType', value);
               }}
             ></Select>
-          </PropertyItemWrap>
+          </PropertyItemWrap> */}
           {optionType !== 'custom' && (
             <>
               <PropertyItemWrap>
@@ -313,6 +344,12 @@ function ControlProperty(props) {
                 ></Select>
               </PropertyItemWrap>
             </>
+          )}
+          {optionType === 'custom' && (
+            <CustomOptions
+              options={options}
+              changeControlConfig={changeControlConfig}
+            ></CustomOptions>
           )}
         </>
       )}

@@ -208,7 +208,7 @@ function Designer(props) {
         </Box>
         {mode == 'preview' ? (
           <Wrap>
-            <Preview></Preview>
+            <Preview onQuery={conf?.event?.onQuery}></Preview>
           </Wrap>
         ) : null}
       </DesignerContext.Provider>

@@ -62,7 +62,7 @@ function handleDatas(params) {
   }
 }
 
-export default function () {
+export default function (props) {
   const context = useContext(DesignerContext);
   const dispatch = useDispatch();
   let {
@@ -172,6 +172,7 @@ export default function () {
           toolbar={_toolbar}
           isShowBtnToolbar={isShowToolbar}
           persistingDataSlice={persistingDataSlice}
+          onQuery={props.onQuery}
         >
           <Worksheet></Worksheet>
         </Workbook>

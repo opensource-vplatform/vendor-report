@@ -1,4 +1,7 @@
-import { useMemo } from 'react';
+import {
+  useMemo,
+  useState,
+} from 'react';
 
 import Print from './Print';
 import ParseReportJson from './template/ParseReportJson';
@@ -16,16 +19,21 @@ export default function (props) {
     onExportExcelHandler,
     onExportPDFHandler,
     license,
-    dataSource,
+    dataSource: _dataSource,
     json: _json,
     template,
     setting,
+    onQuery,
   } = props;
   if (license) {
     setLicense(license);
   }
   const GC = getNamespace();
+  const [workbookDatas, setWorkbookDatas] = useState({
+    dataSource: _dataSource,
+  });
 
+  const dataSource = workbookDatas.dataSource;
   const licenseKey = getLicense();
   if (licenseKey) {
     GC.Spread.Sheets.LicenseKey = licenseKey;
@@ -91,6 +99,23 @@ export default function (props) {
     }
   };
 
+  const handleOnQuery = (queryParams) => {
+    if (typeof onQuery === 'function') {
+      const queryResult = onQuery(queryParams);
+      queryResult.then((datas) => {
+        setWorkbookDatas((workbookDatas) => {
+          return {
+            ...workbookDatas,
+            dataSource: {
+              ..._dataSource,
+              ...(datas || {}),
+            },
+          };
+        });
+      });
+    }
+  };
+
   return (
     <>
       <Print
@@ -108,6 +133,7 @@ export default function (props) {
         onPrintHandler={null}
         inst={inst}
         json={json}
+        onQuery={handleOnQuery}
       ></WorkbookItem>
     </>
   );

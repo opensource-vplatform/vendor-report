@@ -280,6 +280,24 @@ export default function (props) {
       return { ...config, items: newControls };
     });
   };
+  const changeControlType = (value) => {
+    setConfig((config) => {
+      const controls = config.items;
+      const newControls = [];
+      controls.forEach((control) => {
+        let type = control?.type;
+        if (control.id === datas.activeId) {
+          type = value;
+        }
+        newControls.push({
+          ...control,
+          type,
+        });
+      });
+
+      return { ...config, items: newControls };
+    });
+  };
 
   const addControls = (control) => {
     setConfig((config) => {
@@ -367,6 +385,12 @@ export default function (props) {
   };
 
   const saveHandler = () => {
+    if (!datas.save) {
+      setDatas((datas) => {
+        return { ...datas, isShowOperationDialog: false };
+      });
+      return;
+    }
     dispatch(
       saveQueryPanelSettings({
         datas: config,
@@ -404,7 +428,9 @@ export default function (props) {
               height: '36px',
             }}
           >
-            确定保存吗？
+            {datas?.save
+              ? '确定保存吗？'
+              : '候选项的标识字段和显示字段不能为空'}
           </div>
         </OperationDialog>
       )}
@@ -419,8 +445,18 @@ export default function (props) {
           }}
           title='保存'
           onClick={() => {
+            let isEmpty = false;
+            const items = config?.items || [];
+            items.forEach(({ config }) => {
+              const options = config?.options || [];
+              options.forEach(({ label, value }) => {
+                if (!label || !value) {
+                  isEmpty = true;
+                }
+              });
+            });
             setDatas((datas) => {
-              return { ...datas, isShowOperationDialog: true };
+              return { ...datas, isShowOperationDialog: true, save: !isEmpty };
             });
           }}
         >
@@ -430,7 +466,7 @@ export default function (props) {
         </div>
         <Wrap>
           <DndProvider backend={HTML5Backend}>
-            <Left addControls={addControls}></Left>
+            <Left addControls={addControls} config={config}></Left>
             <Main
               axis='xy'
               lockToContainerEdges={true}
@@ -447,6 +483,7 @@ export default function (props) {
               changeControlConfig={changeControlConfig}
               datas={datas}
               changePanelConfig={changePanelConfig}
+              changeControlType={changeControlType}
             ></Right>
           </DndProvider>
         </Wrap>

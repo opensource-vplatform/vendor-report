@@ -19,6 +19,7 @@ import {
 import AddIcon from './icons/shape/Add';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
+import QueryPanel from './QueryPanel';
 import { withDivStyled } from './utils/componentUtil';
 import { setBaseUrl } from './utils/environmentUtil';
 import {
@@ -435,6 +436,8 @@ export default function (props) {
     toolbar,
     type = 'preview',
     isShowBtnToolbar = true,
+    persistingDataSlice,
+    onQuery,
   } = props;
   if (license) {
     setLicense(license);
@@ -754,7 +757,8 @@ export default function (props) {
               actualSize: 'actualSize',
             },
           });
-          dataSource &&
+          false &&
+            dataSource &&
             zoom({
               el: paperWrapEl,
               value: 'suitableToPageWidth',
@@ -786,6 +790,11 @@ export default function (props) {
     onRedo,
   ]);
 
+  useEffect(() => {
+    if (data.spread) {
+      data.spread.fromJSON(json);
+    }
+  }, [json]);
   const PaperStyls = {
     width: '100%',
     height: '100%',
@@ -793,6 +802,10 @@ export default function (props) {
 
   return (
     <Wrap>
+      <QueryPanel
+        persistingDataSlice={persistingDataSlice}
+        onQuery={onQuery}
+      ></QueryPanel>
       {isShowToolbar && (
         <Toolbar>
           <Zoom zoomOptions={zoomOptions} el={paperWrapEl} data={data}></Zoom>
@@ -820,6 +833,8 @@ export default function (props) {
             backgroundColor: type === 'designer' ? '' : '#ddd',
             overflow: type === 'designer' ? 'visible' : 'auto',
             padding: type === 'designer' ? '0' : '8px',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <Paper

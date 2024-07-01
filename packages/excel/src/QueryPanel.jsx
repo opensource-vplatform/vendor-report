@@ -1,11 +1,11 @@
 import { Query } from '@toone/report-ui';
 
 export default function (props) {
-  const { persistingDataSlice, width } = props;
+  const { persistingDataSlice, width, onQuery } = props;
   const queryPanelSettings = JSON.parse(
     JSON.stringify(persistingDataSlice?.sheets?.queryPanelSettings || '')
   );
-  if (!queryPanelSettings) {
+  if (!queryPanelSettings || queryPanelSettings.visible === false) {
     return null;
   }
   return (
@@ -13,7 +13,7 @@ export default function (props) {
       <Query
         {...queryPanelSettings}
         onQuery={(datas) => {
-          console.log(datas);
+          typeof onQuery === 'function' && onQuery(datas);
         }}
       ></Query>
     </div>

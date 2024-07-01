@@ -82,6 +82,7 @@ export const EVENTS = {
   CellDoubleClick: 'CellDoubleClick',
 
   EditStarting: 'EditStarting',
+  onQuery: 'onQuery',
 };
 
 const check = function (params) {

@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 import { uuid } from '@toone/report-util';
 
+import Tree from './Tree';
+
 const Wrap = styled.div`
   width: 350px;
   border-right: 1px solid #ddd;
@@ -71,7 +73,7 @@ function ControlListItem(props) {
     canDrag: () => false,
   }))[1];
 
-  const { children = [], code, name } = item;
+  const { params = [], code, name } = item;
 
   return (
     <DragWrap
@@ -89,21 +91,20 @@ function ControlListItem(props) {
           type: fieldType,
           id: uuid(),
         };
-        debugger;
         addControls(control);
       }}
     >
       <DragWrapTitle>{name}</DragWrapTitle>
       <DragWrapContent>
-        {children.map((data) => {
+        {params.map((data) => {
           return (
             <DragWrapContentItem
-              key={data.code}
-              data-field-code={data.code}
-              data-field-name={data.name}
-              data-field-type={data.type}
+              key={data.paramName}
+              data-field-code={data.paramName}
+              data-field-name={data.paramNameCn}
+              data-field-type={data.paramsType}
             >
-              {data.name}
+              {data.paramNameCn || data.paramName}
             </DragWrapContentItem>
           );
         })}
@@ -114,7 +115,10 @@ function ControlListItem(props) {
 
 function ControlList(props) {
   const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
-  const queryParameterList = finalDsList.filter(({ type }) => type === 'table');
+  const queryParameterList = finalDsList.filter(
+    ({ type, params }) =>
+      type === 'table' && Array.isArray(params) && params.length > 0
+  );
   return (
     <ControlListWrap>
       {queryParameterList.map((item) => {
@@ -131,6 +135,73 @@ function ControlList(props) {
 }
 
 export default function (props) {
+  const { addControls, config } = props;
+  const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
+  const queryParameterList = finalDsList.reduce((result, item) => {
+    const { type, params, name, code } = item;
+    if (type === 'table' && Array.isArray(params) && params.length > 0) {
+      const children = params.map((item) => {
+        let disabled = false;
+        const items = config?.items || [];
+        items.forEach((configItem) => {
+          if (
+            configItem?.config?.datasource === code &&
+            configItem?.config?.code === item.paramName
+          ) {
+            disabled = true;
+          }
+        });
+        return {
+          ...item,
+          label: item.paramNameCn,
+          type: item.paramsType,
+          disabled,
+        };
+      });
+      result.push({
+        ...item,
+        label: name,
+        children,
+        enableDoubleClick: false,
+      });
+    }
+    return result;
+  }, []);
+
+  return (
+    <Tree
+      title='数据集查询 参数'
+      datas={queryParameterList}
+      onDoubleClick={(datas) => {
+        const { paramName, paramNameCn, paramsType, parent = {} } = datas;
+        const control = {
+          config: {
+            code: paramName,
+            label: paramNameCn,
+            fieldName: paramNameCn,
+            datasource: parent.code,
+            datasourceName: parent.name,
+          },
+          type: paramsType,
+          id: uuid(),
+        };
+        let hasAdd = false;
+        const items = config?.items || [];
+        items.forEach((item) => {
+          if (
+            item?.config?.datasource === parent.code &&
+            item?.config?.code === paramName
+          ) {
+            hasAdd = true;
+          }
+        });
+        if (hasAdd) {
+          return;
+        }
+        addControls(control);
+      }}
+    ></Tree>
+  );
   return (
     <Wrap>
       <Title>可选参数</Title>
