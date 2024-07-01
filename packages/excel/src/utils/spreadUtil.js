@@ -113,6 +113,8 @@ const getSheetRect = function (sheet) {
 };
 
 const recursionSheetZoom = function (sheet, el, spread) {
+  _resolve(true);
+  return;
   spread.options.showHorizontalScrollbar = true;
   spread.options.showVerticalScrollbar = true;
   const result = new Promise(function (resolve) {

@@ -81,7 +81,7 @@ const LoadingWrap = styled.div`
   height: 100%;
   position: absolute;
   background-color: rgb(255, 255, 255);
-  z-index: 1;
+  z-index: 1003;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -803,6 +803,10 @@ export default function (props) {
               setData((datas) => {
                 return { ...datas, isLoading: false };
               });
+            });
+          } else if (data.isLoading) {
+            setData((datas) => {
+              return { ...datas, isLoading: false };
             });
           }
 
