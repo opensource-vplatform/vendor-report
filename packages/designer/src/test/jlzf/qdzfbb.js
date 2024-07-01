@@ -141,6 +141,24 @@ const define = {
                 fieldName: 'totalRow',
             },
         ],
+        params: [
+            {
+                "paramsType": "text",
+                "paramName": "code",
+                "defaultValue": "",
+                "description": "",
+                "paramNameCn": "清单编号",
+                "position": ""
+            },
+            {
+                "paramsType": "select",
+                "paramName": "name",
+                "defaultValue": "",
+                "description": "",
+                "paramNameCn": "清单名称",
+                "position": ""
+            }
+        ]
     },
     datas:  [
         {

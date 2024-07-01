@@ -459,7 +459,12 @@ export default {
             if (Array.isArray(oldDatas)) {
               oldDatas.forEach((data) => {
                 const res = params.every(({ code, value }) => {
-                  return data?.[code] === value;
+                  const val = data?.[code];
+                  if(typeof val == 'string' && val.indexOf(value)!=-1){
+                    return true;
+                  }else{
+                    return data?.[code] === value;
+                  }
                 });
                 if (res) {
                   queryResult[dsCode].push({ ...data });
