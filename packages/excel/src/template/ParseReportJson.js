@@ -122,8 +122,8 @@ export default class ParseReportJson {
     } = config;
     console.time('耗时多久');
     reportJson.scrollbarMaxAlign = true;
-    /* reportJson.showHorizontalScrollbar = false;
-    reportJson.showVerticalScrollbar = false; */
+    reportJson.showHorizontalScrollbar = false;
+    reportJson.showVerticalScrollbar = false;
     this.paper = {};
     this.datas = datas;
     this.showPageCount = showPageCount;
