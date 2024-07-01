@@ -16,7 +16,7 @@ const paintCell = function (context, value, x, y, w, h, style, options) {
   // context.clearRect(x, y, w, h);
 
   const chartConfig = getCellTagPlugin(sheet, row, col, PLUGIN_TYPE);
-  console.log('=====================', chartConfig)
+  // console.log('=====================', chartConfig)
   // 初始化浮动对象
   const uuId = `echart-${row}-${col}`;
   let span = sheet.getSpan(row, col)

@@ -162,19 +162,15 @@ const getRequestParams = {
   }
 }
 
+let callback_index = 0;
+
 /**
- * 请求本地数据接口
- * @param {*} action 请求类型
- * @param {*} options 额外参数
- * @returns 
+ * 调用不同接口类型
+ * @param {*} requestJson 请求参数
+ * @param {*} resolve promise返回值
  */
-export const request = function (action, options = {}) {
-  return new Promise((resolve) => {
-    const requestJson = JSON.stringify({
-      action,
-      ...(getRequestParams[action] || {}),
-      ...options
-    });
+const call = (requestJson, resolve) => {
+  if (typeof java !== undefined)
     java({
       request: requestJson,
       onSuccess: function (response) {
@@ -185,6 +181,36 @@ export const request = function (action, options = {}) {
         }
       }
     })
+  else {
+    const index = callback_index++;
+    window[`JWebTopCallback_${index}`] = function (response) {
+      try {
+        resolve(JSON.parse(response));
+      } catch (e) {
+        console.log("请求失败：" + e);
+      } finally {
+        delete window[`JWebTopCallback_${index}`]
+      }
+    }
+    JWebTop.invokeRemote_CallBack(requestJson, `JWebTopCallback_${index}`)
+  }
+}
+
+
+/**
+ * 请求本地数据接口
+ * @param {*} action 请求类型
+ * @param {*} options 额外参数
+ * @returns 
+ */
+export const request = function (action, options = {}) {
+  return new Promise((resolve) => {
+    const requestJson = JSON.stringify({
+      [typeof java !== 'undefined' ? 'action' : 'method']: action,
+      ...(getRequestParams[action] || {}),
+      ...options
+    });
+    call(requestJson, resolve)
   })
 }
 
