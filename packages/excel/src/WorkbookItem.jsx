@@ -36,6 +36,7 @@ import { setPrintInfo } from './utils/printUtil';
 import {
   getNamespace,
   getPluginSrc,
+  getSpreadWrapRect,
   withBatchCalcUpdate,
   zoom,
   zoomIn,
@@ -315,6 +316,7 @@ function Zoom(props) {
     defaultZoom = 'suitableToPageWidth',
     el,
     data,
+    setData,
   } = props;
   const [value, setValue] = useState(defaultZoom);
   let zoomOptionsItem = zoomOptions.find((item) => item.value === value);
@@ -327,14 +329,21 @@ function Zoom(props) {
     <ZoomWrap>
       <ZoomOut
         onClick={function () {
-          const res = zoomOut({
+          setData((data) => {
+            return { ...data, isLoading: true };
+          });
+          zoomOut({
             spread: data.spread,
             paper: data.pageInfo.paper,
             getStyle: data.getStyle,
             setStyle: data.setStyle,
             el,
+          }).then((res) => {
+            setValue(res);
+            setData((data) => {
+              return { ...data, isLoading: false };
+            });
           });
-          setValue(res);
         }}
       >
         <ZoomOutIcon></ZoomOutIcon>
@@ -342,14 +351,21 @@ function Zoom(props) {
 
       <div
         onClick={function () {
-          const res = zoomIn({
+          setData((data) => {
+            return { ...data, isLoading: true };
+          });
+          zoomIn({
             spread: data.spread,
             paper: data.pageInfo.paper,
             getStyle: data.getStyle,
             setStyle: data.setStyle,
             el,
+          }).then((res) => {
+            setValue(res);
+            setData((data) => {
+              return { ...data, isLoading: false };
+            });
           });
-          setValue(res);
         }}
       >
         <AddIcon></AddIcon>
@@ -357,6 +373,9 @@ function Zoom(props) {
       <Select
         datas={zoomOptions}
         onChange={function (value) {
+          setData((data) => {
+            return { ...data, isLoading: true };
+          });
           setValue(value);
           zoom({
             el,
@@ -364,6 +383,10 @@ function Zoom(props) {
             spread: data.spread,
             paper: data.pageInfo.paper,
             setStyle: data.setStyle,
+          }).then(() => {
+            setData((data) => {
+              return { ...data, isLoading: false };
+            });
           });
         }}
         style={{
@@ -855,8 +878,9 @@ export default function (props) {
   const PaperStyls = {
     width: '100%',
     height: '100%',
+    position: 'relative',
   };
-
+  const elWidth = getSpreadWrapRect(paperWrapEl)?.width;
   return (
     <Wrap>
       <QueryPanel
@@ -872,7 +896,12 @@ export default function (props) {
       ></QueryPanel>
       {isShowToolbar && (
         <Toolbar>
-          <Zoom zoomOptions={zoomOptions} el={paperWrapEl} data={data}></Zoom>
+          <Zoom
+            zoomOptions={zoomOptions}
+            el={paperWrapEl}
+            data={data}
+            setData={setData}
+          ></Zoom>
           {isShowBtnToolbar && (
             <ToolbarRight>
               <Page
@@ -908,7 +937,9 @@ export default function (props) {
             }}
           >
             {type === 'preview' && data.isLoading && (
-              <LoadingWrap>
+              <LoadingWrap
+                style={{ maxWidth: elWidth ? `${elWidth}px` : 'auto' }}
+              >
                 <Loading></Loading>
                 Loading...
               </LoadingWrap>

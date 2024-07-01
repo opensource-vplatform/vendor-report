@@ -345,7 +345,10 @@ const getSpreadCanvasRect = function (el) {
   };
 };
 
-const getSpreadWrapRect = function (el) {
+export const getSpreadWrapRect = function (el) {
+  if (!el?.current) {
+    return {};
+  }
   const css = getComputedStyle(el.current);
   const height = css.height;
   const width = css.width;
@@ -476,67 +479,71 @@ export const zoom = function (params) {
 };
 
 export const zoomOut = function ({ spread, getStyle, setStyle, el, paper }) {
-  let { zoomFactor } = getStyle();
-  zoomFactor = Math.floor(zoomFactor * 10);
-  if (zoomFactor === 12.5 || zoomFactor === 7.5 || zoomFactor === 2.5) {
-    zoomFactor += 0.5;
-  }
+  return new Promise((resolve) => {
+    let { zoomFactor } = getStyle();
+    zoomFactor = Math.floor(zoomFactor * 10);
+    if (zoomFactor === 12.5 || zoomFactor === 7.5 || zoomFactor === 2.5) {
+      zoomFactor += 0.5;
+    }
 
-  let step = -1;
-  if (zoomFactor >= 33) {
-    step = -4;
-  } else if (zoomFactor >= 21) {
-    step = -3;
-  } else if (zoomFactor >= 11) {
-    step = -2;
-  }
-  zoomFactor = (zoomFactor + step) / 10;
-  if (zoomFactor <= 0.5) {
-    zoomFactor = 0.5;
-  }
+    let step = -1;
+    if (zoomFactor >= 33) {
+      step = -4;
+    } else if (zoomFactor >= 21) {
+      step = -3;
+    } else if (zoomFactor >= 11) {
+      step = -2;
+    }
+    zoomFactor = (zoomFactor + step) / 10;
+    if (zoomFactor <= 0.5) {
+      zoomFactor = 0.5;
+    }
 
-  const { width: _width } = getSpreadWrapRect(el);
-  zoomByNumber({
-    spread,
-    value: zoomFactor,
-    setStyle,
-    width: _width,
-    paper,
-    el,
+    const { width: _width } = getSpreadWrapRect(el);
+    zoom({
+      spread,
+      value: zoomFactor,
+      setStyle,
+      paper,
+      el,
+    }).then(() => {
+      resolve((zoomFactor * 100).toFixed(0));
+    });
   });
-  return (zoomFactor * 100).toFixed(0);
 };
 
 export const zoomIn = function ({ spread, getStyle, setStyle, el, paper }) {
-  let { zoomFactor } = getStyle();
-  zoomFactor = Math.floor(zoomFactor * 10);
-  if (zoomFactor === 12.5 || zoomFactor === 7.5 || zoomFactor === 2.5) {
-    zoomFactor += 0.5;
-  }
+  return new Promise((resolve) => {
+    let { zoomFactor } = getStyle();
+    zoomFactor = Math.floor(zoomFactor * 10);
+    if (zoomFactor === 12.5 || zoomFactor === 7.5 || zoomFactor === 2.5) {
+      zoomFactor += 0.5;
+    }
 
-  let step = 1;
-  if (zoomFactor >= 33) {
-    step = 4;
-  } else if (zoomFactor >= 21) {
-    step = 3;
-  } else if (zoomFactor >= 11) {
-    step = 2;
-  }
-  zoomFactor = (zoomFactor + step) / 10;
-  if (zoomFactor >= 4) {
-    zoomFactor = 4;
-  }
+    let step = 1;
+    if (zoomFactor >= 33) {
+      step = 4;
+    } else if (zoomFactor >= 21) {
+      step = 3;
+    } else if (zoomFactor >= 11) {
+      step = 2;
+    }
+    zoomFactor = (zoomFactor + step) / 10;
+    if (zoomFactor >= 4) {
+      zoomFactor = 4;
+    }
 
-  const { width: _width } = getSpreadWrapRect(el);
-  zoomByNumber({
-    spread,
-    value: zoomFactor,
-    setStyle,
-    width: _width,
-    paper,
-    el,
+    const { width: _width } = getSpreadWrapRect(el);
+    zoom({
+      spread,
+      value: zoomFactor,
+      setStyle,
+      paper,
+      el,
+    }).then(() => {
+      resolve((zoomFactor * 100).toFixed(0));
+    });
   });
-  return (zoomFactor * 100).toFixed(0);
 };
 
 const sheetZoom = function (sheet, value) {
