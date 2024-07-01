@@ -151,7 +151,7 @@ function ControlProperty(props) {
     config = {},
     datas: { activeId },
     changeControlConfig,
-    changeControlType,
+    changeControlProps,
     removeControl,
   } = props;
 
@@ -198,10 +198,10 @@ function ControlProperty(props) {
       optionText = '',
       optionValue,
       optionDatasource,
-      colSpan = 1,
       options = [],
     },
     type,
+    colSpan = 1,
   } = control;
   console.log(control);
   return (
@@ -234,7 +234,7 @@ function ControlProperty(props) {
             },
           ]}
           onChange={(value) => {
-            changeControlType(value);
+            changeControlProps('type', value);
           }}
         ></Select>
       </PropertyItemWrap>
@@ -272,7 +272,7 @@ function ControlProperty(props) {
           value={colSpan}
           max={colCount}
           onChange={(value) => {
-            changeControlConfig('colSpan', value);
+            changeControlProps('colSpan', value);
           }}
         ></Integer>
       </PropertyItemWrap>

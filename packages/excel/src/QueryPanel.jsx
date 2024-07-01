@@ -8,6 +8,10 @@ export default function (props) {
   if (!queryPanelSettings || queryPanelSettings.visible === false) {
     return null;
   }
+  const items = queryPanelSettings.items;
+  if (!Array.isArray(items) || items.length <= 0) {
+    return null;
+  }
   return (
     <div style={{ width, padding: '8px' }}>
       <Query

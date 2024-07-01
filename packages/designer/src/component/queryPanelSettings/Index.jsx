@@ -141,14 +141,14 @@ function SaveIcon(props) {
 }
 
 const MainItem = SortableElement((props) => {
-  const { type, config = {}, active } = props;
+  const { type, config = {}, active, colSpan = 1 } = props;
   const el = useRef();
   const Component = optionalControlsMap[type];
   return (
     <MainItemWrap
       ref={el}
       active={active ? 'active' : ''}
-      style={{ gridColumn: `span ${config?.colSpan || 1}` }}
+      style={{ gridColumn: `span ${colSpan || 1}` }}
     >
       <div style={{ pointerEvents: 'none' }}>
         <Component {...config} value={config.defaultValue}></Component>
@@ -240,16 +240,13 @@ export default function (props) {
       if (key === 'colCount') {
         const controls = config.items;
         controls.forEach((control) => {
-          let colSpan = control?.config?.colSpan || 1;
+          let colSpan = control?.colSpan || 1;
           if (value < colSpan) {
             colSpan = value;
           }
           newControls.push({
             ...control,
-            config: {
-              ...control?.config,
-              colSpan,
-            },
+            colSpan,
           });
         });
         result.items = newControls;
@@ -280,18 +277,18 @@ export default function (props) {
       return { ...config, items: newControls };
     });
   };
-  const changeControlType = (value) => {
+  const changeControlProps = (key, value) => {
     setConfig((config) => {
       const controls = config.items;
       const newControls = [];
       controls.forEach((control) => {
-        let type = control?.type;
+        let newValue = control?.[key];
         if (control.id === datas.activeId) {
-          type = value;
+          newValue = value;
         }
         newControls.push({
           ...control,
-          type,
+          [key]: newValue,
         });
       });
 
@@ -483,7 +480,7 @@ export default function (props) {
               changeControlConfig={changeControlConfig}
               datas={datas}
               changePanelConfig={changePanelConfig}
-              changeControlType={changeControlType}
+              changeControlProps={changeControlProps}
             ></Right>
           </DndProvider>
         </Wrap>
