@@ -209,6 +209,14 @@
                 "description": "",
                 "paramNameCn": "销售城市",
                 "position": ""
+            },
+            {
+                "paramsType": "integer",
+                "paramName": "quantity",
+                "defaultValue": "",
+                "description": "",
+                "paramNameCn": "购买数量",
+                "position": ""
             }
         ]
     },

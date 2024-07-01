@@ -5,7 +5,7 @@ import {
 } from 'react';
 
 import resourceManager from 'resource-manager-js';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 import {
   Page,
@@ -70,6 +70,35 @@ const Wrap = withDivStyled({
   display: 'flex',
   flexDirection: 'column',
 });
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const LoadingWrap = styled.div`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-color: rgb(255, 255, 255);
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  top: 0;
+  padding-top: 200px;
+  left: 0;
+`;
+
+const Loading = styled.div`
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #2d8cf0;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: ${spin} 1s linear infinite;
+`;
 
 const PaperWrap = styled.div`
   width: 100%;
@@ -293,6 +322,7 @@ function Zoom(props) {
   if (!text) {
     text = `${value}%`;
   }
+  data.zoomValue = value;
   return (
     <ZoomWrap>
       <ZoomOut
@@ -353,6 +383,7 @@ const PaperDiv = styled.div`
   box-sizing: border-box;
   background: #fff;
   flex: none;
+  position: relative;
   box-shadow:
     rgba(0, 0, 0, 0.05) 0px 2rem 8rem 0px,
     rgba(0, 0, 0, 0.15) 0px 0.6rem 1.6rem,
@@ -453,7 +484,7 @@ export default function (props) {
   if (licenseKey) {
     GC.Spread.Sheets.LicenseKey = licenseKey;
   }
-  const [data] = useState(() => {
+  const [data, setData] = useState(() => {
     const result = checkLicense(localLicenseUnCheck);
     let showError = false,
       showWarn = false;
@@ -467,6 +498,7 @@ export default function (props) {
       showWarn: showWarn,
       pageInfo: inst,
       setPageInfos: null,
+      isLoading: true,
     };
   });
 
@@ -759,14 +791,21 @@ export default function (props) {
               actualSize: 'actualSize',
             },
           });
-          dataSource &&
+          if (dataSource) {
+            data.zoomValue = 'suitableToPageWidth';
             zoom({
               el: paperWrapEl,
               value: 'suitableToPageWidth',
               spread: data.spread,
               paper: data.pageInfo.paper,
               setStyle: data.setStyle,
+            }).then((res) => {
+              setData((datas) => {
+                return { ...datas, isLoading: false };
+              });
             });
+          }
+
           if (promise && promise.then) {
             promise.then((json) => {
               handleSheets(json);
@@ -794,6 +833,19 @@ export default function (props) {
   useEffect(() => {
     if (data.spread) {
       data.spread.fromJSON(json);
+      if (dataSource) {
+        zoom({
+          el: paperWrapEl,
+          value: data.zoomValue,
+          spread: data.spread,
+          paper: data.pageInfo.paper,
+          setStyle: data.setStyle,
+        }).then((res) => {
+          setData((datas) => {
+            return { ...datas, isLoading: false };
+          });
+        });
+      }
     }
   }, [json]);
   const PaperStyls = {
@@ -805,7 +857,14 @@ export default function (props) {
     <Wrap>
       <QueryPanel
         persistingDataSlice={persistingDataSlice}
-        onQuery={onQuery}
+        onQuery={(datas) => {
+          if (typeof onQuery === 'function') {
+            setData((datas) => {
+              return { ...datas, isLoading: true };
+            });
+            onQuery(datas);
+          }
+        }}
       ></QueryPanel>
       {isShowToolbar && (
         <Toolbar>
@@ -844,6 +903,12 @@ export default function (props) {
               data.getStyle = datas.getStyle;
             }}
           >
+            {type === 'preview' && data.isLoading && (
+              <LoadingWrap>
+                <Loading></Loading>
+                Loading...
+              </LoadingWrap>
+            )}
             <ExcelWrap ref={el}></ExcelWrap>
           </Paper>
         </PaperWrap>

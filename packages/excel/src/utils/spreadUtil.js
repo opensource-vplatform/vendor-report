@@ -177,6 +177,7 @@ const recursionSheetZoom = function (sheet, el, spread) {
     spread.options.showHorizontalScrollbar = false;
     spread.options.showVerticalScrollbar = false;
     spread.refresh();
+    _resolve(true);
   });
 };
 
@@ -255,7 +256,7 @@ export const zoomToPage = function ({
   setTimeout(() => spread.refresh(), 0);
   afterRefresh({ spread, el });
 };
-
+let _resolve = null;
 export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
   let paperHeight = 0;
   let paperWidth = 0;
@@ -444,31 +445,34 @@ const zoomByNumber = function ({
 };
 
 export const zoom = function (params) {
-  const { el, value } = params;
-  const { height, width, isRender } = getSpreadWrapRect(el);
-  if (value === 'actualSize') {
-    zoomToRecover({ ...params, width });
-    return;
-  }
+  return new Promise((resolve) => {
+    _resolve = resolve;
+    const { el, value } = params;
+    const { height, width, isRender } = getSpreadWrapRect(el);
+    if (value === 'actualSize') {
+      zoomToRecover({ ...params, width });
+      return;
+    }
 
-  if (!isRender) {
-    return;
-  }
-  let newValue = Number(value);
-  if (!Number.isNaN(newValue)) {
-    zoomByNumber({ ...params, value: newValue, width });
-    return;
-  }
+    if (!isRender) {
+      return;
+    }
+    let newValue = Number(value);
+    if (!Number.isNaN(newValue)) {
+      zoomByNumber({ ...params, value: newValue, width });
+      return;
+    }
 
-  if (value === 'suitableToPageWidth') {
-    zoomToFit({ ...params, width });
-    return;
-  }
+    if (value === 'suitableToPageWidth') {
+      zoomToFit({ ...params, width });
+      return;
+    }
 
-  if (value === 'suitableToPage') {
-    zoomToPage({ ...params, width, height });
-    return;
-  }
+    if (value === 'suitableToPage') {
+      zoomToPage({ ...params, width, height });
+      return;
+    }
+  });
 };
 
 export const zoomOut = function ({ spread, getStyle, setStyle, el, paper }) {

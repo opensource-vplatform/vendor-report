@@ -66,6 +66,7 @@ export const optionalControlsMap = {
 
 export const dropdownDatasource = {
   select: true,
+  integer: true,
 };
 
 export const defaultQueryPanelSettings = {

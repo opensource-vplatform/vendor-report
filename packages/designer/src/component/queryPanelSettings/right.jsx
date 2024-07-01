@@ -191,6 +191,7 @@ function ControlProperty(props) {
       labelWidth = 80,
       datasourceName = '',
       code = '',
+      fieldType = '',
       fieldName = '',
       defaultValue = '',
       optionType = 'custom',
@@ -202,7 +203,7 @@ function ControlProperty(props) {
     },
     type,
   } = control;
-
+  console.log(control);
   return (
     <PropertyWrap>
       <PropertyItemWrap>
@@ -322,7 +323,7 @@ function ControlProperty(props) {
                 ></Select>
               </PropertyItemWrap>
               <PropertyItemWrap>
-                <PropertyLable>显示字段</PropertyLable>
+                <PropertyLable>显示值</PropertyLable>
                 <Select
                   wrapStyle={{ flex: 1 }}
                   value={optionText}
@@ -333,7 +334,7 @@ function ControlProperty(props) {
                 ></Select>
               </PropertyItemWrap>
               <PropertyItemWrap>
-                <PropertyLable>标识字段</PropertyLable>
+                <PropertyLable>标识值</PropertyLable>
                 <Select
                   wrapStyle={{ flex: 1 }}
                   value={optionValue}
@@ -349,6 +350,7 @@ function ControlProperty(props) {
             <CustomOptions
               options={options}
               changeControlConfig={changeControlConfig}
+              fieldType={fieldType}
             ></CustomOptions>
           )}
         </>

@@ -170,7 +170,7 @@ export default function (props) {
 
   return (
     <Tree
-      title='数据集查询 参数'
+      title='数据集查询参数'
       datas={queryParameterList}
       onDoubleClick={(datas) => {
         const { paramName, paramNameCn, paramsType, parent = {} } = datas;
@@ -181,6 +181,7 @@ export default function (props) {
             fieldName: paramNameCn,
             datasource: parent.code,
             datasourceName: parent.name,
+            fieldType: paramsType,
           },
           type: paramsType,
           id: uuid(),

@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import Add from '@icons/shape/Add';
 import Close from '@icons/shape/Close';
 import {
+  Integer,
   Table,
   TableBody,
   TableCell,
@@ -12,8 +13,25 @@ import {
 } from '@toone/report-ui';
 import { uuid } from '@toone/report-util';
 
+const Components = {
+  integer: Integer,
+  text: TextInput,
+};
+
+function IdentificationForm(props) {
+  const { fieldType = 'text', value, onChange } = props;
+  const Component = Components?.[fieldType] || TextInput;
+  return (
+    <Component
+      style={{ flex: 1 }}
+      value={value || ''}
+      onChange={onChange}
+    ></Component>
+  );
+}
+
 function FieldNameConfig(props) {
-  const { options, changeControlConfig } = props;
+  const { options, changeControlConfig, fieldType } = props;
 
   const fieldCellStyle = { width: 100, padding: '4px 4px' };
   const operationCellStyle = { width: 32, padding: '4px 4px' };
@@ -22,8 +40,8 @@ function FieldNameConfig(props) {
       <Table style={{ fontSize: '12px' }}>
         <TableHeader>
           <TableRow>
-            <TableCell style={fieldCellStyle}>标识字段</TableCell>
-            <TableCell style={fieldCellStyle}>显示字段</TableCell>
+            <TableCell style={fieldCellStyle}>标识值</TableCell>
+            <TableCell style={fieldCellStyle}>显示值</TableCell>
             <TableCell style={operationCellStyle}> </TableCell>
           </TableRow>
         </TableHeader>
@@ -33,9 +51,9 @@ function FieldNameConfig(props) {
               <Fragment key={id || value || index}>
                 <TableRow>
                   <TableCell style={fieldCellStyle}>
-                    <TextInput
-                      style={{ flex: 1 }}
-                      value={value || ''}
+                    <IdentificationForm
+                      fieldType={fieldType}
+                      value={value}
                       onChange={(value) => {
                         const newOptions = [];
                         options.forEach((item) => {
@@ -47,7 +65,7 @@ function FieldNameConfig(props) {
                         });
                         changeControlConfig('options', newOptions);
                       }}
-                    ></TextInput>
+                    ></IdentificationForm>
                   </TableCell>
                   <TableCell style={fieldCellStyle}>
                     <TextInput
