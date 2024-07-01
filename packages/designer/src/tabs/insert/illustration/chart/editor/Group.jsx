@@ -1,9 +1,19 @@
-import { Fragment, useEffect, useState } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { setConfig } from '@store/chartSlice/index';
-import { FormItem, Select } from '@toone/report-ui';
+import {
+  FormItem,
+  Select,
+} from '@toone/report-ui';
 
 import { toSelectOptions } from './utils';
 
@@ -24,7 +34,7 @@ export default function () {
   }, [config.datasource]);
   return (
     <Fragment>
-      <FormItem label='分组:'>
+      <FormItem label='分类:'>
         <Select
           wrapStyle={{ width: '100%' }}
           value={
