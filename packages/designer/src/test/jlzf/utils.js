@@ -11,7 +11,7 @@ const dataTypeToType = function (dataType) {
 };
 
 const parseMetadata = function (metadata) {
-    let { code, name, children = [] } = metadata;
+    let { code, name, children = [],params } = metadata;
     children = children.map((child) => {
         const { field, dataType, fieldName } = child;
         return {
@@ -31,6 +31,7 @@ const parseMetadata = function (metadata) {
         code,
         name,
         children,
+        params,
     };
 };
 
