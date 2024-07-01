@@ -80,7 +80,8 @@ const PaperWrap = styled.div`
   padding: 8px;
   box-sizing: border-box;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  //justify-content: center;
   &:has(.exceededWidth) {
     display: block;
   }
@@ -351,6 +352,7 @@ function Zoom(props) {
 const PaperDiv = styled.div`
   box-sizing: border-box;
   background: #fff;
+  flex: none;
   box-shadow:
     rgba(0, 0, 0, 0.05) 0px 2rem 8rem 0px,
     rgba(0, 0, 0, 0.15) 0px 0.6rem 1.6rem,
@@ -757,8 +759,7 @@ export default function (props) {
               actualSize: 'actualSize',
             },
           });
-          false &&
-            dataSource &&
+          dataSource &&
             zoom({
               el: paperWrapEl,
               value: 'suitableToPageWidth',
@@ -833,7 +834,6 @@ export default function (props) {
             backgroundColor: type === 'designer' ? '' : '#ddd',
             overflow: type === 'designer' ? 'visible' : 'auto',
             padding: type === 'designer' ? '0' : '8px',
-            display: 'flex',
             flexDirection: 'column',
           }}
         >
