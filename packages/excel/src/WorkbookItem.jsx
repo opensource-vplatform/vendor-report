@@ -1,37 +1,19 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import resourceManager from 'resource-manager-js';
 import styled, { keyframes } from 'styled-components';
 
-import {
-  Page,
-  Select,
-} from '@toone/report-ui';
+import { Page, Select } from '@toone/report-ui';
 
-import {
-  EVENTS,
-  fire,
-} from './event/EventManager';
+import { EVENTS, fire } from './event/EventManager';
 import AddIcon from './icons/shape/Add';
 import LicenseError from './LicenseError';
 import LicenseWarn from './LicenseWarn';
 import QueryPanel from './QueryPanel';
 import { withDivStyled } from './utils/componentUtil';
 import { setBaseUrl } from './utils/environmentUtil';
-import {
-  checkLicense,
-  getLicense,
-  setLicense,
-} from './utils/licenseUtil';
-import {
-  genAutoMergeRangeInfos,
-  genSpans,
-  sortData,
-} from './utils/other';
+import { checkLicense, getLicense, setLicense } from './utils/licenseUtil';
+import { genAutoMergeRangeInfos, genSpans, sortData } from './utils/other';
 import { setPrintInfo } from './utils/printUtil';
 import {
   getNamespace,
@@ -862,6 +844,13 @@ export default function (props) {
       data.pageInfo = inst;
       handlePage();
       data.spread.fromJSON(json);
+      // 重新重写默认单元格
+      fire({
+        event: EVENTS.OnSheetInited,
+        args: [data.spread.getActiveSheet()],
+      });
+      // 重新绑定数据
+      handleDatas();
       if (dataSource) {
         zoom({
           el: paperWrapEl,
