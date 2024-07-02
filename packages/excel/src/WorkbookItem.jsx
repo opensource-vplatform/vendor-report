@@ -844,13 +844,16 @@ export default function (props) {
       data.pageInfo = inst;
       handlePage();
       data.spread.fromJSON(json);
-      // 重新重写默认单元格
-      fire({
-        event: EVENTS.OnSheetInited,
-        args: [data.spread.getActiveSheet()],
-      });
-      // 重新绑定数据
-      handleDatas();
+    
+      if (!!data.spread.getActiveSheet()) {
+          // 重新重写默认单元格
+        fire({
+          event: EVENTS.OnSheetInited,
+          args: [data.spread.getActiveSheet()],
+        });
+        // 重新绑定数据
+        handleDatas();
+      }
       if (dataSource) {
         zoom({
           el: paperWrapEl,
