@@ -222,10 +222,17 @@ export default class ParseReportJson {
       },
     };
   }
+  horizontalExpansion(pageInfos, templates) {
+    const { header, footer, content } = templates;
+    return { header, footer, content };
+  }
   render(pageInfos, templates) {
     //如果有横向扩展，则先横向扩展
+    const { header, footer, content } = this.horizontalExpansion(
+      pageInfos,
+      templates
+    );
 
-    const { header, footer, content } = templates;
     //需要分页
     if (pageInfos.pageArea) {
       function calculate(header, footer, content) {
@@ -413,7 +420,7 @@ export default class ParseReportJson {
         rowCount: 0,
       };
       this.genPageDataTables({
-        templates: header[1].template,
+        templates: header.template,
         pageInfos,
         sheetPage,
       });
