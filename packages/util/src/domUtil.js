@@ -63,8 +63,8 @@ export function getFitHeight(text, width, fontSize, fontFamily) {
 
 let _div_dom_1 = null;
 
-export function getFitFontSize(text, width, height, fontSize) {
-  if (_div_dom_1 != null) {
+export function getFitFontSize(text, width, height, fontSize, unit = 'px') {
+  if (_div_dom_1 == null) {
     _div_dom_1 = document.createElement('div');
     document.body.appendChild(_div_dom_1);
   }
@@ -75,7 +75,7 @@ export function getFitFontSize(text, width, height, fontSize) {
   _div_dom_1.innerHTML = text;
   let temp = fontSize;
   while (true) {
-    style.fontSize = temp + 'px';
+    style.fontSize = temp + unit;
     const h = _div_dom_1.getBoundingClientRect().height;
     if (h < height) {
       style.display = 'none';

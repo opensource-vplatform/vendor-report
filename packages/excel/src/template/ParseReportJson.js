@@ -1,4 +1,5 @@
 import {
+  getFitFontSize,
   getFitHeight,
   isObject,
 } from '@toone/report-util';
@@ -1005,16 +1006,22 @@ export default class ParseReportJson {
 
     Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
       const { bindingPath, tag, formula, style = {} } = _colDataTable;
+      let isUseNamespace = true;
       if (tag) {
         const jsonTag = JSON.parse(tag);
         const plugins = jsonTag?.plugins;
         if (Array.isArray(plugins)) {
-          const cellList = plugins.find(({ type }) => {
-            return type === 'cellList';
+          let rowHeightType = '';
+          plugins.forEach(({ config = {} }) => {
+            if (config?.rowHeight) {
+              rowHeightType = config?.rowHeight;
+            }
           });
 
-          if (cellList?.config?.rowHeight === 'autoFitByContent') {
+          if (rowHeightType === 'autoFitByContent') {
             style.wordWrap = true;
+          } else if (rowHeightType === 'autoFitByZoom') {
+            isUseNamespace = false;
           }
         }
       }
@@ -1022,7 +1029,8 @@ export default class ParseReportJson {
       if (
         _colDataTable.style &&
         typeof _colDataTable.style !== 'string' &&
-        !_colDataTable?.style?.parentName
+        !_colDataTable?.style?.parentName &&
+        isUseNamespace
       ) {
         const namedStyles = getVarName();
         this.namedStyles.push({
@@ -1195,6 +1203,21 @@ export default class ParseReportJson {
             colDataTable,
             colStr,
           });
+
+          //字体
+          const { fontSize, unit } = this.getFitFontSize({
+            tag,
+            style,
+            pageInfos,
+            colDataTable,
+            colStr,
+            height: rows?.size || 20,
+          });
+          if (fontSize) {
+            colDataTable.style = { ...(colDataTable.style || {}) };
+            colDataTable.style.fontSize = fontSize + unit;
+          }
+
           if (height > rowHeight) {
             rowHeight = height;
           }
@@ -1564,11 +1587,14 @@ export default class ParseReportJson {
       const jsonTag = JSON.parse(tag);
       const plugins = jsonTag?.plugins;
       if (Array.isArray(plugins)) {
-        const cellList = plugins.find(({ type }) => {
-          return type === 'cellList';
+        let rowHeightType = '';
+        plugins.forEach(({ config = {} }) => {
+          if (config?.rowHeight) {
+            rowHeightType = config?.rowHeight;
+          }
         });
 
-        if (cellList?.config?.rowHeight === 'autoFitByContent') {
+        if (rowHeightType === 'autoFitByContent') {
           const height = getFitHeight(
             colDataTable.value,
             pageInfos?.columns?.[colStr]?.size || 64,
@@ -1581,6 +1607,56 @@ export default class ParseReportJson {
       }
     }
     return rowHeight;
+  }
+  getFitFontSize({ tag, style, pageInfos, colDataTable, colStr, height }) {
+    let _style = {};
+    if (typeof style === 'string') {
+      const res = this.namedStyles.find(({ name }) => name === style);
+      if (res) {
+        _style = res;
+      }
+    } else if (style) {
+      _style = style;
+    }
+
+    let fontSize = null;
+    let unit = null;
+    if (tag) {
+      const jsonTag = JSON.parse(tag);
+      const plugins = jsonTag?.plugins;
+      if (Array.isArray(plugins)) {
+        let rowHeightType = '';
+        plugins.forEach(({ config = {} }) => {
+          if (config?.rowHeight) {
+            rowHeightType = config?.rowHeight;
+          }
+        });
+
+        if (rowHeightType === 'autoFitByZoom') {
+          let fontSizeStr = '9pt';
+          if (_style?.fontSize) {
+            if (Number.isFinite(Number(_style?.fontSize))) {
+              fontSizeStr = _style?.fontSize + 'pt';
+            } else {
+              fontSizeStr = _style?.fontSize;
+            }
+          }
+          const regex = /(\d+)(\D+)/;
+          const match = fontSizeStr.match(regex);
+          const number = match[1]; // 提取数字部分
+          unit = match[2]; // 提取单位部分
+
+          fontSize = getFitFontSize(
+            colDataTable.value,
+            pageInfos?.columns?.[colStr]?.size || 64,
+            height,
+            number,
+            unit
+          );
+        }
+      }
+    }
+    return { fontSize, unit };
   }
   calcTempAfterRenderHeight({
     dataTables,

@@ -938,7 +938,10 @@ export default function (props) {
                 Loading...
               </LoadingWrap>
             )}
-            <ExcelWrap ref={el}></ExcelWrap>
+            <ExcelWrap
+              ref={el}
+              style={{ opacity: data.isLoading ? 0 : 1 }}
+            ></ExcelWrap>
           </Paper>
         </PaperWrap>
       )}
