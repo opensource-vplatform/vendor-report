@@ -171,14 +171,6 @@ export default class ParseReportJson {
           Object.entries(columns).forEach(([colStr, { style }]) => {
             if (style && isObject(style)) {
               style.decoration = undefined;
-              /*const cellStyle = style.cellType;
-                            if(cellStyle&&cellStyle.typeName=="1"){
-                                //移除旧版本json中绑定样式设置
-                                const col = Number(colStr);
-                                sheet.getCell(row, col).cellType(undefined);
-                                const style = sheet.getStyle(row,col);
-                                style.decoration = undefined;
-                            }*/
             }
           });
         });
@@ -189,60 +181,50 @@ export default class ParseReportJson {
     this.dataSourceMap = [];
     this.templates = {
       header: {
-        1: {
-          template: [],
+        template: [],
+        height: 0,
+        allTableCodes: {},
+        totalArea: {
           height: 0,
-          allTableCodes: {},
+          dataTables: {},
         },
-        2: {
-          template: [],
+        groupSumArea: {
           height: 0,
-          allTableCodes: {},
-        },
-        3: {
-          template: [],
-          height: 0,
-          allTableCodes: {},
+          dataTables: {},
         },
       },
       footer: {
-        1: {
-          template: [],
+        template: [],
+        height: 0,
+        allTableCodes: {},
+        totalArea: {
           height: 0,
-          allTableCodes: {},
+          dataTables: {},
         },
-        2: {
-          template: [],
+        groupSumArea: {
           height: 0,
-          allTableCodes: {},
-        },
-        3: {
-          template: [],
-          height: 0,
-          allTableCodes: {},
+          dataTables: {},
         },
       },
       content: {
-        1: {
-          template: [],
+        template: [],
+        height: 0,
+        allTableCodes: {},
+        totalArea: {
           height: 0,
-          allTableCodes: {},
+          dataTables: {},
         },
-        2: {
-          template: [],
+        groupSumArea: {
           height: 0,
-          allTableCodes: {},
-        },
-        3: {
-          template: [],
-          height: 0,
-          allTableCodes: {},
+          dataTables: {},
         },
         dataLen: 0,
       },
     };
   }
   render(pageInfos, templates) {
+    //如果有横向扩展，则先横向扩展
+
     const { header, footer, content } = templates;
     //需要分页
     if (pageInfos.pageArea) {
@@ -266,12 +248,12 @@ export default class ParseReportJson {
         };
       }
 
-      let { template: headerTemplates } = header[3];
-      let { template: footerTemplates } = footer[3];
-      let { template: contentTemplates } = content[3];
+      let { template: headerTemplates } = header;
+      let { template: footerTemplates, height: footerHeight } = footer;
+      let { template: contentTemplates } = content;
 
       //计算内容区域的可用高度，不包含章合计和总计
-      let { contentHeight } = calculate(header[3], footer[3], content[3]);
+      let { contentHeight } = calculate(header, footer, content);
 
       //内容总高度，不包括头部和底部
       pageInfos.contentTotalHeight = contentHeight;
@@ -331,19 +313,29 @@ export default class ParseReportJson {
         //判断是否已经是最后一页
         if (!pageInfos.flag) {
           //只包含章合计
-          let tempInfo = footer[2];
+          let height = footer.groupSumArea.height + footerHeight;
+          const newTemplates = [...footerTemplates];
+          Object.entries(footer.groupSumArea.dataTables).forEach(
+            ([key, value]) => {
+              newTemplates[key] = value;
+            }
+          );
           if (pageInfos.isLastGroup) {
             //最后一组的最后一页的底部包含章合计和总计
-            tempInfo = footer[1];
+            height += footer.totalArea.height;
+            Object.entries(footer.totalArea.dataTables).forEach(
+              ([key, value]) => {
+                newTemplates[key] = value;
+              }
+            );
           }
 
           const { pageTotalHeight, pageHeight } = pageInfos;
-          const { height, template } = tempInfo;
           const remainderHeight = height % pageTotalHeight;
           diffHeight = pageTotalHeight - pageHeight - remainderHeight;
           if (diffHeight > 0 || pageInfos.hasHandleLastPage) {
             //如果剩余高度能渲染包含章合计的底部，则用包含章合计的底部模板渲染
-            footerTemplates = template;
+            footerTemplates = newTemplates;
           } else {
             //如果剩余高度不能渲染包含章合计的底部，则继续循环
             pageInfos.dataLen += 1;
@@ -372,7 +364,7 @@ export default class ParseReportJson {
             //2，多行填充
             const height = diffHeight - 10;
             if (height > 0) {
-              const tempHeight = content[3].height;
+              const tempHeight = content.height;
               const fillCount = Math.floor(height / tempHeight);
               this.fillData({
                 tempHeight,
@@ -608,15 +600,6 @@ export default class ParseReportJson {
     const dataLen = type === 'content' ? 1 : unionDatasource.getCount() || 1;
 
     for (let i = 0; i < dataLen; i++) {
-      //计算高度
-      /* dataTables.forEach(function ({ rows = {} }) {
-        //计算高度
-        if (rows.hasOwnProperty('size')) {
-          height += rows?.size;
-        } else {
-          height += 20;
-        }
-      }); */
       height += this.calcTempAfterRenderHeight({
         dataTables,
         unionDatasource,
@@ -624,41 +607,22 @@ export default class ParseReportJson {
         dataIndex: i,
       });
     }
-
-    //所有模板
-    let tempType = 1;
-    if (type === 'content') {
-      this.templates[type].dataLen = unionDatasource.getCount() || 1;
+    //如果不是章合计区域并且不是总计区域
+    if (!temp.isTotalArea && !temp.isGroupSumArea) {
+      this.templates[type].template.push(temp);
+      this.templates[type].height += height;
+      this.templates[type].allTableCodes[tableCodes] = tableCodes;
+    } else {
+      const areaKey = temp.isTotalArea ? 'totalArea' : 'groupSumArea';
+      this.templates[type][areaKey].height += height;
+      const len = this.templates[type].template.length;
+      this.templates[type][areaKey].dataTables[len] = temp;
+      this.templates[type].template.push(null);
     }
 
-    this.templates[type][tempType].template.push(temp);
-    this.templates[type][tempType].allTableCodes = {
-      ...this.templates[type][tempType].allTableCodes,
-      tableCodes,
-    };
-    this.templates[type][tempType].height += height;
-    tempType += 1;
-
-    if (!temp.isTotalArea) {
-      //不包含总计的模板
-
-      this.templates[type][tempType].template.push(temp);
-      this.templates[type][tempType].allTableCodes = {
-        ...this.templates[type][tempType].allTableCodes,
-        tableCodes,
-      };
-      this.templates[type][tempType].height += height;
-      tempType += 1;
-
-      //不包含章合计和总计的模板
-      if (!temp.isGroupSumArea) {
-        this.templates[type][tempType].template.push(temp);
-        this.templates[type][tempType].allTableCodes = {
-          ...this.templates[type][tempType].allTableCodes,
-          tableCodes,
-        };
-        this.templates[type][tempType].height += height;
-      }
+    //所有模板
+    if (type === 'content') {
+      this.templates[type].dataLen = unionDatasource.getCount() || 1;
     }
   }
   genTemplateFromSheet(sheet) {
@@ -913,14 +877,6 @@ export default class ParseReportJson {
                 const dataLen = unionDatasource.getCount() || 1;
 
                 for (let i = 0; i < dataLen; i++) {
-                  /*  dataTables.forEach(function ({ rows = {} }) {
-                    //计算高度
-                    if (rows.hasOwnProperty('size')) {
-                      height += rows?.size;
-                    } else {
-                      height += 20;
-                    }
-                  }); */
                   height += this.calcTempAfterRenderHeight({
                     dataTables,
                     unionDatasource,
@@ -938,6 +894,7 @@ export default class ParseReportJson {
           //强制打印时在当前行换页
           this.onAfterPage(pageInfos);
         }
+        debugger;
         this.render(pageInfos, templates);
       });
       if (pageInfos.sheetPrintPage) {
@@ -947,7 +904,6 @@ export default class ParseReportJson {
       }
       pageInfos.sheet.namedStyles = this.namedStyles;
       this.resetSheet(this.sheetPages[name].datas[0]);
-      //this.resetSheet(this.sheetPrintPages[name].datas[0]);
     });
   }
   parseRowDataTable(params) {
@@ -1519,6 +1475,9 @@ export default class ParseReportJson {
   genPageDataTables(params) {
     const { templates, pageInfos, sheetPage, sheetPrintPage } = params;
     templates.forEach((temp) => {
+      if (!temp) {
+        return;
+      }
       const {
         height: tempHeight,
         unionDatasource,
@@ -1709,6 +1668,9 @@ export default class ParseReportJson {
       pageInfos.flag = false;
     }
     templates.forEach((temp) => {
+      if (!temp) {
+        return;
+      }
       const { dataTables, unionDatasource, verticalAutoMergeRanges } = temp;
       const dataLen = pageInfos.dataLen || unionDatasource.getCount() || 1;
       pageInfos.dataLen = dataLen;
