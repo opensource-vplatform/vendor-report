@@ -183,7 +183,6 @@ export default class ParseReportJson {
       header: {
         template: [],
         height: 0,
-        allTableCodes: {},
         totalArea: {
           height: 0,
           dataTables: {},
@@ -196,7 +195,6 @@ export default class ParseReportJson {
       footer: {
         template: [],
         height: 0,
-        allTableCodes: {},
         totalArea: {
           height: 0,
           dataTables: {},
@@ -209,7 +207,6 @@ export default class ParseReportJson {
       content: {
         template: [],
         height: 0,
-        allTableCodes: {},
         totalArea: {
           height: 0,
           dataTables: {},
@@ -224,6 +221,10 @@ export default class ParseReportJson {
   }
   horizontalExpansion(pageInfos, templates) {
     const { header, footer, content } = templates;
+    debugger;
+    if (!this.isHorizontalExpansion) {
+      return { header, footer, content };
+    }
     return { header, footer, content };
   }
   render(pageInfos, templates) {
@@ -578,8 +579,7 @@ export default class ParseReportJson {
     return pageInfos;
   }
   collectTemplate(temp, type, columns = []) {
-    const { tableCodes, datas, allDatas, dataTables, dataPath, cellPlugins } =
-      temp;
+    const { datas, allDatas, dataTables, dataPath, cellPlugins } = temp;
 
     //生成联合数据源
     const setting = {
@@ -618,7 +618,6 @@ export default class ParseReportJson {
     if (!temp.isTotalArea && !temp.isGroupSumArea) {
       this.templates[type].template.push(temp);
       this.templates[type].height += height;
-      this.templates[type].allTableCodes[tableCodes] = tableCodes;
     } else {
       const areaKey = temp.isTotalArea ? 'totalArea' : 'groupSumArea';
       this.templates[type][areaKey].height += height;
@@ -901,7 +900,6 @@ export default class ParseReportJson {
           //强制打印时在当前行换页
           this.onAfterPage(pageInfos);
         }
-        debugger;
         this.render(pageInfos, templates);
       });
       if (pageInfos.sheetPrintPage) {
@@ -978,6 +976,9 @@ export default class ParseReportJson {
           plugins.forEach(({ config = {} }) => {
             if (config?.rowHeight) {
               rowHeightType = config?.rowHeight;
+            }
+            if (config?.direction === 'horizontal') {
+              this.isHorizontalExpansion = true;
             }
           });
 
