@@ -33,7 +33,7 @@ export default function (props) {
   return (
     <QueryContext.Consumer>
       {(ctx) => {
-        const { collapsed, appendValue, values, fireQuery, clearValues } = ctx;
+        const { collapsed, appendValue, values, fireQuery, clearValues,removeValue } = ctx;
         return (
           <Wrap style={{ display: collapsed ? 'none' : 'block' }}>
             <ItemsWrap
@@ -42,6 +42,7 @@ export default function (props) {
               }}
             >
               {items.map(({ colSpan = 1, ...others }, index) => {
+                const { datasource, code, label } = others.config;
                 return (
                   <ItemWrap
                     key={index}
@@ -51,14 +52,18 @@ export default function (props) {
                       {...others}
                       value={getItemValue(values, others.config)}
                       onChange={(val, text) => {
-                        const { datasource, code, label } = others.config;
-                        appendValue({
-                          label,
-                          text: text,
-                          value: val,
-                          datasource,
-                          code,
-                        });
+                        if(val==null){
+                          //值为null代表清空查询条件
+                          removeValue({datasource,code})
+                        }else{
+                          appendValue({
+                            label,
+                            text: text,
+                            value: val,
+                            datasource,
+                            code,
+                          });
+                        }
                       }}
                     ></Item>
                   </ItemWrap>

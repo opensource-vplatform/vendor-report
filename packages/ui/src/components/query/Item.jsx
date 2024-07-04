@@ -8,7 +8,7 @@ import Selectitem from './items/Selectitem';
 import TextItem from './items/TextItem';
 
 export default function(props){
-    const {type,config,onChange,value} = props;
+    const {type,config,onChange,onClear,value} = props;
     let children = null;
     if(type == 'text'){
         return <TextItem {...config} onChange={onChange} value={value}></TextItem>
@@ -25,7 +25,7 @@ export default function(props){
     }else if(type == 'checkbox'){
         return <CheckBoxItem {...config} onChange={onChange} value={value}></CheckBoxItem>
     }else if(type == 'date'){
-        return <DateItem {...config} onChange={onChange} value={value}></DateItem>
+        return <DateItem {...config} onChange={onChange} onClear={onClear} value={value}></DateItem>
     }
     return children;
 }

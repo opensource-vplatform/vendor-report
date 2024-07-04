@@ -9,7 +9,7 @@ import { TextInput } from '../Index';
 import DateComp from './Date';
 
 export default function (props) {
-  const { value, onChange } = props;
+  const { value, onChange,onClear } = props;
   const [data, setData] = useState({ value, open: false });
   const setValue = (val) => {
     if (val !== data) {
@@ -22,6 +22,7 @@ export default function (props) {
   const handleClear = (evt) => {
     setValue(null);
     evt.preventDefault();
+    onClear&&onClear();
   };
   return (
     <Popper
