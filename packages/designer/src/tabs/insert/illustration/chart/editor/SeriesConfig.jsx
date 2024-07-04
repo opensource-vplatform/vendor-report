@@ -46,10 +46,14 @@ function FieldValueConfig() {
   const cfg = config.valueSeriesConfig || {};
   const dispatch = useDispatch();
   const set = (values) => {
+    /*const valueSeriesConfig = { ...cfg, ...values };
+    if(!valueSeriesConfig.sumType){
+      valueSeriesConfig.sumType = 'sum';
+    }*/
     dispatch(
       setConfig({
         ...config,
-        valueSeriesConfig: { ...cfg, ...values },
+        valueSeriesConfig:{ ...cfg, ...values },
       })
     );
   };
@@ -90,11 +94,11 @@ function FieldNameConfig(props) {
   const datasource = config.datasource;
   const configs = config.nameSeriesConfigs || [];
   const dispatch = useDispatch();
-  const fieldCellStyle = {width:100,padding: '4px 4px'};
-  const operationCellStyle = {width:32,padding: '4px 4px'};
+  const fieldCellStyle = { width: 100, padding: '4px 4px' };
+  const operationCellStyle = { width: 32, padding: '4px 4px' };
   return (
     <Fragment>
-      <Table style={{fontSize: '12px'}}>
+      <Table style={{ fontSize: '12px' }}>
         <TableHeader>
           <TableRow>
             <TableCell style={fieldCellStyle}>字段名</TableCell>
@@ -110,12 +114,17 @@ function FieldNameConfig(props) {
                 <TableRow>
                   <TableCell style={fieldCellStyle}>
                     <Select
-                      wrapStyle={{width:100}}
+                      wrapStyle={{ width: 100 }}
                       value={fieldCode}
                       datas={toSelectOptions(dsList, datasource)}
-                      onChange={(val) => {
+                      onChange={(val,text) => {
                         const values = [...configs];
-                        values[index] = { fieldCode: val, seriesName, sumType };
+                        values[index] = {
+                          fieldCode: val,
+                          seriesName: seriesName ? seriesName : text,
+                          sumType,
+                        };
+
                         dispatch(
                           setConfig({
                             ...config,
@@ -128,7 +137,7 @@ function FieldNameConfig(props) {
                   <TableCell style={fieldCellStyle}>
                     <TextInput
                       value={seriesName}
-                      style={{height:24}}
+                      style={{ height: 24 }}
                       onChange={(val) => {
                         const values = [...configs];
                         values[index] = { fieldCode, seriesName: val, sumType };

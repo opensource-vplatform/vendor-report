@@ -1,3 +1,4 @@
+import { DateItem } from './Index';
 import ButtonGroupItem from './items/ButtonGroupItem';
 import CheckBoxItem from './items/CheckBoxItem';
 import FloatItem from './items/FloatItem';
@@ -23,6 +24,8 @@ export default function(props){
         return <RadioGroupItem {...config} onChange={onChange} value={value}></RadioGroupItem>
     }else if(type == 'checkbox'){
         return <CheckBoxItem {...config} onChange={onChange} value={value}></CheckBoxItem>
+    }else if(type == 'date'){
+        return <DateItem {...config} onChange={onChange} value={value}></DateItem>
     }
     return children;
 }

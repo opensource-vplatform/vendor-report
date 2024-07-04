@@ -1,28 +1,18 @@
-import styled from 'styled-components';
-
 import { CheckBox } from '../../form/Index';
-import { Title } from './Components';
+import { WithTitle } from './Components';
 
-const Wrap = styled.div`
-  display: flex;
-  align-items: center;
-`;
+const Component = WithTitle(CheckBox);
 export default function (props) {
   const {
     label = '布尔',
-    labelWidth = 80,
-    disabled = false,
-    value,
     onChange,
+    ...others
   } = props;
   return (
-    <Wrap>
-      <Title width={labelWidth} title={label} height={30}></Title>
-      <CheckBox
-        disabled={disabled}
-        value={value}
-        onChange={(val)=>onChange&&onChange(val,val ? '是':'否')}
-      ></CheckBox>
-    </Wrap>
+    <Component
+      {...others}
+      label={label}
+      onChange={(val) => onChange && onChange(val, val ? '是' : '否')}
+    ></Component>
   );
 }

@@ -30,14 +30,48 @@ const Span = styled.span`
   padding: 0px 4px;
 `;
 
+const Wrap = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 export const Title = function (props) {
   const { title = '', desc = '', width, height } = props;
   return (
-    <Label style={{ width, lineHeight: height+'px', height }}>
-      <TitleWrap title={desc ? desc:title}>
+    <Label style={{ width, lineHeight: height + 'px', height }}>
+      <TitleWrap title={desc ? desc : title}>
         <Span>{title}</Span>
       </TitleWrap>
       :
     </Label>
   );
+};
+
+export const WithTitle = function (Component, attr = {}) {
+  return (props) => {
+    const {
+      label = '标题',
+      labelWidth = 80,
+      disabled = false,
+      value,
+      onChange,
+      children,
+      ...others
+    } = props;
+    return (
+      <Wrap>
+        <Title width={labelWidth} title={label} height={30}></Title>
+        <Component
+          value={value}
+          onChange={(val) => onChange && onChange(val, val)}
+          style={{ flex: 1, borderRadius: 0, height: 30 }}
+          disabled={disabled}
+          {...others}
+          {...attr}
+        >
+          {children}
+        </Component>
+      </Wrap>
+    );
+  };
 };

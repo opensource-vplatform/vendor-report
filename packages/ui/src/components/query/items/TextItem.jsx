@@ -1,30 +1,16 @@
-import styled from 'styled-components';
-
 import { TextInput } from '../../form/Index';
-import { Title } from './Components';
+import { WithTitle } from './Components';
 
-const Wrap = styled.div`
-  display: flex;
-  align-items: center;
-`;
+const Component = WithTitle(TextInput, { maxLength: 99999 });
+
 export default function (props) {
-  const {
-    label = '文本',
-    labelWidth = 80,
-    disabled = false,
-    value,
-    onChange,
-  } = props;
+  const { label = '文本', onChange, value, ...others } = props;
   return (
-    <Wrap>
-      <Title width={labelWidth} title={label} height={30}></Title>
-      <TextInput
-        style={{ flex: 1, borderRadius: 0, height: 30 }}
-        disabled={disabled}
-        value={value==null ? '':value}
-        maxLength={99999}
-        onChange={(val)=>onChange&&onChange(val,val)}
-      ></TextInput>
-    </Wrap>
+    <Component
+      {...others}
+      label={label}
+      value={value == null ? '' : value}
+      onChange={(val) => onChange && onChange(val, val)}
+    ></Component>
   );
 }

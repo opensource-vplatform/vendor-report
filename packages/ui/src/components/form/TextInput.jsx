@@ -18,7 +18,7 @@ const Wrap = styled.div`
   box-sizing: border-box;
   cursor: pointer;
   &[data-disabled='false']:hover {
-      border: solid 1px #999999;
+    border: solid 1px #999999;
   }
   &[data-disabled='true'] {
     outline: none !important;
@@ -36,7 +36,7 @@ const Input = styled.input`
   outline: none !important ;
   flex: 1;
   &:focus-visible {
-      outline: none;
+    outline: none;
   }
   &:disabled {
     cursor: not-allowed;
@@ -55,7 +55,7 @@ export default function Index(props) {
     placeholder = '',
     minWidth,
     width,
-    SuffixIcon = {},
+    SuffixIcon = null,
     maxLength = 20,
     style = {},
   } = props;
@@ -63,8 +63,6 @@ export default function Index(props) {
     return { innerValue: value, value };
   });
   const ref = useRef();
-  const { Component: SuffixComponent, props: SuffixComponentProps = {} } =
-    SuffixIcon;
   useEffect(() => {
     setData(() => {
       return {
@@ -83,7 +81,7 @@ export default function Index(props) {
   };
   const handleInput = (evt) => {
     setVal(evt.target.value);
-    onInput&&onInput(evt.target.value);
+    onInput && onInput(evt.target.value);
   };
   const handleBlur = (evt) => {
     const newVal = evt.target.value;
@@ -114,9 +112,7 @@ export default function Index(props) {
         disabled={disabled}
         placeholder={placeholder}
       ></Input>
-      {SuffixComponent && (
-        <SuffixComponent {...SuffixComponentProps}></SuffixComponent>
-      )}
+      {SuffixIcon}
     </Wrap>
   );
 }

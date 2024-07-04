@@ -1,10 +1,10 @@
-import { Integer } from '../../form/Index';
+import { Date } from '../../form/Index';
 import { WithTitle } from './Components';
 
-const Component = WithTitle(Integer);
+const Component = WithTitle(Date);
 
 export default function (props) {
-  const { label = '整数', onChange, ...others } = props;
+  const { label = '日期', onChange, ...others } = props;
   return (
     <Component
       {...others}
