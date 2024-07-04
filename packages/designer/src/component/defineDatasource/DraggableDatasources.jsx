@@ -109,6 +109,9 @@ function clearContents(params) {
               if (activeSheet.getBindingPath(rowIndex, colIndex)) {
                 activeSheet.setBindingPath(rowIndex, colIndex, '');
                 activeSheet.getCell(rowIndex, colIndex).tag('');
+              } else if (activeSheet.getCell(rowIndex, colIndex).tag()) {  //清除单元格插件
+                activeSheet.getCell(rowIndex, colIndex).tag('');
+                activeSheet.resumePaint();
               }
 
               //清除角标

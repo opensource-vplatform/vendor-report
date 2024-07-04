@@ -10,9 +10,8 @@ import {
   getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
 import {
-  getDecimalsFieldFormatter,
-  getIntegerFieldFormatter,
-  getTextFieldFormatter,
+  getFieldTypeFormatter,
+  getTextFieldDataSourceFormatter,
 } from '@utils/configUtil';
 import { getNamespace } from '@utils/spreadUtil';
 import { getDefineByBindingPath } from '@utils/tableUtil';
@@ -459,7 +458,7 @@ function getOffsetFromBody(element) {
   let offsetLeft = 0,
     offsetTop = 0;
 
-  for (let currentEle = element; currentEle; ) {
+  for (let currentEle = element; currentEle;) {
     offsetLeft += currentEle.offsetLeft;
     offsetTop += currentEle.offsetTop;
     currentEle = currentEle.offsetParent;
@@ -607,22 +606,19 @@ export function bindingPath(params) {
   cell.bindingPath(path); //绑定字段要放在设置单元格之前，否则造成DefaultCell中获取绑定字段获取不到问题  add by xiedh;
   cell.value(value);
   //开始设置字段默认格式
-  const defines = getDefineByBindingPath(sheet.getParent(), path);
-  const define = defines.pop();
-  if (define) {
-    const type = define.type;
-    let formatter;
-    if (type == 'text') {
-      formatter = getTextFieldFormatter(context);
-    } else if (type == 'integer') {
-      formatter = getIntegerFieldFormatter(context);
-    } else if (type == 'decimals') {
-      formatter = getDecimalsFieldFormatter(context);
-    }
-    if (formatter) {
-      cell.formatter(formatter);
-    }
-  }
+  // const defines = getDefineByBindingPath(sheet.getParent(), path);
+  // const define = defines.pop();
+  // if (define) {
+  //   const type = define.type;
+  //   let formatter;
+  //   formatter = getTextFieldDataSourceFormatter(context, path);
+  //   if (!formatter)
+  //     formatter = getFieldTypeFormatter(context, type);
+
+  //   if (formatter) {
+  //     cell.formatter(formatter);
+  //   }
+  // }
   /*let style = sheet.getStyle(row, col);
     if (!style) {
         style = new GC.Spread.Sheets.Style();

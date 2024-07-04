@@ -41,7 +41,6 @@ export default function () {
                 value:null,
                 sumType:"sum"
               },
-              valueSeriesConfig: [],
             })
           );
         }}

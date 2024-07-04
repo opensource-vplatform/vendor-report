@@ -1,22 +1,10 @@
-import {
-  Fragment,
-  useContext,
-  useEffect,
-} from 'react';
+import { Fragment, useContext, useEffect } from 'react';
 
 import axios from 'axios';
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  bind,
-  EVENTS,
-  fire,
-  hasBind,
-} from '@event/EventManager';
+import { bind, EVENTS, fire, hasBind } from '@event/EventManager';
 import { setMode } from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
@@ -31,11 +19,7 @@ import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
 import { ThemeContext } from '@toone/report-excel';
-import {
-  Button,
-  Tab,
-  Tabs,
-} from '@toone/report-ui';
+import { Button, Tab, Tabs } from '@toone/report-ui';
 import { isArray } from '@toone/report-util';
 import { fireCellEnter } from '@utils/eventUtil';
 
@@ -43,11 +27,7 @@ import DesignerContext from './DesignerContext';
 import { GlobalComponent } from './Global';
 import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
 import VerticalAlignTop from './icons/arrow/VerticalAlignTop';
-import {
-  listenRedo,
-  listenSave,
-  listenUndo,
-} from './Listener';
+import { listenRedo, listenSave, listenUndo } from './Listener';
 import { getBindingPaths } from './spread';
 import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
@@ -60,6 +40,7 @@ import {
 } from './utils/configUtil';
 import { handleEventPrmiseResult } from './utils/eventUtil';
 import { parseStyle } from './utils/styleUtil';
+import { initSlice as initPersistingDataSlice } from '@store/persistingDataSlice';
 
 const FileTabTitle = styled.a`
   padding: 6px 12px 6px 12px;
@@ -103,19 +84,83 @@ const SparklinesNavItem = WithNavItem(SparklinesTab);
 const InsertNavItem = WithNavItem(InsertTab);
 const LayoutNavItem = WithNavItem(LayoutTab);
 
+const getbindingPathsMetadata = (spread, finalDsList) => {
+  const bindingPathsMetadatas = {};
+  const datasourceNetadatas = finalDsList.reduce((acc, cur) => {
+    const { code } = cur;
+    acc[code] = { ...cur };
+    if (Array.isArray(acc[code].children)) {
+      acc[code]['metadata'] = {};
+      acc[code].children.forEach((child) => {
+        acc[code]['metadata'][child.code] = child;
+      });
+    }
+    return acc;
+  }, {});
+  const appendUsedDatasource = (bindingPath) => {
+    if (bindingPath) {
+      let code = bindingPath;
+      let field = '';
+      if (bindingPath.includes('.')) {
+        code = bindingPath.split('.')[0];
+        field = bindingPath.split('.')[1];
+      }
+      try {
+        bindingPathsMetadatas[bindingPath] = bindingPath.includes('.')
+          ? datasourceNetadatas[code]['metadata'][field]['type']
+          : datasourceNetadatas[code]['type'];
+      } catch (e) {
+        console.log('appendUsedDatasource', e);
+      }
+    }
+  };
+  spread.sheets.forEach(function (sheet) {
+    const sheetJson = sheet.toJSON();
+    //收集表格已经绑定的数据源编码
+    if (isArray(sheetJson.tables)) {
+      sheetJson.tables.forEach(({ bindingPath }) => {
+        appendUsedDatasource(bindingPath);
+      });
+    }
+    //收集单元格已经绑定的数据源编码
+    const dataTable = sheetJson?.data?.dataTable;
+    if (dataTable && typeof dataTable === 'object') {
+      Object.values(dataTable).forEach((cols) => {
+        if (cols) {
+          Object.values(cols).forEach(({ bindingPath, tag }) => {
+            appendUsedDatasource(bindingPath);
+            if (tag) {
+              //从插件配置中收集绑定信息
+              try {
+                const obj = JSON.parse(tag);
+                const plugins = obj.plugins;
+                const paths = getBindingPaths(plugins);
+                paths.forEach((bindingPath) => {
+                  appendUsedDatasource(bindingPath);
+                });
+              } catch (e) {}
+            }
+          });
+        }
+      });
+    }
+  });
+  return bindingPathsMetadatas;
+};
+
 function parseUsedDatasource(spread, finalDsList) {
   const dsCodes = [];
-  const appendUsedDatasource = (bindingPath)=>{
-    if(bindingPath){
+  const appendUsedDatasource = (bindingPath) => {
+    if (bindingPath) {
       let code = bindingPath;
       if (bindingPath.includes('.')) {
         code = bindingPath.split('.')[0];
       }
-      if(!dsCodes.includes(code)){
+      if (!dsCodes.includes(code)) {
         dsCodes.push(code);
       }
     }
-  }
+  };
   spread.sheets.forEach(function (sheet) {
     const sheetJson = sheet.toJSON();
     //收集表格已经绑定的数据源编码
@@ -132,7 +177,7 @@ function parseUsedDatasource(spread, finalDsList) {
     if (dataTable && typeof dataTable === 'object') {
       Object.values(dataTable).forEach((cols) => {
         if (cols) {
-          Object.values(cols).forEach(({ bindingPath,tag }) => {
+          Object.values(cols).forEach(({ bindingPath, tag }) => {
             appendUsedDatasource(bindingPath);
             /*if (bindingPath && !dsCodes.includes(bindingPath)) {
               let code = bindingPath;
@@ -141,15 +186,16 @@ function parseUsedDatasource(spread, finalDsList) {
               }
               dsCodes.push(code);
             }*/
-            if(tag){//从插件配置中收集绑定信息
-              try{
+            if (tag) {
+              //从插件配置中收集绑定信息
+              try {
                 const obj = JSON.parse(tag);
                 const plugins = obj.plugins;
                 const paths = getBindingPaths(plugins);
-                paths.forEach(bindingPath=>{
+                paths.forEach((bindingPath) => {
                   appendUsedDatasource(bindingPath);
                 });
-              }catch(e){}
+              } catch (e) {}
             }
           });
         }
@@ -181,13 +227,17 @@ export default function () {
       evt.preventDefault();
     }
     if (spread) {
+      const metadatas = getbindingPathsMetadata(spread, finalDsList || []);
       const json = {
         reportJson: spread.toJSON(),
         context: {
           datasourceSlice,
           tableDesignSlice,
           wizardSlice,
-          persistingDataSlice,
+          persistingDataSlice: {
+            ...persistingDataSlice,
+            metadatasType: metadatas,
+          },
         },
       };
       const define = parseUsedDatasource(spread, finalDsList);
@@ -230,7 +280,7 @@ export default function () {
       event: EVENTS.onPreview,
     });
     if (flag) {
-      const define = parseUsedDatasource(spread, finalDsList);
+     const define = parseUsedDatasource(spread, finalDsList);
       const result = fire({
         event: EVENTS.onPreview,
         args: [
@@ -273,6 +323,14 @@ export default function () {
       }
       postPreview(datas);
     }
+    const metadatas = getbindingPathsMetadata(spread, finalDsList || []);
+    dispatch(
+      initPersistingDataSlice({
+        slice: {
+          metadatasType: metadatas,
+        },
+      })
+    );
   };
 
   const themeContext = useContext(ThemeContext);

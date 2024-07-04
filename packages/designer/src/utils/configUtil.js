@@ -46,29 +46,29 @@ export const getNavToolbarIsShow = function (context, attr) {
   return context?.conf?.nav?.toolbar?.[attr] === false;
 };
 
+
 /**
- * 获取整数字段默认格式
+ * 获取类型字段默认格式
  * @param {*} context
  * @returns
  */
-export const getIntegerFieldFormatter = function (context) {
-  return context?.conf?.defaults?.formatter?.integer;
+export const getFieldTypeFormatter = function (context, type) {
+  return context?.conf?.defaults?.formatter?.type?.[type];
 };
 
 /**
- * 获取小数字段默认格式
+ * 获取绑定字段默认格式
  * @param {*} context
  * @returns
  */
-export const getDecimalsFieldFormatter = function (context) {
-  return context?.conf.defaults?.formatter?.decimals;
-};
-
-/**
- * 获取文本字段默认格式
- * @param {*} context
- * @returns
- */
-export const getTextFieldFormatter = function (context) {
-  return context?.conf?.defaults?.formatter?.text;
+export const getTextFieldDataSourceFormatter = function (context, fullPath) {
+  if (!fullPath) {
+    return;
+  }
+  let formatter = context?.conf?.defaults?.formatter?.dataSource?.[fullPath];
+  if (fullPath.split('.').length > 0) {
+    formatter = context?.conf?.defaults?.formatter?.dataSource;
+    fullPath.split('.').forEach(path => (formatter = formatter?.[path]));
+  }
+  return formatter;
 };

@@ -1,19 +1,10 @@
 import { useContext } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  EVENTS,
-  fire,
-} from '@event/EventManager';
-import {
-  Workbook,
-  Worksheet,
-} from '@toone/report-excel';
+import { EVENTS, fire } from '@event/EventManager';
+import { Workbook, Worksheet } from '@toone/report-excel';
 import { Button } from '@toone/report-ui';
 import { isArray } from '@toone/report-util';
 import {
@@ -231,6 +222,14 @@ export default function (props) {
           isShowBtnToolbar={isShowToolbar}
           persistingDataSlice={persistingDataSlice}
           onQuery={props.onQuery}
+          // onDatasourceFormatterHandler={(handler) => {
+          //   handler().then(
+          //     ({ setDataSourceFormatter, delDataSourceFormatter }) => {
+          //       window.setDataSourceFormatter = setDataSourceFormatter;
+          //       window.delDataSourceFormatter = delDataSourceFormatter;
+          //     }
+          //   );
+          // }}
         >
           <Worksheet></Worksheet>
         </Workbook>
