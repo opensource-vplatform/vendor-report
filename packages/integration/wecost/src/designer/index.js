@@ -103,6 +103,13 @@ const enhanceMetadata = function (metadata) {
 };
 
 (async () => {
+  if (typeof JWebTop !== 'undefined')
+    window.invokeByDLL = function (exeScript) {
+      exeScript;
+    };
+  addEventListener('JWebTopReady', function () {
+    JWebTop.inited = true;
+  });
   const res = await request('queryAvailableFonts')
   const fonts = res?.data?.fonts || [];
   const designer = new Designer({
@@ -302,5 +309,6 @@ const enhanceMetadata = function (metadata) {
 
   //设计器挂载到指定dom元素
   designer.mount(document.getElementById('app'));
+
 })()
 

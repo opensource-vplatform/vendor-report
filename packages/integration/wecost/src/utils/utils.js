@@ -182,17 +182,24 @@ const call = (requestJson, resolve) => {
       }
     })
   else {
-    const index = callback_index++;
-    window[`JWebTopCallback_${index}`] = function (response) {
-      try {
-        resolve(JSON.parse(response));
-      } catch (e) {
-        console.log("请求失败：" + e);
-      } finally {
-        delete window[`JWebTopCallback_${index}`]
+    const handler = () => {
+      if (!window.JWebTop.inited) {
+        setTimeout(handler, 100);
+        return;
       }
+      const index = callback_index++;
+      window[`JWebTopCallback_${index}`] = function (response) {
+        try {
+          resolve(response);
+        } catch (e) {
+          console.log("请求失败：" + e);
+        } finally {
+          delete window[`JWebTopCallback_${index}`]
+        }
+      }
+      JWebTop.invokeRemote_CallBack(requestJson, `JWebTopCallback_${index}`)
     }
-    JWebTop.invokeRemote_CallBack(requestJson, `JWebTopCallback_${index}`)
+    handler();
   }
 }
 

@@ -60,8 +60,14 @@ const getError = function (result) {
   return null;
 };
 
+if (typeof JWebTop !== 'undefined')
+  window.invokeByDLL = function (exeScript) {
+    exeScript;
+  };
+
 export default function () {
   const ref = useRef(null);
+
   const progressRef = useRef(null);
   window.progressRef = progressRef;
   const [data, setData] = useState({
@@ -100,6 +106,9 @@ export default function () {
   };
   const isPrint = getParameter('isPrint') == '1';
   useEffect(() => {
+    addEventListener('JWebTopReady', function () {
+      JWebTop.inited = true;
+    });
     if (ref.current) {
       request('queryReportConfig')
         .then((config) => {
@@ -340,7 +349,6 @@ window.tooneReport = {
 
       // const res = await request('queryAvailableFonts')
       // const fonts = res?.data?.fonts || [];
-
 
       // 注册字体...
       const requestFontFamily = [...fontFamaly].map((item) =>
