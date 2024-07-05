@@ -13,10 +13,6 @@ import RowHeight from '@icons/cell/RowHeight';
 import SettingIcon from '@icons/cell/Setting';
 import { isFunction } from '@toone/report-util';
 import { exeCommand } from '@utils/spreadUtil';
-import {
-  getActiveIndexBySpread,
-  getCellTagPlugin,
-} from '@utils/worksheetUtil';
 
 import Dialog from './Dialog';
 
@@ -211,14 +207,14 @@ export default function () {
         value={data.menuValue}
         menus={Cell_Setting_Menus}
         onNodeClick={handleNodeClick}
-        onVisibleChange={() => {
+        /*onVisibleChange={(visible) => {
           const { sheet, row, col } = getActiveIndexBySpread(spread);
           const plugin = getCellTagPlugin(sheet, row, col, 'autoFitRow');
           setData({
             ...data,
             menuValue: plugin ? plugin.config.type : null,
           });
-        }}
+        }}*/
       ></VIconTitleWithDropdown>
     </Fragment>
   );
