@@ -76,8 +76,8 @@ function Copy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-function getOldRowHeight(rows, row) {
-  return rows?.[row] || { size: 20 };
+function getOldRowHeight(rows, row, rowHeight = 20) {
+  return rows?.[row] || { size: rowHeight };
 }
 
 function getRowRules({ rules, row }) {
@@ -217,6 +217,7 @@ export default class ParseReportJson {
         },
         dataLen: 0,
       },
+      datas: {},
     };
   }
   horizontalExpansion(pageInfos, templates) {
@@ -225,6 +226,139 @@ export default class ParseReportJson {
     if (!this.isHorizontalExpansion) {
       return { header, footer, content };
     }
+
+    const { columnCount, columns } = pageInfos.sheet;
+    const newColumns = [];
+    const columnsUnionDatasource = {};
+    Object.entries(this.horizontalExpansionInfos.columns).forEach(
+      ([key, { tableCodes, cellPlugins, dataPath }]) => {
+        const datas = {};
+        const setting = {
+          ...this.setting,
+          cellPlugins,
+        };
+        Object.keys(tableCodes).forEach((tableCode) => {
+          datas[tableCode] = templates.datas[tableCode];
+        });
+        const unionDatasource = new UnionDatasource(dataPath, setting);
+        unionDatasource.load(datas);
+        columnsUnionDatasource[key] = unionDatasource;
+      }
+    );
+
+    const tempKeys = ['header', 'content', 'footer'];
+    let maxColumnCount = 0;
+    tempKeys.forEach((tempKey) => {
+      const tempInfos = templates[tempKey];
+      const { template } = tempInfos;
+      template.forEach((temp) => {
+        if (temp) {
+          const { dataTables = [] } = temp;
+          dataTables.forEach((dataTableInfos) => {
+            const {
+              rows = {},
+              rowDataTable,
+              spans = [],
+              rules = [],
+              autoMergeRanges = [],
+            } = dataTableInfos;
+            dataTableInfos.rowDataTable = {};
+            dataTableInfos.rules = [];
+            const dataTable = { ...rowDataTable };
+            let newColumnCount = 0;
+            for (let col = 0; col < columnCount; col++) {
+              const _colDataTable = dataTable[col];
+              //条件规则
+              const newRules = rules.filter((rule) => {
+                const ranges = rule.ranges || [];
+                return ranges.some((range) => {
+                  return range.col <= col && col < range.col + range.colCount;
+                });
+              });
+              if (newColumnCount < col) {
+                newColumnCount = col;
+              }
+              const colDataTable = { ..._colDataTable };
+              const { bindingPath, tag, style } = colDataTable;
+              const unionDatasource = columnsUnionDatasource[col];
+              if (unionDatasource) {
+                const dataLen = unionDatasource.getCount();
+                let isHorizontalExpansion = false;
+                if (tag) {
+                  const jsonTag = JSON.parse(tag);
+                  const plugins = jsonTag?.plugins;
+                  if (Array.isArray(plugins)) {
+                    plugins.forEach(({ config = {} }) => {
+                      if (config?.direction === 'horizontal') {
+                        isHorizontalExpansion = true;
+                      }
+                    });
+                  }
+                }
+
+                //当前单元格是否是横向扩展
+                if (isHorizontalExpansion) {
+                  for (let i = 0; i < dataLen; i++) {
+                    const colDataTable = { ..._colDataTable };
+                    if (bindingPath?.includes?.('.')) {
+                      const [tableCode, fieldCode] = bindingPath.split('.');
+                      delete colDataTable.bindingPath;
+                      const { type, value: newVlaue } =
+                        unionDatasource.getValue(tableCode, fieldCode, i);
+                      if (type === 'text') {
+                        colDataTable.value = newVlaue;
+                      }
+                    }
+                    dataTableInfos.rowDataTable[newColumnCount] = colDataTable;
+                    if (columns[col]) {
+                      newColumns[newColumnCount] = columns[col];
+                    }
+                    newRules.forEach((rule) => {
+                      const ranges = rule.ranges || [];
+                      ranges.forEach((range) => {
+                        if (
+                          range.col <= col &&
+                          col < range.col + range.colCount
+                        ) {
+                          range.colCount += 1;
+                        }
+                      });
+                    });
+                    newColumnCount++;
+                  }
+                } else {
+                  for (let i = 0; i < dataLen; i++) {
+                    const colDataTable = { ..._colDataTable };
+                    dataTableInfos.rowDataTable[newColumnCount] = colDataTable;
+                    if (columns[col]) {
+                      newColumns[newColumnCount] = columns[col];
+                    }
+                    newColumnCount++;
+                  }
+                }
+              } else {
+                dataTableInfos.rowDataTable[newColumnCount] =
+                  colDataTable || {};
+                if (columns[col]) {
+                  newColumns[newColumnCount] = columns[col];
+                }
+                newColumnCount++;
+              }
+              dataTableInfos.rules.push(...newRules);
+            }
+
+            if (newColumnCount > maxColumnCount) {
+              maxColumnCount = newColumnCount;
+            }
+          });
+        }
+      });
+    });
+    if (maxColumnCount > columnCount) {
+      pageInfos.sheet.columnCount = maxColumnCount;
+    }
+    pageInfos.sheet.columns = newColumns;
+    debugger;
     return { header, footer, content };
   }
   render(pageInfos, templates) {
@@ -233,7 +367,7 @@ export default class ParseReportJson {
       pageInfos,
       templates
     );
-
+    debugger;
     //需要分页
     if (pageInfos.pageArea) {
       function calculate(header, footer, content) {
@@ -448,7 +582,7 @@ export default class ParseReportJson {
       }
 
       //行高
-      if (tempHeight != 20) {
+      if (tempHeight != pageInfos.defaults.rowHeight) {
         sheetPage.rows[sheetPage.rowCount] = {
           size: tempHeight,
         };
@@ -494,6 +628,13 @@ export default class ParseReportJson {
       },
       colHeaderRowInfos = [],
       columns,
+      defaults = {
+        colHeaderRowHeight: 20,
+        colWidth: 62,
+        rowHeaderColWidth: 40,
+        rowHeight: 20,
+        _isExcelDefaultColumnWidth: false,
+      },
     } = sheet;
 
     const templateInfo = this.tempConfig?.[name];
@@ -530,10 +671,10 @@ export default class ParseReportJson {
     this.paper.paddingLeft = marginLeft;
     this.paper.paddingRight = marginRight;
 
-    let defaultHeaderHeight = 20;
+    let defaultHeaderHeight = defaults.colHeaderRowHeight;
     if (colHeaderRowInfos.length > 0) {
       const height = colHeaderRowInfos.reduce((res, cur) => {
-        let size = 20;
+        let size = defaults.rowHeight;
         if (cur.hasOwnProperty('size')) {
           size = cur.size;
         }
@@ -574,6 +715,7 @@ export default class ParseReportJson {
       lastSpans: [],
       lastDataTable: {},
       dataIndex: 0,
+      defaults,
     };
 
     return pageInfos;
@@ -605,7 +747,7 @@ export default class ParseReportJson {
     //计算高度
     let height = 0;
     const dataLen = type === 'content' ? 1 : unionDatasource.getCount() || 1;
-
+    this.templates.datas = { ...this.templates.datas, ...datas };
     for (let i = 0; i < dataLen; i++) {
       height += this.calcTempAfterRenderHeight({
         dataTables,
@@ -795,10 +937,11 @@ export default class ParseReportJson {
       if (isSelected) {
         this.activeSheetName = name;
       }
-
+      this.horizontalExpansionInfos = {
+        columns: {},
+      };
       this.initTempates();
       this.genTemplateFromSheet(sheet);
-
       const templateInfo = this.tempConfig[name];
       let sheetNames = [name];
       let sheetDatas = {};
@@ -858,6 +1001,7 @@ export default class ParseReportJson {
                   ...datas,
                   [tableCode]: pageInfos.groupDatas,
                 };
+                this.templates.datas[tableCode] = pageInfos.groupDatas;
                 pageInfos.unionDatasourceDatas[sheetName] = newDatas;
                 const oldCount = unionDatasource.getCount();
                 unionDatasource.load(newDatas);
@@ -918,6 +1062,13 @@ export default class ParseReportJson {
       data = {},
       rows = {} /* 行高 */,
       conditionalFormats = {},
+      defaults = {
+        colHeaderRowHeight: 20,
+        colWidth: 62,
+        rowHeaderColWidth: 40,
+        rowHeight: 20,
+        _isExcelDefaultColumnWidth: false,
+      },
     } = sheet;
     const rules = conditionalFormats?.rules || [];
     const dataTable = data?.dataTable || {};
@@ -962,12 +1113,13 @@ export default class ParseReportJson {
     dataTableInfos.spans.push(...rowSpans);
 
     //行高等信息
-    dataTableInfos.rows = getOldRowHeight(rows, row);
+    dataTableInfos.rows = getOldRowHeight(rows, row, defaults.rowHeight);
     result.height = dataTableInfos?.rows?.size;
 
     Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
       const { bindingPath, tag, formula, style = {} } = _colDataTable;
       let isUseNamespace = true;
+      let isHorizontalExpansion = false;
       if (tag) {
         const jsonTag = JSON.parse(tag);
         const plugins = jsonTag?.plugins;
@@ -978,10 +1130,35 @@ export default class ParseReportJson {
               rowHeightType = config?.rowHeight;
             }
             if (config?.direction === 'horizontal') {
-              this.isHorizontalExpansion = true;
+              isHorizontalExpansion = true;
             }
           });
 
+          //当前单元格是否是横向扩展
+          if (isHorizontalExpansion) {
+            this.isHorizontalExpansion = true;
+            const tableCode = bindingPath.split('.')[0];
+            this.horizontalExpansionInfos.columns[colStr] =
+              this.horizontalExpansionInfos.columns[colStr] || {};
+            this.horizontalExpansionInfos.columns[colStr].tableCodes =
+              this.horizontalExpansionInfos.columns[colStr].tableCodes || {};
+            this.horizontalExpansionInfos.columns[colStr].tableCodes[
+              tableCode
+            ] = true;
+            this.horizontalExpansionInfos.columns[colStr].dataPath =
+              this.horizontalExpansionInfos.columns[colStr].dataPath || [];
+            this.horizontalExpansionInfos.columns[colStr].dataPath.push(
+              bindingPath
+            );
+            this.horizontalExpansionInfos.columns[colStr].cellPlugins =
+              this.horizontalExpansionInfos.columns[colStr].cellPlugins || [];
+            this.horizontalExpansionInfos.columns[colStr].cellPlugins.push({
+              plugins,
+              bindingPath,
+            });
+
+            this.templates.datas[tableCode] = this.datas[tableCode] || [];
+          }
           if (rowHeightType === 'autoFitByContent') {
             style.wordWrap = true;
           } else if (rowHeightType === 'autoFitByZoom') {
@@ -1008,11 +1185,15 @@ export default class ParseReportJson {
       let isBindEntity = bindingPath?.includes?.('.');
 
       if (isBindEntity) {
-        result.dataPath.push(bindingPath);
         const tableCode = bindingPath.split('.')[0];
-        result.tableCodes[tableCode] = true;
-        result.datas[tableCode] = this.datas[tableCode] || [];
-        result.allDatas[tableCode] = this.datas[tableCode] || [];
+
+        if (!isHorizontalExpansion) {
+          result.dataPath.push(bindingPath);
+          result.tableCodes[tableCode] = true;
+          result.datas[tableCode] = this.datas[tableCode] || [];
+          result.allDatas[tableCode] = this.datas[tableCode] || [];
+        }
+
         const span = rowSpans.find((span) => span.col === col) || {
           rowCount: 1,
           colCount: 1,
@@ -1032,7 +1213,7 @@ export default class ParseReportJson {
             });
           }
           const plugins = jsonTag.plugins;
-          if (Array.isArray(plugins)) {
+          if (Array.isArray(plugins) && !isHorizontalExpansion) {
             result.cellPlugins.push({
               plugins,
               bindingPath,
@@ -1108,7 +1289,15 @@ export default class ParseReportJson {
   }
 
   handleDataTable(params) {
-    const { pageInfos, sheetPage, sheetPrintPage, temp, i, type } = params;
+    const {
+      pageInfos,
+      sheetPage,
+      sheetPrintPage,
+      temp,
+      i,
+      type,
+      isRetainHorizontalExpansionData,
+    } = params;
     const { page, lastDataTable, dataIndex } = pageInfos;
     const {
       dataTables,
@@ -1175,7 +1364,7 @@ export default class ParseReportJson {
             pageInfos,
             colDataTable,
             colStr,
-            height: rows?.size || 20,
+            height: rows?.size || pageInfos?.defaults?.rowHeight,
           });
           if (fontSize) {
             colDataTable.style = { ...(colDataTable.style || {}) };
@@ -1198,6 +1387,7 @@ export default class ParseReportJson {
           );
 
           let hasRuntimePlugins = false;
+          let isHorizontalExpansion = false;
           if (tag) {
             const tagObj = JSON.parse(tag);
 
@@ -1245,6 +1435,13 @@ export default class ParseReportJson {
                 }
                 return ['cellSubTotal'].includes(type);
               });
+
+              plugins.forEach(({ config = {} }) => {
+                if (config?.direction === 'horizontal') {
+                  isHorizontalExpansion = true;
+                }
+              });
+
               hasRuntimePlugins = plugins.some(
                 ({ retention }) => retention === 'runtime'
               );
@@ -1338,7 +1535,9 @@ export default class ParseReportJson {
               }
             }
           }
-
+          if (isHorizontalExpansion && !isRetainHorizontalExpansionData) {
+            colDataTable.value = '';
+          }
           let pageIndex = pageInfos.pageIndex;
 
           //先执行插件，后执行函数
@@ -1431,12 +1630,18 @@ export default class ParseReportJson {
           });
 
           //行高
-          let size = rows?.size || 20;
+          let size = rows?.size || pageInfos.defaults.rowHeight;
           size = size > rowHeight ? size : rowHeight;
           const newRows = { ...rows, size };
           const rowsKeys = Object.keys(newRows);
           const hasSizeKey = newRows.hasOwnProperty('size');
-          if (!(hasSizeKey && rowsKeys.length === 1 && newRows.size == 20)) {
+          if (
+            !(
+              hasSizeKey &&
+              rowsKeys.length === 1 &&
+              newRows.size == pageInfos.defaults.rowHeight
+            )
+          ) {
             sheetPage.rows[sheetPageRowCount] = {
               ...(sheetPage.rows[sheetPageRowCount] || {}),
               ...rows,
@@ -1715,6 +1920,7 @@ export default class ParseReportJson {
           temp,
           i,
           type: 'content',
+          isRetainHorizontalExpansionData: i === startIndex,
         });
       }
       //标识内容处理结束
