@@ -33,6 +33,7 @@ export default function (props) {
   const baseConfig = useRef({
     dataSourceFormatterMap: new Map(),
     typeFormatterMap: new Map(),
+    addDataSourceFormatterMap: new Map(),
     isInitFormatter: false,
   });
   const [isRefresh, setIsRefresh] = useState(false);
@@ -109,6 +110,15 @@ export default function (props) {
                   cell.bindingPath
                 ),
               };
+          } else if (
+            baseConfig.current.addDataSourceFormatterMap.has(cell?.bindingPath)
+          ) {
+            cell.style = {
+              ...(cell?.style || {}),
+              formatter: baseConfig.current.addDataSourceFormatterMap.get(
+                cell.bindingPath
+              ),
+            };
           }
         }
       }
@@ -155,6 +165,7 @@ export default function (props) {
    */
   const setDataSourceFormatter = (datasource, format) => {
     baseConfig.current.dataSourceFormatterMap.set(datasource, format);
+    baseConfig.current.addDataSourceFormatterMap.set(datasource, format);
     setIsRefresh(!isRefresh);
   };
 
@@ -164,6 +175,7 @@ export default function (props) {
    */
   const delDataSourceFormatter = (datasource) => {
     baseConfig.current.dataSourceFormatterMap.delete(datasource);
+    baseConfig.current.addDataSourceFormatterMap.delete(datasource);
     setIsRefresh(!isRefresh);
   };
 
