@@ -21,8 +21,8 @@ export default function () {
     return isAllowToView ? (
         <HCard title='数据绑定'>
             <VIconTitle
-                title='数据源'
-                desc='维护数据源信息'
+                title='数据集'
+                desc='维护数据集信息'
                 icon={DatasourceIcon}
                 onClick={() => {
                     isAllowToView && dispatch(setIsShowDatasource());
