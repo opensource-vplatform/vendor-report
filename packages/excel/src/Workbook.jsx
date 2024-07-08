@@ -1,15 +1,8 @@
-import {
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import Print from './Print';
 import ParseReportJson from './template/ParseReportJson';
-import {
-  getLicense,
-  setLicense,
-} from './utils/licenseUtil';
+import { getLicense, setLicense } from './utils/licenseUtil';
 import { getNamespace } from './utils/spreadUtil';
 import WorkbookItem from './WorkbookItem';
 
@@ -99,8 +92,8 @@ export default function (props) {
     const { formatter } = props.persistingDataSlice || {};
     if (!formatter && baseConfig.current.dataSourceFormatterMap.size == 0)
       return;
-    for (let sheet of Object.values(json.sheets)) {
-      for (let row of Object.values(sheet.data.dataTable)) {
+    for (let sheet of Object.values(json?.sheets ?? {})) {
+      for (let row of Object.values(sheet?.data?.dataTable ?? {})) {
         for (let cell of Object.values(row)) {
           if (!cell.style || !cell?.style?.formatter) {
             if (
