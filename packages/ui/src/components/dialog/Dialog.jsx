@@ -50,6 +50,7 @@ const TitleWrap = styled.div`
     background-color: white;
     cursor: move;
     height: 30px;
+    min-height: 30px;
     flex-flow: column;
     font-weight: 500;
 `;

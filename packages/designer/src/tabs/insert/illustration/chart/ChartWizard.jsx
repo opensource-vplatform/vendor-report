@@ -127,7 +127,8 @@ export default function Index(props) {
             padding: '10px 0px',
             borderBottom: '1px solid #ddd',
             borderTop: '1px solid #ddd',
-            height: '102px',
+            height: '82px',
+            minHeight: '82px',
             marginBottom: 'auto',
           }}
         ></Steps>

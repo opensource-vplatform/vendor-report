@@ -10,6 +10,7 @@ const Wrap = styled.div`
   padding: 8px;
   box-sizing: border-box;
   height: calc(100% - 30px);
+  min-height: calc(100% - 30px);
 `;
 
 const Content = styled.div`
@@ -24,6 +25,8 @@ export const ButtonWrap = styled.div`
   margin: 0px;
   box-sizing: border-box;
   display: flex;
+  height: 40px;
+  min-height:40px;
   flex-direction: row-reverse;
 `;
 
