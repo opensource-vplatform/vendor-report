@@ -126,17 +126,18 @@ export const CLASSIFY_CHARTS = [
         config: {
           type: 'pie',
           dimension: '2d',
+          style: '',
         }
       },
-      {
-        value: 'pie-3d',
-        title: '饼图3D',
-        icon: 'pie-3d',
-        config: {
-          type: 'pie',
-          dimension: '3d',
-        }
-      },
+      // {
+      //   value: 'pie-3d',
+      //   title: '饼图3D',
+      //   icon: 'pie-3d',
+      //   config: {
+      //     type: 'pie',
+      //     dimension: '3d',
+      //   }
+      // },
       {
         value: 'pie-cycle-2d',
         icon: 'pie-cycle-2d',
@@ -147,16 +148,16 @@ export const CLASSIFY_CHARTS = [
           style: 'cycle',
         },
       },
-      {
-        value: 'pie-cycle-3d',
-        icon: 'pie-cycle-3d',
-        title: '环形图3D',
-        config: {
-          type: 'pie',
-          style: 'cycle',
-          dimension: '3d',
-        }
-      },
+      // {
+      //   value: 'pie-cycle-3d',
+      //   icon: 'pie-cycle-3d',
+      //   title: '环形图3D',
+      //   config: {
+      //     type: 'pie',
+      //     style: 'cycle',
+      //     dimension: '3d',
+      //   }
+      // },
     ],
   },
   {
