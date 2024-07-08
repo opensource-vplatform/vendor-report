@@ -1,8 +1,15 @@
-import { useMemo, useState, useRef, useEffect } from 'react';
+import {
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import Print from './Print';
 import ParseReportJson from './template/ParseReportJson';
-import { getLicense, setLicense } from './utils/licenseUtil';
+import {
+  getLicense,
+  setLicense,
+} from './utils/licenseUtil';
 import { getNamespace } from './utils/spreadUtil';
 import WorkbookItem from './WorkbookItem';
 
@@ -265,7 +272,7 @@ export default function (props) {
         onQuery={handleOnQuery}
         onInited={(...args) => {
           baseConfig.current.setLoading = args[1].setLoading;
-          props.onInited(...args);
+          return props.onInited(...args);
         }}
       ></WorkbookItem>
     </>
