@@ -453,7 +453,7 @@ window.tooneReport = {
     _report.setDataSourceFormatter(datasource, format);
   },
   // 删除数据源格式
-  delDataSourceFormatter(datasource, format) {
-    _report.delDataSourceFormatter(datasource, format);
+  delDataSourceFormatter(datasource) {
+    _report.delDataSourceFormatter(datasource);
   },
 };
