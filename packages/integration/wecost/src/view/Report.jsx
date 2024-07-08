@@ -442,4 +442,18 @@ window.tooneReport = {
     if (typeof _report?.getPrintTotalPages === 'function')
       return _report.getPrintTotalPages();
   },
+  /**
+   *  设置数据源格式
+   * @param {*} datasource 数据源
+   * @param {*} format 格式
+   * example: 设置sales的数据源字段'cost'为保留小数点后两位
+   * window.tooneReport.setDataSourceFormatter(sales.cost,'#,##0.00_);-#,##0.00')
+   */
+  setDataSourceFormatter(datasource, format) {
+    _report.setDataSourceFormatter(datasource, format);
+  },
+  // 删除数据源格式
+  delDataSourceFormatter(datasource, format) {
+    _report.delDataSourceFormatter(datasource, format);
+  },
 };
