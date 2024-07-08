@@ -109,7 +109,8 @@ function clearContents(params) {
               if (activeSheet.getBindingPath(rowIndex, colIndex)) {
                 activeSheet.setBindingPath(rowIndex, colIndex, '');
                 activeSheet.getCell(rowIndex, colIndex).tag('');
-              } else if (activeSheet.getCell(rowIndex, colIndex).tag()) {  //清除单元格插件
+              } else if (activeSheet.getCell(rowIndex, colIndex).tag()) {
+                //清除单元格插件
                 activeSheet.getCell(rowIndex, colIndex).tag('');
                 activeSheet.resumePaint();
               }
@@ -343,6 +344,11 @@ export default function Index() {
         if (isFormula(editingText)) {
           console.log('formula');
           cacheDatasRef.current.currentformulaValue = editingText.slice(1);
+          setTimeout(() => {
+            cacheDatasRef.current.currentformulaValue = '';
+          }, 500);
+        } else {
+          cacheDatasRef.current.currentformulaValue = '';
         }
         let index = 1;
         if (cacheDatasRef.current.currentClickBar) index = 0;
