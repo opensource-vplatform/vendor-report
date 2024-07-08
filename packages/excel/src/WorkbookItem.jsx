@@ -766,6 +766,12 @@ export default function (props) {
     }
   };
 
+  const setLoading = ()=>{
+    setData((datas) => {
+      return { ...datas, isLoading: true };
+    });
+  }
+
   useEffect(() => {
     (async () => {
       const inited = await initSpread();
@@ -795,6 +801,7 @@ export default function (props) {
               suitableToPageWidth: 'suitableToPageWidth',
               actualSize: 'actualSize',
             },
+            setLoading
           });
           if (dataSource) {
             data.zoomValue = 'suitableToPageWidth';

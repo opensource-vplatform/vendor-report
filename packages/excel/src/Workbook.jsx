@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 
 import Print from './Print';
 import ParseReportJson from './template/ParseReportJson';
@@ -35,6 +35,7 @@ export default function (props) {
     typeFormatterMap: new Map(),
     addDataSourceFormatterMap: new Map(),
     isInitFormatter: false,
+    setLoading: () => {},
   });
   const [isRefresh, setIsRefresh] = useState(false);
   if (licenseKey) {
@@ -89,7 +90,8 @@ export default function (props) {
   const initFormatter = (json) => {
     if (!baseConfig.current.isInitFormatter) structuralFormaMap();
     const { formatter } = props.persistingDataSlice || {};
-    if (!formatter) return;
+    if (!formatter && baseConfig.current.dataSourceFormatterMap.size == 0)
+      return;
     for (let sheet of Object.values(json.sheets)) {
       for (let row of Object.values(sheet.data.dataTable)) {
         for (let cell of Object.values(row)) {
@@ -166,6 +168,7 @@ export default function (props) {
   const setDataSourceFormatter = (datasource, format) => {
     baseConfig.current.dataSourceFormatterMap.set(datasource, format);
     baseConfig.current.addDataSourceFormatterMap.set(datasource, format);
+    baseConfig.current.setLoading();
     setIsRefresh(!isRefresh);
   };
 
@@ -176,6 +179,7 @@ export default function (props) {
   const delDataSourceFormatter = (datasource) => {
     baseConfig.current.dataSourceFormatterMap.delete(datasource);
     baseConfig.current.addDataSourceFormatterMap.delete(datasource);
+    baseConfig.current.setLoading();
     setIsRefresh(!isRefresh);
   };
 
@@ -259,6 +263,10 @@ export default function (props) {
         inst={inst}
         json={json}
         onQuery={handleOnQuery}
+        onInited={(...args) => {
+          baseConfig.current.setLoading = args[1].setLoading;
+          props.onInited(...args);
+        }}
       ></WorkbookItem>
     </>
   );

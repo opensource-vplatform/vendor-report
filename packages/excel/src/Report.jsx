@@ -455,12 +455,12 @@ class Report {
       });
     }
   }
-  
+
   // 删除数据源格式
-  delDataSourceFormatter(datasource, format) {
+  delDataSourceFormatter(datasource) {
     if (this.datasourceFormatterHandler) {
       this.datasourceFormatterHandler().then(({ delDataSourceFormatter }) => {
-        delDataSourceFormatter(datasource, format);
+        delDataSourceFormatter(datasource);
       });
     }
   }
