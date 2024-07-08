@@ -59,11 +59,35 @@ class Chart {
   }
   async mount(el) {
     await resourceManager.loadScript(`${getBaseUrl()}/vendor/echart/echarts.min.js`);
+    this.chartDom = el;
     this.ChartInstance = echarts.init(el);
     this.ChartInstance.setOption(generateEChartsOption(this.config));
     return this.ChartInstance;
   }
 }
+/**
+ * 行与列转换
+ * @param {*} data 数据源
+ * @returns 
+ */
+const transformData = (data) => {
+  var result = [];
+
+  // 初始化结果数组的第一行
+  result.push(data.map(row => row[0]));
+
+  // 遍历数据的列
+  for (var i = 1; i < data[0].length; i++) {
+    var newRow = [data[0][i]];
+    for (var j = 1; j < data.length; j++) {
+      newRow.push(data[j][i]);
+    }
+    result.push(newRow);
+  }
+
+  return result;
+}
+
 
 /**
  * 数据分组
@@ -71,21 +95,27 @@ class Chart {
  * @param {*} keys 分组字段合集
  * @returns 
  */
-function groupBy(data, keys) {
+const groupBy = (data, keys) => {
   if (keys.length === 0) {
     return data;
   }
 
   const [firstKey, ...restKeys] = keys;
 
-  const grouped = data.reduce((result, item) => {
-    const key = item[firstKey];
-    if (!result[key]) {
-      result[key] = [];
+  let grouped;
+  if (!firstKey)
+    grouped = {
+      '': data
     }
-    result[key].push(item);
-    return result;
-  }, {});
+  else
+    grouped = data.reduce((result, item) => {
+      const key = item[firstKey];
+      if (!result[key]) {
+        result[key] = [];
+      }
+      result[key].push(item);
+      return result;
+    }, {});
 
   if (restKeys.length > 0) {
     for (let key in grouped) {
@@ -146,7 +176,7 @@ const generateEChartsOption = (config) => {
   } = conf;
   const nameSeriesConfigs_conf = nameSeriesConfigs.filter(conf => !!conf.fieldCode);
   if (!datasource.length || !groups.length
-    || (seriesType == 'fieldValue' && (!valueSeriesConfig || !valueSeriesConfig?.sumType))
+    || (seriesType == 'fieldValue' && (!valueSeriesConfig || !valueSeriesConfig?.sumType || !valueSeriesConfig?.value))
     || (seriesType == 'fieldName' && !nameSeriesConfigs_conf.length))
     return {
       title: {
@@ -173,11 +203,15 @@ const generateEChartsOption = (config) => {
 
       if (!!valueSeriesConfig?.seriesName || seriesType !== 'fieldValue')
         if (seriesType === 'fieldValue') {
-          Object.values(groupedData).forEach(item => {
-            const newKeys = Object.keys(item)
-            if (!seriesTypesKeys || seriesTypesKeys.length < newKeys.length)
-              seriesTypesKeys = newKeys;
-          })
+          Object.keys(groupItems).forEach(item => {
+            if (seriesTypesKeys.indexOf(item) === -1)
+              seriesTypesKeys.push(item);
+          });
+          // Object.values(groupedData).forEach(item => {
+          //   const newKeys = Object.keys(item)
+          //   if (!seriesTypesKeys || seriesTypesKeys.length < newKeys.length)
+          //     seriesTypesKeys = newKeys;
+          // })
           if (xAxisData.length - 1 === index)
             seriesDatas[0].push(...seriesTypesKeys);
         } else {
@@ -193,10 +227,16 @@ const generateEChartsOption = (config) => {
     if (seriesType === 'fieldValue') {
       if (!valueSeriesConfig.seriesName)
         seriesArrayValue.push(calcDatasFunc(valueSeriesConfig.sumType, groupItems, valueSeriesConfig.value));
-      else
-        seriesArrayValue.push(...Object.keys(groupItems).map(key => {
-          return calcDatasFunc(valueSeriesConfig.sumType, groupItems[key], valueSeriesConfig.value);
-        }))
+      else {
+        let seriesArrayObj = {}
+        Object.keys(groupItems).forEach(key => {
+          seriesArrayObj[key] = calcDatasFunc(valueSeriesConfig.sumType, groupItems[key], valueSeriesConfig.value);
+        })
+        seriesTypesKeys.forEach(key => {
+          seriesArrayValue.push(seriesArrayObj[key] || 0);
+        })
+
+      }
     } else {
       seriesArrayValue.push(...nameSeriesConfigs_conf.map(seriesConfig => {
         return calcDatasFunc(seriesConfig.sumType, groupItems, seriesConfig.fieldCode);
@@ -204,29 +244,87 @@ const generateEChartsOption = (config) => {
     }
     seriesDatas[index + 1] = [xAxisData[index], ...seriesArrayValue];
   });
+  let option;
+  if (type === 'bar')
+    // 构造 ECharts 配置项
+    option = {
+      legend: {
+        bottom: 0  // 将图例放在底部
+      },
+      title: {
+        text: title,
+        show: titleVisible
+      },
+      tooltip: {},
+      xAxis: type == 'pie' ? {} : orientation == 'portrait' ? { type: 'category', axisTick: { show: false }, data: xAxisData } : {},
+      yAxis: type == 'pie' ? {} : orientation != 'portrait' ? { type: 'category', axisTick: { show: false }, data: xAxisData } : {},
+      dataset: {
+        source: seriesDatas
+      },
+      series: seriesTypesKeys.map(() => ({
+        type,
+        // radius: '50%',
+        stack: style == 'stack' ? 'one' : undefined,
+      }))
+    };
+  else if (type === 'pie') {
+    if (!groups[0]){
+      seriesDatas[0][0] = 'product';
+      seriesDatas[1][0] = 'xxx';
+    }
+    // 行列转换
+    seriesDatas = transformData(seriesDatas)
+    var series = [];
+    const size = + parseFloat(divideCalc(100, seriesDatas[0].length - 1).toFixed(2));
+    const subTitle = []
 
+    for (var i = 1; i < seriesDatas[0].length; i++) {
+      series.push({
+        type: 'pie',
+        radius: seriesDatas[0].length > 2 ? size : 50 + '%',
+        center: [size * (i - 1) + size / 2 + '%', '50%'],
+        label: {
+          formatter: '{b}: {@' + seriesDatas[0][i] + '} ({d}%)',
+          // show: seriesDatas[0].length - 1 > 1 ? false : true,
+          show: true,
+        },
+        encode: {
+          itemName: seriesDatas[0][0],
+          value: seriesDatas[0][i]
+        },
+        name: seriesDatas[0][i]
+      });
+      subTitle.push({
+        subtext: seriesDatas[0][i],
+        left: size * (i - 1) + size / 2 + '%',
+        top: '75%',
+        textAlign: 'center'
+      })
+    }
 
-  // 构造 ECharts 配置项
-  const option = {
-    legend: {
-      bottom: 0  // 将图例放在底部
-    },
-    title: {
-      text: title,
-      show: titleVisible
-    },
-    tooltip: {},
-    xAxis: orientation == 'portrait' ? { type: 'category', axisTick: { show: false }, data: xAxisData } : {},
-    yAxis: orientation != 'portrait' ? { type: 'category', axisTick: { show: false }, data: xAxisData } : {},
-    dataset: {
-      source: seriesDatas
-    },
-    series: seriesTypesKeys.map(() => ({
-      type,
-      stack: style == 'stack' ? 'one' : undefined,
-    }))
-  };
+    option = {
+      legend: {
+        orient: 'horizontal', // 水平排列
+        width: '100%', // 设置图例宽度为容器宽度
+        left: 'center', // 图例居中
+        bottom: 0, // 将图例放在底部
+        // textStyle: {
+        //   width: 'auto',
+        //   overflow: 'truncate'
+        // }
 
+      },
+      title: [{
+        text: title,
+        show: titleVisible
+      }, ...subTitle],
+      tooltip: {},
+      dataset: {
+        source: seriesDatas
+      },
+      series
+    };
+  }
   return option;
 }
 

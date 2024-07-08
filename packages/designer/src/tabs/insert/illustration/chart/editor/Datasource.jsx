@@ -34,7 +34,7 @@ export default function () {
             setConfig({
               ...config,
               datasource: val,
-              groups: [],
+              groups: [null],
               seriesType: 'fieldValue',
               valueSeriesConfig: {
                 seriesName:null,
