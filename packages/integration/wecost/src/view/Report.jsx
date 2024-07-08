@@ -20,6 +20,7 @@ import { ErrorDialog, ErrorPage } from './components/error/Index';
 import WaitMsg from './components/loading/Index';
 import ProgressCircle from './components/progress';
 import { PDFDocument } from 'pdf-lib';
+import { genUUID as md5 } from '../utils/commonUtil';
 
 const Wrap = styled.div`
   display: flex;
@@ -134,7 +135,7 @@ export default function () {
                     //总页数
                     if (typeof window?.java === 'function') {
                       const requestData = {
-                        id: TOONE.Report.Utils.md5(),
+                        id: md5(),
                         action: 'updatePagecount',
                         pagecount: datas.total,
                       };
@@ -143,6 +144,13 @@ export default function () {
                         onSuccess() {},
                         onFailure() {},
                       });
+                    }
+                    if (typeof JWebTop !== 'undefined') {
+                      window.onReportReadyCallback = function () {};
+                      JWebTop.invokeRemote_CallBack(
+                        `{"method":"onReportReady","totalPageCount":${datas.total}}`,
+                        'onReportReadyCallback'
+                      );
                     }
                   });
                 },
@@ -429,5 +437,9 @@ window.tooneReport = {
   },
   getReport: function () {
     return _report;
+  },
+  getPrintTotalPages: function () {
+    if (typeof _report?.getPrintTotalPages === 'function')
+      return _report.getPrintTotalPages();
   },
 };
