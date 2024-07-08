@@ -18,7 +18,7 @@
     "build-vdaas-console": "npm run build-designer && npm run build-report && pnpm -F integration-vdaas-console build && npm run postBuild-vdaas-console",
     "build-vdaas-service": "npm run build-report && pnpm -F integration-vdaas-service build && npm run postBuild-vdaas-service",
     "build-vdaas": "npm run build-designer && npm run build-report && pnpm -F integration-vdaas-web build && npm run postBuild-vdaas-tenant && pnpm -F integration-vdaas-console build && npm run postBuild-vdaas-console",
-    "build-wecost": "pnpm -F integration-wecost build && npm run postBuild-wecost",
+    "build-wecost": "npm run build-designer && npm run build-report && pnpm -F integration-wecost build && npm run postBuild-wecost",
     "build-docs": "pnpm -F report-docs build",
     "build-template": "npm run preBuild-template",
     "build": "npm run build-vdaas && npm run build-wecost && npm run build-template",
