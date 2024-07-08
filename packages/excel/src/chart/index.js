@@ -268,7 +268,7 @@ const generateEChartsOption = (config) => {
       }))
     };
   else if (type === 'pie') {
-    if (!groups[0]){
+    if (!groups[0]) {
       seriesDatas[0][0] = 'product';
       seriesDatas[1][0] = 'xxx';
     }
@@ -281,12 +281,12 @@ const generateEChartsOption = (config) => {
     for (var i = 1; i < seriesDatas[0].length; i++) {
       series.push({
         type: 'pie',
-        radius: seriesDatas[0].length > 2 ? size : 50 + '%',
+        radius: style == 'cycle' ? [seriesDatas[0].length > 2 ? size - (size / 4 * 1) : 50 + '%', seriesDatas[0].length > 2 ? size : 50 + '%'] : seriesDatas[0].length > 2 ? size : 50 + '%',
         center: [size * (i - 1) + size / 2 + '%', '50%'],
         label: {
           formatter: '{b}: {@' + seriesDatas[0][i] + '} ({d}%)',
           // show: seriesDatas[0].length - 1 > 1 ? false : true,
-          show: true,
+          show: false,
         },
         encode: {
           itemName: seriesDatas[0][0],
