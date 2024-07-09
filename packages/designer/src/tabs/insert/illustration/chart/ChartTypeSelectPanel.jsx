@@ -76,15 +76,15 @@ export default function (props) {
               charts={charts}
               selected={{ config, type }}
               onClick={({ icon, config: cfg }) => {
-                const { type, ...others } = cfg;
-                dispatch(setType(type));
+                const { type: type_new, ...others } = cfg;
                 let config_new = null;
-                if (cfg.type !== type) {
-                  config_new = others;
-                } else {
+                // if (cfg.type !== type) {
+                //   config_new = others;
+                // } else {
                   //选择的图表类型相同，则复用其原有配置
                   config_new = { ...config, ...others };
-                }
+                // }
+                dispatch(setType(type_new));
                 dispatch(setConfig(config_new));
                 dispatch(setIcon(icon));
                 dispatch(setStep('config'));
