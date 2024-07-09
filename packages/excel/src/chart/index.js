@@ -270,7 +270,7 @@ const generateEChartsOption = (config) => {
   else if (type === 'pie') {
     if (!groups[0]) {
       seriesDatas[0][0] = 'product';
-      seriesDatas[1][0] = 'xxx';
+      seriesDatas[1][0] = '';
     }
     // 行列转换
     seriesDatas = transformData(seriesDatas)
@@ -292,7 +292,12 @@ const generateEChartsOption = (config) => {
           itemName: seriesDatas[0][0],
           value: seriesDatas[0][i]
         },
-        name: seriesDatas[0][i]
+        name: seriesDatas[0][i],
+        itemStyle: {
+          // borderRadius: 10,
+          borderColor: '#fff',
+          borderWidth: 2
+        },
       });
       subTitle.push({
         subtext: seriesDatas[0][i],
@@ -308,6 +313,7 @@ const generateEChartsOption = (config) => {
         width: '100%', // 设置图例宽度为容器宽度
         left: 'center', // 图例居中
         bottom: 0, // 将图例放在底部
+        type: 'scroll',
         // textStyle: {
         //   width: 'auto',
         //   overflow: 'truncate'
