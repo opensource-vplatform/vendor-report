@@ -31,6 +31,10 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     this._bindEvent();
   }
 
+  _isActiveSheet(){
+    return this.sheet === this.sheet.getParent()?.getActiveSheet();
+  }
+
   _showDirectionIcons(item) {
     if (isUndefined(item)) {
       const icons = this.directionIcons;
@@ -49,7 +53,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
       const icons = this.directionIcons;
       if (icons) {
         icons.forEach((item) => {
-          this._showDirectionIcons(item);
+          this._hideDirectionIcons(item);
         });
       }
     } else {
@@ -211,7 +215,9 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
           const icon = this._initIcon();
           icon.style.display = 'flex';
         }
-        this._showDirectionIcons();
+        if(this._isActiveSheet()){
+          this._showDirectionIcons();
+        }
       }
     });
   }
@@ -235,7 +241,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
   }
 
   _couldShowIcon(sheet, row, col) {
-    return this._isDesignMode(sheet) && isShowIcon(sheet, row, col);
+    return this._isActiveSheet() && this._isDesignMode(sheet) && isShowIcon(sheet, row, col);
   }
 
   _paintSettingIcon(sheet, row, col) {

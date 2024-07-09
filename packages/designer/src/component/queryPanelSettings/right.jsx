@@ -14,6 +14,7 @@ import {
   Select,
   TextInput,
 } from '@toone/report-ui';
+import { showConfirm } from '@utils/messageUtil';
 
 import { dropdownDatasource } from './constant';
 import CustomOptions from './customOptions';
@@ -365,7 +366,11 @@ function ControlProperty(props) {
             height: '28px',
           }}
           onClick={() => {
-            removeControl();
+            showConfirm("提示","确定删除吗？", (confirmed)=>{
+              if(confirmed){
+                removeControl();
+              }
+            });
           }}
         >
           删除
