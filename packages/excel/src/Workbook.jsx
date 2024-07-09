@@ -5,6 +5,7 @@ import ParseReportJson from './template/ParseReportJson';
 import { getLicense, setLicense } from './utils/licenseUtil';
 import { getNamespace } from './utils/spreadUtil';
 import WorkbookItem from './WorkbookItem';
+import { isFunction } from '@toone/report-util';
 
 export default function (props) {
   const {
@@ -265,7 +266,7 @@ export default function (props) {
         onQuery={handleOnQuery}
         onInited={(...args) => {
           baseConfig.current.setLoading = args[1].setLoading;
-          return props.onInited(...args);
+          if (isFunction(props.onInited)) return props.onInited(...args);
         }}
       ></WorkbookItem>
     </>
