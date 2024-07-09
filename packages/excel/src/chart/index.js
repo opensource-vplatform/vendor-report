@@ -281,7 +281,7 @@ const generateEChartsOption = (config) => {
     for (var i = 1; i < seriesDatas[0].length; i++) {
       series.push({
         type: 'pie',
-        radius: style == 'cycle' ? [seriesDatas[0].length > 2 ? size - (size / 4 * 1) : 50 + '%', seriesDatas[0].length > 2 ? size : 50 + '%'] : seriesDatas[0].length > 2 ? size : 50 + '%',
+        radius: style == 'cycle' ? [seriesDatas[0].length > 2 ? size - (size / 4 * 1) : 50 + '%', seriesDatas[0].length > 2 ? size : 70 + '%'] : seriesDatas[0].length > 2 ? size : 50 + '%',
         center: [size * (i - 1) + size / 2 + '%', '50%'],
         label: {
           formatter: '{b}: {@' + seriesDatas[0][i] + '} ({d}%)',
