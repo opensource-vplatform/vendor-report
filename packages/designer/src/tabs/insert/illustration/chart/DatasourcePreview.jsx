@@ -23,7 +23,8 @@ const genTestDatas = function(define){
         const record = {};
         fields.forEach(({name,code,type})=>{
             if(type=='text'){
-                record[code] = (name||code)+count;
+                const index = parseInt(Math.random()*10);
+                record[code] = (name||code)+index;
             }else if(type=='integer'){
                 record[code] = parseInt(Math.random()*200);
             }else if(type=='decimals'){
