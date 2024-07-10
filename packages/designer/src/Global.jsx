@@ -62,30 +62,30 @@ export const GlobalStyle = createGlobalStyle`
 `;
 
 export const GlobalComponent = function () {
-    const dispatch = useDispatch();
-    setDispatch(dispatch);
-    const { sparklineSlice, cellSettingSlice, rangeSlice, appSlice } =
-        useSelector((slice) => slice);
-    return (
-        <Fragment>
-            {appSlice.waitMsg != null ? (
-                <Loading title={appSlice.waitMsg}></Loading>
-            ) : null}
-            {appSlice.errorMsg != null ? (
-                <Error
-                    message={appSlice.errorMsg}
-                    detail={appSlice.errorDetail}
-                    onClose={() => {
-                        dispatch(setErrorMsg({ message: null }));
-                    }}
-                ></Error>
-            ) : null}
-            {appSlice.confirmMsg != null ? <Confirm></Confirm>:null}
-            {rangeSlice.visible ? <SelectBox></SelectBox> : null}
-            {cellSettingSlice.visible ? (
-                <CellStylesSetting></CellStylesSetting>
-            ) : null}
-            {sparklineSlice.visible ? <SparkLine></SparkLine> : null}
-        </Fragment>
-    );
+  const dispatch = useDispatch();
+  setDispatch(dispatch);
+  const { sparklineSlice, cellSettingSlice, rangeSlice, appSlice } =
+    useSelector((slice) => slice);
+  return (
+    <Fragment>
+      {appSlice.waitMsg != null ? (
+        <Loading title={appSlice.waitMsg}></Loading>
+      ) : null}
+      {appSlice.errorMsg != null ? (
+        <Error
+          message={appSlice.errorMsg}
+          detail={appSlice.errorDetail}
+          onClose={() => {
+            dispatch(setErrorMsg({ message: null }));
+          }}
+        ></Error>
+      ) : null}
+      {appSlice.confirmMsg != null ? <Confirm></Confirm> : null}
+      {rangeSlice.visible ? <SelectBox></SelectBox> : null}
+      {cellSettingSlice.visible ? (
+        <CellStylesSetting></CellStylesSetting>
+      ) : null}
+      {sparklineSlice.visible ? <SparkLine></SparkLine> : null}
+    </Fragment>
+  );
 };
