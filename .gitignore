@@ -8,6 +8,7 @@ packages/integration/vdaas-console/resources/page/spreadsheet/**
 packages/integration/vdaas-console/resources/page/vdaas/spreadsheet/**
 packages/integration/vdass-web/resources/static/vdaasweb/spreadsheet/**
 packages/integration/vdaas-service/resources/**
+packages/integration/vdaas-service-ghost/resources/**
 packages/integration/wecost/resources/static/wecost/spreadsheet/**
 packages/script/src/designer/icon/icons/**
 packages/script/src/designer/icon/delta/**
@@ -18,6 +19,9 @@ org.eclipse.m2e.core.prefs
 packages/integration/vdaas-service/uploads/**
 packages/integration/vdaas-service/httpAccess.log
 packages/integration/vdaas-service/runLogs.log
+packages/integration/vdaas-service-ghost/uploads/**
+packages/integration/vdaas-service-ghost/httpAccess.log
+packages/integration/vdaas-service-ghost/runLogs.log
 .vscode/launch.json
 pnpm-lock.yaml
 
