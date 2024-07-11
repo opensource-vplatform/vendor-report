@@ -1,0 +1,26 @@
+{
+    "name": "@toone/report-plugin-jasperreport-parser",
+    "version": "1.0.0",
+    "description": "jasperreport解析",
+    "main": "index.js",
+    "scripts": {
+        "dev": "vite --host",
+        "test": "node test/index.js",
+        "postBuild": "node scripts/postBuild.js",
+        "build": "vite build -c=vite.config.build.js && npm run postBuild"
+    },
+    "dependencies": {
+        "fast-xml-parser":"^4.4.0"
+    },
+    "devDependencies": {
+        "@babel/plugin-transform-runtime": "^7.23.7",
+        "@babel/preset-env": "^7.23.7",
+        "@babel/runtime": "^7.23.7",
+        "@rollup/plugin-babel": "^6.0.4",
+        "terser": "^5.26.0",
+        "vite": "^4.3.9"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+}

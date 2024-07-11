@@ -4,6 +4,7 @@
   "scripts": {
     "designer": "pnpm -F report-designer dev",
     "ui": "pnpm -F report-ui dev",
+    "parser": "pnpm -F report-plugin-jasperreport-parser dev",
     "postBuild": "node scripts/postBuild.js",
     "postBuild-vdata": "node scripts/postBuild-vdata.js",
     "postBuild-vdaas-tenant": "node scripts/postBuild-vdaas-tenant.js",
