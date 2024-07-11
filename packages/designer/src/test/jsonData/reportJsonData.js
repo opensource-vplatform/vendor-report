@@ -3,6 +3,8 @@
  export default data; */
 import qdzfbb from './reportJson/qdzfbb';
 
-export default qdzfbb;
+const spreadJSON = window.localStorage.getItem('spreadJSON1');
+const urlSearchParams = new URLSearchParams(window.location.search);
+const jsonDatas = urlSearchParams.get('type') === '1' ? spreadJSON : qdzfbb;
 
-//export default window.localStorage.getItem('spreadJSON1');
+export default jsonDatas;
