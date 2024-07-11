@@ -179,5 +179,5 @@ export default function useZoom(ctxVal, setCtxVal) {
         paperWrapStyle,
       };
     });
-  }, [ctxVal.zoomValue, ctxVal.pageIndex]);
+  }, [ctxVal.zoomValue, ctxVal.pageIndex, ctxVal.dataSource]);
 }
