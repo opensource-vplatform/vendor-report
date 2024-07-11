@@ -3,8 +3,10 @@ import {
   ThemeContextProvider,
 } from '@toone/report-ui';
 
+import Chart from './chart';
 import { ConditionRule } from './conditionRule/Index';
 import { init } from './Init';
+import Preview from './Preview';
 import Report from './Report';
 import {
   genAutoMergeRangeInfos,
@@ -14,14 +16,15 @@ import {
 import { setPrintInfo } from './utils/printUtil';
 import Workbook from './Workbook';
 import Worksheet from './Worksheet';
-import Chart from './chart'
 
 init();
 
 export {
+  Chart,
   ConditionRule,
   genAutoMergeRangeInfos,
   genSpans,
+  Preview,
   Report,
   setPrintInfo,
   sortData,
@@ -29,5 +32,4 @@ export {
   ThemeContextProvider,
   Workbook,
   Worksheet,
-  Chart,
 };

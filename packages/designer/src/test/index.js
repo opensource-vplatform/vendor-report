@@ -12,7 +12,7 @@ import tourismData from './jsonData/tourismData.json';
 
 let json = JSON.parse(jsonStr);
 
-salesData.data.length = 30;
+//salesData.data.length = 100;
 /* salesData.data = salesData.data.filter(function (item) {
     return ['西北'].includes(item.sales_area);
 }); */
@@ -426,7 +426,7 @@ export default {
       // 格式化类型
       type: {
         text: '#,##0',
-        decimals : '#,##0_);-#,##0'
+        decimals: '#,##0_);-#,##0',
       },
       // 格式化数据源
       dataSource: {
@@ -434,10 +434,10 @@ export default {
           bqMoney: '#,##0_);-#,##0',
         },
         sales: {
-          cost: '#,##0_);-#,##0'
+          cost: '#,##0_);-#,##0',
         },
-        age: '#,##0.00_);-#,##0.00'
-      }
+        age: '#,##0.00_);-#,##0.00',
+      },
     },
   },
   event: {

@@ -60,8 +60,7 @@ export const toExcelPluginUrl = function (filename) {
   return `${getExcelBaseUrl()}/plugins/${filename}`;
 };
 
-const getSheetRect = function (sheet) {
-  const sheetJSON = sheet.toJSON();
+export const getSheetRect = function (sheetJSON) {
   const {
     rows = [],
     rowCount = 200,
@@ -71,28 +70,35 @@ const getSheetRect = function (sheet) {
     columnCount = 20,
     rowHeaderVisible = true,
     rowHeaderColInfos = [],
+    defaults = {
+      colHeaderRowHeight: 20,
+      colWidth: 62,
+      rowHeaderColWidth: 40,
+      rowHeight: 20,
+      _isExcelDefaultColumnWidth: false,
+    },
   } = sheetJSON;
 
   //内容高度
-  let sheetHeight = 0;
+  let sheetHeight = 20;
   if (colHeaderVisible) {
     if (colHeaderRowInfos.length > 0) {
       colHeaderRowInfos.forEach((info) => {
-        sheetHeight += info?.size || 20;
+        sheetHeight += info?.size || defaults.colHeaderRowHeight;
       });
     } else {
-      sheetHeight += 20;
+      sheetHeight += defaults.colHeaderRowHeight;
     }
   }
 
   for (let i = 0; i < rowCount; i++) {
-    sheetHeight += rows[i]?.size || 20;
+    sheetHeight += rows[i]?.size || defaults.rowHeight;
   }
 
   //内容宽度
   let sheetWidth = 30; //显示竖向滚动条，则添加竖向滚动条宽度
   if (rowHeaderVisible) {
-    const rowHeaderWidth = sheetJSON.defaults?.rowHeaderColWidth || 40; //默认行标题宽度
+    const rowHeaderWidth = defaults.rowHeaderColWidth; //默认行标题宽度
     if (rowHeaderColInfos.length > 0) {
       rowHeaderColInfos.forEach((info) => {
         sheetWidth += info?.size || rowHeaderWidth;
@@ -101,7 +107,7 @@ const getSheetRect = function (sheet) {
       sheetWidth += rowHeaderWidth;
     }
   }
-  const defColWidth = sheetJSON.defaults?.colWidth || 62; //默认列宽
+  const defColWidth = defaults?.colWidth; //默认列宽
   for (let i = 0; i < columnCount; i++) {
     sheetWidth += columns[i]?.size || defColWidth;
   }
@@ -111,7 +117,7 @@ const getSheetRect = function (sheet) {
     sheetWidth,
   };
 };
-
+//已经弃用
 const recursionSheetZoom = function (sheet, el, spread) {
   spread.options.showHorizontalScrollbar = true;
   spread.options.showVerticalScrollbar = true;
@@ -180,7 +186,7 @@ const recursionSheetZoom = function (sheet, el, spread) {
     _resolve(true);
   });
 };
-
+//已经弃用
 const afterRefresh = function ({ spread, el }) {
   setTimeout(() => {
     spread.options.showHorizontalScrollbar = true;
@@ -209,7 +215,7 @@ const afterRefresh = function ({ spread, el }) {
     });
   }, 200);
 };
-
+//已经弃用
 export const zoomToPage = function ({
   spread,
   width,
@@ -301,7 +307,7 @@ export const zoomToFit = function ({ spread, width, paper, setStyle, el }) {
     });
   }, 200);
 };
-
+//已经弃用
 export const zoomToRecover = function ({ spread, setStyle, paper, el, width }) {
   let paperHeight = 0;
   let paperWidth = 0;
@@ -335,7 +341,8 @@ export const zoomToRecover = function ({ spread, setStyle, paper, el, width }) {
   afterRefresh({ spread, el });
 };
 
-const getSpreadCanvasRect = function (el) {
+//已经弃用
+export const getSpreadCanvasRect = function (el) {
   const canvasEl = el?.current?.querySelector?.('#vp_vp');
   const height = Number(canvasEl.getAttribute('height'));
   const width = Number(canvasEl.getAttribute('width'));
@@ -354,11 +361,12 @@ export const getSpreadWrapRect = function (el) {
   const width = css.width;
   return {
     isRender: width.endsWith('px') ? true : false,
-    height: height.slice(0, -2),
-    width: width.slice(0, -2),
+    height: Number(height.slice(0, -2)),
+    width: Number(width.slice(0, -2)),
   };
 };
 
+//已经弃用
 const genPaperHeight = function ({
   height,
   width,
@@ -400,7 +408,7 @@ const genPaperHeight = function ({
     direction,
   };
 };
-
+//已经弃用
 const zoomByNumber = function ({
   spread,
   value,
@@ -446,7 +454,7 @@ const zoomByNumber = function ({
   setTimeout(() => spread.refresh(), 0);
   afterRefresh({ spread, el });
 };
-
+//已经弃用
 export const zoom = function (params) {
   return new Promise((resolve) => {
     _resolve = resolve;
@@ -478,6 +486,7 @@ export const zoom = function (params) {
   });
 };
 
+//已经弃用
 export const zoomOut = function ({ spread, getStyle, setStyle, el, paper }) {
   return new Promise((resolve) => {
     let { zoomFactor } = getStyle();
@@ -511,7 +520,7 @@ export const zoomOut = function ({ spread, getStyle, setStyle, el, paper }) {
     });
   });
 };
-
+//已经弃用
 export const zoomIn = function ({ spread, getStyle, setStyle, el, paper }) {
   return new Promise((resolve) => {
     let { zoomFactor } = getStyle();

@@ -123,8 +123,8 @@ export default class ParseReportJson {
     } = config;
     console.time('耗时多久');
     reportJson.scrollbarMaxAlign = true;
-    reportJson.showHorizontalScrollbar = false;
-    reportJson.showVerticalScrollbar = false;
+    /* reportJson.showHorizontalScrollbar = false;
+    reportJson.showVerticalScrollbar = false; */
     this.paper = {};
     this.datas = datas;
     this.showPageCount = showPageCount;
@@ -222,7 +222,6 @@ export default class ParseReportJson {
   }
   horizontalExpansion(pageInfos, templates) {
     const { header, footer, content } = templates;
-    debugger;
     if (!this.isHorizontalExpansion) {
       return { header, footer, content };
     }
@@ -358,7 +357,6 @@ export default class ParseReportJson {
       pageInfos.sheet.columnCount = maxColumnCount;
     }
     pageInfos.sheet.columns = newColumns;
-    debugger;
     return { header, footer, content };
   }
   render(pageInfos, templates) {
@@ -367,7 +365,6 @@ export default class ParseReportJson {
       pageInfos,
       templates
     );
-    debugger;
     //需要分页
     if (pageInfos.pageArea) {
       function calculate(header, footer, content) {

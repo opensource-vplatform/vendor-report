@@ -1,10 +1,19 @@
 import { useContext } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
-import { EVENTS, fire } from '@event/EventManager';
-import { Workbook, Worksheet } from '@toone/report-excel';
+import {
+  EVENTS,
+  fire,
+} from '@event/EventManager';
+import {
+  Preview,
+  Worksheet,
+} from '@toone/report-excel';
 import { Button } from '@toone/report-ui';
 import { isArray } from '@toone/report-util';
 import {
@@ -190,7 +199,7 @@ export default function (props) {
   return (
     <Wrap>
       <ExcelWrap>
-        <Workbook
+        <Preview
           license={license}
           localLicenseUnCheck={localLicenseUnCheck}
           json={json}
@@ -232,7 +241,7 @@ export default function (props) {
           // }}
         >
           <Worksheet></Worksheet>
-        </Workbook>
+        </Preview>
       </ExcelWrap>
     </Wrap>
   );

@@ -1,274 +1,323 @@
-import { useMemo, useRef, useState } from 'react';
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import Print from './Print';
-import ParseReportJson from './template/ParseReportJson';
-import { getLicense, setLicense } from './utils/licenseUtil';
-import { getNamespace } from './utils/spreadUtil';
-import WorkbookItem from './WorkbookItem';
+import resourceManager from 'resource-manager-js';
+import styled from 'styled-components';
+
 import { isFunction } from '@toone/report-util';
+
+import {
+  EVENTS,
+  fire,
+} from './event/EventManager';
+import LicenseError from './LicenseError';
+import LicenseWarn from './LicenseWarn';
+import PreviewContext from './PreviewContext';
+import { withDivStyled } from './utils/componentUtil';
+import { setBaseUrl } from './utils/environmentUtil';
+import {
+  checkLicense,
+  getLicense,
+  setLicense,
+} from './utils/licenseUtil';
+import {
+  getNamespace,
+  getPluginSrc,
+  withBatchCalcUpdate,
+} from './utils/spreadUtil';
+
+const GC = getNamespace();
+const GCsheets = GC.Spread.Sheets;
+const Wrap = withDivStyled({
+  position: 'relative',
+  width: '100%',
+  height: '100%',
+  overflow: 'visible',
+  userSelect: 'none',
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+const ExcelWrap = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  user-select: none;
+  box-sizing: border-box;
+`;
+
+const bindEvent = function (spread, typeName, handler) {
+  if (handler) {
+    const type = GC.Spread.Sheets.Events[typeName];
+    spread.bind(type, handler);
+  }
+};
+
+const bindEvents = function (spread, events) {
+  if (spread && events) {
+    for (let [event, handler] of Object.entries(events)) {
+      bindEvent(spread, event, handler);
+    }
+  }
+};
+
+//绑定数据源
+const bindDataSource = function (params) {
+  const { spread, dataSource } = params;
+  if (!spread || !dataSource) {
+    return;
+  }
+  spread.sheets.forEach((sheet) => {
+    const _dataSource = JSON.parse(JSON.stringify(dataSource));
+    const source = new GCsheets.Bindings.CellBindingSource(_dataSource);
+    sheet.setDataSource(source);
+  });
+};
+
+//处理事件绑定
+const handleEvents = (params) => {
+  const { spread } = params || {};
+  if (!spread) return;
+  const {
+    onEnterCell,
+    onActiveSheetChanged,
+    onValueChanged,
+    onSelectionChanged,
+    onSelectionChanging,
+    onEditorStatusChanged,
+    onSheetNameChanged,
+    onSheetNameChanging,
+    onActiveSheetChanging,
+    onSheetChanged,
+    onRowChanged,
+    onUndo,
+    onRedo,
+    json: _json = null,
+    onColumnWidthChanged,
+    onRowHeightChanged,
+    onLeftColumnChanged,
+    onTopRowChanged,
+    onViewZoomed,
+    onEditEnding,
+    onEditStarting,
+    onCellDoubleClick,
+  } = params;
+
+  spread.unbindAll();
+  bindEvents(spread, {
+    EnterCell: onEnterCell,
+    ActiveSheetChanged: onActiveSheetChanged,
+    ValueChanged: onValueChanged,
+    ActiveSheetChanging: onActiveSheetChanging,
+    SheetNameChanged: onSheetNameChanged,
+    SheetNameChanging: onSheetNameChanging,
+    SelectionChanged: onSelectionChanged,
+    SelectionChanging: onSelectionChanging,
+    EditorStatusChanged: onEditorStatusChanged,
+    WorkbookUndo: onUndo,
+    WorkbookRedo: onRedo,
+    RowChanged: onRowChanged,
+    SheetChanged: onSheetChanged,
+    ColumnWidthChanged: onColumnWidthChanged,
+    RowHeightChanged: onRowHeightChanged,
+    LeftColumnChanged: onLeftColumnChanged,
+    TopRowChanged: onTopRowChanged,
+    ViewZoomed: onViewZoomed,
+    EditEnding: onEditEnding,
+    EditStarting: onEditStarting,
+    CellDoubleClick: onCellDoubleClick,
+  });
+};
 
 export default function (props) {
   const {
-    enablePrint = false,
-    onPrintHandler,
-    onExportExcelHandler,
-    onExportPDFHandler,
-    onDatasourceFormatterHandler,
+    newTabVisible = true,
+    tabEditable = true,
+    tabStripVisible = true,
+    onInited,
+    onActiveSheetChanged: _onActiveSheetChanged,
+    onSheetChanged,
     license,
-    dataSource: _dataSource,
-    json: _json,
-    template,
-    setting,
-    onQuery,
+    localLicenseUnCheck = false,
+    enablePrint = false,
+    json: _json = null,
+    children,
+    baseUrl,
+    dataSource = null,
   } = props;
   if (license) {
     setLicense(license);
   }
-  const GC = getNamespace();
-  const [workbookDatas, setWorkbookDatas] = useState({
-    dataSource: _dataSource,
-  });
-
-  const dataSource = workbookDatas.dataSource;
+  if (baseUrl) {
+    setBaseUrl(baseUrl);
+  }
+  const context = useContext(PreviewContext);
+  const json = context?.json || _json;
+  const pageIndex = context?.pageIndex || 1;
   const licenseKey = getLicense();
-  const baseConfig = useRef({
-    dataSourceFormatterMap: new Map(),
-    typeFormatterMap: new Map(),
-    addDataSourceFormatterMap: new Map(),
-    isInitFormatter: false,
-    setLoading: () => {},
-  });
-  const [isRefresh, setIsRefresh] = useState(false);
   if (licenseKey) {
     GC.Spread.Sheets.LicenseKey = licenseKey;
   }
-
-  /**
-   * 构造格式化Map
-   */
-  const structuralFormaMap = () => {
-    baseConfig.current.dataSourceFormatterMap.clear();
-    baseConfig.current.typeFormatterMap.clear();
-    const { formatter, metadatasType } = props.persistingDataSlice || {};
-    if (!!formatter) {
-      for (let [dataSourceKey, dataSourceValue] of Object.entries(
-        formatter.dataSource || {}
-      )) {
-        if (typeof dataSourceValue === 'string')
-          baseConfig.current.dataSourceFormatterMap.set(
-            dataSourceKey,
-            dataSourceValue
-          );
-        else
-          for (let [dataSourceItemKey, dataSourceItemValue] of Object.entries(
-            dataSourceValue
-          )) {
-            baseConfig.current.dataSourceFormatterMap.set(
-              `${dataSourceKey}.${dataSourceItemKey}`,
-              dataSourceItemValue
-            );
-          }
-      }
-
-      const formatterType = formatter.type || {};
-      for (let [dataSourceKey, dataSourceValue] of Object.entries(
-        metadatasType
-      )) {
-        if (!!formatterType[dataSourceValue])
-          baseConfig.current.typeFormatterMap.set(
-            dataSourceKey,
-            formatterType[dataSourceValue]
-          );
-      }
+  const [data] = useState(() => {
+    const result = checkLicense(localLicenseUnCheck);
+    let showError = false,
+      showWarn = false;
+    if (!result.success) {
+      showError = result.showError;
+      showWarn = result.showWarn;
     }
-    baseConfig.current.isInitFormatter = true;
-  };
-
-  /**
-   * 格式化绑定字段的值
-   * @param {*} json
-   */
-  const initFormatter = (json) => {
-    if (!baseConfig.current.isInitFormatter) structuralFormaMap();
-    const { formatter } = props.persistingDataSlice || {};
-    if (!formatter && baseConfig.current.dataSourceFormatterMap.size == 0)
-      return;
-    for (let sheet of Object.values(json?.sheets ?? {})) {
-      for (let row of Object.values(sheet?.data?.dataTable ?? {})) {
-        for (let cell of Object.values(row)) {
-          if (!cell.style || !cell?.style?.formatter) {
-            if (
-              baseConfig.current.dataSourceFormatterMap.has(cell?.bindingPath)
-            )
-              cell.style = {
-                ...(cell?.style || {}),
-                formatter: baseConfig.current.dataSourceFormatterMap.get(
-                  cell.bindingPath
-                ),
-              };
-            else if (baseConfig.current.typeFormatterMap.has(cell?.bindingPath))
-              cell.style = {
-                ...(cell?.style || {}),
-                formatter: baseConfig.current.typeFormatterMap.get(
-                  cell.bindingPath
-                ),
-              };
-          } else if (
-            baseConfig.current.addDataSourceFormatterMap.has(cell?.bindingPath)
-          ) {
-            cell.style = {
-              ...(cell?.style || {}),
-              formatter: baseConfig.current.addDataSourceFormatterMap.get(
-                cell.bindingPath
-              ),
-            };
-          }
-        }
-      }
-    }
-  };
-
-  const { json, inst } = useMemo(() => {
-    let json = null;
-    let inst = null;
-
-    if (_json) {
-      json = JSON.parse(JSON.stringify(_json));
-      if (json && dataSource) {
-        initFormatter(json);
-        inst = new ParseReportJson({
-          reportJson: json,
-          datas: dataSource,
-          tempConfig: template,
-          setting,
-        });
-        const item = localStorage.getItem('storeSpreadJson');
-        if (item) {
-          localStorage.setItem('spreadJson', JSON.stringify(json));
-        }
-      }
-    }
-
     return {
-      json,
-      inst,
+      spread: null,
+      showError: showError,
+      showWarn: showWarn,
+      isFirstRender: true,
     };
-  }, [
-    _json,
-    dataSource,
-    JSON.stringify(template),
-    JSON.stringify(setting),
-    isRefresh,
-  ]);
+  });
 
-  /**
-   * 设置数据源格式化
-   * @param {string} datasource 数据源
-   * @param {string} format 格式化格式
-   */
-  const setDataSourceFormatter = (datasource, format) => {
-    baseConfig.current.dataSourceFormatterMap.set(datasource, format);
-    baseConfig.current.addDataSourceFormatterMap.set(datasource, format);
-    baseConfig.current.setLoading();
-    setIsRefresh(!isRefresh);
+  const el = useRef(null);
+
+  const onActiveSheetChanged = (type, args) => {
+    _onActiveSheetChanged && _onActiveSheetChanged(type, args);
   };
 
-  /**
-   * 删除数据源格式化值
-   * @param {string} datasource 数据源
-   */
-  const delDataSourceFormatter = (datasource) => {
-    baseConfig.current.dataSourceFormatterMap.delete(datasource);
-    baseConfig.current.addDataSourceFormatterMap.delete(datasource);
-    baseConfig.current.setLoading();
-    setIsRefresh(!isRefresh);
+  const initSpread = async () => {
+    if (enablePrint) {
+      const plugins = getPluginSrc('print');
+      await resourceManager.loadScript(plugins);
+    }
+    if (!data.spread && el.current && !el.showError) {
+      const spread = new GC.Spread.Sheets.Workbook(el.current, {
+        sheetCount: 0,
+        newTabVisible,
+        tabEditable,
+        tabStripVisible,
+      });
+      data.spread = spread;
+      fire({
+        event: EVENTS.OnSpreadInited,
+        args: [spread],
+      });
+      return true;
+    }
+    return false;
   };
 
-  const handlePrint = (printInfos) => {
-    if (onPrintHandler) {
-      onPrintHandler((params) => {
-        return new Promise((resolve, reject) => {
-          if (!enablePrint) {
-            reject(Error('打印失败，原因：初始化报表时未开启打印功能'));
-            return;
-          }
-          resolve({
-            print: printInfos.show,
-            exportExcel: printInfos.exportExcel,
-          });
+  //处理工作表生成，优先使用json
+  const handleSheets = (json) => {
+    if (!data.spread) return;
+    const spread = data.spread;
+    if (json) {
+      withBatchCalcUpdate(spread, () => {
+        spread.fromJSON(json);
+        fire({
+          event: EVENTS.OnSpreadJsonParsed,
+          args: [spread],
         });
-      });
-    }
-    if (onExportExcelHandler) {
-      onExportExcelHandler((params) => {
-        return new Promise((resolve, reject) => {
-          resolve({
-            exportExcel: printInfos.exportExcel,
+        const sheets = spread.sheets;
+        if (sheets && sheets.length > 0) {
+          sheets.forEach((sheet) => {
+            fire({
+              event: EVENTS.OnSheetInited,
+              args: [sheet],
+            });
+            onSheetChanged && onSheetChanged('SheetChanged', { sheet });
           });
-        });
+        }
       });
-    }
-    if (typeof onExportPDFHandler === 'function') {
-      onExportPDFHandler(() => {
-        return new Promise((resolve, reject) => {
-          resolve({
-            exportPDF: printInfos.exportPDF,
+    } else {
+      //不存在json数据时才根据子组件创建工作表
+      withBatchCalcUpdate(spread, () => {
+        let sheetList;
+        if (children) {
+          sheetList = Array.isArray(children) ? children : [children];
+        } else {
+          sheetList = [];
+        }
+        spread.clearSheets();
+        sheetList.forEach((sheet, index) => {
+          const {
+            name = `Sheet${index + 1}`,
+            rowCount = 20,
+            colCount = 20,
+          } = sheet.props;
+          const workSheet = new GC.Spread.Sheets.Worksheet(name);
+          workSheet.setRowCount(rowCount);
+          workSheet.setColumnCount(colCount);
+          spread.addSheet(index, workSheet);
+          fire({
+            event: EVENTS.OnSheetInited,
+            args: [workSheet],
           });
-        });
-      });
-    }
-    if (typeof onDatasourceFormatterHandler === 'function') {
-      onDatasourceFormatterHandler(() => {
-        return new Promise((resolve, reject) => {
-          resolve({
-            setDataSourceFormatter,
-            delDataSourceFormatter,
-          });
-        });
-      });
-    }
-  };
-
-  const handleOnQuery = (queryParams) => {
-    if (typeof onQuery === 'function') {
-      const queryResult = onQuery(queryParams);
-      queryResult.then((datas) => {
-        setWorkbookDatas((workbookDatas) => {
-          return {
-            ...workbookDatas,
-            dataSource: {
-              ..._dataSource,
-              ...(datas || {}),
-            },
-          };
+          onSheetChanged &&
+            onSheetChanged('SheetChanged', { sheet: workSheet });
         });
       });
     }
   };
+  //处理数据
+  const handleDatas = () => {
+    if (!data.spread) return;
+    const spread = data.spread;
+    if (dataSource) {
+      bindDataSource({
+        spread: spread,
+        dataSource,
+      });
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      const inited = await initSpread();
+      data.inited = inited;
+      if (inited) {
+        /**
+         * 处理事件绑定必须在第一次spread初始才做，
+         * 否则导致设计器编辑栏在初始化时注册的事件被清空
+         */
+        handleEvents({ ...props, onActiveSheetChanged, spread: data.spread });
+        handleSheets(json);
+        handleDatas();
+        if (onInited) {
+          onInited(data.spread);
+        }
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (data.isFirstRender) {
+      data.isFirstRender = false;
+      return;
+    }
+    if (data.inited) {
+      handleSheets(json);
+      if (!!data.spread.getActiveSheet()) {
+        // 重新重写默认单元格
+        fire({
+          event: EVENTS.OnSheetInited,
+          args: [data.spread.getActiveSheet()],
+        });
+      }
+      handleDatas();
+    }
+    if (isFunction(context.closeLoading)) {
+      context.closeLoading();
+    }
+  }, [json, dataSource, pageIndex]);
 
   return (
-    <>
-      <Print
-        onInited={(printInfos) => {
-          handlePrint(printInfos);
-        }}
-        license={license}
-        enablePrint={enablePrint}
-        dataSource={dataSource}
-        json={json}
-        inst={inst}
-      ></Print>
-      <WorkbookItem
-        {...props}
-        onPrintHandler={null}
-        inst={inst}
-        json={json}
-        onQuery={handleOnQuery}
-        onInited={(...args) => {
-          baseConfig.current.setLoading = args[1].setLoading;
-          if (isFunction(props.onInited)) return props.onInited(...args);
-        }}
-      ></WorkbookItem>
-    </>
+    <Wrap>
+      {data.showError ? (
+        <LicenseError></LicenseError>
+      ) : (
+        <ExcelWrap ref={el}></ExcelWrap>
+      )}
+      {!data.showError && data.showWarn ? <LicenseWarn></LicenseWarn> : null}
+    </Wrap>
   );
 }
