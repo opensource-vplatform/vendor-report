@@ -7,7 +7,7 @@
         "dev": "vite --host",
         "test": "node test/index.js",
         "postBuild": "node scripts/postBuild.js",
-        "build": "vite build -c=vite.config.build.js && npm run postBuild"
+        "build": "vite build -c=vite.config.build.js"
     },
     "dependencies": {
         "fast-xml-parser":"^4.4.0"

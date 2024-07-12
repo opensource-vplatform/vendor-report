@@ -1,73 +1,126 @@
 import Cell from '../../model/Cell';
+import {
+  FieldSyntax,
+  ParameterSyntax,
+  parse,
+  print,
+  StringIdentifierSyntax,
+} from '../../syntax';
+import { getTextName } from '../../util/XmlUtil';
 import Element from '../Element';
 
-class TextField extends Element{
-
-    parseReportElement(cell,context){
-        const node = this.getNode();
-        const reportElement = node.reportElement;
-        if(reportElement){
-            cell.setLeft(this.getIntegerAttr("x",reportElement));
-            cell.setTop(this.getIntegerAttr("y",reportElement)+context.getTopOffset());
-            cell.setWidth(this.getIntegerAttr("width",reportElement));
-            cell.setHeight(this.getIntegerAttr("height",reportElement));
-        }
+class TextField extends Element {
+  parseReportElement(cell, context) {
+    const node = this.getNode();
+    const reportElement = node.reportElement;
+    if (reportElement) {
+      cell.setLeft(this.getIntegerAttr('x', reportElement));
+      cell.setTop(
+        this.getIntegerAttr('y', reportElement) + context.getTopOffset()
+      );
+      cell.setWidth(this.getIntegerAttr('width', reportElement));
+      cell.setHeight(this.getIntegerAttr('height', reportElement));
     }
+  }
 
-    toBorder(borderType,box){
-        const type = this.getAttribute(borderType,box);
-        if(type!='None'){
-            return {
-                type: type,
-                color: this.getAttribute(borderType+"Color",box),
+  toBorder(borderType, box) {
+    const type = this.getAttribute(borderType, box);
+    if (type != 'None') {
+      return {
+        type: type,
+        color: this.getAttribute(borderType + 'Color', box),
+      };
+    }
+    return null;
+  }
+
+  parseBox(cell) {
+    const node = this.getNode();
+    const box = node.box;
+    if (box) {
+      cell.setBorderTop(this.toBorder('topBorder', box));
+      cell.setBorderRight(this.toBorder('rightBorder', box));
+      cell.setBorderBottom(this.toBorder('bottomBorder', box));
+      cell.setBorderLeft(this.toBorder('leftBorder', box));
+    }
+  }
+
+  parseTextElement(cell) {
+    const node = this.getNode();
+    const textElement = node.textElement;
+    if (textElement) {
+      cell.setHAlign(this.getAttribute('textAlignment', textElement));
+      cell.setVAlign(this.getAttribute('verticalAlignment', textElement));
+      const font = textElement.font;
+      if (font) {
+        cell.setFont(this.getAttribute('fontName', font));
+        cell.setFontSize(this.getIntegerAttr('size', font));
+        cell.setBold(this.getAttribute('isBold', font) == 'true');
+      }
+    }
+  }
+
+  parseTextFieldExpression(cell) {
+    const node = this.getNode();
+    const textFieldExpression = node.textFieldExpression;
+    if (textFieldExpression) {
+      const text = textFieldExpression[getTextName()];
+      if (text) {
+        let syntax = null;
+        try {
+          syntax = parse(text);
+          const syntaxs = syntax.getSyntaxs();
+          if(syntaxs.length==1){
+            const stx = syntaxs[0];
+            if(stx instanceof StringIdentifierSyntax){
+                cell.setText(stx.getValue());
+                return;
+            }else if(stx instanceof ParameterSyntax){
+                cell.setBindingPath(stx.getCode());
+                return;
+            }else if(stx instanceof FieldSyntax){
+                cell.setBindingPath(stx.getCode());
+                return;
             }
+          }
+          if (syntax.isText()) {
+            cell.setText(syntax.toString());
+          } else {
+            const formula = print(syntax, {
+              printAddSyntax: function (syntax) {
+                const leftSyntax = syntax.getLeft();
+                const rightSyntax = syntax.getRight();
+                return `CONCAT(${leftSyntax.toString()},${rightSyntax.toString()})`
+              },
+              printFieldSyntax: function (syntax) {
+                const code = syntax.getCode();
+                return `TOONE.GET("${code}")`;
+              },
+              printParameterSyntax: function (syntax) {
+                const code = syntax.getCode();
+                return `TOONE.GET("${code}")`;
+              },
+            });
+            cell.setFormula(formula);
+          }
+        } catch (e) {
+          console.error(e);
+          cell.setText(text);
         }
-        return null;
+
+        console.log(syntax);
+      }
     }
+  }
 
-    parseBox(cell){
-        const node = this.getNode();
-        const box = node.box;
-        if(box){
-            cell.setTopBorder(this.toBorder("topBorder",box));
-            cell.setRightBorder(this.toBorder("rightBorder",box));
-            cell.setBottomBorder(this.toBorder("bottomBorder",box));
-            cell.setLeftBorder(this.toBorder("leftBorder",box));
-        }
-    }
-
-    parseTextElement(cell){
-        const node = this.getNode();
-        const textElement = node.textElement;
-        if(textElement){
-            cell.setHAlign(this.getAttribute("textAlignment",textElement));
-            cell.setVAlign(this.getAttribute("verticalAlignment",textElement));
-            const font = textElement.font;
-            if(font){
-                cell.setFont(this.getAttribute("fontName",font));
-                cell.setFontSize(this.getIntegerAttr("size",font));
-                cell.setBold(this.getAttribute("isBold",font)=="true");
-            }
-        }
-    }
-
-    parseTextFieldExpression(cell){
-        const node = this.getNode();
-        const textFieldExpression = node.textFieldExpression;
-        if(textFieldExpression){
-
-        }
-    }
-
-    parse(context){
-        const cell = new Cell();
-        this.parseReportElement(cell,context);
-        this.parseBox(cell,context);
-        this.parseTextElement(cell);
-        this.parseTextFieldExpression(cell);
-        return cell;
-    }
-
+  parse(context) {
+    const cell = new Cell();
+    this.parseReportElement(cell, context);
+    this.parseBox(cell, context);
+    this.parseTextElement(cell);
+    this.parseTextFieldExpression(cell);
+    return cell;
+  }
 }
 
 TextField.nodeName = 'textField';

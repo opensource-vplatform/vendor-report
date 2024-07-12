@@ -1,3 +1,4 @@
+import { toAttrName as toAttr } from '../util/XmlUtil';
 import { createChildren as create } from './Factory';
 
 class Element {
@@ -15,7 +16,7 @@ class Element {
   }
 
   toAttrName(attr) {
-    return '@_' + attr;
+    return toAttr(attr);
   }
 
   getAttribute(attr, node) {

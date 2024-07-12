@@ -1,139 +1,123 @@
 import { addUniqueItem } from '../util/ArrayUtil';
-
-const DefaultSpreadJson = {
-  version: '17.0.10',
-  name: '',
-  docProps: {},
-  sheetCount: 1,
-  tabStripRatio: 0.6,
-  highlightInvalidData: true,
-  allowDynamicArray: true,
-  iterativeCalculation: false,
-  iterativeCalculationMaximumIterations: 100,
-  iterativeCalculationMaximumChange: 0.001,
-  dynamicReferences: false,
-  customList: [],
-  defaultSheetTabStyles: {},
-  sheets: {},
-  sheetTabCount: 0,
-  namedStyles: [],
-  namedPatterns: {},
-  pivotCaches: {},
-};
-
-const DefaultSheetJson = {
-  name: 'Sheet1',
-  isSelected: true,
-  visible: 1,
-  theme: 'Office',
-  data: {
-    defaultDataNode: {
-      style: {
-        themeFont: 'Body',
-      },
-    },
-  },
-  rowHeaderData: {
-    defaultDataNode: {
-      style: {
-        themeFont: 'Body',
-      },
-    },
-  },
-  colHeaderData: {
-    defaultDataNode: {
-      style: {
-        themeFont: 'Body',
-      },
-    },
-  },
-  defaultData: {},
-  leftCellIndex: 0,
-  topCellIndex: 0,
-  selections: undefined,
-  rowOutlines: {
-    items: [],
-  },
-  columnOutlines: {
-    items: [],
-  },
-  cellStates: {},
-  states: {},
-  outlineColumnOptions: {},
-  autoMergeRangeInfos: [],
-  shapeCollectionOption: {
-    snapMode: 0,
-  },
-  printInfo: {
-    paperSize: {
-      height: 1169.2913385826773,
-      kind: 9,
-      width: 826.7716535433073,
-    },
-  },
-  index: 0,
-  order: 0,
-};
+import {
+  addSpan,
+  getDefaultSheetJson,
+  getDefaultSpreadJson,
+  setBindingPath,
+  setColumnCount,
+  setColumnWidths,
+  setFormula,
+  setRowCount,
+  setRowHeights,
+  setStyle,
+  setValue,
+  toHAlign,
+  toVAlign,
+} from '../util/SpreadUtil';
 
 class SheetToJson {
   constructor(sheet) {
     this.sheet = sheet;
+    this.sheetJson = null;
   }
 
-  /**
-   * 设置列数
-   * @param {*} lefts 
-   * @param {*} sheetJson 
-   */
-  setColumnCount(lefts,sheetJson){
-    sheetJson.columnCount = lefts.length - 1;
-  }
-
-  /**
-   * 设置行数
-   * @param {*} tops 
-   * @param {*} sheetJson 
-   */
-  setRowCount(tops,sheetJson){
-    sheetJson.rowCount = tops.length - 1;
-  }
-
-  /**
-   * 设置列宽
-   */
-  setColumnWidths(lefts,sheetJson){
+  toColumnWidths(lefts) {
     const columns = [];
-    lefts.forEach((left,index)=>{
-        if(index!=lefts.length-1){
-            columns.push({
-                size: lefts[index+1]-left
-            });
-        }
+    lefts.forEach((left, index) => {
+      if (index != lefts.length - 1) {
+        columns.push({
+          size: lefts[index + 1] - left,
+        });
+      }
     });
-    sheetJson.columns = columns;
+    return columns;
   }
 
   /**
    * 设置行高
-   * @param {*} tops 
-   * @param {*} sheetJson 
+   * @param {*} tops
+   * @param {*} sheetJson
    */
-  setRowHeights(tops,sheetJson){
+  toRowHeights(tops) {
     const rows = [];
-    tops.forEach((top,index)=>{
-        if(index!=tops.length-1){
-            rows.push({
-                size: tops[index+1]-top
-            });
-        }
+    tops.forEach((top, index) => {
+      if (index != tops.length - 1) {
+        rows.push({
+          size: tops[index + 1] - top,
+        });
+      }
     });
-    sheetJson.rows = rows;
+    return rows;
+  }
+
+  appnedBorderStyle(type, border, style) {
+    if (border) {
+      style[type] = {
+        style: 1, //border.type == 'Thin' ? 1: 5,
+        color: border.color,
+      };
+    }
+  }
+
+  /**
+   * 设置单元格样式
+   * @param {*} col
+   * @param {*} cell
+   */
+  setCellStyle(row, col, cell) {
+    const font = cell.getFont();
+    const fontSize = cell.getFontSize();
+    const style = {
+      hAlign: toHAlign(cell.getHAlign().toLowerCase()),
+      vAlign: toVAlign(cell.getVAlign().toLowerCase()),
+      font: `${fontSize}pt ${font}`,
+      fontFamily: font,
+      fontSize: fontSize + 'pt',
+    };
+    this.appnedBorderStyle('borderTop', cell.getBorderTop(), style);
+    this.appnedBorderStyle('borderRight', cell.getBorderRight(), style);
+    this.appnedBorderStyle('borderBottom', cell.getBorderBottom(), style);
+    this.appnedBorderStyle('borderLeft', cell.getBorderLeft(), style);
+    setStyle(row, col, style, this.sheetJson);
+  }
+
+  /**
+   * 设置单元格
+   * @param {*} lefts
+   * @param {*} tops
+   * @param {*} cells
+   */
+  setCells(lefts, tops, cells) {
+    cells.forEach((cell) => {
+      const left = cell.getLeft();
+      const top = cell.getTop();
+      const right = cell.getRight();
+      const bottom = cell.getBottom();
+      const row = tops.indexOf(top);
+      const col = lefts.indexOf(left);
+      const rowEnd = tops.indexOf(bottom);
+      const colEnd = lefts.indexOf(right);
+      const rowCount = rowEnd - row;
+      const colCount = colEnd - col;
+      setValue(row, col, cell.getText(), this.sheetJson);
+      setBindingPath(row, col, cell.getBindingPath(), this.sheetJson);
+      setFormula(row, col, cell.getFormula(), this.sheetJson);
+      for (let i = 0; i < rowCount; i++) {
+        for (let j = 0; j < colCount; j++) {
+          this.setCellStyle(row + i, col + j, cell);
+        }
+      }
+      if (rowCount > 1 || colCount > 1) {
+        addSpan(row, col, rowCount, colCount, this.sheetJson);
+      }
+    });
   }
 
   parseSheet() {
+    const sheetJson = getDefaultSheetJson();
+    this.sheetJson = sheetJson;
     const name = this.sheet.getName();
-    const sheetJson = DefaultSheetJson;
-    sheetJson.name = name;
+    this.sheetJson.name = name;
     const lefts = [0]; //所有左边距
     const tops = [0]; //所有上边距
     const cells = this.sheet.getCells();
@@ -145,11 +129,17 @@ class SheetToJson {
       addUniqueItem(left + cell.getWidth(), lefts);
       addUniqueItem(top + cell.getHeight(), tops);
     });
-    this.setColumnCount(lefts,sheetJson);
-    this.setColumnWidths(lefts,sheetJson);
-    this.setRowCount(tops,sheetJson);
-    this.setRowHeights(tops,sheetJson);
-    return { [name]: sheetJson };
+    const sortHandler = function (a, b) {
+      return a - b;
+    };
+    lefts.sort(sortHandler);
+    tops.sort(sortHandler);
+    setColumnCount(lefts.length - 1, this.sheetJson);
+    setRowCount(tops.length - 1, this.sheetJson);
+    setColumnWidths(this.toColumnWidths(lefts), this.sheetJson);
+    setRowHeights(this.toRowHeights(tops), this.sheetJson);
+    this.setCells(lefts, tops, cells);
+    return { [name]: this.sheetJson };
   }
 
   /**
@@ -207,9 +197,9 @@ class SheetToJson {
   }
 
   toJSON() {
-    let json = DefaultSpreadJson;
-    json.sheets = this.parseSheet();
-    return json;
+    const spread = getDefaultSpreadJson();
+    spread.sheets = this.parseSheet();
+    return spread;
   }
 }
 

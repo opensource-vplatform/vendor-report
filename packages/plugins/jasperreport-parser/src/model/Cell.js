@@ -8,6 +8,14 @@ class Cell{
         return this.left;
     }
 
+    getRight(){
+        return this.left + this.width;
+    }
+
+    getBottom(){
+        return this.top + this.height;
+    }
+
     setTop(top){
         this.top = top;
     }
@@ -36,44 +44,88 @@ class Cell{
         this.hAlign = hAlign;
     }
 
+    getHAlign(){
+        return this.hAlign;
+    }
+
     setVAlign(vAlign){
         this.vAlign = vAlign;
+    }
+
+    getVAlign(){
+        return this.vAlign;
     }
 
     setFont(font){
         this.font = font;
     }
 
+    getFont(){
+        return this.font;
+    }
+
     setFontSize(fontSize){
         this.fontSize = fontSize;
+    }
+
+    getFontSize(){
+        return this.fontSize;
     }
 
     setBold(bold){
         this.bold = bold;
     }
 
+    isBold(){
+        return this.bold;
+    }
+
     setText(text){
         this.text = text;
+    }
+
+    getText(){
+        return this.text;
     }
 
     setFormula(formula){
         this.formula = formula;
     }
 
-    setTopBorder(topBorder){
-        this.topBorder = topBorder;
+    getFormula(){
+        return this.formula;
     }
 
-    setRightBorder(rightBorder){
-        this.rightBorder = rightBorder;
+    setBorderTop(borderTop){
+        this.borderTop = borderTop;
     }
 
-    setBottomBorder(bottomBorder){
-        this.bottomBorder = bottomBorder;
+    getBorderTop(){
+        return this.borderTop
     }
 
-    setLeftBorder(leftBorder){
-        this.leftBorder = leftBorder;
+    setBorderRight(borderRight){
+        this.borderRight = borderRight;
+    }
+
+    getBorderRight(){
+        return this.borderRight;
+    }
+
+    setBorderBottom(borderBottom){
+        this.borderBottom = borderBottom;
+    }
+
+    getBorderBottom(){
+        return this.borderBottom;
+    }
+
+    setBorderLeft(borderLeft){
+        this.borderLeft = borderLeft;
+    }
+
+    getBorderLeft(){
+        return this.borderLeft;
     }
 
     setColSpan(colSpan){
@@ -82,6 +134,14 @@ class Cell{
 
     setRowSpan(rowSpan){
         this.rowSpan = rowSpan;
+    }
+
+    setBindingPath(bindingPath){
+        this.bindingPath = bindingPath;
+    }
+
+    getBindingPath(){
+        return this.bindingPath;
     }
 
 }

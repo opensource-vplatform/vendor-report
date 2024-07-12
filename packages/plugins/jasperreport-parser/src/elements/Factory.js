@@ -1,3 +1,4 @@
+import { isChild } from '../util/XmlUtil';
 import Context from './Context';
 import Band from './impls/Band';
 import ColumnFooter from './impls/ColumnFooter';
@@ -31,7 +32,7 @@ export const createChildren = function (parentElement) {
 
 export const createByNode = function (nodeName, nodeVal) {
   const children = [];
-  if (!nodeName.startsWith('@_')) {
+  if (isChild(nodeName)) {
     const Constructor = Components.find((con) => con.nodeName == nodeName);
     if (Constructor) {
       nodeVal = Array.isArray(nodeVal) ? nodeVal : [nodeVal];
