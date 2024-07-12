@@ -398,11 +398,24 @@ export default (props) => {
         printHandler({
           ctxVal,
         });
-        return ctxVal;
+        if (ctxVal.printed[ctxVal.printIndex]) {
+          return ctxVal;
+        } else {
+          return {
+            ctxVal,
+            printed: {
+              ...ctxVal.printed,
+              [ctxVal.printIndex]: true,
+            },
+          };
+        }
       }
       return {
         ...ctxVal,
         showExcel: true,
+        printed: {
+          [ctxVal.printIndex]: true,
+        },
         handler(ctxVal) {
           if (enablePrint) {
             printHandler({
@@ -529,6 +542,7 @@ export default (props) => {
       });
     }
   });
+
   return (
     <PreviewContext.Provider value={ctxVal}>
       {ctxVal.showExcel && (
