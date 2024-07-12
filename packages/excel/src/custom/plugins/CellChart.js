@@ -36,8 +36,9 @@ const paintCell = function (context, value, x, y, w, h, style, options) {
     }
   }
   if (!!sheet.floatingObjects.get(uuId)) {
-    // console.log('++++++++++++++++', sheet.getDataSource()?.getValue("Ipes_MP_Certificate_DetailCalc"))
+    // onsole.log('++++++++++++++++', sheet.getDataSource()?.getValue("Ipes_MP_Certificate_DetailCalc"))
     // console.log(ChartInstanceMap)
+
     ChartInstanceMap.get(uuId) && ChartInstanceMap.get(uuId).updateConfig({
       type: chartConfig.config.type,
       config: {
@@ -68,7 +69,7 @@ const paintCell = function (context, value, x, y, w, h, style, options) {
       type: chartConfig.config.type,
       config: {
         ...chartConfig.config.config,
-        datasource: sheet.getDataSource()?.getValue(chartConfig.config.datasource) || []
+        datasource: sheet.getDataSource()?.getValue(chartConfig.config.config.datasource) || []
       }
 
     });
