@@ -6,6 +6,8 @@ import {
 
 import styled, { keyframes } from 'styled-components';
 
+import { isFunction } from '@toone/report-util';
+
 import useInitFormatter from './hooks/useInitFormatter';
 import useLoading from './hooks/useLoading';
 import usePage from './hooks/usePage';
@@ -95,6 +97,7 @@ export default (props) => {
     setting,
     dataSource,
     onPageCompleted,
+    onActiveSheetChanged,
   } = props;
   const [ctxVal, setCtxVal] = useState({
     json: null,
@@ -236,7 +239,16 @@ export default (props) => {
             </LoadingWrap>
           )}
           <PaperDiv style={{ ...ctxVal.paperStyle }}>
-            <WorkBook {...props} dataSource={ctxVal.dataSource}>
+            <WorkBook
+              {...props}
+              dataSource={ctxVal.dataSource}
+              onActiveSheetChanged={(type, args) => {
+                debugger;
+                if (isFunction(onActiveSheetChanged)) {
+                  onActiveSheetChanged(type, args);
+                }
+              }}
+            >
               <WorkSheet></WorkSheet>
             </WorkBook>
           </PaperDiv>

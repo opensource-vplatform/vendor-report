@@ -49,6 +49,10 @@ export default function useZoom(ctxVal, setCtxVal) {
         let height = 0;
         //报表缩放因子计算
         Object.values(_json.sheets).forEach((sheet) => {
+          const { isSelected = false } = sheet;
+          if (!isSelected) {
+            return;
+          }
           const { sheetWidth, sheetHeight } = getSheetRect(sheet);
           const zoomFactor = width / sheetWidth;
           //缩放后内容新高度
@@ -80,6 +84,10 @@ export default function useZoom(ctxVal, setCtxVal) {
         let height = paperWrapHeight - diffHeight;
         //报表缩放因子计算
         Object.values(_json.sheets).forEach((sheet) => {
+          const { isSelected = false } = sheet;
+          if (!isSelected) {
+            return;
+          }
           const { sheetWidth, sheetHeight } = getSheetRect(sheet);
           let zoomFactor = 1;
           let value = 0;
@@ -153,6 +161,10 @@ export default function useZoom(ctxVal, setCtxVal) {
         let height = paperHeight - diffHeight;
         //纸张大小大于等于内容大小
         Object.values(_json.sheets).forEach((sheet) => {
+          const { isSelected = false } = sheet;
+          if (!isSelected) {
+            return;
+          }
           const { sheetWidth, sheetHeight } = getSheetRect(sheet);
           width = sheetWidth;
           height = sheetHeight;
@@ -179,5 +191,5 @@ export default function useZoom(ctxVal, setCtxVal) {
         paperWrapStyle,
       };
     });
-  }, [ctxVal.zoomValue, ctxVal.pageIndex, ctxVal.dataSource]);
+  }, [ctxVal.zoomValue, ctxVal.pageIndex, ctxVal.dataSource, ctxVal.isRefresh]);
 }
