@@ -6,13 +6,13 @@ import {
   print,
   StringIdentifierSyntax,
 } from '../../syntax';
-import { getTextName } from '../../util/XmlUtil';
+import { getChild, getText } from '../../util/XmlUtil';
 import Element from '../Element';
 
 class TextField extends Element {
   parseReportElement(cell, context) {
     const node = this.getNode();
-    const reportElement = node.reportElement;
+    const reportElement = getChild('reportElement', node);
     if (reportElement) {
       cell.setLeft(this.getIntegerAttr('x', reportElement));
       cell.setTop(
@@ -36,7 +36,7 @@ class TextField extends Element {
 
   parseBox(cell) {
     const node = this.getNode();
-    const box = node.box;
+    const box = getChild('box', node);
     if (box) {
       cell.setBorderTop(this.toBorder('topBorder', box));
       cell.setBorderRight(this.toBorder('rightBorder', box));
@@ -47,11 +47,11 @@ class TextField extends Element {
 
   parseTextElement(cell) {
     const node = this.getNode();
-    const textElement = node.textElement;
+    const textElement = getChild('textElement', node);
     if (textElement) {
       cell.setHAlign(this.getAttribute('textAlignment', textElement));
       cell.setVAlign(this.getAttribute('verticalAlignment', textElement));
-      const font = textElement.font;
+      const font = getChild('font', textElement);
       if (font) {
         cell.setFont(this.getAttribute('fontName', font));
         cell.setFontSize(this.getIntegerAttr('size', font));
@@ -62,25 +62,25 @@ class TextField extends Element {
 
   parseTextFieldExpression(cell) {
     const node = this.getNode();
-    const textFieldExpression = node.textFieldExpression;
+    const textFieldExpression = getChild('textFieldExpression', node);
     if (textFieldExpression) {
-      const text = textFieldExpression[getTextName()];
+      const text = getText(textFieldExpression);
       if (text) {
         let syntax = null;
         try {
           syntax = parse(text);
           const syntaxs = syntax.getSyntaxs();
-          if(syntaxs.length==1){
+          if (syntaxs.length == 1) {
             const stx = syntaxs[0];
-            if(stx instanceof StringIdentifierSyntax){
-                cell.setText(stx.getValue());
-                return;
-            }else if(stx instanceof ParameterSyntax){
-                cell.setBindingPath(stx.getCode());
-                return;
-            }else if(stx instanceof FieldSyntax){
-                cell.setBindingPath(stx.getCode());
-                return;
+            if (stx instanceof StringIdentifierSyntax) {
+              cell.setText(stx.getValue());
+              return;
+            } else if (stx instanceof ParameterSyntax) {
+              cell.setBindingPath(stx.getCode());
+              return;
+            } else if (stx instanceof FieldSyntax) {
+              cell.setBindingPath(stx.getCode());
+              return;
             }
           }
           if (syntax.isText()) {
@@ -90,7 +90,7 @@ class TextField extends Element {
               printAddSyntax: function (syntax) {
                 const leftSyntax = syntax.getLeft();
                 const rightSyntax = syntax.getRight();
-                return `CONCAT(${leftSyntax.toString()},${rightSyntax.toString()})`
+                return `CONCAT(${leftSyntax.toString()},${rightSyntax.toString()})`;
               },
               printFieldSyntax: function (syntax) {
                 const code = syntax.getCode();

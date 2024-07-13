@@ -1,6 +1,6 @@
-import { XMLParser } from 'fast-xml-parser';
+import { xml2js } from 'xml-js';
 
-import { createChildren } from './elements/Factory';
+import { createByNode } from './elements/Factory';
 import ParseContext from './elements/ParseContext';
 import SheetToJson from './model/SheetToJson';
 
@@ -10,15 +10,21 @@ class Parser {
   }
 
   parse() {
-    const xmlParser = new XMLParser({
-      ignoreAttributes: false,
+    const xmlObj = xml2js(this.jrxml, {
+      ignoreComment: true,
+      alwaysChildren: true,
     });
-    const xmlObj = xmlParser.parse(this.jrxml);
-    const children = createChildren(xmlObj);
-    if (children.length > 0) {
-      const sheet = children[0].parse(new ParseContext());
-      const sheetToJson = new SheetToJson(sheet);
-      return sheetToJson.toJSON();
+    const elements = xmlObj.elements;
+    const element = elements?.find(
+      (element) => element.name == 'jasperReport' && element.type == 'element'
+    );
+    if (element) {
+      const instance = createByNode(element);
+      if (instance) {
+        const sheet = instance.parse(new ParseContext());
+        const sheetToJson = new SheetToJson(sheet);
+        return sheetToJson.toJSON();
+      }
     }
     return null;
   }

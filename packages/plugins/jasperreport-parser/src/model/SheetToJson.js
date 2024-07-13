@@ -114,8 +114,7 @@ class SheetToJson {
   }
 
   parseSheet() {
-    const sheetJson = getDefaultSheetJson();
-    this.sheetJson = sheetJson;
+    this.sheetJson = getDefaultSheetJson();
     const name = this.sheet.getName();
     this.sheetJson.name = name;
     const lefts = [0]; //所有左边距

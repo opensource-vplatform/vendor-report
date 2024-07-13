@@ -1,16 +1,14 @@
 import Element from '../Element';
 
 class Band extends Element {
-  
-
   parse(context) {
     const children = this.createChildren();
-    const tds = [];
+    const cells = [];
     children.forEach((child) => {
-      const td = child.parse(context);
-      tds.push(td);
+      const cell = child.parse(context);
+      cells.push(cell);
     });
-    return tds;
+    return cells;
   }
 }
 

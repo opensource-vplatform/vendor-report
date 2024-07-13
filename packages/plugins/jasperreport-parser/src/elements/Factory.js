@@ -1,4 +1,3 @@
-import { isChild } from '../util/XmlUtil';
 import Context from './Context';
 import Band from './impls/Band';
 import ColumnFooter from './impls/ColumnFooter';
@@ -23,24 +22,26 @@ const Components = [
 ];
 
 export const createChildren = function (parentElement) {
-  let children = [];
-  for (let [key, val] of Object.entries(parentElement)) {
-    children = children.concat(createByNode(key, val));
+  const children = [];
+  const elements = parentElement.elements;
+  if (elements) {
+    elements.forEach((element) => {
+      if (element.type == 'element') {
+        const child = createByNode(element);
+        if (child) {
+          children.push(child);
+        }
+      }
+    });
   }
   return children;
 };
 
-export const createByNode = function (nodeName, nodeVal) {
-  const children = [];
-  if (isChild(nodeName)) {
-    const Constructor = Components.find((con) => con.nodeName == nodeName);
-    if (Constructor) {
-      nodeVal = Array.isArray(nodeVal) ? nodeVal : [nodeVal];
-      nodeVal.forEach((item) => {
-        const inst = new Constructor(item, new Context());
-        children.push(inst);
-      });
-    }
+export const createByNode = function (node) {
+  const nodeName = node.name;
+  const Constructor = Components.find((con) => con.nodeName == nodeName);
+  if (Constructor) {
+    return new Constructor(node, new Context());
   }
-  return children;
+  return null;
 };

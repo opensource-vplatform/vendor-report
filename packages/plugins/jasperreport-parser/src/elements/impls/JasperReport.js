@@ -1,9 +1,11 @@
 import Sheet from '../../model/Sheet';
+import { getChild } from '../../util/XmlUtil';
 import Element from '../Element';
 import { createByNode } from '../Factory';
 
 class JasperReport extends Element {
   parse(context) {
+    debugger;
     const childrenNames = [
       'title',
       'pageHeader',
@@ -25,18 +27,18 @@ class JasperReport extends Element {
     let cells = [];
     const node = this.getNode();
     childrenNames.forEach((childrenName) => {
-      const nodeVal = node[childrenName];
-      if (nodeVal) {
-        const band = nodeVal.band;
+      const child = getChild(childrenName, node);
+      if (child) {
+        const band = getChild('band', child);
         const height = this.getIntegerAttr('height', band);
-        const children = createByNode(childrenName, nodeVal);
+        const children = this.createChildren(child);
         children.forEach((child) => {
-          const td = child.parse(context);
-          if (td) {
-            if (Array.isArray(td)) {
-              cells = cells.concat(td);
+          const cell = child.parse(context);
+          if (cell) {
+            if (Array.isArray(cell)) {
+              cells = cells.concat(cell);
             } else {
-              cells.push(td);
+              cells.push(cell);
             }
           }
         });
