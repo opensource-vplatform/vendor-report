@@ -101,6 +101,7 @@ export default (props) => {
   } = props;
   const [ctxVal, setCtxVal] = useState({
     json: null,
+    cacheJson: null,
     dataSource,
     pageIndex: 1, //当前页码
     total: 1, //总页数
@@ -197,6 +198,7 @@ export default (props) => {
           ...ctxVal,
           dataSource: ctxVal.dataSource,
           json: _json,
+          cacheJson: JSON.parse(JSON.stringify(_json)),
           pageIndex,
           isPage,
           total,

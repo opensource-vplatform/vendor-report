@@ -2,6 +2,23 @@ import { useEffect } from 'react';
 
 import { getSheetRect } from '../utils/spreadUtil';
 
+function floorOrCeil(zoomFactor) {
+  if (true) {
+    let num = zoomFactor * 10;
+    const decimal = num - Math.floor(num); // 获取小数部分
+    if (decimal < 0.5) {
+      num = Math.floor(num) / 10; // 小于0.5时向下取整
+    } else {
+      num = Math.ceil(num) / 10; // 大于等于0.5时向上取整
+    }
+    if (num < zoomFactor) {
+      zoomFactor = num;
+    }
+  }
+
+  return zoomFactor;
+}
+
 export default function useZoom(ctxVal, setCtxVal) {
   //设置缩放
   ctxVal.setZoomInfo = (zoomValue, zoomType = 'zoom') => {
@@ -25,6 +42,7 @@ export default function useZoom(ctxVal, setCtxVal) {
     setCtxVal((ctxVal) => {
       const {
         json: _json,
+        cacheJson,
         paperStyle,
         paperWrapWidth,
         paperWrapHeight,
@@ -39,13 +57,17 @@ export default function useZoom(ctxVal, setCtxVal) {
         paddingTop,
       } = paper;
       let paperWrapStyle = {};
+      //还原配置
+      _json.showVerticalScrollbar = cacheJson.showVerticalScrollbar;
+      _json.showHorizontalScrollbar = cacheJson.showHorizontalScrollbar;
 
       //缩放类型：适合页宽
       if (ctxVal.zoomValue === 'suitableToPageWidth') {
         paperWidth = '100%'; //纸张宽度
-        let diffHeight = 16 + paddingBottom + paddingTop + 28;
+        let diffHeight = 16 + paddingBottom + paddingTop + 28 + 20;
+        let diffWidth = 16 + paddingLeft + paddingRight + 10;
         //计算报表画布canvas的宽度；16：边距；28：报表底部工具栏;10:滚动条宽度
-        const width = paperWrapWidth - 16 - paddingLeft - paddingRight - 10;
+        let width = paperWrapWidth - diffWidth;
         let height = 0;
         //报表缩放因子计算
         Object.values(_json.sheets).forEach((sheet) => {
@@ -54,14 +76,19 @@ export default function useZoom(ctxVal, setCtxVal) {
             return;
           }
           const { sheetWidth, sheetHeight } = getSheetRect(sheet);
-          const zoomFactor = width / sheetWidth;
+          //const zoomFactor = width / sheetWidth;
+          const zoomFactor = floorOrCeil(width / sheetWidth);
           //缩放后内容新高度
           height = sheetHeight * zoomFactor;
+          width = sheetWidth * zoomFactor;
           sheet.zoomFactor = zoomFactor;
         });
         paperHeight = height + 10 + diffHeight;
-        paperStyle.display = 'block';
-        paperWrapStyle = {};
+        //paperWidth = width + diffWidth;
+        paperStyle.display = 'flex';
+        if (paperWidth < paperWrapWidth) {
+          paperWrapStyle = { justifyContent: 'center' };
+        }
       }
 
       //缩放类型：适合页面
@@ -101,18 +128,6 @@ export default function useZoom(ctxVal, setCtxVal) {
             value = sheetHeight;
             limitValue = height;
           }
-          function floorOrCeil(zoomFactor) {
-            if (true) {
-              const num = zoomFactor * 10;
-              const decimal = num - Math.floor(num); // 获取小数部分
-              if (decimal < 0.5) {
-                zoomFactor = Math.floor(num) / 10; // 小于0.5时向下取整
-              } else {
-                zoomFactor = Math.ceil(num) / 10; // 大于等于0.5时向上取整
-              }
-            }
-            return zoomFactor;
-          }
           let newValue = 0;
           let index = 0;
           do {
@@ -135,10 +150,7 @@ export default function useZoom(ctxVal, setCtxVal) {
             }
             height = sheetHeight * zoomFactor;
           }
-          const newZoomFactor = floorOrCeil(zoomFactor);
-          if (newZoomFactor < zoomFactor) {
-            zoomFactor = newZoomFactor;
-          }
+          //zoomFactor = floorOrCeil(zoomFactor);
           sheet.zoomFactor = zoomFactor;
         });
         //纸张大小等于画布大小加上边距等
@@ -180,6 +192,16 @@ export default function useZoom(ctxVal, setCtxVal) {
       }
       //缩放类型：其它
 
+      //纸张大小不能大于容器大小(存在性能问题)
+      if (paperHeight > paperWrapHeight) {
+        _json.showVerticalScrollbar = true;
+        paperHeight = '100%';
+      }
+
+      if (paperWidth > paperWrapWidth) {
+        paperWidth = '100%';
+        _json.showHorizontalScrollbar = true;
+      }
       return {
         ...ctxVal,
         json: { ..._json },
