@@ -12,6 +12,14 @@ class ParseContext{
         return this.topOffset;
     }
 
+    setColumnWidth(columnWidth){
+        this.columnWidth = columnWidth;
+    }
+
+    getColumnWidth(){
+        return this.columnWidth;
+    }
+
 }
 
 export default ParseContext;

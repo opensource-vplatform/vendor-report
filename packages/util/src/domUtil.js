@@ -44,6 +44,59 @@ function initDivDom() {
   return _div_dom;
 }
 
+function IsChinese(str){ 
+  if(!str){
+      return false;
+  }
+
+  return encodeURIComponent(str).startsWith("%E");
+}
+
+const Chinese_Char_Width_Cache = {};
+
+const UnChinese_Char_Width_Cache = {};
+
+function getDomActualStyle(text,style){
+  const dom = initDivDom();
+  const style = dom.style;
+  Object.assign(dom.style,style);
+  
+}
+
+function getLineHeight(fontSize,fontFamily){
+  const dom = initDivDom();
+  const style = dom.style;
+  style.display = 'block';
+  style.overflow = 'visible';
+  style.width =  '100px';
+  
+}
+
+function getWidth(text,fontSize,fontFamily){
+  const dom = initDivDom();
+  const style = dom.style;
+  style.display = 'block';
+  style.overflow = 'visible';
+  style.width =  '0px';
+  //style.fontSize = fontSize + 'px';
+  style.fontSize = Number.isFinite(Number(fontSize))
+    ? fontSize + 'px'
+    : fontSize;
+  style.fontFamily = fontFamily;
+  dom.innerText = text;
+  const width = dom.getBoundingClientRect().width;
+  style.display = 'none';
+  return width;
+}
+
+function getChineseCharWidth(fontSize){
+
+}
+
+function getUnChineseCharWidth(fontSize){
+
+}
+
 export function getFitHeight(text, width, fontSize, fontFamily) {
   const dom = initDivDom();
   const style = dom.style;

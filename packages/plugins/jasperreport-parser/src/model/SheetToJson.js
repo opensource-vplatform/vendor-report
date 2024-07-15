@@ -73,6 +73,7 @@ class SheetToJson {
       font: `${fontSize}pt ${font}`,
       fontFamily: font,
       fontSize: fontSize + 'pt',
+      fontWeight: cell.isBold() ? 'bold':'normal',
     };
     this.appnedBorderStyle('borderTop', cell.getBorderTop(), style);
     this.appnedBorderStyle('borderRight', cell.getBorderRight(), style);

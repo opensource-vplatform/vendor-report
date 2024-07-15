@@ -1,7 +1,6 @@
 import Sheet from '../../model/Sheet';
 import { getChild } from '../../util/XmlUtil';
 import Element from '../Element';
-import { createByNode } from '../Factory';
 
 class JasperReport extends Element {
   parse(context) {
@@ -24,6 +23,8 @@ class JasperReport extends Element {
     sheet.setMarginRight(this.getIntegerAttr('rightMargin'));
     sheet.setMarginBottom(this.getIntegerAttr('bottomMargin'));
     sheet.setMarginLeft(this.getIntegerAttr('leftMargin'));
+    const columnWidth = this.getIntegerAttr('columnWidth');
+    context.setColumnWidth(columnWidth);
     let cells = [];
     const node = this.getNode();
     childrenNames.forEach((childrenName) => {

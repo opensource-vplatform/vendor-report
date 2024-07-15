@@ -44,9 +44,9 @@ const getSelectedDatasources = function (context) {
 };
 
 const Type_Map = {
-    table: 'table',
-    query: 'table',
-    api: 'table',
+    apiView: 'table',
+    mode: 'table',
+    view: 'table',
     char: 'text',
     text: 'text',
     number: 'decimals',
