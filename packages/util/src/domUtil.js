@@ -43,75 +43,104 @@ function initDivDom() {
   }
   return _div_dom;
 }
-
-function IsChinese(str){ 
-  if(!str){
-      return false;
+function IsChinese(str) {
+  if (!str) {
+    return false;
   }
 
-  return encodeURIComponent(str).startsWith("%E");
+  return encodeURIComponent(str).startsWith('%E');
 }
 
-const Chinese_Char_Width_Cache = {};
+const CACHE = {
+  Chinese_Char_Width_Cache : {},
+  UnChinese_Char_Width_Cache : {},
+  line_height : -1,
+};
 
-const UnChinese_Char_Width_Cache = {};
-
-function getDomActualStyle(text,style){
-  const dom = initDivDom();
-  const actualStyle = dom.style;
-  Object.assign(dom.style,style);
-  
-}
-
-function getLineHeight(fontSize,fontFamily){
+function hideDom() {
   const dom = initDivDom();
   const style = dom.style;
-  style.display = 'block';
-  style.overflow = 'visible';
-  style.width =  '100px';
-  
+  style.display = 'none';
 }
 
-function getWidth(text,fontSize,fontFamily){
+function applyDomStyle(style) {
   const dom = initDivDom();
-  const style = dom.style;
-  style.display = 'block';
-  style.overflow = 'visible';
-  style.width =  '0px';
-  //style.fontSize = fontSize + 'px';
-  style.fontSize = Number.isFinite(Number(fontSize))
-    ? fontSize + 'px'
-    : fontSize;
-  style.fontFamily = fontFamily;
+  Object.assign(dom.style, style);
+  return dom;
+}
+
+function getLineHeight(fontSize, fontFamily) {
+  if (CACHE.line_height == -1) {
+    const dom = initDivDom();
+    applyDomStyle({
+      display:'block',
+      overflow:'visible',
+      width: '100px',
+      fontSize:Number.isFinite(Number(fontSize)) ? fontSize + 'px' : fontSize,
+      fontFamily,
+    });
+    dom.innerText = '测试';
+    const computedStyle = getComputedStyle(dom);
+    const lineHeightStr = computedStyle.getPropertyValue('line-height');
+    let line_height = parseFloat(lineHeightStr);
+    if (isNaN(line_height)) {
+      line_height = parseFloat(computedStyle.getPropertyValue('height'));
+    }
+    CACHE.line_height = line_height;
+    hideDom();
+  }
+  return CACHE.line_height;
+}
+
+function getWidth(text, fontSize, fontFamily) {
+  const dom = applyDomStyle({
+    display: 'block',
+    overflow: 'visible',
+    width: 'max-content',
+    fontSize: Number.isFinite(Number(fontSize)) ? fontSize + 'px' : fontSize,
+    fontFamily: fontFamily,
+  });
   dom.innerText = text;
   const width = dom.getBoundingClientRect().width;
-  style.display = 'none';
+  hideDom();
   return width;
 }
 
-function getChineseCharWidth(fontSize){
-
+function getChineseCharWidth(fontSize, fontFamily) {
+  const values = CACHE.Chinese_Char_Width_Cache[fontFamily] || {};
+  let width = values[fontSize];
+  if (!width) {
+    width = getWidth('测', fontSize, fontFamily);
+    values[fontSize] = width;
+    CACHE.Chinese_Char_Width_Cache[fontFamily] = values;
+  }
+  return width;
 }
 
-function getUnChineseCharWidth(fontSize){
-
+function getUnChineseCharWidth(fontSize, fontFamily) {
+  const values = CACHE.UnChinese_Char_Width_Cache[fontFamily] || {};
+  let width = values[fontSize];
+  if (!width) {
+    width = getWidth('a', fontSize, fontFamily);
+    values[fontSize] = width;
+    CACHE.UnChinese_Char_Width_Cache[fontFamily] = values;
+  }
+  return width;
 }
 
 export function getFitHeight(text, width, fontSize, fontFamily) {
-  const dom = initDivDom();
-  const style = dom.style;
-  style.display = 'block';
-  style.overflow = 'visible';
-  style.width = width + 'px';
-  //style.fontSize = fontSize + 'px';
-  style.fontSize = Number.isFinite(Number(fontSize))
-    ? fontSize + 'px'
-    : fontSize;
-  style.fontFamily = fontFamily;
-  dom.innerText = text;
-  const height = dom.getBoundingClientRect().height;
-  style.display = 'none';
-  return height;
+  let wd = 0;
+  for (let i = 0; i < text.length; i++) {
+    const chr = text.charAt(i);
+    if (IsChinese(chr)) {
+      wd += getChineseCharWidth(fontSize, fontFamily);
+    } else {
+      wd += getUnChineseCharWidth(fontSize, fontFamily);
+    }
+  }
+  const count = Math.ceil(wd / width);
+  const lineHeight = getLineHeight(fontSize, fontFamily);
+  return lineHeight * count;
 }
 
 let _div_dom_1 = null;
