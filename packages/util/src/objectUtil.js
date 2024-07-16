@@ -1,105 +1,129 @@
 const is = function (obj, type) {
-    return typeof obj === type;
+  return typeof obj === type;
 };
 
 export const isArray = function (obj) {
-    return Array.isArray(obj);
+  return Array.isArray(obj);
 };
 
 export const isFunction = function (obj) {
-    return is(obj, 'function');
+  return is(obj, 'function');
 };
 
-export const isString = function(obj){
-    return is(obj,'string');
+export const isString = function (obj) {
+  return is(obj, 'string');
 }
 
 export const isNull = function (obj) {
-    return obj === null;
+  return obj === null;
 };
 
 export const isUndefined = function (obj) {
-    return obj === undefined;
+  return obj === undefined;
 };
 
 export const isNullOrUndef = function (obj) {
-    return isNull(obj) || isUndefined(obj);
+  return isNull(obj) || isUndefined(obj);
 };
 
 export const isObject = function (obj) {
-    return '[object Object]' === Object.prototype.toString.call(obj);
+  return '[object Object]' === Object.prototype.toString.call(obj);
 };
 
-export const isBoolean = function(obj){
-    return is(obj,'boolean');
+export const isBoolean = function (obj) {
+  return is(obj, 'boolean');
 }
 
-export const isNumber = function(obj){
-    return is(obj,'number');
+export const isNumber = function (obj) {
+  return is(obj, 'number');
 }
 
 export const isNotBlank = function (obj) {
-    return typeof obj == 'string' && obj.trim().length > 0;
+  return typeof obj == 'string' && obj.trim().length > 0;
 };
 
 export const deepClone = function (obj) {
-    if (isArray(obj)) {
-        const list = [];
-        for (let i = 0; i < obj.length; i++) {
-            list[i] = deepClone(obj[i]);
-        }
-        return list;
+  if (isArray(obj)) {
+    const list = [];
+    for (let i = 0; i < obj.length; i++) {
+      list[i] = deepClone(obj[i]);
     }
-    if (isObject(obj)) {
-        const object = {};
-        for (let r in obj) {
-            if (obj.hasOwnProperty(r)) {
-                object[r] = deepClone(obj[r]);
-            }
-        }
-        return object;
+    return list;
+  }
+  if (isObject(obj)) {
+    const object = {};
+    for (let r in obj) {
+      if (obj.hasOwnProperty(r)) {
+        object[r] = deepClone(obj[r]);
+      }
     }
-    return obj;
+    return object;
+  }
+  return obj;
 };
 
 export const unoin = function (source, target) {
-    if (!isArray(source) || !isArray(target)) {
-        throw Error('并集对象必须为数组');
+  if (!isArray(source) || !isArray(target)) {
+    throw Error('并集对象必须为数组');
+  }
+  const result = [];
+  const handler = (item) => {
+    if (result.indexOf(item) == -1) {
+      result.push(item);
     }
-    const result = [];
-    const handler = (item) => {
-        if (result.indexOf(item) == -1) {
-            result.push(item);
-        }
-    };
-    source.forEach(handler);
-    target.forEach(handler);
-    return result;
+  };
+  source.forEach(handler);
+  target.forEach(handler);
+  return result;
 };
 
 export const diff = function (source, target, except = []) {
-    if (!isObject(source) || !isObject(target)) {
-        throw Error('差异化对象必须为Object');
-    }
-    const targetKeys = Object.keys(target);
-    let result = null;
-    targetKeys.forEach((key) => {
-        if (except.indexOf(key) == -1) {
-            const val = source[key];
-            const val1 = target[key];
-            if (isObject(val) && isObject(val1)) {
-                const res = diff(val, val1);
-                if (res !== null) {
-                    result = result ? result : {};
-                    result[key] = res;
-                }
-            } else {
-                if (val !== val1) {
-                    result = result ? result : {};
-                    result[key] = val1;
-                }
-            }
+  if (!isObject(source) || !isObject(target)) {
+    throw Error('差异化对象必须为Object');
+  }
+  const targetKeys = Object.keys(target);
+  let result = null;
+  targetKeys.forEach((key) => {
+    if (except.indexOf(key) == -1) {
+      const val = source[key];
+      const val1 = target[key];
+      if (isObject(val) && isObject(val1)) {
+        const res = diff(val, val1);
+        if (res !== null) {
+          result = result ? result : {};
+          result[key] = res;
         }
-    });
-    return result;
+      } else {
+        if (val !== val1) {
+          result = result ? result : {};
+          result[key] = val1;
+        }
+      }
+    }
+  });
+  return result;
 };
+
+/**
+ * 对象深度合并
+ * @param {*} target 目标
+ * @param  {...any} sources 多个来源
+ * @returns 
+ */
+export const deepMerge = function (target, ...sources) {
+  if (!sources.length) return target;
+  const source = sources.shift();
+
+  if (isObject(target) && isObject(source)) {
+    for (const key in source) {
+      if (isObject(source[key])) {
+        if (!target[key]) Object.assign(target, { [key]: {} });
+        deepMerge(target[key], source[key]);
+      } else {
+        Object.assign(target, { [key]: source[key] });
+      }
+    }
+  }
+
+  return deepMerge(target, ...sources);
+}

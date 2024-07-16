@@ -15,3 +15,4 @@ export * from './theme/Index';
 export * from './components/query/Index';
 export * from './components/steps/Index';
 export * from './components/table/Index';
+export * from './components/collapsiblePanel/Index'

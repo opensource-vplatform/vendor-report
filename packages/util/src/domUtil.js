@@ -58,7 +58,7 @@ const UnChinese_Char_Width_Cache = {};
 
 function getDomActualStyle(text,style){
   const dom = initDivDom();
-  const style = dom.style;
+  const actualStyle = dom.style;
   Object.assign(dom.style,style);
   
 }

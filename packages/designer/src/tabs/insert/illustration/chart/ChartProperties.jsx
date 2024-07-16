@@ -6,12 +6,12 @@ import LineChartProperties from './impls/LineChartProperties';
 
 export default function (props) {
   const { type, config } = useSelector(({ chartSlice }) => chartSlice);
-  if (type == 'bar') {
+  // if (type == 'bar') {
     return <BarChartProperties></BarChartProperties>;
-  } else if (type == 'pie') {
-    return <PieChartProperties></PieChartProperties>;
-  } else if (type == 'line') {
-    return <LineChartProperties></LineChartProperties>;
-  }
+  // } else if (type == 'pie') {
+  //   return <PieChartProperties></PieChartProperties>;
+  // } else if (type == 'line') {
+  //   return <LineChartProperties></LineChartProperties>;
+  // }
   return null;
 }

@@ -1,13 +1,7 @@
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { setConfig } from '@store/chartSlice';
-import {
-  FormItem,
-  TextInput,
-} from '@toone/report-ui';
+import { FormItem, TextInput } from '@toone/report-ui';
 
 /**
  * 标题属性
@@ -15,13 +9,26 @@ import {
  */
 export default function () {
   const { config } = useSelector(({ chartSlice }) => chartSlice);
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
   return (
-    <FormItem label='标题:'>
+    <FormItem label='内容:'>
       <TextInput
         style={{ height: 24 }}
-        value={config.title ? config.title : ''}
-        onChange={(val) => dispath(setConfig({ ...config, title: val }))}
+        value={config?.styleConfig?.label?.text ?? ''}
+        onChange={(val) => {
+          dispatch(
+            setConfig({
+              ...config,
+              styleConfig: {
+                ...config?.styleConfig,
+                label: {
+                  ...config?.styleConfig?.label,
+                  text: val,
+                },
+              },
+            })
+          );
+        }}
       ></TextInput>
     </FormItem>
   );

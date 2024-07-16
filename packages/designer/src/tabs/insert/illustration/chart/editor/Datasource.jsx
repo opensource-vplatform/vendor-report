@@ -16,7 +16,7 @@ import {
 export default function () {
   const { config } = useSelector(({ chartSlice }) => chartSlice);
   const { dsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
 
   return (
     <FormItem label='数据集:'>
@@ -30,7 +30,7 @@ export default function () {
           })}
         onChange={(val) => {
           //更改数据集，其他绑定信息应置空，否则会引发配置问题
-          dispath(
+          dispatch(
             setConfig({
               ...config,
               datasource: val,

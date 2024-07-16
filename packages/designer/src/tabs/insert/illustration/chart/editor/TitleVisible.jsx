@@ -16,12 +16,12 @@ import { isUndefined } from '@toone/report-util';
  */
 export default function () {
   const { config } = useSelector(({ chartSlice }) => chartSlice);
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
   return (
     <FormItem label='标题可见:'>
       <CheckBox
         value={isUndefined(config.titleVisible) ? true : config.titleVisible}
-        onChange={(val) => dispath(setConfig({ ...config, titleVisible: val }))}
+        onChange={(val) => dispatch(setConfig({ ...config, titleVisible: val }))}
       ></CheckBox>
     </FormItem>
   );

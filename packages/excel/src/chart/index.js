@@ -6,6 +6,15 @@ import { getBaseUrl } from '../utils/environmentUtil';
 import { sum as sumCalc, div as divideCalc } from '../utils/mathUtil'
 
 /**
+ * 转换为数字
+ * @param {*} num 数字
+ * @returns 
+ */
+const transformNumber = (num) => {
+  return isNaN(num) ? 0 : num;
+}
+
+/**
  * 计算函数
  * 
  * @param {Object[]} data - 数据源
@@ -14,20 +23,20 @@ import { sum as sumCalc, div as divideCalc } from '../utils/mathUtil'
  */
 const calcDatas = {
   sum: (data, key) => {
-    return data.reduce((sum, item) => sumCalc([sum, item[key]]), 0);
+    return data.reduce((sum, item) => sumCalc([sum, transformNumber(item[key])]), 0);
   },
   count: (data) => {
     return data.length;
   },
   average: (data, key) => {
-    const total = data.reduce((sum, item) => sumCalc([sum, item[key]]), 0);
+    const total = data.reduce((sum, item) => sumCalc([sum, transformNumber(item[key])]), 0);
     return parseFloat(divideCalc(total, data.length).toFixed(2));
   },
   max: (data, key) => {
-    return Math.max.apply(null, data.map(item => item[key]));
+    return Math.max.apply(null, data.map(item => transformNumber(item[key])));
   },
   min: (data, key) => {
-    return Math.min.apply(null, data.map(item => item[key]));
+    return Math.min.apply(null, data.map(item => transformNumber(item[key])));
   }
 }
 
@@ -41,6 +50,17 @@ const calcDatas = {
  */
 const calcDatasFunc = (type, data, key) => {
   return calcDatas[type](data, key)
+}
+
+
+const calcLabelOffset = (position, orientation) => {
+  if (orientation === 'vertical') {
+    if (position === 'outside')
+      return [20, 5]
+    else if (position === 'inside')
+      return [-20, -5]
+  }
+  return [0, 0]
 }
 
 /**
@@ -166,8 +186,7 @@ const generateEChartsOption = (config) => {
     dimension = '2d',
     style = '',
     orientation = "portrait",
-    titleVisible = true,
-    title = '',
+    styleConfig = {},
     datasource = [],
     groups = [],
     seriesType = 'fieldValue',
@@ -180,8 +199,9 @@ const generateEChartsOption = (config) => {
     || (seriesType == 'fieldName' && !nameSeriesConfigs_conf.length))
     return {
       title: {
-        text: title,
-        show: titleVisible
+        text: styleConfig?.label?.text ?? '',
+        show: styleConfig?.label?.visible ?? true,
+        left: styleConfig?.label?.position ?? 'left'
       }
     };
 
@@ -245,16 +265,42 @@ const generateEChartsOption = (config) => {
     seriesDatas[index + 1] = [xAxisData[index], ...seriesArrayValue];
   });
   let option;
-  if (type === 'bar')
+  const title = {
+    text: styleConfig?.label?.text ?? '',
+    show: styleConfig?.label?.visible ?? true,
+    left: styleConfig?.label?.position ?? 'left'
+  }
+
+  const legendPosition = styleConfig?.legend?.position ?? 'bottom';
+  const legend = {
+    show: styleConfig?.legend?.visible ?? true,
+    // bottom: 0 , // 将图例放在底部
+    top: ['top', 'rightTop'].includes(legendPosition) ? 'top' : legendPosition == 'bottom' ? 'bottom' : 'middle',
+    left: legendPosition == 'left' ? 'left' : ['right', 'rightTop'].includes(legendPosition) ? 'right' : 'center',
+    orient: ['left', 'right', 'rightTop'].includes(legendPosition) ? 'vertical' : 'horizontal',
+    type: 'scroll',
+  }
+
+  const labelPosition = styleConfig?.tag?.position ?? 'outside';
+  const labelOrientation = styleConfig?.tag?.orientation ?? 'horizontal';
+  const label = {
+    show: styleConfig?.tag?.visible ?? false,
+    // distance: 15,
+    // 调整标签和柱子之间的距离
+    offset: calcLabelOffset(labelPosition, labelOrientation),
+    position: labelPosition == 'outside' ? 'top' : labelPosition == 'inside' ? 'insideTop' : 'inside',
+    rotate: labelOrientation == 'horizontal' ? 0 : 90
+    // formatter: (params) => {
+    //   const { name, value, percent, total } = params.data;
+    //   return `${name}: ${value}(${percent}%)`;
+    // },
+  }
+
+  if (type === 'bar' || type == 'line')
     // 构造 ECharts 配置项
     option = {
-      legend: {
-        bottom: 0  // 将图例放在底部
-      },
-      title: {
-        text: title,
-        show: titleVisible
-      },
+      legend,
+      title,
       tooltip: {},
       xAxis: type == 'pie' ? {} : orientation == 'portrait' ? { type: 'category', axisTick: { show: false }, data: xAxisData } : {},
       yAxis: type == 'pie' ? {} : orientation != 'portrait' ? { type: 'category', axisTick: { show: false }, data: xAxisData } : {},
@@ -263,6 +309,7 @@ const generateEChartsOption = (config) => {
       },
       series: seriesTypesKeys.map(() => ({
         type,
+        label,
         // radius: '50%',
         stack: style == 'stack' ? 'one' : undefined,
       }))
@@ -281,7 +328,7 @@ const generateEChartsOption = (config) => {
     for (var i = 1; i < seriesDatas[0].length; i++) {
       series.push({
         type: 'pie',
-        radius: style == 'cycle' ? [seriesDatas[0].length > 2 ? size - (size / 4 * 1) : 50 + '%', seriesDatas[0].length > 2 ? size : 70 + '%'] : seriesDatas[0].length > 2 ? size : 50 + '%',
+        radius: style == 'cycle' ? [seriesDatas[0].length > 2 ? size - (size / 5 * 1) : 40 + '%', seriesDatas[0].length > 2 ? size : 50 + '%'] : seriesDatas[0].length > 2 ? size : 50 + '%',
         center: [size * (i - 1) + size / 2 + '%', '50%'],
         label: {
           formatter: '{b}: {@' + seriesDatas[0][i] + '} ({d}%)',
@@ -308,22 +355,19 @@ const generateEChartsOption = (config) => {
     }
 
     option = {
-      legend: {
-        orient: 'horizontal', // 水平排列
-        width: '100%', // 设置图例宽度为容器宽度
-        left: 'center', // 图例居中
-        bottom: 0, // 将图例放在底部
-        type: 'scroll',
-        // textStyle: {
-        //   width: 'auto',
-        //   overflow: 'truncate'
-        // }
-
-      },
-      title: [{
-        text: title,
-        show: titleVisible
-      }, ...subTitle],
+      legend,
+      // legend: {
+      //   orient: 'horizontal', // 水平排列
+      //   width: '100%', // 设置图例宽度为容器宽度
+      //   left: 'center', // 图例居中
+      //   bottom: 0, // 将图例放在底部
+      //   type: 'scroll',
+      //   // textStyle: {
+      //   //   width: 'auto',
+      //   //   overflow: 'truncate'
+      //   // }
+      // },
+      title: [title, ...subTitle],
       tooltip: {},
       dataset: {
         source: seriesDatas
