@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styled, { keyframes } from 'styled-components';
 
@@ -79,6 +75,8 @@ const Loading = styled.div`
 `;
 
 const PaperDiv = styled.div`
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   background: #fff;
   flex: none;
@@ -98,6 +96,7 @@ export default (props) => {
     dataSource,
     onPageCompleted,
     onActiveSheetChanged,
+    newInstance = false, //是否是新建的实例
   } = props;
   const [ctxVal, setCtxVal] = useState({
     json: null,
@@ -148,6 +147,10 @@ export default (props) => {
   });
 
   useEffect(() => {
+    if (!json || !ctxVal.dataSource) {
+      ctxVal.closeLoading();
+      return;
+    }
     const _json = JSON.parse(JSON.stringify(json));
     let pageIndex = 1;
     let total = 1;
@@ -223,16 +226,21 @@ export default (props) => {
   ]);
 
   //缩放
-  useZoom(ctxVal, setCtxVal);
+  json && useZoom(ctxVal, setCtxVal);
+
   return (
     <PreviewContext.Provider value={ctxVal}>
       <Wrap>
-        <Print {...props}></Print>
-        <QueryPanel
-          persistingDataSlice={persistingDataSlice}
-          onQuery={ctxVal.query}
-        ></QueryPanel>
-        <Toolbar {...props}></Toolbar>
+        {!newInstance && (
+          <>
+            <Print {...props}></Print>
+            <QueryPanel
+              persistingDataSlice={persistingDataSlice}
+              onQuery={ctxVal.query}
+            ></QueryPanel>
+            <Toolbar {...props}></Toolbar>
+          </>
+        )}
         <PaperWrap ref={paperWrapEl} style={{ ...ctxVal.paperWrapStyle }}>
           {ctxVal.isLoading && (
             <LoadingWrap>
@@ -240,12 +248,11 @@ export default (props) => {
               Loading...
             </LoadingWrap>
           )}
-          <PaperDiv style={{ ...ctxVal.paperStyle }}>
+          <PaperDiv style={json ? { ...ctxVal.paperStyle } : {}}>
             <WorkBook
               {...props}
               dataSource={ctxVal.dataSource}
               onActiveSheetChanged={(type, args) => {
-                debugger;
                 if (isFunction(onActiveSheetChanged)) {
                   onActiveSheetChanged(type, args);
                 }

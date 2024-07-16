@@ -11,7 +11,7 @@ import {
   getPluginSrc,
   withBatchCalcUpdate,
 } from './utils/spreadUtil';
-import Workbook from './Workbook';
+import Preview from './Preview';
 
 const invoker = function (handler, args) {
   if (typeof handler == 'function') {
@@ -62,7 +62,7 @@ class Report {
     const {
       onInited,
       ready,
-      dataSource,
+      dataSource = {},
       dev,
       license,
       localLicenseUnCheck,
@@ -108,7 +108,7 @@ class Report {
     const persistingDataSlice = this.conf?.json?.context?.persistingDataSlice;
 
     createRoot(el).render(
-      createElement(Workbook, {
+      createElement(Preview, {
         onInited: onInitHandler,
         onPrintHandler: (handler) => {
           this.printHandler = handler;
@@ -146,6 +146,7 @@ class Report {
         persistingDataSlice,
         ...others,
         json,
+        newInstance: true,
       })
     );
   }

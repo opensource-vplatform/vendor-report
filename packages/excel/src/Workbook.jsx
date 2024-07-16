@@ -210,7 +210,7 @@ export default function (props) {
   const handleSheets = (json) => {
     if (!data.spread) return;
     const spread = data.spread;
-    if (json) {
+    if (json && Object.keys(json).length > 2) {
       withBatchCalcUpdate(spread, () => {
         spread.fromJSON(json);
         fire({
