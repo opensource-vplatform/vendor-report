@@ -100,7 +100,9 @@ export default (props) => {
     dataSource,
     onPageCompleted,
     onActiveSheetChanged,
-    isShowToolbar = true, //是否显示工具栏。查询面板，缩放按钮，打印按钮等
+    isShowToolbar = true, //是否显示工具栏。
+    headerVisible = true, //是否头部。查询面板，缩放按钮，打印按钮等
+    queryPanelVisible = true, //是否显示查询面板
   } = props;
   const [ctxVal, setCtxVal] = useState({
     json: null,
@@ -236,13 +238,15 @@ export default (props) => {
     <PreviewContext.Provider value={ctxVal}>
       <Wrap>
         <Print {...props}></Print>
-        {isShowToolbar && (
+        {headerVisible && (
           <>
-            <QueryPanel
-              persistingDataSlice={persistingDataSlice}
-              onQuery={ctxVal.query}
-            ></QueryPanel>
-            <Toolbar {...props}></Toolbar>
+            {queryPanelVisible && (
+              <QueryPanel
+                persistingDataSlice={persistingDataSlice}
+                onQuery={ctxVal.query}
+              ></QueryPanel>
+            )}
+            {isShowToolbar && <Toolbar {...props}></Toolbar>}
           </>
         )}
         <PaperWrap ref={paperWrapEl} style={{ ...ctxVal.paperWrapStyle }}>
