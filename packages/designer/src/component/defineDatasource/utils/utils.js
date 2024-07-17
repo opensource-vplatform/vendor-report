@@ -2,21 +2,25 @@ import {
   saveTables,
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
-import { setActive, showTab } from '@store/navSlice/navSlice';
+import {
+  setActive,
+  showTab,
+} from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
 import { uuid } from '@toone/report-util';
 import {
   findTreeNodeById,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
-import {
-  getFieldTypeFormatter,
-  getTextFieldDataSourceFormatter,
-} from '@utils/configUtil';
 import { getNamespace } from '@utils/spreadUtil';
-import { getDefineByBindingPath } from '@utils/tableUtil';
-import { parseTable, setTableCornerMarks } from '@utils/tableUtil.js';
-import { getSheetInstanceId, setCellTag } from '@utils/worksheetUtil.js';
+import {
+  parseTable,
+  setTableCornerMarks,
+} from '@utils/tableUtil.js';
+import {
+  getSheetInstanceId,
+  setCellTag,
+} from '@utils/worksheetUtil.js';
 
 const GC = getNamespace();
 
@@ -458,7 +462,7 @@ function getOffsetFromBody(element) {
   let offsetLeft = 0,
     offsetTop = 0;
 
-  for (let currentEle = element; currentEle;) {
+  for (let currentEle = element; currentEle; ) {
     offsetLeft += currentEle.offsetLeft;
     offsetTop += currentEle.offsetTop;
     currentEle = currentEle.offsetParent;
@@ -635,16 +639,11 @@ export function bindingPath(params) {
 }
 
 export function bindingTablePathHandler(params) {
-  const {
-    columnsTemp,
-    row,
-    col,
-    dataPath,
-    dsName = '',
-    sheet,
-    context,
-  } = params;
-
+  const { row, col, path, pathName, sheet, context } = params;
+  let { columnsTemp } = params;
+  columnsTemp = columnsTemp.filter(({ type }) => {
+    return type !== 'table';
+  });
   let columnCount = sheet.getColumnCount();
   const diff = col + columnsTemp.length - columnCount;
   if (diff > 0) {
@@ -661,8 +660,8 @@ export function bindingTablePathHandler(params) {
       row,
       col: newCol,
       context,
-      value: `[${dsName}.${name}]`,
-      path: `${dataPath}.${code}`,
+      value: pathName ? `[${pathName}.${name}]` : `[${name}]`,
+      path: path ? `${path}.${code}` : code,
     });
 
     const span = sheet.getSpan(row, newCol) || {

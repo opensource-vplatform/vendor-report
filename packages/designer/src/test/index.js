@@ -9,6 +9,7 @@ import jsonStr from './jsonData/reportJsonData';
 import sale from './jsonData/sale.json';
 import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
+import wecost from './jsonData/wecost.json';
 
 let json = JSON.parse(jsonStr);
 
@@ -21,6 +22,7 @@ tourismData.data = tourismData.data.filter(function (item) {
 });
 
 const datasourceDefines = [
+  wecost.ds,
   sale.ds,
   {
     id: 'zonaTree',
@@ -209,6 +211,7 @@ tourismData.data.length = 2 || 21;
 const dataSource = {
   dataSourceDefinition: datasourceDefines, //数据源定义
   datas: {
+    reportDetailData: wecost.data,
     sale: sale.data,
     ...otherData.data,
     ...zqzfzs.datas,

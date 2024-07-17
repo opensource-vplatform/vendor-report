@@ -12,11 +12,17 @@ export default function (props) {
       notAllowEdit={false}
       isEditData={false}
       searchKey={searchKey.dsSearchKey}
-      onDoubleClick={(data, parent) => {
+      onDoubleClick={(data) => {
         if (data.type != 'table') {
-          const formula = parent
-            ? `TOONE.GET("${parent.code}","${data?.code}")`
-            : `TOONE.GET("${data?.code}")`;
+          const { $Path } = data;
+          const parameters = $Path.split('.').reduce((res, cur) => {
+            if (res) {
+              return `${res},"${cur}"`;
+            } else {
+              return `"${cur}"`;
+            }
+          }, '');
+          const formula = `TOONE.GET(${parameters})`;
           onChange && onChange(formula);
         }
       }}

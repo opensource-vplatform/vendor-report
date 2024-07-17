@@ -1,0 +1,95 @@
+{
+  "ds": {
+    "id": "reportDetailData",
+    "type": "table",
+    "typeName": "表",
+    "desc": "销量",
+    "code": "reportDetailData",
+    "name": "分项工程估算表",
+    "children": [
+      {
+        "id": "test001",
+        "type": "map",
+        "typeName": "集合",
+        "desc": "test001",
+        "code": "test001",
+        "name": "字段是Map",
+        "parentId": "sale",
+        "children": [
+          {
+            "id": "id",
+            "type": "integer",
+            "typeName": "整数",
+            "desc": "id",
+            "code": "id",
+            "name": "字段是Map_id",
+            "parentId": "test001"
+          },
+          {
+            "id": "area",
+            "type": "text",
+            "typeName": "文本",
+            "desc": "地区",
+            "code": "area",
+            "name": "字段是Map_地区",
+            "parentId": "test001"
+          }
+        ]
+      },
+      {
+        "id": "hobbyid",
+        "type": "list",
+        "typeName": "数组",
+        "desc": "爱好",
+        "code": "hobbyCode",
+        "name": "爱好",
+        "parentId": "reportDetailData"
+      },
+      {
+        "id": "saleName",
+        "type": "text",
+        "typeName": "文本",
+        "desc": "销售员",
+        "code": "saleName",
+        "name": "销售员22222222",
+        "parentId": "reportDetailData"
+      },
+      {
+        "id": "type",
+        "type": "text",
+        "typeName": "文本",
+        "desc": "产品类型",
+        "code": "type",
+        "name": "产品类型",
+        "parentId": "reportDetailData"
+      }
+    ]
+  },
+  "length": 45,
+  "data": [
+    {
+      "saleName": "苹果",
+      "type": "水果",
+      "test001": {
+        "id": "map_华北",
+        "area": "华北"
+      },
+      "hobbyCode": [
+        "打篮球",
+        "跳舞"
+      ]
+    },
+    {
+      "saleName": "香梨",
+      "type": "水果",
+      "test001": {
+        "id": "map_西北",
+        "area": "西北"
+      },
+      "hobbyCode": [
+        "跑步",
+        "唱歌"
+      ]
+    }
+  ]
+}

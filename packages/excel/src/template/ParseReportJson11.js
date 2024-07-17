@@ -365,6 +365,7 @@ export default class ParseReportJson {
       pageInfos,
       templates
     );
+    debugger;
     //需要分页
     if (pageInfos.pageArea) {
       function calculate(header, footer, content) {
@@ -816,6 +817,8 @@ export default class ParseReportJson {
 
     let template = null;
     let row = 0;
+    debugger;
+    console.log('分栏');
     do {
       let rowTemplate = this.parseRowDataTable({
         row,
@@ -920,6 +923,17 @@ export default class ParseReportJson {
 
       row++;
     } while (row < rowCount);
+
+    if (Array.isArray(sheet.columns)) {
+      const { columnCount, columns } = sheet;
+      sheet.columns = [];
+      for (let i = 0; i < columnCount; i++) {
+        for (let j = 0; j < 2; j++) {
+          sheet.columns[i + j * columnCount] = columns[i];
+        }
+      }
+    }
+    sheet.columnCount = sheet.columnCount * 2;
   }
   parse() {
     const sheets = Object.values(this.reportJson.sheets);
@@ -1066,6 +1080,7 @@ export default class ParseReportJson {
         rowHeight: 20,
         _isExcelDefaultColumnWidth: false,
       },
+      columnCount = 20,
     } = sheet;
     const rules = conditionalFormats?.rules || [];
     const dataTable = data?.dataTable || {};
@@ -1107,13 +1122,13 @@ export default class ParseReportJson {
       }
       return false;
     });
-    dataTableInfos.spans.push(...rowSpans);
+    //dataTableInfos.spans.push(...rowSpans);
 
     //行高等信息
     dataTableInfos.rows = getOldRowHeight(rows, row, defaults.rowHeight);
     result.height = dataTableInfos?.rows?.size;
 
-    Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
+    /*  Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
       const { bindingPath, tag, formula, style = {} } = _colDataTable;
       let isUseNamespace = true;
       let isHorizontalExpansion = false;
@@ -1242,7 +1257,178 @@ export default class ParseReportJson {
           });
         },
       });
-    });
+    }); */
+    let a = 2;
+    let newColIndex = 0;
+    let newRowDataTable = {};
+    let endCol = -1;
+    for (let i = 0; i < columnCount; i++) {
+      const _colDataTable = rowDataTable[i];
+      let _newColIndex = newColIndex++;
+      let colStr = i;
+      let cellSpan = rowSpans.find((span) => {
+        return span.col === i;
+      });
+      if (!cellSpan && _newColIndex > endCol) {
+        cellSpan = { row, col: _newColIndex, colCount: 1, rowCount: 1 };
+      }
+      if (cellSpan) {
+        if (row !== 3 && row !== 4) {
+          cellSpan.colCount = cellSpan.colCount * 2;
+          dataTableInfos.spans.push(cellSpan);
+        }
+
+        endCol = cellSpan.colCount + _newColIndex - 1;
+      }
+
+      if (!_colDataTable) {
+        for (let i = 0; i < 2; i++) {
+          newRowDataTable[_newColIndex + i] = {};
+        }
+        newColIndex = _newColIndex + a - 1;
+        continue;
+      }
+      newRowDataTable[_newColIndex] = _colDataTable;
+      const { bindingPath, tag, formula, style = {} } = _colDataTable;
+
+      let isUseNamespace = true;
+      let isHorizontalExpansion = false;
+      if (tag) {
+        const jsonTag = JSON.parse(tag);
+        const plugins = jsonTag?.plugins;
+        if (Array.isArray(plugins)) {
+          let rowHeightType = '';
+          plugins.forEach(({ config = {} }) => {
+            if (config?.rowHeight) {
+              rowHeightType = config?.rowHeight;
+            }
+            if (config?.direction === 'horizontal') {
+              isHorizontalExpansion = true;
+            }
+          });
+
+          //当前单元格是否是横向扩展
+          if (isHorizontalExpansion) {
+            this.isHorizontalExpansion = true;
+            const tableCode = bindingPath.split('.')[0];
+            this.horizontalExpansionInfos.columns[colStr] =
+              this.horizontalExpansionInfos.columns[colStr] || {};
+            this.horizontalExpansionInfos.columns[colStr].tableCodes =
+              this.horizontalExpansionInfos.columns[colStr].tableCodes || {};
+            this.horizontalExpansionInfos.columns[colStr].tableCodes[
+              tableCode
+            ] = true;
+            this.horizontalExpansionInfos.columns[colStr].dataPath =
+              this.horizontalExpansionInfos.columns[colStr].dataPath || [];
+            this.horizontalExpansionInfos.columns[colStr].dataPath.push(
+              bindingPath
+            );
+            this.horizontalExpansionInfos.columns[colStr].cellPlugins =
+              this.horizontalExpansionInfos.columns[colStr].cellPlugins || [];
+            this.horizontalExpansionInfos.columns[colStr].cellPlugins.push({
+              plugins,
+              bindingPath,
+            });
+
+            this.templates.datas[tableCode] = this.datas[tableCode] || [];
+          }
+          if (rowHeightType === 'autoFitByContent') {
+            style.wordWrap = true;
+          } else if (rowHeightType === 'autoFitByZoom') {
+            isUseNamespace = false;
+          }
+        }
+      }
+      //样式采用命名空间
+      let namedStyles = null;
+      if (
+        _colDataTable.style &&
+        typeof _colDataTable.style !== 'string' &&
+        !_colDataTable?.style?.parentName &&
+        isUseNamespace
+      ) {
+        namedStyles = getVarName();
+        this.namedStyles.push({
+          ...style,
+          name: namedStyles,
+        });
+        _colDataTable.style = namedStyles;
+      }
+
+      const col = Number(colStr);
+      let isBindEntity = bindingPath?.includes?.('.');
+
+      if (isBindEntity) {
+        const tableCode = bindingPath.split('.')[0];
+
+        if (!isHorizontalExpansion) {
+          result.dataPath.push(bindingPath);
+          result.tableCodes[tableCode] = true;
+          result.datas[tableCode] = this.datas[tableCode] || [];
+          result.allDatas[tableCode] = this.datas[tableCode] || [];
+        }
+
+        const span = rowSpans.find((span) => span.col === col) || {
+          rowCount: 1,
+          colCount: 1,
+        };
+        if (tag) {
+          //收集当前单元格是否已经设置了行合并或列合并
+          const jsonTag = JSON.parse(tag);
+          const columnMerge = jsonTag.columnMerge || false;
+          const rowMerge = jsonTag.rowMerge || false;
+          if (columnMerge || rowMerge) {
+            dataTableInfos.mergeInfos.push({
+              ...span,
+              row,
+              col,
+              columnMerge,
+              rowMerge,
+            });
+          }
+          const plugins = jsonTag.plugins;
+          if (Array.isArray(plugins) && !isHorizontalExpansion) {
+            result.cellPlugins.push({
+              plugins,
+              bindingPath,
+            });
+          }
+        }
+      }
+      if (formula) {
+        const tableCodes = getTableCodesFromFormula(formula);
+        if (Array.isArray(tableCodes)) {
+          tableCodes.forEach((tableCode) => {
+            result.tableCodes[tableCode] = true;
+            result.datas[tableCode] = this.datas[tableCode] || [];
+            result.allDatas[tableCode] = this.datas[tableCode] || [];
+          });
+        }
+      }
+
+      if (style?.decoration) {
+        delete style?.decoration;
+      }
+
+      getColRules({
+        rules: rowRules,
+        col,
+        colHandler(rule) {
+          dataTableInfos.rules.push({
+            ...rule,
+          });
+        },
+      });
+      if (row !== 3 && row !== 4) {
+        for (let i = 1; i < 2; i++) {
+          newRowDataTable[_newColIndex + i] = {
+            style: namedStyles ? namedStyles : style,
+          };
+          newColIndex++;
+        }
+      }
+    }
+    dataTableInfos.rowDataTable = newRowDataTable;
     result.rowCount = maxRowCount;
     result.endRow = result.row + maxRowCount;
     return result;
@@ -1332,14 +1518,12 @@ export default class ParseReportJson {
           const col = Number(colStr);
           const { bindingPath, tag, style } = colDataTable;
           if (bindingPath?.includes?.('.')) {
-            const bindingPaths = bindingPath.split('.');
-            if (bindingPaths.length === 2) {
-              bindingPaths.push('');
-            }
+            const [tableCode, fieldCode] = bindingPath.split('.');
             delete colDataTable.bindingPath;
             delete printColDataTable.bindingPath;
             const { type, value: newVlaue } = unionDatasource.getValue(
-              ...bindingPaths,
+              tableCode,
+              fieldCode,
               i
             );
             if (type === 'text') {
@@ -1844,12 +2028,10 @@ export default class ParseReportJson {
         dataTable[colStr] = colDataTable;
         const { bindingPath, tag, style } = colDataTable;
         if (bindingPath?.includes?.('.')) {
-          const bindingPaths = bindingPath.split('.');
-          if (bindingPaths.length === 2) {
-            bindingPaths.push('');
-          }
+          const [tableCode, fieldCode] = bindingPath.split('.');
           const { type, value: newVlaue } = unionDatasource.getValue(
-            ...bindingPaths,
+            tableCode,
+            fieldCode,
             dataIndex
           );
           if (type === 'text') {

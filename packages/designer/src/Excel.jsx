@@ -35,6 +35,8 @@ import {
   updateTemplateName,
 } from '@store/wizardSlice';
 import {
+  bind as _bind,
+  EVENTS as EXCEL_EVENTS,
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
@@ -299,6 +301,15 @@ export default function () {
       unbind();
     };
   }, [spread]);
+
+  useEffect(() => {
+    _bind({
+      event: EXCEL_EVENTS.OnSheetJsonInited,
+      handler: (params) => {
+        console.log('OnSheetJsonInited');
+      },
+    });
+  }, []);
 
   return (
     <Fragment>

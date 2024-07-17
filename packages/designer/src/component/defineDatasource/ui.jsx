@@ -162,6 +162,10 @@ export const ListItemText = styled.div`
     overflow: hidden;
     align-items: center;
     gap: 2px;
+    padding-left: 10px;
+    &:has(> .treeSwitch) {
+      padding-left: 0px;
+    }
 
     & > .textBox {
       overflow: hidden;
@@ -243,3 +247,5 @@ export const DraggableDatasourcesFooter = styled.span`
   background: #f6f6f6;
   border-top: 1px solid #ababab;
 `;
+
+export const TreeSwitchWrap = styled.div``;

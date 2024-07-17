@@ -1,10 +1,21 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import {
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { Commands } from '@commands/index';
 import Hyperlink from '@components/hyperlink';
-import { bind, EVENTS } from '@event/EventManager';
+import {
+  bind,
+  EVENTS,
+} from '@event/EventManager';
 import DatasourceIcon from '@icons/data/datasource';
 import {
   setDatasourceSelectorVisible,
@@ -13,13 +24,22 @@ import {
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
-import { isArray, uuid } from '@toone/report-util';
 import {
-  findTreeNodeById,
+  isArray,
+  uuid,
+} from '@toone/report-util';
+import {
+  findTreeNodeByPath,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
-import { getDataSourceConfig, getNavConfig } from '@utils/configUtil';
-import { exeCommand, getNamespace } from '@utils/spreadUtil';
+import {
+  getDataSourceConfig,
+  getNavConfig,
+} from '@utils/configUtil';
+import {
+  exeCommand,
+  getNamespace,
+} from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
@@ -41,7 +61,6 @@ import {
   bindingPath,
   bindingTablePathHandler,
   getCellInfo,
-  getPath,
   highlightBlock,
   removeHighlightOneBlock,
 } from './utils/utils.js';
@@ -570,30 +589,12 @@ export default function Index() {
           spread.suspendPaint();
           const sheet = spread.getActiveSheet();
           //获取拖动块的值
-          const parentId = dragged.dataset.itemParentId;
-          const itemId = dragged.dataset.itemId;
-          let current = null;
-          let parent = null;
-          if (parentId) {
-            parent = findTreeNodeById(parentId, dsList);
-            const children = isArray(parent.children) ? parent.children : [];
-            current = children.find(function (item) {
-              return item.id === itemId;
-            });
-          } else {
-            current = findTreeNodeById(itemId, dsList);
-          }
-
-          let dataPath = getPath(current, dsList);
-
-          if (current.type === 'table' || parent?.type === 'table') {
+          const $Path = dragged.dataset.itemPath;
+          const $PathName = dragged.dataset.itemPathName;
+          let current = findTreeNodeByPath($Path, dsList);
+          console.log(current, 11);
+          if (current.type === 'table' || current.type === 'map') {
             let columnsTemp = current.children;
-            let dsName = current.name;
-            if (parent?.type === 'table') {
-              columnsTemp = [current];
-              dsName = parent.name;
-              dataPath = parent.code;
-            }
             exeCommand(spread, Commands.CellType.BindingPath, {
               handler() {
                 bindingTablePathHandler({
@@ -602,8 +603,8 @@ export default function Index() {
                   dispatch,
                   row,
                   col,
-                  dataPath,
-                  dsName,
+                  path: $Path,
+                  pathName: $PathName,
                   context,
                 });
               },
@@ -616,8 +617,8 @@ export default function Index() {
                   col,
                   sheet,
                   context,
-                  value: `[${current.name}]`,
-                  path: dataPath,
+                  value: `[${$PathName}]`,
+                  path: $Path,
                 });
               },
             });
@@ -632,7 +633,7 @@ export default function Index() {
       });
     }
   }, []);
-  const handleDbClick = (node, parent) => {
+  const handleDbClick = (node) => {
     if (!node || (node.children && node.children.length > 0)) {
       //双击实体节点不做任何处理
       return;
@@ -641,13 +642,20 @@ export default function Index() {
     const sheet = spread.getActiveSheet();
 
     if (sheet) {
+      const { $Path, $PathName } = node;
       const { row, col } = getActiveIndexBySheet(sheet);
       const cell = sheet.getCell(row, col);
       let formula = cacheDatasRef.current.currentformulaValue || cell.formula();
       if (formula) {
-        let txt = parent
-          ? `TOONE.GET("${parent.code}","${node.code}")`
-          : `TOONE.GET("${node.code}")`;
+        const parameters = $Path.split('.').reduce((res, cur) => {
+          if (res) {
+            return `${res},"${cur}"`;
+          } else {
+            return `"${cur}"`;
+          }
+        }, '');
+
+        let txt = `TOONE.GET(${parameters})`;
         const handleFormula = (formula, flag) => {
           formula = formula.trim();
           const lastIndex = formula.length - 1;
@@ -702,15 +710,16 @@ export default function Index() {
         cacheDatasRef.current.notChangecurrentClickBar = false;
       } else {
         //单元格整个进行数据源绑定
-        let dataPath = node.code;
-        if (parent) {
-          dataPath = parent.code + '.' + dataPath;
-        }
-        let value = parent ? `[${parent.name}.${node.name}]` : `[${node.name}]`;
-
         exeCommand(spread, Commands.CellType.BindingPath, {
           handler() {
-            bindingPath({ row, col, sheet, value, path: dataPath, context });
+            bindingPath({
+              row,
+              col,
+              sheet,
+              value: `[${$PathName}]`,
+              path: $Path,
+              context,
+            });
           },
         });
       }

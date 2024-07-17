@@ -450,12 +450,19 @@ class UnionDatasource {
    * @param {string} fieldCode 字段编号
    * @param {string} index 记录下标
    */
-  getValue(dsCode, fieldCode, index = 0) {
+  getValue(dsCode, fieldCode, mapKey, index = 0) {
+    debugger;
     const data = this.datas[index];
     let value = null;
     if (data) {
       const val = data[dsCode]?.[fieldCode];
       value = val === undefined ? null : val;
+      if (mapKey) {
+        value = value?.[mapKey];
+      }
+      if (Array.isArray(value)) {
+        value = value.toString();
+      }
     }
     return { type: 'text', value };
   }

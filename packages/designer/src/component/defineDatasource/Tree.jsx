@@ -33,6 +33,7 @@ import {
   NumberIcon,
   TableIcon,
   TextIcon,
+  TreeSwitchWrap,
 } from './ui.jsx';
 
 const typeIcons = {
@@ -49,15 +50,17 @@ function TreeSwitch(props) {
   }
   let Component = isOpen ? DownIcon : RightIcon;
   return (
-    <Component
-      style={{
-        width: '16px',
-        height: '16px',
-      }}
-      onClick={function () {
-        setOpen(!isOpen);
-      }}
-    ></Component>
+    <TreeSwitchWrap className='treeSwitch'>
+      <Component
+        style={{
+          width: '16px',
+          height: '16px',
+        }}
+        onClick={function () {
+          setOpen(!isOpen);
+        }}
+      ></Component>
+    </TreeSwitchWrap>
   );
 }
 
@@ -67,7 +70,7 @@ function Icon(props) {
   if (Icon) {
     return <Icon></Icon>;
   }
-  return <div>2</div>;
+  return <div></div>;
 }
 
 function TreeItem(props) {
@@ -75,7 +78,7 @@ function TreeItem(props) {
     id,
     draggableClass,
     parentId,
-    indent = 10,
+    indent = 0,
     children,
     listDoubleClickHandler,
     delDatasourceClickHandler,
@@ -94,7 +97,7 @@ function TreeItem(props) {
     setOpenInfo,
   } = props;
 
-  const isTable = type === 'table';
+  const isTable = type === 'table' || type === 'map';
 
   let childrenCount = isTable && isArray(children) ? children.length : 0;
 
@@ -127,7 +130,10 @@ function TreeItem(props) {
         className={listItemTextClass}
         data-item-id={id}
         data-item-parent-id={parentId}
-        style={{ paddingLeft: isTable ? 0 : indent + 'px' }}
+        data-item-path={dataItem.$Path}
+        data-item-path-name={dataItem.$PathName}
+        /* style={{ paddingLeft: isTable ? 0 : indent + 'px' }} */
+        style={{ paddingLeft: indent + 'px' }}
         draggable={isDraggable}
         data-children-count={childrenCount}
         onDoubleClick={function () {
@@ -155,7 +161,7 @@ function TreeItem(props) {
           ? isAllowToEdit &&
             !originalDatasourceIds[id] && (
               <DddSubDatasource
-                data-not-allow={isNotAllow}
+                /*  data-not-allow={isNotAllow} */
                 onClick={addSubDatasourceClickHandler}
               ></DddSubDatasource>
             )
@@ -175,7 +181,7 @@ function TreeItem(props) {
         <Index
           {...props}
           datas={children}
-          indent={3 * indent + 5}
+          indent={indent + 20}
           parentId={id}
           parentNode={dataItem}
           parentType='table'
@@ -286,7 +292,6 @@ export default function Index(props) {
       {_datas.map(function (dataItem) {
         const { name, id, children, type, code, parentId } = dataItem;
         datasObj[id] = dataItem;
-
         let draggableClass = '';
         let isDraggable = draggable;
         if (draggable) {
@@ -323,7 +328,13 @@ export default function Index(props) {
           type,
           isDraggable,
           searchKey,
-          dataItem,
+          dataItem: {
+            ...dataItem,
+            $Path: parentNode ? `${parentNode.$Path}.${code}` : code,
+            $PathName: parentNode
+              ? `${parentNode.$PathName}.${name}`
+              : `${name}`,
+          },
           disabled,
         };
 
