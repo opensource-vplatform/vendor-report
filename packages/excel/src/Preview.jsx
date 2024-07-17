@@ -1,4 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import styled, { keyframes } from 'styled-components';
 
@@ -96,7 +100,7 @@ export default (props) => {
     dataSource,
     onPageCompleted,
     onActiveSheetChanged,
-    newInstance = false, //是否是新建的实例
+    isShowToolbar = true, //是否显示工具栏。查询面板，缩放按钮，打印按钮等
   } = props;
   const [ctxVal, setCtxVal] = useState({
     json: null,
@@ -231,9 +235,9 @@ export default (props) => {
   return (
     <PreviewContext.Provider value={ctxVal}>
       <Wrap>
-        {!newInstance && (
+        <Print {...props}></Print>
+        {isShowToolbar && (
           <>
-            <Print {...props}></Print>
             <QueryPanel
               persistingDataSlice={persistingDataSlice}
               onQuery={ctxVal.query}
