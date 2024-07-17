@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styled, { keyframes } from 'styled-components';
 
@@ -22,6 +18,7 @@ import { withDivStyled } from './utils/componentUtil';
 import { getSpreadWrapRect } from './utils/spreadUtil';
 import WorkBook from './Workbook';
 import WorkSheet from './WorkSheet';
+import HeaderToolbar from './HeaderToolbar';
 
 const Wrap = withDivStyled({
   position: 'relative',
@@ -91,6 +88,13 @@ const PaperDiv = styled.div`
     rgba(0, 0, 0, 0.1) 0px 0.2rem 0.2rem;
 `;
 
+const wecostPaperStyle = {
+  border: `1px solid rgb(0, 0, 0)`,
+  boxShadow: `rgb(0 0 0 / 40%) 5px 5px 0px 1px`,
+  flexDirection: 'column',
+  display: 'flex',
+};
+
 export default (props) => {
   const {
     persistingDataSlice,
@@ -103,6 +107,9 @@ export default (props) => {
     isShowToolbar = true, //是否显示工具栏。
     headerVisible = true, //是否头部。查询面板，缩放按钮，打印按钮等
     queryPanelVisible = true, //是否显示查询面板
+    headerToolbar = { style: {}, toolbars: [] }, //头部工具栏
+    paperWrapStyle = {}, //纸张外层容器样式
+    paperStyle = {}, //纸张样式
   } = props;
   const [ctxVal, setCtxVal] = useState({
     json: null,
@@ -141,14 +148,19 @@ export default (props) => {
     setLoading() {},
     closeLoading() {},
     isRefresh: false,
+    exportSettings : {
+      type : 'allPage',   // curPage | allPage
+    }
   });
   const paperWrapEl = useRef(null);
 
   usePage(ctxVal, setCtxVal);
   useQuery({ ctxVal, setCtxVal, ...props });
   useLoading(ctxVal, setCtxVal);
+  ctxVal.setCtxVal = setCtxVal;
   const initFormatter = useInitFormatter({
     ...props,
+    ctxVal,
     setCtxVal,
   });
 
@@ -217,6 +229,12 @@ export default (props) => {
           paperWrapWidth: rect.width,
           paperWrapHeight: rect.height,
           paper: parseResult.paper,
+          paperWrapStylePadding: {
+            top: +rect.paddingTop.slice(0, -2) || 8,
+            right: +rect.paddingRight.slice(0, -2) || 8,
+            bottom: +rect.paddingBottom.slice(0, -2) || 8,
+            left: +rect.paddingLeft.slice(0, -2) || 8,
+          },
           paperStyle: {
             ...parseResult.paper,
           },
@@ -247,16 +265,32 @@ export default (props) => {
               ></QueryPanel>
             )}
             {isShowToolbar && <Toolbar {...props}></Toolbar>}
+            {headerToolbar.toolbars.length > 0 && (
+              <HeaderToolbar
+                toolbarConfig={headerToolbar.toolbars}
+                style={headerToolbar.style}
+              />
+            )}
           </>
         )}
-        <PaperWrap ref={paperWrapEl} style={{ ...ctxVal.paperWrapStyle }}>
+        <PaperWrap
+          ref={paperWrapEl}
+          style={{
+            ...ctxVal.paperWrapStyle,
+            ...paperWrapStyle,
+          }}
+        >
           {ctxVal.isLoading && (
             <LoadingWrap>
               <Loading></Loading>
               Loading...
             </LoadingWrap>
           )}
-          <PaperDiv style={json ? { ...ctxVal.paperStyle } : {}}>
+          <PaperDiv
+            style={
+              json ? { ...ctxVal.paperStyle, ...paperStyle } : { ...paperStyle }
+            }
+          >
             <WorkBook
               {...props}
               dataSource={ctxVal.dataSource}

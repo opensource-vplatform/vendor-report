@@ -146,7 +146,6 @@ class Report {
         persistingDataSlice,
         ...others,
         json,
-        newInstance: true,
       })
     );
   }

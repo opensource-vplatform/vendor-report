@@ -1,24 +1,14 @@
-import {
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 import JSZip from 'JSZip';
 import resourceManager from 'resource-manager-js';
 
-import {
-  isFunction,
-  isString,
-} from '@toone/report-util';
+import { isFunction, isString } from '@toone/report-util';
 
 import PreviewContext from '../PreviewContext';
 import ExcelEnhancer from '../utils/ExcelEnhancer';
 import { download } from '../utils/fileUtil';
-import {
-  getNamespace,
-  getPluginSrc,
-} from '../utils/spreadUtil';
+import { getNamespace, getPluginSrc } from '../utils/spreadUtil';
 import Excel from './Excel';
 import Print from './Print';
 
@@ -460,6 +450,7 @@ export default (props) => {
     });
   };
   window.exportExcel = exportExcel;
+  context.exportExcel = exportExcel;
   const exportPDF = (
     filename,
     options = {
@@ -501,6 +492,7 @@ export default (props) => {
     });
   };
   window.exportPDF = exportPDF;
+  context.exportPDF = exportPDF;
   useEffect(() => {
     if (isFunction(onPrintHandler)) {
       onPrintHandler(() => {

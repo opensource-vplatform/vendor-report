@@ -47,6 +47,7 @@ export default function useZoom(ctxVal, setCtxVal) {
         paperWrapWidth,
         paperWrapHeight,
         paper,
+        paperWrapStylePadding
       } = ctxVal;
       let {
         width: paperWidth,
@@ -64,8 +65,8 @@ export default function useZoom(ctxVal, setCtxVal) {
       //缩放类型：适合页宽
       if (ctxVal.zoomValue === 'suitableToPageWidth') {
         paperWidth = '100%'; //纸张宽度
-        let diffHeight = 16 + paddingBottom + paddingTop + 28 + 20;
-        let diffWidth = 16 + paddingLeft + paddingRight + 10;
+        let diffHeight = (paperWrapStylePadding.top + paperWrapStylePadding.bottom) + paddingBottom + paddingTop + 28 + 20;
+        let diffWidth = paperWrapStylePadding.left + paperWrapStylePadding.right + paddingLeft + paddingRight + 10;
         //计算报表画布canvas的宽度；16：边距；28：报表底部工具栏;10:滚动条宽度
         let width = paperWrapWidth - diffWidth;
         let height = 0;

@@ -7,6 +7,7 @@ import { isFunction } from '@toone/report-util';
 
 export default function useInitFormatter({
   setCtxVal,
+  ctxVal,
   onDatasourceFormatterHandler,
   persistingDataSlice = {},
 }) {
@@ -138,6 +139,9 @@ export default function useInitFormatter({
       });
     }
   }, []);
+
+  ctxVal.setDataSourceFormatter = setDataSourceFormatter;
+  ctxVal.delDataSourceFormatter = delDataSourceFormatter;
 
   return initFormatter;
 }

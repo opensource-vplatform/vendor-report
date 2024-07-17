@@ -360,9 +360,11 @@ export const getSpreadWrapRect = function (el) {
   const height = css.height;
   const width = css.width;
   return {
+    ...css,
     isRender: width.endsWith('px') ? true : false,
     height: Number(height.slice(0, -2)),
     width: Number(width.slice(0, -2)),
+    
   };
 };
 

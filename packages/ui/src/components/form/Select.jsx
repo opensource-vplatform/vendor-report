@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 import styled from 'styled-components';
 
@@ -6,6 +6,7 @@ import { isReactNode } from '@toone/report-util';
 
 import ArrowDown from '../../icons/ArrowDown';
 import { Menu } from '../menu/Index';
+import { isNullOrUndef } from '@toone/report-util';
 
 const Wrap = styled.div`
   position: relative;
@@ -95,12 +96,26 @@ export default function (props) {
     cancelValue = undefined,
     error = false,
     value,
+    defaultValue,
     text,
   } = props;
-  const [data, setData] = useState({ text: null, value });
+  const [data, setData] = useState({ text: null, value: value });
+  const isFirstRender = useRef(true);
+
   useEffect(() => {
+    if (!isNullOrUndef(defaultValue) && isFirstRender.current) {
+      setData(valueToData(defaultValue, null, datas));
+      isFirstRender.current = false;
+    }
+  }, [defaultValue, datas]);
+
+  useEffect(() => {
+    if (isNullOrUndef(value)) {
+      return;
+    }
     setData(valueToData(value, null, datas));
   }, [value, datas]);
+
   const handleChange = (val, node) => {
     if (val !== value) {
       setData(valueToData(val, node, datas));

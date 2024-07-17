@@ -30,6 +30,8 @@ export default function (props) {
     btns = [],
     colCount,
     onQuery,
+    onExpand,
+    onCollapse,
     triggerMode = 'Click',
   } = props;
   const [data, setData] = useState(() => {
@@ -37,7 +39,7 @@ export default function (props) {
   });
   /**
    * 触发查询事件
-   * @param {*} values 
+   * @param {*} values
    */
   const fireQuery = (values) => {
     if (onQuery) {
@@ -49,14 +51,16 @@ export default function (props) {
       );
     }
   };
-  const fireQueryOnChange = (values)=>{
-    triggerMode=='Change'&&fireQuery(values);
-  }
+  const fireQueryOnChange = (values) => {
+    triggerMode == 'Change' && fireQuery(values);
+  };
   const ctx = {
     values: data.values,
     collapsed: data.collapsed,
     fireQuery,
     setCollapsed: (val) => {
+      if (!val) onExpand && onExpand();
+      else onCollapse && onCollapse();
       setData((data) => {
         return {
           ...data,
