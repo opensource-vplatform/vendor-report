@@ -201,9 +201,19 @@ export default function (props) {
           const result = spread.fromJSON(json);
           result.then(() => {
             fire({
-              event: EVENTS.OnSheetJsonInited,
-              args: [],
+              event: EVENTS.OnSpreadJsonParsed,
+              args: [spread],
             });
+            const sheets = spread.sheets;
+            if (sheets && sheets.length > 0) {
+              sheets.forEach((sheet) => {
+                fire({
+                  event: EVENTS.OnSheetInited,
+                  args: [sheet],
+                });
+                onSheetChanged && onSheetChanged('SheetChanged', { sheet });
+              });
+            }
           });
         },
       };
@@ -223,21 +233,7 @@ export default function (props) {
     const spread = data.spread;
     if (json && Object.keys(json).length > 2) {
       withBatchCalcUpdate(spread, () => {
-        spread.fromJSON(json);
-        fire({
-          event: EVENTS.OnSpreadJsonParsed,
-          args: [spread],
-        });
-        const sheets = spread.sheets;
-        if (sheets && sheets.length > 0) {
-          sheets.forEach((sheet) => {
-            fire({
-              event: EVENTS.OnSheetInited,
-              args: [sheet],
-            });
-            onSheetChanged && onSheetChanged('SheetChanged', { sheet });
-          });
-        }
+        spread.TOONE_FUNCS.setJSON(json);
       });
     } else {
       //不存在json数据时才根据子组件创建工作表

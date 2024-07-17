@@ -35,7 +35,7 @@ import {
   updateTemplateName,
 } from '@store/wizardSlice';
 import {
-  bind as _bind,
+  bind as bindExcelEvent,
   EVENTS as EXCEL_EVENTS,
   Workbook,
   Worksheet,
@@ -303,10 +303,15 @@ export default function () {
   }, [spread]);
 
   useEffect(() => {
-    _bind({
-      event: EXCEL_EVENTS.OnSheetJsonInited,
-      handler: (params) => {
-        console.log('OnSheetJsonInited');
+    bindExcelEvent({
+      event: EXCEL_EVENTS.OnSpreadJsonParsed,
+      handler: (spread) => {
+        const sheets = spread.sheets;
+        if(sheets&&sheets.length>0){
+          sheets.forEach((sheet)=>{
+            enhanceSheet(sheet);
+          });
+        }
       },
     });
   }, []);

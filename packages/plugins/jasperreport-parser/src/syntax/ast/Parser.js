@@ -2,47 +2,39 @@ import {
   parse as parse2ken,
   Token,
 } from '../../tokenizer/index';
+import {
+  AddSyntax,
+  AndSyntax,
+  BooleanIdentifierSyntax,
+  BracketSyntax,
+  DivideSyntax,
+  EqualSyntax,
+  EscapeAndSyntax,
+  EscapeGreaterOrEqualSyntax,
+  EscapeGreaterThanSyntax,
+  EscapeLessOrEqualSyntax,
+  EscapeLessThanSyntax,
+  EscapeNotEqualSyntax,
+  FieldSyntax,
+  GreaterOrEqualSyntax,
+  GreaterThanSyntax,
+  LessOrEqualSyntax,
+  LessThanSyntax,
+  MultiplySyntax,
+  NotEqualSyntax,
+  NotSyntax,
+  NullIdentifierSyntax,
+  NumberIdentifierSyntax,
+  OrSyntax,
+  ParameterSyntax,
+  ParseResultSyntax,
+  StringIdentifierSyntax,
+  SubtractSyntax,
+  Syntax,
+  UnknownSyntax,
+  VariableSyntax,
+} from '../syntaxImports';
 import Position from './Position';
-import BracketSyntax from './syntax/block/BracketSyntax';
-import FieldSyntax from './syntax/business/FieldSyntax';
-import ParameterSyntax from './syntax/business/ParameterSyntax';
-import BooleanIdentifierSyntax
-  from './syntax/identifiers/BooleanIdentifierSyntax';
-import NullIdentifierSyntax from './syntax/identifiers/NullIdentifierSyntax';
-import NumberIdentifierSyntax
-  from './syntax/identifiers/NumberIdentifierSyntax';
-import StringIdentifierSyntax
-  from './syntax/identifiers/StringIdentifierSyntax';
-import AddSyntax from './syntax/operators/calculator/AddSyntax';
-import DivideSyntax from './syntax/operators/calculator/DivideSyntax';
-import MultiplySyntax from './syntax/operators/calculator/MultiplySyntax';
-import SubtractSyntax from './syntax/operators/calculator/SubtractSyntax';
-import EqualSyntax from './syntax/operators/comparator/impls/EqualSyntax';
-import EscapeGreaterOrEqualSyntax
-  from './syntax/operators/comparator/impls/EscapeGreaterOrEqualSyntax';
-import EscapeGreaterThanSyntax
-  from './syntax/operators/comparator/impls/EscapeGreaterThanSyntax';
-import EscapeLessOrEqualSyntax
-  from './syntax/operators/comparator/impls/EscapeLessOrEqualSyntax';
-import EscapeLessThanSyntax
-  from './syntax/operators/comparator/impls/EscapeLessThanSyntax';
-import EscapeNotEqualSyntax
-  from './syntax/operators/comparator/impls/EscapeNotEqualSyntax';
-import GreaterOrEqualSyntax
-  from './syntax/operators/comparator/impls/GreaterOrEqualSyntax';
-import GreaterThanSyntax
-  from './syntax/operators/comparator/impls/GreaterThanSyntax';
-import LessOrEqualSyntax
-  from './syntax/operators/comparator/impls/LessOrEqualSyntax';
-import LessThanSyntax from './syntax/operators/comparator/impls/LessThanSyntax';
-import NotEqualSyntax from './syntax/operators/comparator/impls/NotEqualSyntax';
-import AndSyntax from './syntax/operators/logic/impls/AndSyntax';
-import EscapeAndSyntax from './syntax/operators/logic/impls/EscapeAndSyntax';
-import NotSyntax from './syntax/operators/logic/impls/NotSyntax';
-import OrSyntax from './syntax/operators/logic/impls/OrSyntax';
-import ParseResultSyntax from './syntax/ParseResultSyntax';
-import Syntax from './syntax/Syntax';
-import UnknownSyntax from './syntax/UnknownSyntax';
 import SyntaxParseContext from './SyntaxParseContext';
 
 let Synatx_Constructor_Cache = [
@@ -73,6 +65,8 @@ let Synatx_Constructor_Cache = [
   NotSyntax,
   OrSyntax,
   ParameterSyntax,
+  //FunctionSyntax,
+  VariableSyntax,
 ]
 
 Synatx_Constructor_Cache = Synatx_Constructor_Cache.sort((item1, item2) => {

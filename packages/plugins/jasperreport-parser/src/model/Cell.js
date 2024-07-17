@@ -144,6 +144,14 @@ class Cell{
         return this.bindingPath;
     }
 
+    setWordWrap(wordWrap){
+        this.wordWrap = wordWrap;
+    }
+
+    isWordWrap(){
+        return this.wordWrap;
+    }
+
 }
 
 export default Cell;

@@ -8,6 +8,7 @@ import { getBaseUrl } from '@utils/environmentUtil';
 
 import Setting from './Setting';
 import chart from './types/Chart';
+import error from './types/Error';
 import formula from './types/Formula';
 import group from './types/Group';
 import image from './types/Image';
@@ -29,7 +30,7 @@ const Img = styled.img`
     cursor: pointer;
 `;
 
-const plugins = [formula, group, list, image, sum, merge, chart];
+const plugins = [error,formula, group, list, image, sum, merge, chart];
 
 /**
  * 是否显示设置图标

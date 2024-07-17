@@ -1,4 +1,7 @@
-import { defineConfig, loadEnv } from 'vite';
+import {
+  defineConfig,
+  loadEnv,
+} from 'vite';
 
 import { babel } from '@rollup/plugin-babel';
 
@@ -39,8 +42,8 @@ export default defineConfig(({ mode }) => {
           drop_debugger: true,
         },
       },
-      commonjsOptions: {
-        transformMixedEsModules: true,
+      commonjsOptions:{
+        transformMixedEsModules:true,
       },
       target: 'es2015',
       lib: {

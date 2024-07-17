@@ -1,4 +1,4 @@
-import { isFunction, isNullOrUndef } from '@toone/report-util';
+import { isNullOrUndef } from '@toone/report-util';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { getNamespace } from '@utils/spreadUtil';
 import { getBindingPathText } from '@utils/tableUtil';
@@ -60,6 +60,17 @@ export const setFormulaDecoration = function (style) {
 export const setListDecoration = function (style) {
   setIconDecoration(style, 'list', 'vertical');
 };
+
+export const setErrorDecoration = function(style){
+  const GC = getNamespace();
+  const decoration = style.decoration||{};
+  decoration.cornerFold = {
+    size: 6,
+    position: GC.Spread.Sheets.CornerPosition.rightTop,
+    color: "red"
+  }
+  style.decoration = decoration;
+}
 
 export const setGroupDecoration = function (style) {
   setIconDecoration(style, 'group', 'vertical');

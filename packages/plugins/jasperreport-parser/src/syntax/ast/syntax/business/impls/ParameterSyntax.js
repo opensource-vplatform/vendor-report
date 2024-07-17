@@ -1,7 +1,25 @@
-import Position from '../../Position';
-import { isParameterSyntax } from '../../utils/SyntaxUtils';
-import { getVarIdentifierTokens } from '../../utils/TokenUtils';
-import Syntax from '../Syntax';
+import AbstractValueSyntax from '../AbstractValueSyntax';
+
+class ParameterSyntax extends AbstractValueSyntax {
+  
+  static SYMBOL = '$P';
+
+  getSymbol(){
+    return ParameterSyntax.SYMBOL;
+  }
+
+  visit() {
+    const ctx = this.getContext(),
+      visitor = ctx.getVisitor()
+    if (visitor && visitor.visitParameterSyntax) {
+      visitor.visitParameterSyntax(this)
+    }
+  }
+}
+/*import Position from '../../../Position';
+import { isParameterSyntax } from '../../../utils/SyntaxUtils';
+import { getVarIdentifierTokens } from '../../../utils/TokenUtils';
+import Syntax from '../../Syntax';
 
 class ParameterSyntax extends Syntax {
   
@@ -65,6 +83,6 @@ class ParameterSyntax extends Syntax {
       visitor.visitParameterSyntax(this)
     }
   }
-}
+}*/
 
 export default ParameterSyntax

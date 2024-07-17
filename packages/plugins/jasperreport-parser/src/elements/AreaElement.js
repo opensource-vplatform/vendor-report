@@ -1,3 +1,4 @@
+import { getChild } from '../util/XmlUtil';
 import Element from './Element';
 
 class AreaElement extends Element{
@@ -16,6 +17,15 @@ class AreaElement extends Element{
             }
         });
         return cells;
+    }
+
+    getHeight(){
+        const node = this.getNode();
+        const band = getChild("band",node);
+        if(band){
+            return this.getIntegerAttr("height",band);
+        }
+        return 0;
     }
 
 }

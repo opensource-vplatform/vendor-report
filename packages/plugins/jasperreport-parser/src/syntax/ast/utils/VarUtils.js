@@ -1,30 +1,36 @@
-const isVarChar = function (chr) {
+export const isVarChar = function (chr) {
   return isWordChar(chr) || isNumberChar(chr) || isUnderScoreChar(chr)
 }
 
-const isVarCharToken = function (token) {}
+export const isFuncVarChar = function(chr){
+  return isVarChar(chr) || isDotChar(chr);
+}
 
-const isWordChar = function (chr) {
+export const isWordChar = function (chr) {
   return isLowerCaseWordChar(chr) || isUpperCaseWordChar(chr)
 }
 
-const isLowerCaseWordChar = function (chr) {
+export const isLowerCaseWordChar = function (chr) {
   return chr >= 'a' && chr <= 'z'
 }
 
-const isUpperCaseWordChar = function (chr) {
+export const isUpperCaseWordChar = function (chr) {
   return chr >= 'A' && chr <= 'Z'
 }
 
-const isNumberChar = function (chr) {
+export const isNumberChar = function (chr) {
   return chr >= '0' && chr <= '9'
 }
 
-const isUnderScoreChar = function (chr) {
+export const isUnderScoreChar = function (chr) {
   return chr == '_'
 }
 
-const getWordIdentifier = function (startIndex, expression) {
+const isDotChar = function(chr){
+  return chr == '.';
+}
+
+export const getWordIdentifier = function (startIndex, expression) {
   let word = '',
     index = startIndex
   while (true) {
@@ -41,7 +47,7 @@ const getWordIdentifier = function (startIndex, expression) {
 /**
  * 获取非负数值
  */
-const getPositiveNumber = function (startIndex, expression) {
+export const getPositiveNumber = function (startIndex, expression) {
   let code = [],
     index = startIndex
   while (true) {
@@ -63,15 +69,3 @@ const getPositiveNumber = function (startIndex, expression) {
   }
   return res
 }
-
-export {
-  getPositiveNumber,
-  getWordIdentifier,
-  isLowerCaseWordChar,
-  isNumberChar,
-  isUnderScoreChar,
-  isUpperCaseWordChar,
-  isVarChar,
-  isVarCharToken,
-  isWordChar,
-};

@@ -1,6 +1,8 @@
 import BracketSyntax from './ast/syntax/block/BracketSyntax';
-import FieldSyntax from './ast/syntax/business/FieldSyntax';
-import ParameterSyntax from './ast/syntax/business/ParameterSyntax';
+//import FunctionSyntax from './ast/syntax/business/FunctionSyntax';
+import FieldSyntax from './ast/syntax/business/impls/FieldSyntax';
+import ParameterSyntax from './ast/syntax/business/impls/ParameterSyntax';
+import VariableSyntax from './ast/syntax/business/impls/VariableSyntax';
 import BooleanIdentifierSyntax
   from './ast/syntax/identifiers/BooleanIdentifierSyntax';
 import NullIdentifierSyntax
@@ -14,6 +16,16 @@ import DivideSyntax from './ast/syntax/operators/calculator/DivideSyntax';
 import MultiplySyntax from './ast/syntax/operators/calculator/MultiplySyntax';
 import SubtractSyntax from './ast/syntax/operators/calculator/SubtractSyntax';
 import EqualSyntax from './ast/syntax/operators/comparator/impls/EqualSyntax';
+import EscapeGreaterOrEqualSyntax
+  from './ast/syntax/operators/comparator/impls/EscapeGreaterOrEqualSyntax';
+import EscapeGreaterThanSyntax
+  from './ast/syntax/operators/comparator/impls/EscapeGreaterThanSyntax';
+import EscapeLessOrEqualSyntax
+  from './ast/syntax/operators/comparator/impls/EscapeLessOrEqualSyntax';
+import EscapeLessThanSyntax
+  from './ast/syntax/operators/comparator/impls/EscapeLessThanSyntax';
+import EscapeNotEqualSyntax
+  from './ast/syntax/operators/comparator/impls/EscapeNotEqualSyntax';
 import GreaterOrEqualSyntax
   from './ast/syntax/operators/comparator/impls/GreaterOrEqualSyntax';
 import GreaterThanSyntax
@@ -25,6 +37,8 @@ import LessThanSyntax
 import NotEqualSyntax
   from './ast/syntax/operators/comparator/impls/NotEqualSyntax';
 import AndSyntax from './ast/syntax/operators/logic/impls/AndSyntax';
+import EscapeAndSyntax
+  from './ast/syntax/operators/logic/impls/EscapeAndSyntax';
 import NotSyntax from './ast/syntax/operators/logic/impls/NotSyntax';
 import OrSyntax from './ast/syntax/operators/logic/impls/OrSyntax';
 import ParseResultSyntax from './ast/syntax/ParseResultSyntax';
@@ -38,6 +52,12 @@ export {
   BracketSyntax,
   DivideSyntax,
   EqualSyntax,
+  EscapeAndSyntax,
+  EscapeGreaterOrEqualSyntax,
+  EscapeGreaterThanSyntax,
+  EscapeLessOrEqualSyntax,
+  EscapeLessThanSyntax,
+  EscapeNotEqualSyntax,
   FieldSyntax,
   GreaterOrEqualSyntax,
   GreaterThanSyntax,
@@ -55,4 +75,5 @@ export {
   SubtractSyntax,
   Syntax,
   UnknownSyntax,
+  VariableSyntax,
 };

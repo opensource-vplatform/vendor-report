@@ -1,11 +1,17 @@
 import { createRef } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import resourceManager from 'resource-manager-js';
 
 import { error } from '@utils/consoleUtil';
 import { toExcelPluginUrl } from '@utils/environmentUtil';
-import { showErrorMessage, showLoadingMessage } from '@utils/messageUtil';
+import {
+  showErrorMessage,
+  showLoadingMessage,
+} from '@utils/messageUtil';
 
 import {
   DetailTitle,
@@ -48,7 +54,7 @@ export default function (props) {
                   if (target) {
                     target.value = null;
                   }
-                  const promise = spread.fromJSON(json);
+                  const promise = spread.TOONE_FUNCS.setJSON(json);
                   closeHandler();
                   showLoadingMessage(dispatch, null);
                   if (promise) {

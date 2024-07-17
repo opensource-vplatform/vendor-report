@@ -1,15 +1,16 @@
 import Sheet from '../../model/Sheet';
 import { getChild } from '../../util/XmlUtil';
 import Element from '../Element';
+import { createByNode } from '../Factory';
 
 class JasperReport extends Element {
   parse(context) {
-    debugger;
     const childrenNames = [
       'title',
       'pageHeader',
       'columnHeader',
       'detail',
+      'group',
       'columnFooter',
       'pageFooter',
       'summary',
@@ -30,20 +31,22 @@ class JasperReport extends Element {
     childrenNames.forEach((childrenName) => {
       const child = getChild(childrenName, node);
       if (child) {
-        const band = getChild('band', child);
-        const height = this.getIntegerAttr('height', band);
-        const children = this.createChildren(child);
-        children.forEach((child) => {
-          const cell = child.parse(context);
-          if (cell) {
-            if (Array.isArray(cell)) {
-              cells = cells.concat(cell);
-            } else {
-              cells.push(cell);
+        const instance = createByNode(child);
+        if(instance){
+          const height = instance.getHeight();
+          const children = this.createChildren(child);
+          children.forEach((child) => {
+            const cell = child.parse(context);
+            if (cell) {
+              if (Array.isArray(cell)) {
+                cells = cells.concat(cell);
+              } else {
+                cells.push(cell);
+              }
             }
-          }
-        });
-        context.appendTopOffset(height);
+          });
+          context.appendTopOffset(height);
+        }
       }
     });
     sheet.appendCell(cells);

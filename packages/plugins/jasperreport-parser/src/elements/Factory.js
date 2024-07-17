@@ -3,9 +3,13 @@ import Band from './impls/Band';
 import ColumnFooter from './impls/ColumnFooter';
 import ColumnHeader from './impls/ColumnHeader';
 import Detail from './impls/Detail';
+import Group from './impls/Group';
+import GroupFooter from './impls/GroupFooter';
+import GroupHeader from './impls/GroupHeader';
 import JasperReport from './impls/JasperReport';
 import PageFooter from './impls/PageFooter';
 import PageHeader from './impls/PageHeader';
+import StaticText from './impls/StaticText';
 import TextField from './impls/TextField';
 import Title from './impls/Title';
 
@@ -19,6 +23,10 @@ const Components = [
   TextField,
   Title,
   Detail,
+  StaticText,
+  Group,
+  GroupFooter,
+  GroupHeader,
 ];
 
 export const createChildren = function (parentElement) {
