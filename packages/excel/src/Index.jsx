@@ -5,6 +5,11 @@ import {
 
 import Chart from './chart';
 import { ConditionRule } from './conditionRule/Index';
+import {
+  bind,
+  EVENTS,
+  unbind,
+} from './event/EventManager';
 import { init } from './Init';
 import Preview from './Preview';
 import Report from './Report';
@@ -20,8 +25,10 @@ import Worksheet from './Worksheet';
 init();
 
 export {
+  bind,
   Chart,
   ConditionRule,
+  EVENTS,
   genAutoMergeRangeInfos,
   genSpans,
   Preview,
@@ -30,6 +37,7 @@ export {
   sortData,
   ThemeContext,
   ThemeContextProvider,
+  unbind,
   Workbook,
   Worksheet,
 };

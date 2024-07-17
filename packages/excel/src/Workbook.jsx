@@ -196,6 +196,17 @@ export default function (props) {
         tabEditable,
         tabStripVisible,
       });
+      spread.TOONE_FUNCS = {
+        setJSON(json) {
+          const result = spread.fromJSON(json);
+          result.then(() => {
+            fire({
+              event: EVENTS.OnSheetJsonInited,
+              args: [],
+            });
+          });
+        },
+      };
       data.spread = spread;
       fire({
         event: EVENTS.OnSpreadInited,

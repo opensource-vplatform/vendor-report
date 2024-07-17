@@ -1,29 +1,33 @@
 const EventNames = [
-    /**
-     * 工作薄初始化事件
-     */
-    'OnSpreadInited',
-    /**
-     * 工作表初始化事件
-     */
-    'OnSheetInited',
-    /**
-     * 工作簿json解析后事件
-     */
-    'OnSpreadJsonParsed',
+  /**
+   * 工作薄初始化事件
+   */
+  'OnSpreadInited',
+  /**
+   * 工作表初始化事件
+   */
+  'OnSheetInited',
+  /**
+   * 工作簿json解析后事件
+   */
+  'OnSpreadJsonParsed',
+  /**
+   * 执行spread.TOONE_FUNCS.setJSON后触发
+   */
+  'OnSheetJsonInited',
 ];
 
 export const EVENTS = {};
 
 EventNames.forEach((name) => {
-    EVENTS[name] = name;
+  EVENTS[name] = name;
 });
 
 const check = function (params) {
-    const { event } = params;
-    if (!EVENTS[event]) {
-        throw Error(`不支持[${event}]事件，请检查！`);
-    }
+  const { event } = params;
+  if (!EVENTS[event]) {
+    throw Error(`不支持[${event}]事件，请检查！`);
+  }
 };
 
 /**
@@ -44,14 +48,14 @@ const EVENT_HANDLER_MAP = {};
  *  } params
  */
 export const bind = function (params) {
-    check(params);
-    const { event, handler } = params;
-    const handlers = EVENT_HANDLER_MAP[event] || [];
-    handlers.push(handler);
-    EVENT_HANDLER_MAP[event] = handlers;
-    return () => {
-        unbind(params);
-    };
+  check(params);
+  const { event, handler } = params;
+  const handlers = EVENT_HANDLER_MAP[event] || [];
+  handlers.push(handler);
+  EVENT_HANDLER_MAP[event] = handlers;
+  return () => {
+    unbind(params);
+  };
 };
 
 /**
@@ -62,15 +66,15 @@ export const bind = function (params) {
  * } params
  */
 export const unbind = function (params) {
-    check(params);
-    const { event, handler } = params;
-    const handlers = EVENT_HANDLER_MAP[event];
-    if (handlers) {
-        const index = handlers.indexOf(handler);
-        if (index != -1) {
-            handlers.splice(index, 1);
-        }
+  check(params);
+  const { event, handler } = params;
+  const handlers = EVENT_HANDLER_MAP[event];
+  if (handlers) {
+    const index = handlers.indexOf(handler);
+    if (index != -1) {
+      handlers.splice(index, 1);
     }
+  }
 };
 
 /**
@@ -78,20 +82,20 @@ export const unbind = function (params) {
  * @param {event:事件名称,args:事件参数} params
  */
 export const fire = function (params) {
-    check(params);
-    const { event, args } = params;
-    const handlers = EVENT_HANDLER_MAP[event];
-    const result = [];
-    if (handlers) {
-        for (let handler of handlers) {
-            try {
-                result.push(handler.apply(handler, args));
-            } catch (e) {
-                handler(null, e);
-            }
-        }
+  check(params);
+  const { event, args } = params;
+  const handlers = EVENT_HANDLER_MAP[event];
+  const result = [];
+  if (handlers) {
+    for (let handler of handlers) {
+      try {
+        result.push(handler.apply(handler, args));
+      } catch (e) {
+        handler(null, e);
+      }
     }
-    return result;
+  }
+  return result;
 };
 
 /**
@@ -99,8 +103,8 @@ export const fire = function (params) {
  * @param {*} params
  */
 export const hasBind = function (params) {
-    check(params);
-    const { event } = params;
-    const handlers = EVENT_HANDLER_MAP[event];
-    return handlers && handlers.length > 0;
+  check(params);
+  const { event } = params;
+  const handlers = EVENT_HANDLER_MAP[event];
+  return handlers && handlers.length > 0;
 };
