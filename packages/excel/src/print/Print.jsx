@@ -115,7 +115,6 @@ const zoomPrint = (sheetJson, inst) => {
 export default function (props) {
   const {} = props;
   const context = useContext(PreviewContext);
-  debugger;
   return (
     <Dialog width='550px' height='250px' onClose={context.close}>
       <Wrap>

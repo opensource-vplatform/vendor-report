@@ -1556,7 +1556,11 @@ export default class ParseReportJson {
                     value: this.datas[args[0]],
                   };
                 } else {
-                  return unionDatasource.getValue(args[0], args[1], i);
+                  const parameter = [...args];
+                  if (parameter.length === 2) {
+                    parameter.push('');
+                  }
+                  return unionDatasource.getValue(...parameter, i);
                 }
               });
 

@@ -32,7 +32,7 @@ export const getTableCodes = function (formula) {
         const functionName = ast.functionName;
         if (functionName == 'TOONE.GET') {
           const args = ast.arguments;
-          if (args.length == 2) {
+          if (args.length > 1) {
             tableCodes.push(args[0].value);
           }
           return false;

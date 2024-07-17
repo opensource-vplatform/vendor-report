@@ -464,6 +464,7 @@ class UnionDatasource {
         value = value.toString();
       }
     }
+    console.log(value);
     return { type: 'text', value };
   }
 
