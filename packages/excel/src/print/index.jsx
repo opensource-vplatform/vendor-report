@@ -97,9 +97,10 @@ const exportExcelHandler = ({ filename, options, exportResolve, ctxVal }) => {
 
       const excelIO = new GC.Spread.Excel.IO();
       const sheet = spread.getActiveSheet();
-      const datasLen = pageDatas.datas.length;
-
       const promiseFns = [];
+      if(ctxVal.exportSettings.type == 'allPage'){
+
+      const datasLen = pageDatas.datas.length;
       for (let i = 0; i < datasLen; i++) {
         promiseFns.push(() => {
           return new Promise((resolve) => {
@@ -163,6 +164,69 @@ const exportExcelHandler = ({ filename, options, exportResolve, ctxVal }) => {
           });
         });
       }
+    }else{
+      promiseFns.push(() => {
+        return new Promise((resolve) => {
+          let newfilename = filename + (i + 1) + '.xlsx';
+          const sheetJson = sheet.toJSON();
+          zoomPrint(sheetJson, inst);
+          const newSheet = pageDatas.datas[i];
+          newSheet.sheet = sheetJson;
+          inst.resetSheet(newSheet);
+          sheet.setRowCount(0);
+          sheet.fromJSON(sheetJson);
+          const enhancer = new ExcelEnhancer(spread).enhance();
+          const enhancerHandler = (result) => {
+            const json = JSON.stringify(result);
+            //当前批次导出excel成功回调
+            const success = (blob) => {
+              blobs.unshift({
+                filename: newfilename,
+                blob,
+              });
+
+              if (isFunction(options.progress)) {
+                let currentIndex = (i + 1) * 20;
+                const total = currentIndex;
+                if (currentIndex >= datas.total) {
+                  currentIndex = datas.total;
+                }
+                for (let i = total - 20 + 1; i <= currentIndex; i++) {
+                  options.progress(i, datas.total);
+                }
+              }
+
+              if (blobs.length === pageDatas.datas.length) {
+                _resolve();
+              }
+              resolve();
+            };
+
+            excelIO.save(
+              json,
+              success,
+              (err) => {
+                reject(err);
+              },
+              {
+                columnHeadersAsFrozenRows: false,
+                includeAutoMergedCells: false,
+                includeBindingSource: false,
+                includeCalcModelCache: false,
+                includeEmptyRegionCells: true,
+                includeFormulas: !options.ignoreFormula,
+                includeStyles: !options.ignoreStyle,
+                includeUnusedNames: true,
+                password: undefined,
+                rowHeadersAsFrozenColumns: false,
+                saveAsView: false,
+              }
+            );
+          };
+          enhancer.then(enhancerHandler).catch(reject);
+        });
+      });
+    }
       promiseFns.reduce((prev, cur) => {
         return prev.then((a) => {
           return cur().then(() => {});
@@ -337,10 +401,17 @@ export default (props) => {
     end: printTotal, //本次打印结束范围
     spread: null,
     handler: null,
+    pages : [],
+    exportSettings : {
+      type : 'allPage',   // curPage | allPage
+    }
   });
   ctxVal.total = context.total; //总共有多少页
   ctxVal.printPages = context.printPages;
   ctxVal.parseReportJsonInst = context.parseReportJsonInst;
+  ctxVal.pages = context.pages;
+  ctxVal.exportSettings = context.exportSettings;
+
   ctxVal.close = () => {
     setCtxVal((ctxVal) => {
       return { ...ctxVal, showPrint: false };

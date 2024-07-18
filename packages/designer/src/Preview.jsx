@@ -1,19 +1,10 @@
 import { useContext } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import {
-  EVENTS,
-  fire,
-} from '@event/EventManager';
-import {
-  Preview,
-  Worksheet,
-} from '@toone/report-excel';
+import { EVENTS, fire } from '@event/EventManager';
+import { Preview, Worksheet } from '@toone/report-excel';
 import { Button } from '@toone/report-ui';
 import { isArray } from '@toone/report-util';
 import {
@@ -26,6 +17,7 @@ import {
 import DesignerContext from './DesignerContext';
 import { setMode } from './store/appSlice/appSlice';
 import { getBaseUrl } from './utils/environmentUtil';
+
 
 const Wrap = styled.div`
   display: flex;
@@ -231,6 +223,73 @@ export default function (props) {
           isShowBtnToolbar={isShowToolbar}
           persistingDataSlice={persistingDataSlice}
           onQuery={props.onQuery}
+          paperStyle={{
+            border: `1px solid rgb(0, 0, 0)`,
+            boxShadow: `rgb(0 0 0 / 40%) 5px 5px 0px 1px`,
+            flexDirection: 'column',
+            display: 'flex',
+          }}
+          paperWrapStyle={{ backgroundColor: '#fbfbfb', padding: '8px 300px' }}
+          // isShowToolbar={false}
+          // queryPanelVisible={false}
+          headerToolbar={{
+            // style: {justifyContent: 'center'},
+            toolbars: [
+              { type: 'ExportSetting', title: '导出设置' },
+              {type : 'DataSourceFormatter',title : '使用千分位分隔符',datasource:'sales.order_amount',formatter:'#,##0.000_);-#,##0.000'},
+              {type : 'ExportExcel',title:'导出Excel'}
+              // {
+              //   type: 'Dropdown',
+              //   title: '导出配置',
+              //   defaultValue: 'all',
+              //   options: [
+              //     {
+              //       value: 'all',
+              //       text: 'XXXXX',
+              //     },
+              //     {
+              //       value: 'chapters',
+              //       text: '所有章节内容连续导出',
+              //     },
+              //   ],
+              //   onChange: (val) => {
+              //     console.log(val);
+              //   },
+              // },
+              // {
+              //   type: 'Checkbox',
+              //   title: '使用千分位分隔符',
+              //   defaultValue: false,
+              //   //  notFristTrigger : true,
+              //   onChange: (val) => {
+              //     console.log(val);
+              //   },
+              // },
+              // {
+              //   type: 'CheckBoxGroup',
+              //   title: '汇总规则',
+              //   // defaultValue: ['sum'],
+              //   options: [
+              //     {
+              //       value: 'identifier',
+              //       text: '编号',
+              //     },
+              //     {
+              //       value: 'specification',
+              //       text: '规格名称',
+              //     },
+              //     {
+              //       value: 'unit',
+              //       text: '单位',
+              //     },
+              //   ],
+              //   multiple: true,
+              //   onChange: (val) => {
+              //     console.log(val);
+              //   },
+              // },
+            ],
+          }}
           // onDatasourceFormatterHandler={(handler) => {
           //   handler().then(
           //     ({ setDataSourceFormatter, delDataSourceFormatter }) => {
