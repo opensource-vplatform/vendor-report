@@ -2,7 +2,10 @@ import { useDrag } from 'react-dnd';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-import { uuid } from '@toone/report-util';
+import {
+  isArray,
+  uuid,
+} from '@toone/report-util';
 
 import Tree from './Tree';
 
@@ -117,7 +120,7 @@ function ControlList(props) {
   const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
   const queryParameterList = finalDsList.filter(
     ({ type, params }) =>
-      type === 'table' && Array.isArray(params) && params.length > 0
+      type === 'table' && isArray(params) && params.length > 0
   );
   return (
     <ControlListWrap>
@@ -139,7 +142,7 @@ export default function (props) {
   const { finalDsList } = useSelector(({ datasourceSlice }) => datasourceSlice);
   const queryParameterList = finalDsList.reduce((result, item) => {
     const { type, params, name, code } = item;
-    if (type === 'table' && Array.isArray(params) && params.length > 0) {
+    if (type === 'table' && isArray(params) && params.length > 0) {
       const children = params.map((item) => {
         let disabled = false;
         const items = config?.items || [];

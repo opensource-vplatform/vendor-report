@@ -7,7 +7,10 @@ import {
   showTab,
 } from '@store/navSlice/navSlice';
 import { setData } from '@store/tableDesignSlice/tableDesignSlice';
-import { uuid } from '@toone/report-util';
+import {
+  isArray,
+  uuid,
+} from '@toone/report-util';
 import {
   findTreeNodeById,
   getActiveSheetTablesPath,
@@ -43,7 +46,7 @@ export function addTable(params) {
     colMergeColumns = [],
   } = params;
 
-  const tableColumnsCount = Array.isArray(columnsTemp) ? columnsTemp.length : 0;
+  const tableColumnsCount = isArray(columnsTemp) ? columnsTemp.length : 0;
 
   if (tableColumnsCount <= 0) {
     return;
@@ -78,7 +81,7 @@ export function addTable(params) {
     colCount: tableColumnsCount,
   });
 
-  if (Array.isArray(columnsTemp)) {
+  if (isArray(columnsTemp)) {
     const tableColumns = [];
     const groupsFields = [];
     const sumFields = [];
@@ -180,7 +183,7 @@ export function getChanged(params) {
     } else {
       result.added.push({ newData: { ...current } });
     }
-    if (Array.isArray(children)) {
+    if (isArray(children)) {
       stack.push(...children);
     }
   }
@@ -333,7 +336,7 @@ export function checkHasBind(params) {
           const { BSt } = table;
           //字段发生变化
           BSt.forEach(function (tableColumn, index) {
-            if (Array.isArray(children) && children.length > 0) {
+            if (isArray(children) && children.length > 0) {
               const columnId = tableColumn.id();
               const columnName = tableColumn.name();
               const dataField = tableColumn.dataField();
@@ -357,7 +360,7 @@ export function checkHasBind(params) {
           });
 
           //数据源新增字段
-          if (Array.isArray(children) && addingMode === 'drag') {
+          if (isArray(children) && addingMode === 'drag') {
             let isInserted = false;
             children.forEach(function ({ id, name, code }, index) {
               const col = BSt.find((item) => item.id() === id);
@@ -641,9 +644,28 @@ export function bindingPath(params) {
 export function bindingTablePathHandler(params) {
   const { row, col, path, pathName, sheet, context } = params;
   let { columnsTemp } = params;
-  columnsTemp = columnsTemp.filter(({ type }) => {
-    return type !== 'table';
-  });
+  columnsTemp = columnsTemp.reduce((res, cur) => {
+    const { code, name, type, children } = cur;
+    if (type === 'map') {
+      if (isArray(children)) {
+        children.forEach(({ code: _code, name: _name }) => {
+          res.push({
+            $PathName: pathName
+              ? `[${pathName}.${name}.${_name}]`
+              : `[${name}.${_name}]`,
+            $Path: path ? `${path}.${code}.${_code}` : `${code}.${_code}`,
+          });
+        });
+      }
+    } else {
+      res.push({
+        $PathName: pathName ? `[${pathName}.${name}]` : `[${name}]`,
+        $Path: path ? `${path}.${code}` : code,
+      });
+    }
+    return res;
+  }, []);
+
   let columnCount = sheet.getColumnCount();
   const diff = col + columnsTemp.length - columnCount;
   if (diff > 0) {
@@ -653,15 +675,15 @@ export function bindingTablePathHandler(params) {
 
   let index = 0;
   sheet.suspendPaint();
-  columnsTemp.forEach(function ({ code, name }) {
+  columnsTemp.forEach(function ({ $Path, $PathName }) {
     const newCol = col + index;
     bindingPath({
       sheet,
       row,
       col: newCol,
       context,
-      value: pathName ? `[${pathName}.${name}]` : `[${name}]`,
-      path: path ? `${path}.${code}` : code,
+      value: $PathName,
+      path: $Path,
     });
 
     const span = sheet.getSpan(row, newCol) || {

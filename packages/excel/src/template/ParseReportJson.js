@@ -2,6 +2,7 @@ import {
   getFitFontSize,
   getFitHeight,
   isObject,
+  isString,
 } from '@toone/report-util';
 
 import {
@@ -1295,7 +1296,8 @@ export default class ParseReportJson {
       type,
       isRetainHorizontalExpansionData,
     } = params;
-    const { page, lastDataTable, dataIndex } = pageInfos;
+    const { page, lastDataTable, dataIndex, sheet } = pageInfos;
+    const sharedFormulas = sheet?.sharedFormulas;
     const {
       dataTables,
       isGroupSumArea,
@@ -1564,10 +1566,24 @@ export default class ParseReportJson {
                 }
               });
 
+              //序列号
+              tool.setSeqHandler((...args) => {
+                let value = i + 1;
+                if (args.length <= 0) {
+                  value -= dataIndex;
+                }
+                if (value <= 1) {
+                  value = 1;
+                }
+                return { type: 'text', value };
+              });
+
               let res = enhanceFormula(
                 {
                   type: 'formula',
-                  value: colDataTable.formula,
+                  value: isString(colDataTable.formula)
+                    ? colDataTable.formula
+                    : sharedFormulas?.[colDataTable?.formula?.si]?.formula,
                 },
                 tool
               );

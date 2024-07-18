@@ -451,7 +451,6 @@ class UnionDatasource {
    * @param {string} index 记录下标
    */
   getValue(dsCode, fieldCode, mapKey, index = 0) {
-    debugger;
     const data = this.datas[index];
     let value = null;
     if (data) {
@@ -464,7 +463,6 @@ class UnionDatasource {
         value = value.toString();
       }
     }
-    console.log(value);
     return { type: 'text', value };
   }
 

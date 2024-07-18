@@ -6,6 +6,7 @@ import {
   Highlight,
   Search,
 } from '@toone/report-ui';
+import { isArray } from '@toone/report-util';
 
 import DownIcon from '../../icons/arrow/Down';
 import RightIcon from '../../icons/arrow/Right';
@@ -180,7 +181,7 @@ function Tree(props) {
   if (searchKey) {
     _datas = datas.filter(function ({ label = '', children }) {
       let result = label.includes(searchKey);
-      if (!result && Array.isArray(children) && children.length > 0) {
+      if (!result && isArray(children) && children.length > 0) {
         result = children.some(({ label = '' }) => label.includes(searchKey));
       }
       return result;
@@ -198,7 +199,7 @@ function Tree(props) {
           enableDoubleClick = true,
           disabled = false,
         } = data;
-        const flag = Array.isArray(children) && children.length > 0;
+        const flag = isArray(children) && children.length > 0;
         const isOpen = openInfos[id];
         return (
           <li
@@ -287,7 +288,7 @@ export default function (props) {
   const [state, setState] = useState(() => {
     const openInfos = datas.reduce((result, item) => {
       const { id, children } = item;
-      const flag = Array.isArray(children) && children.length > 0;
+      const flag = isArray(children) && children.length > 0;
       if (flag) {
         result[id] = true;
       }
@@ -305,7 +306,7 @@ export default function (props) {
       let isOpenAll = value;
       const openInfos = datas.reduce((result, item) => {
         const { id, children } = item;
-        const flag = Array.isArray(children) && children.length > 0;
+        const flag = isArray(children) && children.length > 0;
         if (flag) {
           const isOpen = state.openInfos[id] === false ? false : true;
           result[id] = isOpen;
@@ -330,7 +331,7 @@ export default function (props) {
     setState((state) => {
       const openInfos = datas.reduce((result, item) => {
         const { id, children } = item;
-        const flag = Array.isArray(children) && children.length > 0;
+        const flag = isArray(children) && children.length > 0;
         if (flag) {
           result[id] = value;
         }

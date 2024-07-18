@@ -120,4 +120,15 @@ export default class Tool {
   getSetting() {
     return this.settingHandler();
   }
+
+  /**
+   * 序列号
+   * @returns
+   */
+  seq(...args) {
+    return this?.seqHandler?.(...args) || { type: 'text', value: 1 };
+  }
+  setSeqHandler(handler) {
+    this.seqHandler = handler;
+  }
 }
