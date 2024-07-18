@@ -33,7 +33,7 @@ const HLayout = styled.div`
 
 const Default_Info = '选择需要分页的区域';
 const Default_Group_Sum_Range_Info = '选择分组汇总区域';
-const Default_Total_Range_Info = '选择总计区域';
+const Default_Total_Range_Info = '选择总计区域。总计只在尾页显示';
 
 const Group_Sum_Range_Info_Before_Range_info =
   '分组汇总区域应该位于分页区域后面';
@@ -279,7 +279,6 @@ export default function (props) {
             tips={data.rangeMessage}
           ></InfoIcon>
         </HLayout>
-
         {isTemplate && (
           <>
             <HLayout>
@@ -306,32 +305,28 @@ export default function (props) {
                 tips={data.groupSumRangeMessage}
               ></InfoIcon>
             </HLayout>
-            <HLayout>
-              <Text>总计区域：</Text>
-              <Range
-                value={data.totalRange}
-                hostId={data.domId}
-                error={data.totalRangeError}
-                selectionType='row'
-                onStartSelect={onRangeStartSelect}
-                onEndSelect={onRangeEndSelect}
-                onChange={(val) => {
-                  handleRangeOnChange(
-                    'totalRange',
-                    val,
-                    Default_Total_Range_Info
-                  );
-                }}
-              ></Range>
-              <InfoIcon
-                iconStyle={{
-                  color: data.totalRangeError ? 'red' : '#228ee5',
-                }}
-                tips={data.totalRangeMessage}
-              ></InfoIcon>
-            </HLayout>
           </>
         )}
+        <HLayout>
+          <Text>总计区域：</Text>
+          <Range
+            value={data.totalRange}
+            hostId={data.domId}
+            error={data.totalRangeError}
+            selectionType='row'
+            onStartSelect={onRangeStartSelect}
+            onEndSelect={onRangeEndSelect}
+            onChange={(val) => {
+              handleRangeOnChange('totalRange', val, Default_Total_Range_Info);
+            }}
+          ></Range>
+          <InfoIcon
+            iconStyle={{
+              color: data.totalRangeError ? 'red' : '#228ee5',
+            }}
+            tips={data.totalRangeMessage}
+          ></InfoIcon>
+        </HLayout>
       </Wrap>
     </OperationDialog>
   ) : null;
