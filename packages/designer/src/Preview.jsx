@@ -223,21 +223,21 @@ export default function (props) {
           isShowBtnToolbar={isShowToolbar}
           persistingDataSlice={persistingDataSlice}
           onQuery={props.onQuery}
-          paperStyle={{
-            border: `1px solid rgb(0, 0, 0)`,
-            boxShadow: `rgb(0 0 0 / 40%) 5px 5px 0px 1px`,
-            flexDirection: 'column',
-            display: 'flex',
-          }}
-          paperWrapStyle={{ backgroundColor: '#fbfbfb', padding: '8px 300px' }}
+          // paperStyle={{
+          //   border: `1px solid rgb(0, 0, 0)`,
+          //   boxShadow: `rgb(0 0 0 / 40%) 5px 5px 0px 1px`,
+          //   flexDirection: 'column',
+          //   display: 'flex',
+          // }}
+          // paperWrapStyle={{ backgroundColor: '#fbfbfb', padding: '8px 300px' }}
           // isShowToolbar={false}
           // queryPanelVisible={false}
-          headerToolbar={{
-            // style: {justifyContent: 'center'},
-            toolbars: [
-              { type: 'ExportSetting', title: '导出设置' },
-              {type : 'DataSourceFormatter',title : '使用千分位分隔符',datasource:'sales.order_amount',formatter:'#,##0.000_);-#,##0.000'},
-              {type : 'ExportExcel',title:'导出Excel'}
+          // headerToolbar={{
+          //   // style: {justifyContent: 'center'},
+          //   toolbars: [
+          //     { type: 'ExportSetting', title: '导出设置' },
+          //     {type : 'DataSourceFormatter',title : '使用千分位分隔符',datasource:'sales.order_amount',formatter:'#,##0.000_);-#,##0.000'},
+          //     {type : 'ExportExcel',title:'导出Excel'}
               // {
               //   type: 'Dropdown',
               //   title: '导出配置',
@@ -288,8 +288,8 @@ export default function (props) {
               //     console.log(val);
               //   },
               // },
-            ],
-          }}
+          //   ],
+          // }}
           // onDatasourceFormatterHandler={(handler) => {
           //   handler().then(
           //     ({ setDataSourceFormatter, delDataSourceFormatter }) => {
