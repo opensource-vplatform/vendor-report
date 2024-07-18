@@ -1,21 +1,10 @@
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Commands } from '@commands/index';
 import Hyperlink from '@components/hyperlink';
-import {
-  bind,
-  EVENTS,
-} from '@event/EventManager';
+import { bind, EVENTS } from '@event/EventManager';
 import DatasourceIcon from '@icons/data/datasource';
 import {
   setDatasourceSelectorVisible,
@@ -24,22 +13,13 @@ import {
   updateActiveSheetTablePath,
 } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
-import {
-  isArray,
-  uuid,
-} from '@toone/report-util';
+import { isArray, uuid } from '@toone/report-util';
 import {
   findTreeNodeByPath,
   getActiveSheetTablesPath,
 } from '@utils/commonUtil.js';
-import {
-  getDataSourceConfig,
-  getNavConfig,
-} from '@utils/configUtil';
-import {
-  exeCommand,
-  getNamespace,
-} from '@utils/spreadUtil';
+import { getDataSourceConfig, getNavConfig } from '@utils/configUtil';
+import { exeCommand, getNamespace } from '@utils/spreadUtil';
 import { setTableCornerMarks } from '@utils/tableUtil.js';
 import { getActiveIndexBySheet } from '@utils/worksheetUtil';
 
@@ -64,6 +44,7 @@ import {
   highlightBlock,
   removeHighlightOneBlock,
 } from './utils/utils.js';
+import { showErrorMessage } from '@utils/messageUtil';
 
 //删除表格
 function removeTable(params) {
@@ -297,7 +278,9 @@ export default function Index() {
   const { dsList, showHyperlink, datasourceSelectorVisible } = useSelector(
     ({ datasourceSlice }) => datasourceSlice
   );
-
+  const { allowInvalidFormula } = useSelector(
+    ({ workbookSettingSlice }) => workbookSettingSlice
+  );
   const context = useContext(DesignerContext);
   //是否允许查看数据源
   const isAllowToView = !getDataSourceConfig(context, 'allowToView');
@@ -315,6 +298,9 @@ export default function Index() {
     currentClickBar: true,
     currentformulaValue: '',
     notChangecurrentClickBar: false,
+    editFormulaTime: '',
+    startCellValue: '',
+    startAllowInvalidFormula: true,
   });
 
   const [treeOpenTrigger, setTreeOpenTrigger] = useState(Promise.resolve(true));
@@ -358,10 +344,50 @@ export default function Index() {
       id,
       event: EVENTS.EditEnding,
       handler: (args) => {
-        // console.log('editEnding', args);
+        setTimeout(() => {
+          var curDate = new Date().getTime();
+          // console.log(
+          //   curDate,
+          //   cacheDatasRef.current.editFormulaTime,
+          //   curDate - cacheDatasRef.current.editFormulaTime
+          // );
+          if (
+            !cacheDatasRef.current.editFormulaTime ||
+            new Date().getTime() - cacheDatasRef.current.editFormulaTime > 200
+          ) {
+            // console.log('editEnding', args);
+            const sheet = cacheDatasRef.current.spread.getActiveSheet();
+            const { row, col } = getActiveIndexBySheet(sheet);
+            const cell = sheet.getCell(row, col);
+            const curText =
+              cell.text() == '[函数(Fx)]' ? cell.formula() : cell.text();
+            if (isFormula(curText)) {
+              try {
+                // const lastIndex = curText.length - 1;
+                // const char = formula.charAt(lastIndex);
+                cell.formula(curText.slice(1));
+              } catch (e) {
+                showErrorMessage(dispatch, e);
+                if (
+                  cacheDatasRef.current.startCellValue &&
+                  isFormula(cacheDatasRef.current.startCellValue)
+                ) {
+                  cell.formula(cacheDatasRef.current.startCellValue);
+                } else {
+                  cell.text(cacheDatasRef.current.startCellValue);
+                }
+              }
+            }
+            !cacheDatasRef.current.startAllowInvalidFormula &&
+              (cacheDatasRef.current.spread.options.allowInvalidFormula = false);
+            cacheDatasRef.current.startCellValue = '';
+            cacheDatasRef.current.editFormulaTime = '';
+          }
+        }, 300);
+
         const editingText = args.editingText || '';
         if (isFormula(editingText)) {
-          console.log('formula');
+          // console.log('formula');
           cacheDatasRef.current.currentformulaValue = editingText.slice(1);
           setTimeout(() => {
             cacheDatasRef.current.currentformulaValue = '';
@@ -425,8 +451,20 @@ export default function Index() {
       event: EVENTS.EditStarting,
       handler: () => {
         // 记录点击表达式框
-        if (!cacheDatasRef.current.notChangecurrentClickBar)
+        if (!cacheDatasRef.current.notChangecurrentClickBar) {
           cacheDatasRef.current.currentClickBar = true;
+          // console.log('editStarting');
+          const sheet = cacheDatasRef.current.spread.getActiveSheet();
+          const { row, col } = getActiveIndexBySheet(sheet);
+          const cell = sheet.getCell(row, col);
+          const curText = cell.text().includes('[函数(Fx)]')
+            ? '=' + cell.formula()
+            : cell.text();
+          cacheDatasRef.current.startCellValue = curText;
+          cacheDatasRef.current.startAllowInvalidFormula = allowInvalidFormula;
+          !allowInvalidFormula &&
+            (cacheDatasRef.current.spread.options.allowInvalidFormula = true);
+        }
       },
     });
     return unBindHandler;
@@ -592,7 +630,7 @@ export default function Index() {
           const $Path = dragged.dataset.itemPath;
           const $PathName = dragged.dataset.itemPathName;
           let current = findTreeNodeByPath($Path, dsList);
-          console.log(current, 11);
+          // console.log(current, 11);
           if (current.type === 'table' || current.type === 'map') {
             let columnsTemp = current.children;
             exeCommand(spread, Commands.CellType.BindingPath, {
@@ -642,6 +680,7 @@ export default function Index() {
     const sheet = spread.getActiveSheet();
 
     if (sheet) {
+      cacheDatasRef.current.editFormulaTime = new Date().getTime();
       const { $Path, $PathName } = node;
       const { row, col } = getActiveIndexBySheet(sheet);
       const cell = sheet.getCell(row, col);
@@ -660,39 +699,39 @@ export default function Index() {
           formula = formula.trim();
           const lastIndex = formula.length - 1;
           const char = formula.charAt(lastIndex);
-          if (char == ')' && !flag) {
-            formula = formula.substring(0, lastIndex);
+          if (char !== ')' && !flag) {
+            // formula = formula.substring(0, lastIndex);
             formula = handleFormula(formula, true) + ')';
-          } else if (char == '(') {
-            formula += txt;
+            // } else if (char == '(') {
+            //   formula += txt;
           } else {
-            let startStrHasComma =
-              formula.slice(
-                cacheDatasRef.current.caretOffset - 2,
-                cacheDatasRef.current.caretOffset - 1
-              ) == ',';
-            let endStrHasComma =
-              formula.slice(
-                cacheDatasRef.current.caretOffset - 1,
-                cacheDatasRef.current.caretOffset
-              ) == ',';
+            // let startStrHasComma =
+            //   formula.slice(
+            //     cacheDatasRef.current.caretOffset - 2,
+            //     cacheDatasRef.current.caretOffset - 1
+            //   ) == ',';
+            // let endStrHasComma =
+            //   formula.slice(
+            //     cacheDatasRef.current.caretOffset - 1,
+            //     cacheDatasRef.current.caretOffset
+            //   ) == ',';
 
-            //补全","
-            if (
-              !startStrHasComma &&
-              formula.slice(
-                cacheDatasRef.current.caretOffset - 2,
-                cacheDatasRef.current.caretOffset - 1
-              ) !== '('
-            ) {
-              txt = ',' + txt;
-            }
-            if (
-              !endStrHasComma &&
-              cacheDatasRef.current.caretOffset - 1 !== formula.length
-            ) {
-              txt = txt + ',';
-            }
+            // //补全","
+            // if (
+            //   !startStrHasComma &&
+            //   formula.slice(
+            //     cacheDatasRef.current.caretOffset - 2,
+            //     cacheDatasRef.current.caretOffset - 1
+            //   ) !== '('
+            // ) {
+            //   txt = ',' + txt;
+            // }
+            // if (
+            //   !endStrHasComma &&
+            //   cacheDatasRef.current.caretOffset - 1 !== formula.length
+            // ) {
+            //   txt = txt + ',';
+            // }
             formula =
               formula.slice(0, cacheDatasRef.current.caretOffset - 1) +
               txt +
@@ -701,13 +740,16 @@ export default function Index() {
 
           return formula;
         };
+        // !allowInvalidFormula && (spread.options.allowInvalidFormula = true);
         formula = handleFormula(formula);
-        cell.formula(formula);
+        cell.formula('');
+        cell.text('=' + formula);
         cacheDatasRef.current.notChangecurrentClickBar = true;
         sheet.startEdit(true);
         // 获取编辑控件并设置光标位置
         moveCursorToCharIndex(cacheDatasRef.current.caretOffset + txt.length);
         cacheDatasRef.current.notChangecurrentClickBar = false;
+        // !allowInvalidFormula && (spread.options.allowInvalidFormula = false);
       } else {
         //单元格整个进行数据源绑定
         exeCommand(spread, Commands.CellType.BindingPath, {
