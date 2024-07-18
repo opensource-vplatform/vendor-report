@@ -476,7 +476,7 @@ class UnionDatasource {
     const count = this.getCount();
     let index = 0;
     while (index < count) {
-      result.push(this.getValue(dsCode, fieldCode, index));
+      result.push(this.getValue(dsCode, fieldCode, '', index));
       index++;
     }
     return result;
