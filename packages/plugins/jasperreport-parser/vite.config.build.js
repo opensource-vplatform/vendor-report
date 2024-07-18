@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       commonjsOptions:{
-        transformMixedEsModules:true,
+        exclude: ['@babel/parser'],
       },
       target: 'es2015',
       lib: {
@@ -51,15 +51,6 @@ export default defineConfig(({ mode }) => {
         entry: 'src/index.js',
         fileName: 'jasperreport-parser',
         formats: ['umd'],
-      },
-      rollupOptions: {
-        external: ['react', 'react-dom/client'],
-        output: {
-          globals: {
-            react: 'React',
-            'react-dom/client': 'ReactDOM',
-          },
-        },
       },
     },
     plugins,

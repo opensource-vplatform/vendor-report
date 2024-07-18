@@ -76,6 +76,10 @@ class SheetToJson {
       fontWeight: cell.isBold() ? 'bold':'normal',
       wordWrap: cell.isWordWrap(),
     };
+    const formatter = cell.getFormatter();
+    if(formatter){
+      style.formatter = formatter;
+    }
     this.appnedBorderStyle('borderTop', cell.getBorderTop(), style);
     this.appnedBorderStyle('borderRight', cell.getBorderRight(), style);
     this.appnedBorderStyle('borderBottom', cell.getBorderBottom(), style);

@@ -17,7 +17,7 @@ export const getBindText = function (bindingPath, spread) {
 export const hasBindField = function (sheet, row, col) {
   const bindingPath = sheet.getBindingPath(row, col);
   //有绑定信息，且绑定的为实体字段
-  return bindingPath && bindingPath.split && bindingPath.split('.').length == 2;
+  return bindingPath && bindingPath.split && bindingPath.split('.').length > 1;
 };
 
 export const setIconDecoration = function (style, type, expandDirection) {

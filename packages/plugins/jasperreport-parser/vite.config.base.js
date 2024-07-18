@@ -1,7 +1,8 @@
-import react from '@vitejs/plugin-react';
+import requireTranformer from 'vite-plugin-require-transform';
+
+import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-    resolve: {
-    },
-    plugins: [react()],
+  resolve: {},
+  plugins: [commonjs(), requireTranformer()],
 };

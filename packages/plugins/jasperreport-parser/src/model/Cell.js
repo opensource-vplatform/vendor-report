@@ -152,6 +152,14 @@ class Cell{
         return this.wordWrap;
     }
 
+    setFormatter(formatter){
+        this.formatter = formatter;
+    }
+
+    getFormatter(){
+        return this.formatter;
+    }
+
 }
 
 export default Cell;

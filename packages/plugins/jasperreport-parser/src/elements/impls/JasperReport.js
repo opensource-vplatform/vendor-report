@@ -16,7 +16,9 @@ class JasperReport extends Element {
       'summary',
     ];
     const sheet = new Sheet();
-    sheet.setName(this.getAttribute('name'));
+    const name = this.getAttribute('name');
+    sheet.setName(name);
+    context.setName(name);
     sheet.setOrientation(
       this.getAttribute('orientation') == 'Landscape' ? 'landscope' : 'portrait'
     );

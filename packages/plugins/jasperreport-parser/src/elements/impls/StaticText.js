@@ -59,11 +59,7 @@ class StaticText extends Element {
   parseText(cell){
     const node = this.getNode();
     const text = getChild('text', node);
-    let content = getText(text);
-    if(content){
-      content = content.replaceAll("\n","")
-    }
-    cell.setText(content);
+    cell.setText(getText(text));
   }
 
   parse(context) {
