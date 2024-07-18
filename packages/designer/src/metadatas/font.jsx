@@ -84,6 +84,7 @@ const FONT_FAMILIES_En = [
   },
   { value: 'Trebuchet MS', title: 'Trebuchet MS', text: 'Trebuchet MS' },
   { value: 'Verdana', title: 'Verdana', text: 'Verdana' },
+  { value: 'Arial Narrow', title: 'Arial Narrow', text: 'Arial Narrow'}
 ];
 
 const FONT_SIZES = [

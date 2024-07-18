@@ -20,6 +20,14 @@ class ParseContext{
         return this.columnWidth;
     }
 
+    setName(name){
+        this.name = name;
+    }
+
+    getName(){
+        return this.name;
+    }
+
 }
 
 export default ParseContext;

@@ -1,3 +1,5 @@
+import { isNullOrUndef } from './objectUtil';
+
 export function isInViewPort(element) {
   const viewWidth = window.innerWidth || document.documentElement.clientWidth;
   const viewHeight =
@@ -129,6 +131,9 @@ function getUnChineseCharWidth(fontSize, fontFamily) {
 }
 
 export function getFitHeight(text, width, fontSize, fontFamily) {
+  if(isNullOrUndef(text)){
+    return 0;
+  }
   let wd = 0;
   for (let i = 0; i < text.length; i++) {
     const chr = text.charAt(i);

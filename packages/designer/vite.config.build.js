@@ -3,7 +3,10 @@ import {
   loadEnv,
 } from 'vite';
 
-import { babel } from '@rollup/plugin-babel';
+import {
+  babel,
+  getBabelOutputPlugin,
+} from '@rollup/plugin-babel';
 
 import baseConfig from './vite.config.base';
 
@@ -25,6 +28,7 @@ const plugins = [
               ],
           ],
       }),
+      getBabelOutputPlugin({presets: ['@babel/preset-env']})
   ];
   
   export default defineConfig(({ mode }) => {

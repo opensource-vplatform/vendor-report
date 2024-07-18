@@ -9,7 +9,8 @@ import jsonStr from './jsonData/reportJsonData';
 import sale from './jsonData/sale.json';
 import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
-import wecost from './jsonData/wecost.json';
+//import wecost from './jsonData/wecost.json';
+import wecost from './wecost/index';
 
 let json = JSON.parse(jsonStr);
 
@@ -209,7 +210,7 @@ const datasourceDefines = [
 tourismData.data.length = 2 || 21;
 
 const dataSource = {
-  dataSourceDefinition: datasourceDefines, //数据源定义
+  /*dataSourceDefinition: datasourceDefines, //数据源定义
   datas: {
     reportDetailData: wecost.data,
     sale: sale.data,
@@ -366,7 +367,9 @@ const dataSource = {
         groupId: 'zona',
       },
     ],
-  }, //数据源数据
+  }, //数据源数据*/
+  dataSourceDefinition:wecost.dataSource,
+  datas:wecost.datas,
   allowToView: true, //是否允许查看数据源
   allowToEdit: true, //是否允许编辑数据源
 };
@@ -427,10 +430,10 @@ export default {
   defaults: {
     formatter: {
       // 格式化类型
-      type: {
+      /*type: {
         text: '#,##0',
         decimals: '#,##0_);-#,##0',
-      },
+      },*/
       // 格式化数据源
       dataSource: {
         Ipes_MP_Billpay_DetailCalc: {

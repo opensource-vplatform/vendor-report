@@ -19,7 +19,7 @@ const paintCell = function(context, style, value){
   if (isStaticCell(sheet,row,col)&&isErrorPrefix(value)) {
     setErrorDecoration(style);
     const text = value.substring(prefix.length);
-    sheet.setText(row,col,text);
+    //sheet.setText(row,col,text);
     return text;
   }
   return value;
