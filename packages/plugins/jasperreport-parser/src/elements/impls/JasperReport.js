@@ -1,4 +1,5 @@
 import Sheet from '../../model/Sheet';
+import { getHeight, getWidth } from '../../util/PaperUtil';
 import { getChild } from '../../util/XmlUtil';
 import Element from '../Element';
 import { createByNode } from '../Factory';
@@ -19,9 +20,17 @@ class JasperReport extends Element {
     const name = this.getAttribute('name');
     sheet.setName(name);
     context.setName(name);
-    sheet.setOrientation(
-      this.getAttribute('orientation') == 'Landscape' ? 'landscope' : 'portrait'
-    );
+    const orientation =
+      this.getAttribute('orientation') == 'Landscape'
+        ? 'landscape'
+        : 'portrait';
+    sheet.setOrientation(orientation);
+    const paperWidth = this.getIntegerAttr('pageWidth');
+    const zoom =
+      orientation == 'landscape'
+        ? getHeight() / paperWidth
+        : getWidth() / paperWidth;
+    sheet.setZoom(zoom);
     sheet.setMarginTop(this.getIntegerAttr('topMargin'));
     sheet.setMarginRight(this.getIntegerAttr('rightMargin'));
     sheet.setMarginBottom(this.getIntegerAttr('bottomMargin'));
@@ -34,7 +43,7 @@ class JasperReport extends Element {
       const child = getChild(childrenName, node);
       if (child) {
         const instance = createByNode(child);
-        if(instance){
+        if (instance) {
           const height = instance.getHeight();
           const children = this.createChildren(child);
           children.forEach((child) => {

@@ -27,7 +27,7 @@ class SheetToJson {
     lefts.forEach((left, index) => {
       if (index != lefts.length - 1) {
         columns.push({
-          size: lefts[index + 1] - left,
+          size: this.withZoom(lefts[index + 1] - left),
         });
       }
     });
@@ -44,7 +44,7 @@ class SheetToJson {
     tops.forEach((top, index) => {
       if (index != tops.length - 1) {
         rows.push({
-          size: tops[index + 1] - top,
+          size: this.withZoom(tops[index + 1] - top),
         });
       }
     });
@@ -118,6 +118,21 @@ class SheetToJson {
       if (rowCount > 1 || colCount > 1) {
         addSpan(row, col, rowCount, colCount, this.sheetJson);
       }
+    });
+  }
+
+  withZoom(value) {
+    const zoom = this.sheet.getZoom();
+    return Math.floor(value * zoom);
+  }
+
+  adjustCellWithZoom() {
+    const cells = this.sheet.getCells();
+    cells.forEach((cell) => {
+      cell.setLeft(this.withZoom(cell.getLeft()));
+      cell.setTop(this.withZoom(cell.getTop()));
+      cell.setWidth(this.withZoom(cell.getWidth()));
+      cell.setHeight(this.withZoom(cell.getHeight()));
     });
   }
 
