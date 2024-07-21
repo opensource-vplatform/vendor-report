@@ -1,17 +1,11 @@
 import { createRef } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import resourceManager from 'resource-manager-js';
 
 import { error } from '@utils/consoleUtil';
 import { toExcelPluginUrl } from '@utils/environmentUtil';
-import {
-  showErrorMessage,
-  showLoadingMessage,
-} from '@utils/messageUtil';
+import { showErrorMessage, showLoadingMessage } from '@utils/messageUtil';
 
 import {
   DetailTitle,
@@ -99,8 +93,16 @@ export default function (props) {
         onClick={() => {
           importHandler();
         }}
+        style={{ width: 120, height: 120 }}
       >
-        <JRLIcon></JRLIcon>
+        <JRLIcon
+          style={{
+            width: 64,
+            height: 64,
+            backgroundPosition: 'center center',
+            backgroundSize: 'cover',
+          }}
+        ></JRLIcon>
         <IconTitle>导入WEC报表文件</IconTitle>
       </ImportButtonWrap>
       <None>

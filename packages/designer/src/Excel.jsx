@@ -1,22 +1,9 @@
-import {
-  Fragment,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-} from 'react';
+import { Fragment, useCallback, useContext, useEffect, useRef } from 'react';
 
-import {
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { registerCommand } from '@commands/index';
-import {
-  bind,
-  EVENTS,
-  fire,
-} from '@event/EventManager';
+import { bind, EVENTS, fire } from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
   initDatasource,
@@ -25,9 +12,7 @@ import {
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import { hideTab } from '@store/navSlice/navSlice';
-import {
-  initSlice as initPersistingDataSlice,
-} from '@store/persistingDataSlice';
+import { initSlice as initPersistingDataSlice } from '@store/persistingDataSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
   initWizardSlice,
@@ -40,22 +25,14 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
-import {
-  enhanceSpreadJson,
-  formatBindingPathCellType,
-} from '@utils/cellUtil';
-import {
-  findTreeNodeById,
-  getActiveSheetTablesPath,
-} from '@utils/commonUtil';
-import {
-  getLicense,
-  isLocalLicenseUnCheck,
-} from '@utils/configUtil';
+import { enhanceSpreadJson, formatBindingPathCellType } from '@utils/cellUtil';
+import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
+import { getLicense, isLocalLicenseUnCheck } from '@utils/configUtil';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import { getNamespace } from '@utils/spreadUtil';
 import {
+  clearCellTagPlugin,
   getCellTag,
   getSheetTag,
   setSheetTag,
@@ -132,6 +109,8 @@ export default function () {
   const sheetName = 'Sheet1';
   const handleValueChanged = useCallback((type, args) => {
     const { sheet, row, col, newValue } = args;
+    //清空单元格错误插件
+    clearCellTagPlugin(sheet, row, col, 'error');
     const bindInfo = getCellTag(sheet, row, col, 'bindInfo');
     if (bindInfo && bindInfo.bindType === 'tableColumn') {
       const ds = findTreeNodeById(bindInfo.bindDsInstanceId, dsList);
@@ -307,8 +286,8 @@ export default function () {
       event: EXCEL_EVENTS.OnSpreadJsonParsed,
       handler: (spread) => {
         const sheets = spread.sheets;
-        if(sheets&&sheets.length>0){
-          sheets.forEach((sheet)=>{
+        if (sheets && sheets.length > 0) {
+          sheets.forEach((sheet) => {
             enhanceSheet(sheet);
           });
         }

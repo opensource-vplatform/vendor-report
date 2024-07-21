@@ -8,13 +8,11 @@ import Cell from '../../model/Cell';
   print,
   StringIdentifierSyntax,
 } from '../../syntax/index';*/
-import {
-  getChild,
-  getText,
-} from '../../util/XmlUtil';
+import { getChild, getText } from '../../util/XmlUtil';
 import Context from '../../vistor/Context';
 import { create } from '../../vistor/Factory';
 import StaticText from './StaticText';
+import { uuid } from '@toone/report-util';
 
 const Force_Type_Syntax = /\(Map\)|\(String\)|\((Double)\)/g;
 
@@ -25,34 +23,33 @@ const Field_Syntax = /\$F{(\w+)}/g;
 const Variable_Syntax = /\$V{(\w+)}/g;
 
 class TextField extends StaticText {
-
   /**
    * 移除java强制类型转换语法
    */
-  _removeForceTypeChange(text){
-    return text.replace(Force_Type_Syntax,'');
+  _removeForceTypeChange(text) {
+    return text.replace(Force_Type_Syntax, '');
   }
 
-  _convertSyntax(text){
-    text = text.replace(Parameter_Syntax,(group,match)=>`$P("${match}")`);
-    text = text.replace(Field_Syntax,(group,match)=>`$F("${match}")`);
-    text = text.replace(Variable_Syntax,(group,match)=>`$V("${match}")`);
+  _convertSyntax(text) {
+    text = text.replace(Parameter_Syntax, (group, match) => `$P("${match}")`);
+    text = text.replace(Field_Syntax, (group, match) => `$F("${match}")`);
+    text = text.replace(Variable_Syntax, (group, match) => `$V("${match}")`);
     return text;
   }
 
   /**
    * 调整语法
-   * @param {*} text 
+   * @param {*} text
    */
-  _adjustExpression(text){
-    if(typeof text == 'string'){
+  _adjustExpression(text) {
+    if (typeof text == 'string') {
       text = this._removeForceTypeChange(text);
       return this._convertSyntax(text);
     }
     return text;
   }
 
-  parseTextFieldExpression(cell,context) {
+  parseTextFieldExpression(cell, context) {
     const node = this.getNode();
     const textFieldExpression = getChild('textFieldExpression', node);
     if (textFieldExpression) {
@@ -63,18 +60,24 @@ class TextField extends StaticText {
           const node = parse(text);
           const printer = create(node);
           const name = context.getName();
-          const ctx = new Context(`${name}_parameter`,`${name}_detail`);
+          const ctx = new Context(`${name}_parameter`, `${name}_detail`);
           const res = printer.print(ctx);
           const type = res.type;
-          if(type==2){
+          if (type == 2) {
             cell.setFormula(res.text);
-          }else if(type == 1){
+          } else if (type == 1) {
             cell.setBindingPath(res.text);
-          }else{
+          } else {
             cell.setText(res.text);
           }
         } catch (e) {
-          cell.setText("_@_$_toone_report_error_message_prefix_$_@_"+text);
+          cell.setText(text);
+          cell.setTag(
+            JSON.stringify({
+              instanceId: uuid(),
+              plugins: [{ type: 'error', config: {} }],
+            })
+          );
         }
       }
     }
@@ -82,15 +85,15 @@ class TextField extends StaticText {
 
   parse(context) {
     const cell = new Cell();
-    cell.setWordWrap(this.getAttribute("isStretchWithOverflow")=="true");
-    const pattern = this.getAttribute("pattern");
-    if(pattern){
+    cell.setWordWrap(this.getAttribute('isStretchWithOverflow') == 'true');
+    const pattern = this.getAttribute('pattern');
+    if (pattern) {
       cell.setFormatter(pattern);
     }
     this.parseReportElement(cell, context);
     this.parseBox(cell, context);
     this.parseTextElement(cell);
-    this.parseTextFieldExpression(cell,context);
+    this.parseTextFieldExpression(cell, context);
     return cell;
   }
 }

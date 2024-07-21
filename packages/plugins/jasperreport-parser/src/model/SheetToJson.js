@@ -10,6 +10,7 @@ import {
   setRowCount,
   setRowHeights,
   setStyle,
+  setTag,
   setValue,
   toHAlign,
   toVAlign,
@@ -73,11 +74,11 @@ class SheetToJson {
       font: `${fontSize}pt ${font}`,
       fontFamily: font,
       fontSize: fontSize + 'pt',
-      fontWeight: cell.isBold() ? 'bold':'normal',
+      fontWeight: cell.isBold() ? 'bold' : 'normal',
       wordWrap: cell.isWordWrap(),
     };
     const formatter = cell.getFormatter();
-    if(formatter){
+    if (formatter) {
       style.formatter = formatter;
     }
     this.appnedBorderStyle('borderTop', cell.getBorderTop(), style);
@@ -108,6 +109,7 @@ class SheetToJson {
       setValue(row, col, cell.getText(), this.sheetJson);
       setBindingPath(row, col, cell.getBindingPath(), this.sheetJson);
       setFormula(row, col, cell.getFormula(), this.sheetJson);
+      setTag(row, col, cell.getTag(), this.sheetJson);
       for (let i = 0; i < rowCount; i++) {
         for (let j = 0; j < colCount; j++) {
           this.setCellStyle(row + i, col + j, cell);

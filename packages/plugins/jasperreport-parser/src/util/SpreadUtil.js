@@ -107,7 +107,7 @@ export const toHAlign = function (hAlign) {
 
 export const toVAlign = function (vAlign) {
   //return NS.Spread.Sheets.VerticalAlign[vAlign];
-  return VAlgins[vAlign]
+  return VAlgins[vAlign];
 };
 
 const cloneJson = function (json) {
@@ -168,19 +168,19 @@ export const setValue = function (row, col, value, sheetJson) {
   cell.value = value;
 };
 
-export const setBindingPath = function(row,col,bindingPath,sheetJson){
-  if(bindingPath){
-    const cell = getCell(row,col,sheetJson);
+export const setBindingPath = function (row, col, bindingPath, sheetJson) {
+  if (bindingPath) {
+    const cell = getCell(row, col, sheetJson);
     cell.bindingPath = bindingPath;
   }
-}
+};
 
-export const setFormula = function(row,col,formula,sheetJson){
-  if(formula){
-    const cell = getCell(row,col,sheetJson);
+export const setFormula = function (row, col, formula, sheetJson) {
+  if (formula) {
+    const cell = getCell(row, col, sheetJson);
     cell.formula = formula;
   }
-}
+};
 
 export const setStyle = function (row, col, style, sheetJson) {
   const cell = getCell(row, col, sheetJson);
@@ -198,4 +198,11 @@ export const addSpan = function (row, col, rowCount, colCount, sheetJson) {
     col,
     colCount,
   });
+};
+
+export const setTag = function (row, col, tag, sheetJson) {
+  if (tag) {
+    const cell = getCell(row, col, sheetJson);
+    cell.tag = tag;
+  }
 };

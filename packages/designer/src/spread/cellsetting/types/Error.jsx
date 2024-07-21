@@ -1,30 +1,25 @@
+import { hasCellTagPluginByIndex } from '@toone/report-util';
 import { setErrorDecoration } from '../utils';
 
-const prefix = '_@_$_toone_report_error_message_prefix_$_@_';
+const PLUGIN_TYPE = 'error';
 
-const isErrorPrefix = function(value){
-    if(typeof value == 'string'){
-        return value.startsWith(prefix);
-    }
-    return false;
-}
+const isStaticCell = function (sheet, row, col) {
+  const bindingPath = sheet.getBindingPath(row, col);
+  return !bindingPath;
+};
 
-const isStaticCell = function(sheet, row, col){
-    const bindingPath = sheet.getBindingPath(row,col);
-    return !bindingPath;
-}
-
-const paintCell = function(context, style, value){
-    const { sheet, row, col } = context;
-  if (isStaticCell(sheet,row,col)&&isErrorPrefix(value)) {
+const paintCell = function (context, style, value) {
+  const { sheet, row, col } = context;
+  if (
+    isStaticCell(sheet, row, col) &&
+    hasCellTagPluginByIndex(sheet, row, col, PLUGIN_TYPE)
+  ) {
     setErrorDecoration(style);
-    const text = value.substring(prefix.length);
-    //sheet.setText(row,col,text);
-    return text;
   }
   return value;
-}
+};
 
 export default {
-    paintCell
-}
+  paintCell,
+  PLUGIN_TYPE,
+};

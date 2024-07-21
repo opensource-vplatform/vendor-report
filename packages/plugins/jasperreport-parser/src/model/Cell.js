@@ -1,165 +1,171 @@
-class Cell{
+class Cell {
+  setLeft(left) {
+    this.left = left;
+  }
 
-    setLeft(left){
-        this.left = left;
-    }
+  getLeft() {
+    return this.left;
+  }
 
-    getLeft(){
-        return this.left;
-    }
+  getRight() {
+    return this.left + this.width;
+  }
 
-    getRight(){
-        return this.left + this.width;
-    }
+  getBottom() {
+    return this.top + this.height;
+  }
 
-    getBottom(){
-        return this.top + this.height;
-    }
+  setTop(top) {
+    this.top = top;
+  }
 
-    setTop(top){
-        this.top = top;
-    }
+  getTop() {
+    return this.top;
+  }
 
-    getTop(){
-        return this.top;
-    }
+  setWidth(width) {
+    this.width = width;
+  }
 
-    setWidth(width){
-        this.width = width;
-    }
+  getWidth() {
+    return this.width;
+  }
 
-    getWidth(){
-        return this.width;
-    }
+  setHeight(height) {
+    this.height = height;
+  }
 
-    setHeight(height){
-        this.height = height;
-    }
+  getHeight() {
+    return this.height;
+  }
 
-    getHeight(){
-        return this.height;
-    }
+  setHAlign(hAlign) {
+    this.hAlign = hAlign;
+  }
 
-    setHAlign(hAlign){
-        this.hAlign = hAlign;
-    }
+  getHAlign() {
+    return this.hAlign;
+  }
 
-    getHAlign(){
-        return this.hAlign;
-    }
+  setVAlign(vAlign) {
+    this.vAlign = vAlign;
+  }
 
-    setVAlign(vAlign){
-        this.vAlign = vAlign;
-    }
+  getVAlign() {
+    return this.vAlign;
+  }
 
-    getVAlign(){
-        return this.vAlign;
-    }
+  setFont(font) {
+    this.font = font;
+  }
 
-    setFont(font){
-        this.font = font;
-    }
+  getFont() {
+    return this.font;
+  }
 
-    getFont(){
-        return this.font;
-    }
+  setFontSize(fontSize) {
+    this.fontSize = fontSize;
+  }
 
-    setFontSize(fontSize){
-        this.fontSize = fontSize;
-    }
+  getFontSize() {
+    return this.fontSize;
+  }
 
-    getFontSize(){
-        return this.fontSize;
-    }
+  setBold(bold) {
+    this.bold = bold;
+  }
 
-    setBold(bold){
-        this.bold = bold;
-    }
+  isBold() {
+    return this.bold;
+  }
 
-    isBold(){
-        return this.bold;
-    }
+  setText(text) {
+    this.text = text;
+  }
 
-    setText(text){
-        this.text = text;
-    }
+  getText() {
+    return this.text;
+  }
 
-    getText(){
-        return this.text;
-    }
+  setFormula(formula) {
+    this.formula = formula;
+  }
 
-    setFormula(formula){
-        this.formula = formula;
-    }
+  getFormula() {
+    return this.formula;
+  }
 
-    getFormula(){
-        return this.formula;
-    }
+  setBorderTop(borderTop) {
+    this.borderTop = borderTop;
+  }
 
-    setBorderTop(borderTop){
-        this.borderTop = borderTop;
-    }
+  getBorderTop() {
+    return this.borderTop;
+  }
 
-    getBorderTop(){
-        return this.borderTop
-    }
+  setBorderRight(borderRight) {
+    this.borderRight = borderRight;
+  }
 
-    setBorderRight(borderRight){
-        this.borderRight = borderRight;
-    }
+  getBorderRight() {
+    return this.borderRight;
+  }
 
-    getBorderRight(){
-        return this.borderRight;
-    }
+  setBorderBottom(borderBottom) {
+    this.borderBottom = borderBottom;
+  }
 
-    setBorderBottom(borderBottom){
-        this.borderBottom = borderBottom;
-    }
+  getBorderBottom() {
+    return this.borderBottom;
+  }
 
-    getBorderBottom(){
-        return this.borderBottom;
-    }
+  setBorderLeft(borderLeft) {
+    this.borderLeft = borderLeft;
+  }
 
-    setBorderLeft(borderLeft){
-        this.borderLeft = borderLeft;
-    }
+  getBorderLeft() {
+    return this.borderLeft;
+  }
 
-    getBorderLeft(){
-        return this.borderLeft;
-    }
+  setColSpan(colSpan) {
+    this.colSpan = colSpan;
+  }
 
-    setColSpan(colSpan){
-        this.colSpan = colSpan;
-    }
+  setRowSpan(rowSpan) {
+    this.rowSpan = rowSpan;
+  }
 
-    setRowSpan(rowSpan){
-        this.rowSpan = rowSpan;
-    }
+  setBindingPath(bindingPath) {
+    this.bindingPath = bindingPath;
+  }
 
-    setBindingPath(bindingPath){
-        this.bindingPath = bindingPath;
-    }
+  getBindingPath() {
+    return this.bindingPath;
+  }
 
-    getBindingPath(){
-        return this.bindingPath;
-    }
+  setWordWrap(wordWrap) {
+    this.wordWrap = wordWrap;
+  }
 
-    setWordWrap(wordWrap){
-        this.wordWrap = wordWrap;
-    }
+  isWordWrap() {
+    return this.wordWrap;
+  }
 
-    isWordWrap(){
-        return this.wordWrap;
-    }
+  setFormatter(formatter) {
+    this.formatter = formatter;
+  }
 
-    setFormatter(formatter){
-        this.formatter = formatter;
-    }
+  getFormatter() {
+    return this.formatter;
+  }
 
-    getFormatter(){
-        return this.formatter;
-    }
+  setTag(tag) {
+    this.tag = tag;
+  }
 
+  getTag() {
+    return this.tag;
+  }
 }
 
 export default Cell;

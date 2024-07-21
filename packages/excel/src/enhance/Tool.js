@@ -39,6 +39,22 @@ export default class Tool {
   }
 
   /**
+   *
+   * @param {*} handler
+   */
+  setSheetJsonHandler(handler) {
+    this.sheetJsonHandler = handler;
+  }
+
+  setRowHandler(handler) {
+    this.rowHandler = handler;
+  }
+
+  setColHandler(handler) {
+    this.colHandler = handler;
+  }
+
+  /**
    * 获取字段下标（在工作表中的起始位置）
    * @param {*} tableCode
    * @param {*} fieldCode
@@ -130,5 +146,17 @@ export default class Tool {
   }
   setSeqHandler(handler) {
     this.seqHandler = handler;
+  }
+
+  getSheetJson() {
+    return this.sheetJsonHandler();
+  }
+
+  getRow() {
+    return this.rowHandler();
+  }
+
+  getCol() {
+    return this.colHandler();
   }
 }

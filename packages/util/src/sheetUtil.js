@@ -1,6 +1,4 @@
-import {
-  uuid,
-} from './uuidUtil';
+import { uuid } from './uuidUtil';
 
 /**
  * 获取命令空间
@@ -106,16 +104,16 @@ export function hasCellTagPlugin(sheet, pluginType) {
 }
 
 /**
-* 清除单元格插件
-* @param {*} sheet
-* @param {*} row
-* @param {*} col
-* @param {*} plugin
-* {
-*  type:string,//插件类型
-*  ...
-* }
-*/
+ * 清除单元格插件
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @param {*} plugin
+ * {
+ *  type:string,//插件类型
+ *  ...
+ * }
+ */
 export function clearCellTagPlugin(sheet, row, col, plugin) {
   const plugins = getCellTagPlugins(sheet, row, col);
   if (plugins) {
@@ -132,9 +130,7 @@ export function clearAllCellTagPlugin(sheet, row, col) {
   withBatchUpdate(sheet.getParent(), () => {
     const plugins = getCellTagPlugins(sheet, row, col);
     if (plugins) {
-      plugins.forEach((plugin) =>
-        clearCellTagPlugin(sheet, row, col, plugin)
-      );
+      plugins.forEach((plugin) => clearCellTagPlugin(sheet, row, col, plugin));
     }
     const GC = getNamespace();
     sheet.clear(
@@ -149,18 +145,18 @@ export function clearAllCellTagPlugin(sheet, row, col) {
 }
 
 /**
-* 设置单元格插件,如果已存在该类型插件，则更新，否则新增
-* @param {*} sheet
-* @param {*} row
-* @param {*} col
-* @param {*} plugin
-* {
-*  type:string,//插件类型
-*  config:{
-*     //插件配置信息
-*  }
-* }
-*/
+ * 设置单元格插件,如果已存在该类型插件，则更新，否则新增
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @param {*} plugin
+ * {
+ *  type:string,//插件类型
+ *  config:{
+ *     //插件配置信息
+ *  }
+ * }
+ */
 export function setCellTagPlugin(sheet, row, col, plugin) {
   const plugins = getCellTagPlugins(sheet, row, col) || [];
   const pl = plugins.find((pl) => plugin.type == pl.type);
@@ -173,13 +169,13 @@ export function setCellTagPlugin(sheet, row, col, plugin) {
 }
 
 /**
-* 获取单元格插件
-* @param {*} sheet
-* @param {*} row
-* @param {*} col
-* @param {*} pluginType
-* @returns
-*/
+ * 获取单元格插件
+ * @param {*} sheet
+ * @param {*} row
+ * @param {*} col
+ * @param {*} pluginType
+ * @returns
+ */
 export function getCellTagPlugin(sheet, row, col, pluginType) {
   const plugins = getCellTagPlugins(sheet, row, col);
   return plugins ? plugins.find((pl) => pl.type == pluginType) : null;
