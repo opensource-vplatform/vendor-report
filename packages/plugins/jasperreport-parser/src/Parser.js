@@ -10,23 +10,30 @@ class Parser {
   }
 
   parse() {
-    const xmlObj = xml2js(this.jrxml, {
-      ignoreComment: true,
-      alwaysChildren: true,
-    });
-    const elements = xmlObj.elements;
-    const element = elements?.find(
-      (element) => element.name == 'jasperReport' && element.type == 'element'
-    );
-    if (element) {
-      const instance = createByNode(element);
-      if (instance) {
-        const sheet = instance.parse(new ParseContext());
-        const sheetToJson = new SheetToJson(sheet);
-        return sheetToJson.toJSON();
+    return new Promise((resolve, reject) => {
+      try {
+        const xmlObj = xml2js(this.jrxml, {
+          ignoreComment: true,
+          alwaysChildren: true,
+        });
+        const elements = xmlObj.elements;
+        const element = elements?.find(
+          (element) =>
+            element.name == 'jasperReport' && element.type == 'element'
+        );
+        if (element) {
+          const instance = createByNode(element);
+          if (instance) {
+            const sheet = instance.parse(new ParseContext());
+            const sheetToJson = new SheetToJson(sheet);
+            return resolve(sheetToJson.toJSON());
+          }
+        }
+        resolve(null);
+      } catch (e) {
+        reject(e);
       }
-    }
-    return null;
+    });
   }
 }
 

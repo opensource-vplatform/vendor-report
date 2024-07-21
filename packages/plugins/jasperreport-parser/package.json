@@ -12,7 +12,8 @@
   "dependencies": {
     "@babel/parser": "^7.24.8",
     "xml-js": "^1.6.11",
-    "@toone/report-util":"workspace:^"
+    "@toone/report-util": "workspace:^",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.23.7",

@@ -26,6 +26,10 @@ export default function (props) {
       iptRef.current.click();
     }
   };
+  const handleError = (e) => {
+    error(e);
+    showErrorMessage(dispatch, '导入失败，请重试！');
+  };
   const handleFileChange = (evt) => {
     const target = evt.target;
     const fileList = target.files;
@@ -33,21 +37,23 @@ export default function (props) {
       showLoadingMessage(dispatch, '导入中');
       setTimeout(() => {
         const file = fileList[0];
+        const isRptb = file.name.endsWith('.rptb');
         const reader = new FileReader();
         reader.onload = () => {
-          try {
-            resourceManager
-              .loadScript([toExcelPluginUrl('jasperreport-parser.umd.js')])
-              .then(() => {
-                try {
-                  const jasperReport =
-                    new TOONE.Utils.JasperReport.JasperReportParser(
-                      reader.result
-                    );
-                  const json = jasperReport.parse();
-                  if (target) {
-                    target.value = null;
-                  }
+          resourceManager
+            .loadScript([toExcelPluginUrl('jasperreport-parser.umd.js')])
+            .then(() => {
+              const jasperReport = isRptb
+                ? new TOONE.Utils.JasperReport.WECReportParser(reader.result)
+                : new TOONE.Utils.JasperReport.JasperReportParser(
+                    reader.result
+                  );
+              if (target) {
+                target.value = null;
+              }
+              jasperReport
+                .parse()
+                .then((json) => {
                   const promise = spread.TOONE_FUNCS.setJSON(json);
                   closeHandler();
                   showLoadingMessage(dispatch, null);
@@ -61,28 +67,16 @@ export default function (props) {
                       spread.refresh();
                     }, 100);
                   }
-                } catch (err) {
-                  if (target) {
-                    target.value = null;
-                  }
-                  showLoadingMessage(dispatch, null);
-                  if (err && err.errorMessage) {
-                    showErrorMessage(dispatch, err.errorMessage);
-                  } else {
-                    error(err);
-                  }
-                }
-              })
-              .catch((e) => {
-                error(e);
-                showErrorMessage(dispatch, '导入失败，请重试！');
-              });
-          } catch (e) {
-            error(e);
-            showErrorMessage(dispatch, '导入失败，请重试！');
-          }
+                })
+                .catch(handleError);
+            })
+            .catch(handleError);
         };
-        reader.readAsText(file);
+        if (isRptb) {
+          reader.readAsArrayBuffer(file);
+        } else {
+          reader.readAsText(file);
+        }
       }, 500);
     }
   };
@@ -108,7 +102,7 @@ export default function (props) {
       <None>
         <input
           type='file'
-          accept='.jrxml'
+          accept='.jrxml,.rptb'
           ref={iptRef}
           onChange={handleFileChange}
         ></input>
