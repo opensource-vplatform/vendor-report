@@ -3,42 +3,45 @@ import { create } from '../Factory';
 import Printer from '../Printer';
 
 class BinaryExpressionPrinter extends Printer {
-  printAdd(context) {
+  getOperatorArgs(context) {
     const left = this.getLeft();
     const right = this.getRight();
     const leftRes = left.print(context);
     const rightRes = right.print(context);
     const leftArg = this.toArg(leftRes);
     const rightArg = this.toArg(rightRes);
+    return [leftArg, rightArg];
+  }
+
+  printAdd(context) {
+    const args = this.getOperatorArgs(context);
     return {
       type: ResultType.formula,
-      text: `CONCAT(${leftArg},${rightArg})`,
+      text: `CONCAT(${args[0]},${args[1]})`,
     };
   }
 
   printEqual(context) {
-    const left = this.getLeft();
-    const right = this.getRight();
-    const leftRes = left.print(context);
-    const rightRes = right.print(context);
-    const leftArg = this.toArg(leftRes);
-    const rightArg = this.toArg(rightRes);
+    const args = this.getOperatorArgs(context);
     return {
       type: ResultType.formula,
-      text: `${leftArg}=${rightArg}`,
+      text: `${args[0]}=${args[1]}`,
     };
   }
 
   printDiv(context) {
-    const left = this.getLeft();
-    const right = this.getRight();
-    const leftRes = left.print(context);
-    const rightRes = right.print(context);
-    const leftArg = this.toArg(leftRes);
-    const rightArg = this.toArg(rightRes);
+    const args = this.getOperatorArgs(context);
     return {
       type: ResultType.formula,
-      text: `${leftArg}/${rightArg}`,
+      text: `${args[0]}/${args[1]}`,
+    };
+  }
+
+  printSub(context) {
+    const args = this.getOperatorArgs(context);
+    return {
+      type: ResultType.formula,
+      text: `${args[0]}-${args[1]}`,
     };
   }
 
@@ -67,6 +70,8 @@ class BinaryExpressionPrinter extends Printer {
       return this.printEqual(context);
     } else if (operator === '/') {
       return this.printDiv(context);
+    } else if (operator === '-') {
+      return this.printSub(context);
     } else {
       throw Error('未识别操作符：' + operator);
     }

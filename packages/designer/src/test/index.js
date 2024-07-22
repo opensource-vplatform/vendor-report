@@ -368,15 +368,15 @@ const dataSource = {
       },
     ],
   }, //数据源数据*/
-  dataSourceDefinition:wecost.dataSource,
-  datas:wecost.datas,
+  dataSourceDefinition: wecost.dataSource,
+  datas: wecost.datas,
   allowToView: true, //是否允许查看数据源
   allowToEdit: true, //是否允许编辑数据源
 };
 
 export default {
-  json,
-  /* json: { reportJson: json }, */
+  /* json,
+  json: { reportJson: json }, */
   /*batchGetDatasURL,
     datasPath,  */
   /* toolbar: [
