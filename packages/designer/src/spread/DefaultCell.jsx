@@ -129,8 +129,9 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
   }
 
   _refreshIconPosition(row, col) {
-    if (this._iconEle) {
-      const style = getComputedStyle(this._iconEle);
+    const ele = document.getElementById(this._getSettingIconId());
+    if (ele) {
+      const style = getComputedStyle(ele);
       const width = style.width;
       const height = style.height;
       if (
@@ -163,9 +164,9 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
               undefined,
               this.sheet
             )[0];
-            const offset = getOffsetFromBody(this._iconEle);
+            const offset = getOffsetFromBody(ele);
             if (rect && offset) {
-              const style = this._iconEle.style;
+              const style = ele.style;
               style.display = 'flex';
               style.left = rect.x + 3 + rect.width + 'px';
               style.top = rect.y + 'px';
@@ -174,7 +175,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
           }
         }
       }
-      this._iconEle.style.display = 'none';
+      ele.style.display = 'none';
     }
   }
 
@@ -248,7 +249,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
   }
 
   _isDesignMode(sheet) {
-    return sheet.getParent()?.getHost()?.dataset?.type !== 'preview';
+    return sheet.getParent()?.getHost()?.dataset?.type == 'design';
   }
 
   _couldShowIcon(sheet, row, col) {
@@ -382,28 +383,33 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     };
   }
 
-  _initIcon() {
-    if (!this._iconEle) {
-      //this._iconEle = document.getElementById(Ele_Id);
-      if (!this._iconEle) {
-        let iconEle = document.createElement('div');
-        //iconEle.id = Ele_Id;
-        document.body.append(iconEle);
-        const style = iconEle.style;
-        style.position = 'absolute';
-        style.width = '16px';
-        style.height = '16px';
-        style.display = 'flex';
-        style.backgroundColor = 'white';
-        style.alignItems = 'center';
-        style.justifyContent = 'center';
-        style.zIndex = 1; //防止被扩展方向箭头遮�?
-        this._iconEle = iconEle;
-        this.root = createRoot(iconEle);
-        this.root.render(<Setting sheet={this.sheet}></Setting>);
-      }
+  _getSettingIconId(){
+    if(!this.setting_icon_id){
+      this.setting_icon_id = this.sheet.name() + '_setting_icon'
     }
-    return this._iconEle;
+    return this.setting_icon_id;
+  }
+
+  _initIcon() {
+    const eleId = this._getSettingIconId();
+    let icon = document.getElementById(eleId);
+    if(!icon){
+      icon = document.createElement('div');
+      icon.id = eleId;
+      const style = icon.style;
+      style.position = 'absolute';
+      style.width = '16px';
+      style.height = '16px';
+      style.display = 'flex';
+      style.backgroundColor = 'white';
+      style.alignItems = 'center';
+      style.justifyContent = 'center';
+      style.zIndex = 1; //防止被扩展方向箭头遮�?
+      document.body.append(icon);
+      this.root = createRoot(icon);
+      this.root.render(<Setting sheet={this.sheet}></Setting>);
+    }
+    return icon;
   }
 
   _showIcon(row, col) {
@@ -433,10 +439,10 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
       root.unmount();
     }
     this.root = null;
-    if(this._iconEle){
-      document.body.removeChild(this._iconEle);
+    const settingIcon = document.getElementById(this._getSettingIconId());
+    if(settingIcon){
+      document.body.removeChild(settingIcon);
     }
-    this._iconEle = null;
     this.spread = null;
     if (this.directionIcons) {
       this.directionIcons.forEach(({sheetName,row,col}) => {
@@ -454,7 +460,6 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     //const json = { ...super.toJSON() };
     //delete json.sheet;
     //delete json.root;
-    //delete json._iconEle;
     //delete json.spread;
     //delete json.directionIcons;
     return undefined;

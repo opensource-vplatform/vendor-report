@@ -1,9 +1,22 @@
-import { Fragment, useCallback, useContext, useEffect, useRef } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 
 import { registerCommand } from '@commands/index';
-import { bind, EVENTS, fire } from '@event/EventManager';
+import {
+  bind,
+  EVENTS,
+  fire,
+} from '@event/EventManager';
 import { setSpread } from '@store/appSlice/appSlice';
 import {
   initDatasource,
@@ -12,7 +25,9 @@ import {
   updateDslist,
 } from '@store/datasourceSlice/datasourceSlice';
 import { hideTab } from '@store/navSlice/navSlice';
-import { initSlice as initPersistingDataSlice } from '@store/persistingDataSlice';
+import {
+  initSlice as initPersistingDataSlice,
+} from '@store/persistingDataSlice';
 import { resetView } from '@store/viewSlice/viewSlice';
 import {
   initWizardSlice,
@@ -25,9 +40,18 @@ import {
   Workbook,
   Worksheet,
 } from '@toone/report-excel';
-import { enhanceSpreadJson, formatBindingPathCellType } from '@utils/cellUtil';
-import { findTreeNodeById, getActiveSheetTablesPath } from '@utils/commonUtil';
-import { getLicense, isLocalLicenseUnCheck } from '@utils/configUtil';
+import {
+  enhanceSpreadJson,
+  formatBindingPathCellType,
+} from '@utils/cellUtil';
+import {
+  findTreeNodeById,
+  getActiveSheetTablesPath,
+} from '@utils/commonUtil';
+import {
+  getLicense,
+  isLocalLicenseUnCheck,
+} from '@utils/configUtil';
 import { getBaseUrl } from '@utils/environmentUtil';
 import { fireCellEnter } from '@utils/eventUtil';
 import { getNamespace } from '@utils/spreadUtil';
@@ -264,6 +288,9 @@ export default function () {
   }, []);
 
   useEffect(() => {
+    if(spread){
+      spread.getHost().dataset.type='design'
+    }
     const unbind = bind({
       event: EVENTS.SheetChanged,
       handler: (params) => {
