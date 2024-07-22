@@ -1,4 +1,5 @@
 import { evaluateFormula } from '@toone/report-util';
+
 import Plugin from '../Plugin';
 
 class RowColumnVisible extends Plugin {
@@ -69,18 +70,16 @@ class RowColumnVisible extends Plugin {
   }
 
   execute(value, tool) {
-    debugger;
     const config = this.getConfig();
     const operator = config.operator;
     const handler = this[operator];
     if (handler) {
-      return handler.call(this, value, config, tool);
-    } else {
-      return {
-        type: 'text',
-        value: value,
-      };
+      handler.call(this, value, config, tool);
     }
+    return {
+      type: 'text',
+      value: value,
+    };
   }
 }
 

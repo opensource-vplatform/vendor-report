@@ -1,13 +1,28 @@
-import { Fragment, useContext, useEffect } from 'react';
+import {
+  Fragment,
+  useContext,
+  useEffect,
+} from 'react';
 
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  useDispatch,
+  useSelector,
+} from 'react-redux';
 import styled from 'styled-components';
 
-import { bind, EVENTS, fire, hasBind } from '@event/EventManager';
+import {
+  bind,
+  EVENTS,
+  fire,
+  hasBind,
+} from '@event/EventManager';
 import { setMode } from '@store/appSlice/appSlice';
 import { genPreviewDatas } from '@store/datasourceSlice/datasourceSlice';
 import { setActive } from '@store/navSlice/navSlice';
+import {
+  initSlice as initPersistingDataSlice,
+} from '@store/persistingDataSlice';
 import DataTab from '@tabs/data/Index';
 import FileTab from '@tabs/file/Index';
 import InsertTab from '@tabs/insert/Index';
@@ -19,7 +34,11 @@ import StartTab from '@tabs/start/Index';
 import TableTab from '@tabs/table/Index';
 import ViewTab from '@tabs/view/Index';
 import { ThemeContext } from '@toone/report-excel';
-import { Button, Tab, Tabs } from '@toone/report-ui';
+import {
+  Button,
+  Tab,
+  Tabs,
+} from '@toone/report-ui';
 import { isArray } from '@toone/report-util';
 import { fireCellEnter } from '@utils/eventUtil';
 
@@ -27,7 +46,11 @@ import DesignerContext from './DesignerContext';
 import { GlobalComponent } from './Global';
 import VerticalAlignBottom from './icons/arrow/VerticalAlignBottom';
 import VerticalAlignTop from './icons/arrow/VerticalAlignTop';
-import { listenRedo, listenSave, listenUndo } from './Listener';
+import {
+  listenRedo,
+  listenSave,
+  listenUndo,
+} from './Listener';
 import { getBindingPaths } from './spread';
 import { setNavStyle } from './store/appSlice/appSlice';
 import { setStyle } from './store/styleSlice';
@@ -40,7 +63,6 @@ import {
 } from './utils/configUtil';
 import { handleEventPrmiseResult } from './utils/eventUtil';
 import { parseStyle } from './utils/styleUtil';
-import { initSlice as initPersistingDataSlice } from '@store/persistingDataSlice';
 
 const FileTabTitle = styled.a`
   padding: 6px 12px 6px 12px;
@@ -134,10 +156,12 @@ const getbindingPathsMetadata = (spread, finalDsList) => {
               try {
                 const obj = JSON.parse(tag);
                 const plugins = obj.plugins;
-                const paths = getBindingPaths(plugins);
-                paths.forEach((bindingPath) => {
-                  appendUsedDatasource(bindingPath);
-                });
+                if(plugins){
+                  const paths = getBindingPaths(plugins);
+                  paths.forEach((bindingPath) => {
+                    appendUsedDatasource(bindingPath);
+                  });
+                }
               } catch (e) {}
             }
           });
