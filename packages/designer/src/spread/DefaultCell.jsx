@@ -433,13 +433,18 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
       root.unmount();
     }
     this.root = null;
-    document.body.removeChild(this._iconEle);
+    if(this._iconEle){
+      document.body.removeChild(this._iconEle);
+    }
     this._iconEle = null;
     this.spread = null;
     if (this.directionIcons) {
-      this.directionIcons.forEach((item) => {
-        const ele = item.ele;
-        document.body.removeChild(ele);
+      this.directionIcons.forEach(({sheetName,row,col}) => {
+        const id = this._genDirectionIconId(sheetName,row,col);
+        const ele = document.getElementById(id);
+        if(ele){
+          document.body.removeChild(ele);
+        }
       });
       this.directionIcons = null;
     }
