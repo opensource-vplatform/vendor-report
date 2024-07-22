@@ -1053,6 +1053,7 @@ export default class ParseReportJson {
       }
       pageInfos.sheet.namedStyles = this.namedStyles;
       this.resetSheet(this.sheetPages[name].datas[0]);
+      debugger;
       this.reportJson.sheets[name] = this.sheetPages[name].datas[0].sheet;
     });
   }
@@ -1119,7 +1120,6 @@ export default class ParseReportJson {
 
     Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
       const { bindingPath, tag, formula, style = {} } = _colDataTable;
-      style.shrinkToFit = false;
       let isHorizontalExpansion = false;
       if (tag) {
         const jsonTag = JSON.parse(tag);
@@ -1164,8 +1164,15 @@ export default class ParseReportJson {
             style.wordWrap = true;
             _colDataTable.style = style;
           } else if (rowHeightType === 'autoFitByZoom') {
-            style.shrinkToFit = true;
-            _colDataTable.style = style;
+            if (isString(style)) {
+              _colDataTable.style = {
+                parentName: style,
+                shrinkToFit: true,
+              };
+            } else {
+              style.shrinkToFit = true;
+              _colDataTable.style = style;
+            }
           }
         }
       }
@@ -1324,6 +1331,7 @@ export default class ParseReportJson {
         const dataTable = { ...rowDataTable };
         const printDataTalbe = { ...rowDataTable };
         let rowHeight = 0;
+        const values = {};
         Object.entries(dataTable).forEach(([colStr, _colDataTable]) => {
           const colDataTable = { ..._colDataTable };
           const printColDataTable = { ..._colDataTable };
@@ -1332,7 +1340,6 @@ export default class ParseReportJson {
               style: colDataTable.style,
             };
           }
-
           dataTable[colStr] = colDataTable;
           printDataTalbe[colStr] = printColDataTable;
           const col = Number(colStr);
@@ -1359,6 +1366,13 @@ export default class ParseReportJson {
             if (type === 'text') {
               colDataTable.value = newVlaue;
               printColDataTable.value = newVlaue;
+              spans.forEach(({ col, colCount }) => {
+                if (colStr == col) {
+                  for (let i = col; i < col + colCount; i++) {
+                    values[i] = newVlaue;
+                  }
+                }
+              });
             }
           }
 
@@ -1528,6 +1542,7 @@ export default class ParseReportJson {
                   {
                     type: 'text',
                     value: colDataTable.value,
+                    //value: values[colStr],
                   },
                   plugins,
                   tool
@@ -1539,6 +1554,7 @@ export default class ParseReportJson {
                   {
                     type: 'text',
                     value: printColDataTable.value,
+                    //value: values[colStr],
                   },
                   plugins,
                   printTool
