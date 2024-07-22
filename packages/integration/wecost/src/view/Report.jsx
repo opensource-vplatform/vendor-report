@@ -48,6 +48,7 @@ const ExcelHost = styled.div`
 `;
 
 let _report = null;
+let fontFamilies = {};
 
 const getError = function (result) {
   if (result && result.data) {
@@ -129,6 +130,10 @@ export default function () {
                   if (sheet) {
                     sheet.clearSelection();
                   }
+                  (async () => {
+                    fontFamilies = await getFontFamily();
+                    handlerRegisterFont();
+                  })();
                 },
                 onPageCompleted(handler) {
                   handler().then((datas) => {
@@ -152,12 +157,14 @@ export default function () {
                         'onReportReadyCallback'
                       );
                     }
+
                   });
                 },
                 isShowBtnToolbar: false,
               });
               _report = report;
-              getFontFamily();
+
+
               //报表挂载到指定dom元素
               report.mount(ref.current);
               data.report = report;
@@ -325,6 +332,36 @@ export default function () {
   );
 }
 
+const handlerRegisterFont = () => {
+  const sheets = _report.spread.toJSON().sheets;
+  const fontFamaly = new Set();
+  for (let sheet of Object.values(sheets)) {
+    const dataTable = sheet?.data?.dataTable ?? {};
+    for (let cell of Object.values(dataTable)) {
+      for (let cellStyle of Object.values(cell)) {
+        const style = cellStyle?.style ?? {};
+        fontFamaly.add(style.fontFamily ?? fontFamilies.defaultFont);
+      }
+    }
+    // 获取内置样式字体
+    const namedStyles = sheet.namedStyles ?? [];
+    for (let namedStyle of namedStyles) {
+      fontFamaly.add(namedStyle.fontFamily ?? fontFamilies.defaultFont);
+    }
+  }
+  // const fontsSet = new Set(fontFamilies?.fonts ?? []);
+  //   for(let font of fontFamaly) {
+  //    if(!fontsSet.has(font)) {
+  //     fontFamaly.delete(font);
+  //    }
+  //   }
+  // const res = await request('queryAvailableFonts')
+  // const fonts = res?.data?.fonts || [];
+
+  // 注册字体...
+  return [...fontFamaly].map((item) => registerFont(item, 'normal'));
+};
+
 window.tooneReport = {
   //导出Excel
   exportExcel: function (filename) {
@@ -337,31 +374,7 @@ window.tooneReport = {
     if (typeof _report?.exportPdf === 'function') {
       progressRef.current.setProgress(0, '导出中，请稍候...');
       progressRef.current.onShow();
-      const sheets = _report.spread.toJSON().sheets;
-      const fontFamaly = new Set();
-      // 获取单元格样式字体
-      for (let sheet of Object.values(sheets)) {
-        const dataTable = sheet?.data?.dataTable ?? {};
-        for (let cell of Object.values(dataTable)) {
-          for (let cellStyle of Object.values(cell)) {
-            const style = cellStyle?.style ?? {};
-            fontFamaly.add(style.fontFamily ?? 'Calibri');
-          }
-        }
-        // 获取内置样式字体
-        const namedStyles = sheet.namedStyles ?? [];
-        for (let namedStyle of namedStyles) {
-          fontFamaly.add(namedStyle.fontFamily ?? 'Calibri');
-        }
-      }
-
-      // const res = await request('queryAvailableFonts')
-      // const fonts = res?.data?.fonts || [];
-
-      // 注册字体...
-      const requestFontFamily = [...fontFamaly].map((item) =>
-        registerFont(item, 'normal')
-      );
+      const requestFontFamily = handlerRegisterFont();
       Promise.all(requestFontFamily).then(() => {
         const exportReportPromise = [];
         _report

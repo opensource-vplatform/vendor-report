@@ -251,12 +251,21 @@ export const registerFont = function (name, type) {
       if (!!fontFamilies['fontContent'][name]) {
         resolve();
         return;
+      } else if (!!fontFamilies['fontContent'][downloadFont]) {
+        const fontrrayBuffer = base64ToArrayBuffer(fontFamilies['fontContent'][downloadFont]);
+        const fonts = GC.Spread.Sheets.PDF.PDFFontsManager.getFont(name) || {};
+        fonts[type] = fontrrayBuffer;
+        fontFamilies['fontContent'][name] = fontFamilies['fontContent'][downloadFont];
+        GC.Spread.Sheets.PDF.PDFFontsManager.registerFont(name, fonts);
+        resolve();
+        return;
       }
-      const fontContentRes = await request('getFontContent', { fontName: downloadFont })
-      const fontrrayBuffer = base64ToArrayBuffer(fontContentRes?.data?.content);
+      // const fontContentRes = await request('getFontContent', { fontName: downloadFont })
+      const fontContentRes = await registerFontContent(downloadFont)
+      const fontrrayBuffer = base64ToArrayBuffer(fontContentRes);
       const fonts = GC.Spread.Sheets.PDF.PDFFontsManager.getFont(name) || {};
       fonts[type] = fontrrayBuffer;
-      fontFamilies['fontContent'][name] = fontContentRes?.data?.content;
+      fontFamilies['fontContent'][name] = fontContentRes;
       GC.Spread.Sheets.PDF.PDFFontsManager.registerFont(name, fonts);
       resolve();
 
@@ -264,6 +273,24 @@ export const registerFont = function (name, type) {
       console.log(e);
       resolve()
     }
+  })
+}
+
+const registerFontContent = async (name) => {
+
+  return new Promise((resolve, reject) => {
+    const requestUrl = `./font/${name}.ttf`
+    axios.get(requestUrl, { responseType: 'blob' }).then(res => {
+      const blob = res.data;
+      const reader = new FileReader();
+      reader.onload = function () {
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      }
+      reader.readAsDataURL(blob);
+    }).catch(e => {
+      reject(e)
+    })
   })
 }
 

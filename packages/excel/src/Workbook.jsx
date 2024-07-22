@@ -157,6 +157,8 @@ export default function (props) {
   }
   const context = useContext(PreviewContext);
   const json = context?.json || _json;
+  const config = useRef({});
+  config.current.renderJSON = json;  // 解析后的json
   const pageIndex = context?.pageIndex || 1;
   const licenseKey = getLicense();
   if (licenseKey) {
@@ -287,7 +289,7 @@ export default function (props) {
          * 否则导致设计器编辑栏在初始化时注册的事件被清空
          */
         handleEvents({ ...props, onActiveSheetChanged, spread: data.spread });
-        handleSheets(json);
+        handleSheets(config.current.renderJSON); //防止异步操作拿不到解析后的json
         handleDatas();
         if (onInited) {
           const promise = onInited(data.spread);
