@@ -41,21 +41,22 @@ class RowColumnVisible extends Plugin {
 
   lessThan(value, config, tool) {
     const formula = `${this.valueToFormula(value)}<${config.value}`;
-    if (this.evaluateFormula(formula)) {
+    if (evaluateFormula(formula)) {
+      this.handleVisible(config, tool);
     }
   }
 
   between(value, config, tool) {
     const valExp = this.valueToFormula(value);
     const formula = `${valExp}>=${config.value}&&${valExp}<=${config.value1}`;
-    if (this.evaluateFormula(formula)) {
+    if (evaluateFormula(formula)) {
       this.handleVisible(config, tool);
     }
   }
 
   equalTo(value, config, tool) {
     const formula = `${this.valueToFormula(value)}=${config.value}`;
-    if (this.evaluateFormula(formula)) {
+    if (evaluateFormula(formula)) {
       this.handleVisible(config, tool);
     }
   }
@@ -64,7 +65,7 @@ class RowColumnVisible extends Plugin {
     const formula = `ISNUMBER(SEARCH(${config.value},${this.valueToFormula(
       value
     )}))`;
-    if (this.evaluateFormula(formula)) {
+    if (evaluateFormula(formula)) {
       this.handleVisible(config, tool);
     }
   }
