@@ -191,6 +191,7 @@ export default class ParseReportJson {
           height: 0,
           dataTables: {},
         },
+        tableArray: [],
       },
       footer: {
         template: [],
@@ -203,6 +204,7 @@ export default class ParseReportJson {
           height: 0,
           dataTables: {},
         },
+        tableArray: [],
       },
       content: {
         template: [],
@@ -215,6 +217,7 @@ export default class ParseReportJson {
           height: 0,
           dataTables: {},
         },
+        tableArray: [],
         dataLen: 0,
       },
       datas: {},
@@ -410,6 +413,18 @@ export default class ParseReportJson {
       pageInfos.contentUnionDatasource =
         content?.template?.[0]?.unionDatasource;
 
+      const isInFooter = Object.values(
+        footer?.totalArea?.dataTables || {}
+      ).some((value) => {
+        let res = false;
+        value.tableArray.forEach((tableCode) => {
+          if (content.tableArray.includes(tableCode)) {
+            res = true;
+          }
+        });
+        return res;
+      });
+      pageInfos.isInFooter = isInFooter;
       while (pageInfos.flag) {
         //用于存储当前页内容
         const sheetPage = {
@@ -724,7 +739,8 @@ export default class ParseReportJson {
     return pageInfos;
   }
   collectTemplate(temp, type, columns = []) {
-    const { datas, allDatas, dataTables, dataPath, cellPlugins } = temp;
+    const { datas, allDatas, dataTables, dataPath, cellPlugins, tableArray } =
+      temp;
 
     //生成联合数据源
     const setting = {
@@ -742,7 +758,6 @@ export default class ParseReportJson {
       });
     });
     temp.unionDatasource = unionDatasource;
-
     const unionDatasourceAll = new UnionDatasource(dataPath, setting);
     unionDatasourceAll.load(allDatas);
     temp.unionDatasourceAll = unionDatasourceAll;
@@ -775,6 +790,9 @@ export default class ParseReportJson {
     if (type === 'content') {
       this.templates[type].dataLen = unionDatasource.getCount() || 1;
     }
+
+    const newTableArray = [...this.templates[type].tableArray, ...tableArray];
+    this.templates[type].tableArray = [...new Set(newTableArray)];
   }
   genTemplateFromSheet(sheet) {
     this.namedStyles = [];
@@ -1101,6 +1119,7 @@ export default class ParseReportJson {
       dataPath: [],
       cellPlugins: [],
       tableCodes: {},
+      tableArray: [],
     };
 
     let maxRowCount = 1;
@@ -1197,7 +1216,7 @@ export default class ParseReportJson {
 
       if (isBindEntity) {
         const tableCode = bindingPath.split('.')[0];
-
+        result.tableArray.push(tableCode);
         if (!isHorizontalExpansion) {
           result.dataPath.push(bindingPath);
           result.tableCodes[tableCode] = true;
@@ -1907,7 +1926,12 @@ export default class ParseReportJson {
         return;
       }
       const { dataTables, unionDatasource, verticalAutoMergeRanges } = temp;
-      const dataLen = pageInfos.dataLen || unionDatasource.getCount() || 1;
+      let dataLen = pageInfos.dataLen || unionDatasource.getCount() || 1;
+      if (pageInfos.isInFooter) {
+        pageInfos.oldDataLen = dataLen;
+        dataLen = dataLen - 1;
+        pageInfos.isInFooter = false;
+      }
       pageInfos.dataLen = dataLen;
       pageInfos.dataIndex = startIndex;
 
@@ -1940,7 +1964,7 @@ export default class ParseReportJson {
         this.handleDataTable({
           ...params,
           temp,
-          i,
+          i: i + 1 === pageInfos.oldDataLen ? i + 1 : i,
           type: 'content',
           isRetainHorizontalExpansionData: i === startIndex,
         });
