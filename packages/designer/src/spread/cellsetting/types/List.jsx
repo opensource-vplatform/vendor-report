@@ -10,12 +10,14 @@ import {
   withBatchCalcUpdate,
 } from '@utils/spreadUtil';
 import {
+  clearCellTagPlugin,
   getActiveIndexBySheet,
   hasCellTagPluginByIndex,
   setCellTagPlugin,
 } from '@utils/worksheetUtil';
 
 import {
+  ListIndex,
   RowHeight,
   Text,
   Toolbar,
@@ -31,7 +33,7 @@ const PLUGIN_TYPE = 'cellList';
 
 const Component = function (props) {
   const { onConfirm, onCancel, sheet, plugin } = props;
-  const [config, setConfig] = useState(plugin.config||{});
+  const [config, setConfig] = useState(plugin.config || { listIndex: 0 });
   const handleConfirm = () => {
     const plugin = {
       type: PLUGIN_TYPE,
@@ -42,6 +44,9 @@ const Component = function (props) {
         //clearAllCellTagPlugin(sheet, row, col);
         const bindingPath = sheet.getBindingPath(row, col);
         if (bindingPath) {
+          clearCellTagPlugin(sheet, row, col, {
+            type: 'cellGroup',
+          });
           setCellTagPlugin(sheet, row, col, plugin);
         }
       });
@@ -62,6 +67,16 @@ const Component = function (props) {
           });
         }}
       ></RowHeight>
+      <ListIndex
+        sheet={sheet}
+        value={config.listIndex}
+        onChange={(val) => {
+          setConfig({
+            ...config,
+            listIndex: val,
+          });
+        }}
+      ></ListIndex>
       <Toolbar onCancel={onCancel} onConfirm={handleConfirm}></Toolbar>
     </Fragment>
   );

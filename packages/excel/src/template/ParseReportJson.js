@@ -411,7 +411,7 @@ export default class ParseReportJson {
       while (pageInfos.flag) {
         //用于存储当前页内容
         const sheetPage = {
-          sheet: pageInfos.sheet,
+          sheet: JSON.parse(JSON.stringify(pageInfos.sheet)),
           spans: [],
           rows: [],
           rules: [],
@@ -423,7 +423,7 @@ export default class ParseReportJson {
         if (!pageInfos.sheetPrintPage) {
           //用于存储打印内容，例如次打印20页
           pageInfos.sheetPrintPage = {
-            sheet: pageInfos.sheet,
+            sheet: JSON.parse(JSON.stringify(pageInfos.sheet)),
             spans: [],
             rows: [],
             rules: [],
@@ -544,7 +544,7 @@ export default class ParseReportJson {
       }
     } else {
       const sheetPage = {
-        sheet: pageInfos.sheet,
+        sheet: JSON.parse(JSON.stringify(pageInfos.sheet)),
         spans: [],
         rows: [],
         rules: [],
@@ -1333,6 +1333,12 @@ export default class ParseReportJson {
           printDataTalbe[colStr] = printColDataTable;
           const col = Number(colStr);
           const { bindingPath, tag, style } = colDataTable;
+
+          let tagObj = null;
+          if (tag) {
+            tagObj = JSON.parse(tag);
+          }
+
           if (bindingPath?.includes?.('.')) {
             const bindingPaths = bindingPath.split('.');
             if (bindingPaths.length === 2) {
@@ -1340,9 +1346,11 @@ export default class ParseReportJson {
             }
             delete colDataTable.bindingPath;
             delete printColDataTable.bindingPath;
+            const plugins = tagObj?.plugins;
             const { type, value: newVlaue } = unionDatasource.getValue(
               ...bindingPaths,
-              i
+              i,
+              plugins
             );
             if (type === 'text') {
               colDataTable.value = newVlaue;
@@ -1387,11 +1395,32 @@ export default class ParseReportJson {
             () => isGroupSumArea || isTotalArea
           );
 
+          //设置行号
+          tool.setRowHandler(() => {
+            return sheetPage?.rowCount || 0;
+          });
+          printTool.setRowHandler(() => {
+            return sheetPrintPage?.rowCount || 0;
+          });
+          //设置列号
+          tool.setColHandler(() => {
+            return col;
+          });
+          printTool.setColHandler(() => {
+            return col;
+          });
+
+          //获取json
+          tool.setSheetJsonHandler(() => {
+            return sheetPage?.sheet || {};
+          });
+          printTool.setSheetJsonHandler(() => {
+            return sheetPrintPage?.sheet || {};
+          });
+
           let hasRuntimePlugins = false;
           let isHorizontalExpansion = false;
-          if (tag) {
-            const tagObj = JSON.parse(tag);
-
+          if (tagObj) {
             const instanceId = tagObj.instanceId;
             //当前单元格在当前页中的起始行，记录数等信息
             page[pageInfos.pageIndex] = page[pageInfos.pageIndex] || {};

@@ -31,7 +31,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     this._bindEvent();
   }
 
-  _isActiveSheet(){
+  _isActiveSheet() {
     return this.sheet === this.sheet.getParent()?.getActiveSheet();
   }
 
@@ -192,13 +192,13 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     );
     bind({
       event: EVENTS.SheetChanged,
-      handler: (info)=>{
-        if(info&&info.propertyName=="deleteSheet"){
+      handler: (info) => {
+        if (info && info.propertyName == 'deleteSheet') {
           this.destory();
-        }else{
+        } else {
           refreshIconPosition();
         }
-      }
+      },
     });
     bind({
       event: EVENTS.onPreviewVisible,
@@ -215,7 +215,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
           const icon = this._initIcon();
           icon.style.display = 'flex';
         }
-        if(this._isActiveSheet()){
+        if (this._isActiveSheet()) {
           this._showDirectionIcons();
         }
       }
@@ -241,7 +241,11 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
   }
 
   _couldShowIcon(sheet, row, col) {
-    return this._isActiveSheet() && this._isDesignMode(sheet) && isShowIcon(sheet, row, col);
+    return (
+      this._isActiveSheet() &&
+      this._isDesignMode(sheet) &&
+      isShowIcon(sheet, row, col)
+    );
   }
 
   _paintSettingIcon(sheet, row, col) {
@@ -330,8 +334,8 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
       //this._hideIcon();
     }
     this._paintDirectionIcon(this.sheet, context.row, context.col);
-    if(!isUndefined(value)){
-        super.paint(ctx, value, x, y, w, h, style, context);
+    if (!isUndefined(value)) {
+      super.paint(ctx, value, x, y, w, h, style, context);
     }
   }
 
@@ -360,6 +364,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         style.zIndex = 1; //防止被扩展方向箭头遮盖
         this._iconEle = iconEle;
         this.root = createRoot(iconEle);
+        debugger;
         this.root.render(<Setting sheet={this.sheet}></Setting>);
       }
     }

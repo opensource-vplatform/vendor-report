@@ -29,7 +29,9 @@ import {
   DatasourceListOl,
   DddSubDatasource,
   DelDatasource,
+  GroupIcon,
   ListItemText,
+  MapIcon,
   NumberIcon,
   TableIcon,
   TextIcon,
@@ -41,6 +43,8 @@ const typeIcons = {
   text: TextIcon,
   integer: NumberIcon,
   decimals: NumberIcon,
+  list: GroupIcon,
+  map: MapIcon,
 };
 
 function TreeSwitch(props) {

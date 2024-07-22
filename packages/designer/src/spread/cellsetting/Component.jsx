@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import {
   Button,
   FormItem,
+  Integer,
   Radio,
   RadioGroup,
 } from '@toone/report-ui';
@@ -77,14 +78,40 @@ const btnStyle = {
 export const Toolbar = function (props) {
   const { onConfirm, onCancel } = props;
   return (
-    <FormItem style={{ marginTop:8}}>
-      <div style={{width:'100%'}}></div>
+    <FormItem style={{ marginTop: 8 }}>
+      <div style={{ width: '100%' }}></div>
       <Button style={{ ...btnStyle, marginRight: 8 }} onClick={onConfirm}>
         确定
       </Button>
       <Button style={btnStyle} onClick={onCancel}>
         取消
       </Button>
+    </FormItem>
+  );
+};
+
+export const ListIndex = (props) => {
+  const { sheet } = props;
+  let isList = false;
+  if (sheet) {
+    const col = sheet?.getActiveColumnIndex?.();
+    const row = sheet?.getActiveRowIndex?.();
+    const cell = sheet?.getCell?.(row, col);
+    if (cell) {
+      const bindingPath = cell?.bindingPath?.();
+      sheet.parent.TOONE_FUNCS;
+      const type = sheet.parent.TOONE_FUNCS?.getDsType?.(bindingPath);
+      isList = type === 'list';
+    }
+  }
+
+  if (!isList) {
+    return null;
+  }
+
+  return (
+    <FormItem label='下标'>
+      <Integer {...props} min={0}></Integer>
     </FormItem>
   );
 };

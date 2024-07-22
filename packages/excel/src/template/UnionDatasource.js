@@ -1,3 +1,5 @@
+import { isObject } from '@toone/report-util';
+
 import { sum } from '../utils/mathUtil';
 
 /**
@@ -450,7 +452,7 @@ class UnionDatasource {
    * @param {string} fieldCode 字段编号
    * @param {string} index 记录下标
    */
-  getValue(dsCode, fieldCode, mapKey, index = 0) {
+  getValue(dsCode, fieldCode, mapKey, index = 0, plugins = []) {
     const data = this.datas[index];
     let value = null;
     if (data) {
@@ -460,7 +462,28 @@ class UnionDatasource {
         value = value?.[mapKey];
       }
       if (Array.isArray(value)) {
-        value = value.toString();
+        let index = -1;
+        if (plugins && plugins.length > 0) {
+          for (let i = 0; i < plugins.length; i++) {
+            const plugin = plugins?.[i] || {};
+            const { type, config = {} } = plugin;
+            if (
+              type == 'cellGroup' ||
+              type == 'cellGroupType' ||
+              type == 'cellList'
+            ) {
+              if (isObject(config) && config.hasOwnProperty('listIndex')) {
+                index = Number(config.listIndex) - 1;
+                break;
+              }
+            }
+          }
+        }
+        if (index > -1) {
+          value = value[index];
+        } else {
+          value = value.toString();
+        }
       }
     }
     return { type: 'text', value };
