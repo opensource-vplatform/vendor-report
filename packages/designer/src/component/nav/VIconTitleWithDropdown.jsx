@@ -32,11 +32,13 @@ export default function (props) {
     onVisibleChange,
     onNodeClick,
     value,
+    cancelAble = false,
   } = props;
   return (
     <Menu
       value={value}
       datas={menus}
+      cancelAble={cancelAble}
       onNodeClick={onNodeClick}
       onVisibleChange={onVisibleChange}
     >

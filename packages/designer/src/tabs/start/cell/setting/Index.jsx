@@ -12,7 +12,10 @@ import ColWidth from '@icons/cell/ColWidth';
 import RowHeight from '@icons/cell/RowHeight';
 import SettingIcon from '@icons/cell/Setting';
 import { isFunction } from '@toone/report-util';
-import { exeCommand } from '@utils/spreadUtil';
+import {
+  applyToSelectedCell,
+  exeCommand,
+} from '@utils/spreadUtil';
 
 import Dialog from './Dialog';
 
@@ -93,6 +96,14 @@ const Cell_Setting_Menus = [
     icon: <EmptyIcon></EmptyIcon>,
     handler: function (spread) {
       exeCommand(spread, Commands.Setting.AutoColWidth, {});
+    },
+  },{
+    value: 'autoFitColWidth',
+    title: '根据列宽，自动调整字体大小',
+    text: '自适应列宽',
+    icon: <EmptyIcon></EmptyIcon>,
+    handler: function (spread, setData, autoFit) {
+      exeCommand(spread, Commands.Setting.AutoFitColWidth, {autoFit:!!autoFit});
     },
   },
   {
@@ -189,7 +200,7 @@ export default function () {
   const handleNodeClick = (val, node) => {
     const handler = node.handler;
     if (isFunction(handler)) {
-      handler(spread, setData);
+      handler(spread, setData, val);
     }
   };
   return (
@@ -206,15 +217,28 @@ export default function () {
         icon={SettingIcon}
         value={data.menuValue}
         menus={Cell_Setting_Menus}
+        cancelAble={true}
         onNodeClick={handleNodeClick}
-        /*onVisibleChange={(visible) => {
-          const { sheet, row, col } = getActiveIndexBySpread(spread);
-          const plugin = getCellTagPlugin(sheet, row, col, 'autoFitRow');
-          setData({
-            ...data,
-            menuValue: plugin ? plugin.config.type : null,
-          });
-        }}*/
+        onVisibleChange={(visible) => {
+          if(visible){
+            const sheet = spread.getActiveSheet();
+            let autFit = false;
+            applyToSelectedCell(sheet,(sheet,row,col)=>{
+              const cell = sheet.getCell(row,col);
+              if(cell){
+                const fit = cell.shrinkToFit();
+                if(fit){
+                  autFit = true;
+                  return false;
+                }
+              }
+            });
+            setData({
+              ...data,
+              menuValue: autFit ? "autoFitColWidth":null,
+            });
+          }
+        }}
       ></VIconTitleWithDropdown>
     </Fragment>
   );

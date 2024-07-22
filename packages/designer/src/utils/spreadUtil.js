@@ -192,19 +192,27 @@ export const applyToSelectedCell = function (sheet, func) {
             rowCount = selection.rowCount,
             colCount = selection.colCount;
         if (col === -1 && row === -1) {
-            func(sheet, -1, -1);
+            if(func(sheet, -1, -1)===false){
+                break;
+            }
         } else if (row === -1) {
             for (i = 0; i < colCount; i++) {
-                func(sheet, -1, col + i);
+                if(func(sheet, -1, col + i)===false){
+                    break;
+                }
             }
         } else if (col === -1) {
             for (i = 0; i < rowCount; i++) {
-                func(sheet, row + i, -1);
+                if(func(sheet, row + i, -1)===false){
+                    break;
+                }
             }
         } else {
-            for (i = 0; i < rowCount; i++) {
+            loop:for (i = 0; i < rowCount; i++) {
                 for (j = 0; j < colCount; j++) {
-                    func(sheet, row + i, col + j);
+                    if(func(sheet, row + i, col + j)===false){
+                        break loop;
+                    }
                 }
             }
         }

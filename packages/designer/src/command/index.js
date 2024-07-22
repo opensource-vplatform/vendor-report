@@ -13,6 +13,7 @@ import SetFormulaCommand from './impls/formula/set';
 import InsertCellCommand from './impls/insert/cell';
 import InsertSheetCommand from './impls/insert/sheet';
 import AutoColWidthSettingCommand from './impls/setting/autoColWidth';
+import autoFitColWidthSettingCommand from './impls/setting/autoFitColWidth';
 import AutoRowHeightSettingCommand from './impls/setting/autoRowHeight';
 import ColWidthSettingCommand from './impls/setting/colWidth';
 import DefaultColWidthSettingCommand from './impls/setting/defaultColWidth';
@@ -101,6 +102,10 @@ export const Commands = {
          * 自动列宽
          */
         AutoColWidth: AutoColWidthSettingCommand.Command,
+        /**
+         *自适应列宽
+         */
+        AutoFitColWidth: autoFitColWidthSettingCommand.Command,
         /**
          * 自动行高
          */
@@ -204,6 +209,7 @@ export const registerCommand = function (spread) {
             DeleteCellCommand,
             DeleteSheetCommand,
             AutoColWidthSettingCommand,
+            autoFitColWidthSettingCommand,
             AutoRowHeightSettingCommand,
             ColWidthSettingCommand,
             DefaultColWidthSettingCommand,
