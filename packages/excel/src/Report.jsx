@@ -433,21 +433,39 @@ class Report {
     return this.pageInfos.isPage;
   }
 
-  //上一页
+  /**
+   * 切换到上一页
+   * @returns Promise
+   */ 
   previousPage() {
     if (typeof this.pageInfos.previousPage === 'function') {
       this.pageInfos.previousPage();
     }
   }
 
-  //跳转指定页数
+  /**
+   * 跳转指定页数
+   * @param {number} index 页码
+   * @returns Promise
+   */
   specifyPage(index) {
     if (typeof this.pageInfos.changePageIndex === 'function') {
       this.pageInfos.changePageIndex(index);
     }
   }
 
-  // 设置数据源格式
+  /**
+   * 设置数据源格式
+   * @param {string} datasource 数据源
+   * @param {string} format 格式 
+   * @example
+   * //设置sales的数据源字段'cost'为保留小数点后两位且设置千分位分隔符
+   * window.tooneReport.setDataSourceFormatter('sales.cost','#,##0.00_);-#,##0.00')
+   * //设置sales的数据源字段'cost'为不保留小数且设置千分位分隔符
+   * window.tooneReport.setDataSourceFormatter('sales.cost','#,##0_);-#,##0')
+   * // 设置sales的数据源字段'orderTime'为yyyy-MM-dd格式
+   * window.tooneReport.setDataSourceFormatter('sales.orderTime','yyyy-M-d')
+   */
   setDataSourceFormatter(datasource, format) {
     if (this.datasourceFormatterHandler) {
       this.datasourceFormatterHandler().then(({ setDataSourceFormatter }) => {
@@ -456,7 +474,13 @@ class Report {
     }
   }
 
-  // 删除数据源格式
+  /**
+   * 删除数据源格式
+   * @param {string} datasource 数据源
+   * @example
+   * //删除sales的数据源字段'cost'的格式
+   * window.tooneReport.delDataSourceFormatter('sales.cost')
+   */
   delDataSourceFormatter(datasource) {
     if (this.datasourceFormatterHandler) {
       this.datasourceFormatterHandler().then(({ delDataSourceFormatter }) => {

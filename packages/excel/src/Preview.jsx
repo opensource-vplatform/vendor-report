@@ -255,7 +255,7 @@ export default (props) => {
   return (
     <PreviewContext.Provider value={ctxVal}>
       <Wrap>
-        <Print {...props}></Print>
+        <Print {...props} json={ctxVal.json}></Print>
         {headerVisible && (
           <>
             {queryPanelVisible && (
