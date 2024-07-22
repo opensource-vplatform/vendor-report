@@ -1,5 +1,4 @@
 import {
-  getFitFontSize,
   getFitHeight,
   isObject,
   isString,
@@ -1120,7 +1119,7 @@ export default class ParseReportJson {
 
     Object.entries(rowDataTable).forEach(([colStr, _colDataTable]) => {
       const { bindingPath, tag, formula, style = {} } = _colDataTable;
-      let isUseNamespace = true;
+      style.shrinkToFit = false;
       let isHorizontalExpansion = false;
       if (tag) {
         const jsonTag = JSON.parse(tag);
@@ -1163,8 +1162,10 @@ export default class ParseReportJson {
           }
           if (rowHeightType === 'autoFitByContent') {
             style.wordWrap = true;
+            _colDataTable.style = style;
           } else if (rowHeightType === 'autoFitByZoom') {
-            isUseNamespace = false;
+            style.shrinkToFit = true;
+            _colDataTable.style = style;
           }
         }
       }
@@ -1172,8 +1173,7 @@ export default class ParseReportJson {
       if (
         _colDataTable.style &&
         typeof _colDataTable.style !== 'string' &&
-        !_colDataTable?.style?.parentName &&
-        isUseNamespace
+        !_colDataTable?.style?.parentName
       ) {
         const namedStyles = getVarName();
         this.namedStyles.push({
@@ -1369,21 +1369,6 @@ export default class ParseReportJson {
             colDataTable,
             colStr,
           });
-
-          //字体
-          const { fontSize, unit } = this.getFitFontSize({
-            tag,
-            style,
-            pageInfos,
-            colDataTable,
-            colStr,
-            height: rows?.size || pageInfos?.defaults?.rowHeight,
-          });
-          if (fontSize) {
-            colDataTable.style = { ...(colDataTable.style || {}) };
-            colDataTable.style.fontSize = fontSize + unit;
-          }
-
           if (height > rowHeight) {
             rowHeight = height;
           }
@@ -1832,56 +1817,7 @@ export default class ParseReportJson {
     }
     return rowHeight;
   }
-  getFitFontSize({ tag, style, pageInfos, colDataTable, colStr, height }) {
-    let _style = {};
-    if (typeof style === 'string') {
-      const res = this.namedStyles.find(({ name }) => name === style);
-      if (res) {
-        _style = res;
-      }
-    } else if (style) {
-      _style = style;
-    }
 
-    let fontSize = null;
-    let unit = null;
-    if (tag) {
-      const jsonTag = JSON.parse(tag);
-      const plugins = jsonTag?.plugins;
-      if (Array.isArray(plugins)) {
-        let rowHeightType = '';
-        plugins.forEach(({ config = {} }) => {
-          if (config?.rowHeight) {
-            rowHeightType = config?.rowHeight;
-          }
-        });
-
-        if (rowHeightType === 'autoFitByZoom') {
-          let fontSizeStr = '9pt';
-          if (_style?.fontSize) {
-            if (Number.isFinite(Number(_style?.fontSize))) {
-              fontSizeStr = _style?.fontSize + 'pt';
-            } else {
-              fontSizeStr = _style?.fontSize;
-            }
-          }
-          const regex = /(\d+)(\D+)/;
-          const match = fontSizeStr.match(regex);
-          const number = match[1]; // 提取数字部分
-          unit = match[2]; // 提取单位部分
-
-          fontSize = getFitFontSize(
-            colDataTable.value,
-            pageInfos?.columns?.[colStr]?.size || 64,
-            height,
-            number,
-            unit
-          );
-        }
-      }
-    }
-    return { fontSize, unit };
-  }
   calcTempAfterRenderHeight({
     dataTables,
     unionDatasource,
