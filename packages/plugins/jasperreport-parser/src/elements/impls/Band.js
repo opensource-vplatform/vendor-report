@@ -37,7 +37,9 @@ class Band extends Element {
     const cells = [];
     children.forEach((child) => {
       const cell = child.parse(context);
-      cells.push(cell);
+      if(cell){
+        cells.push(cell);
+      }
     });
     //this.adjustTopWithColumnWidth(cells,context);
     return cells;

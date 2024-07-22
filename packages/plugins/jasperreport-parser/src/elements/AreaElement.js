@@ -11,7 +11,7 @@ class AreaElement extends Element{
             if(cell){
                 if(Array.isArray(cell)){
                     cells = cells.concat(cell);
-                }else{
+                }else if(cell){
                     cells.push(cell);
                 }
             }

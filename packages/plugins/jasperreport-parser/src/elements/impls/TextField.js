@@ -55,11 +55,11 @@ class TextField extends StaticText {
         try {
           const name = context.getName();
           const ctx = new Context(`${name}_parameter`, `${name}_detail`);
-          const res =  parse(text,ctx);
+          const res = parse(text, ctx);
           const type = res.type;
-          if(type==ResultType.formula){
+          if (type == ResultType.formula) {
             cell.setFormula(res.text);
-          }else if(type == ResultType.bindingPath){
+          } else if (type == ResultType.bindingPath) {
             cell.setBindingPath(res.text);
           } else {
             cell.setText(res.text);
@@ -77,7 +77,27 @@ class TextField extends StaticText {
     }
   }
 
+  isIgnore() {
+    const node = this.getNode();
+    const reportEle = node.elements?.find(
+      (ele) => ele.type == 'element' && ele.name == 'reportElement'
+    );
+    if (reportEle) {
+      const ele = reportEle.elements?.find(
+        (ele) => ele.type == 'element' && ele.name == 'printWhenExpression'
+      );
+      if (ele) {
+        const text = getText(ele);
+        return text == '$F{showQfw}';
+      }
+    }
+    return false;
+  }
+
   parse(context) {
+    if (this.isIgnore()) {
+      return null;
+    }
     const cell = new Cell();
     cell.setWordWrap(this.getAttribute('isStretchWithOverflow') == 'true');
     const pattern = this.getAttribute('pattern');
