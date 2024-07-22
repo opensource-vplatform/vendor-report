@@ -92,7 +92,10 @@ export const getSheetRect = function (sheetJSON) {
   }
 
   for (let i = 0; i < rowCount; i++) {
-    sheetHeight += rows[i]?.size || defaults.rowHeight;
+    const row = rows?.[i] || {};
+    if (row.visible !== false) {
+      sheetHeight += row?.size || defaults.rowHeight;
+    }
   }
 
   //内容宽度
@@ -109,7 +112,10 @@ export const getSheetRect = function (sheetJSON) {
   }
   const defColWidth = defaults?.colWidth; //默认列宽
   for (let i = 0; i < columnCount; i++) {
-    sheetWidth += columns[i]?.size || defColWidth;
+    const column = columns?.[i] || {};
+    if (column.visible !== false) {
+      sheetWidth += column.size || defColWidth;
+    }
   }
 
   return {
@@ -364,7 +370,6 @@ export const getSpreadWrapRect = function (el) {
     isRender: width.endsWith('px') ? true : false,
     height: Number(height.slice(0, -2)),
     width: Number(width.slice(0, -2)),
-    
   };
 };
 

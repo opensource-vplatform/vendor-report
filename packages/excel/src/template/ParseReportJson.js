@@ -411,7 +411,8 @@ export default class ParseReportJson {
       while (pageInfos.flag) {
         //用于存储当前页内容
         const sheetPage = {
-          sheet: JSON.parse(JSON.stringify(pageInfos.sheet)),
+          sheet: pageInfos.sheet,
+          columns: JSON.parse(JSON.stringify(pageInfos.sheet.columns)),
           spans: [],
           rows: [],
           rules: [],
@@ -423,7 +424,8 @@ export default class ParseReportJson {
         if (!pageInfos.sheetPrintPage) {
           //用于存储打印内容，例如次打印20页
           pageInfos.sheetPrintPage = {
-            sheet: JSON.parse(JSON.stringify(pageInfos.sheet)),
+            sheet: pageInfos.sheet,
+            columns: JSON.parse(JSON.stringify(pageInfos.sheet.columns)),
             spans: [],
             rows: [],
             rules: [],
@@ -544,7 +546,8 @@ export default class ParseReportJson {
       }
     } else {
       const sheetPage = {
-        sheet: JSON.parse(JSON.stringify(pageInfos.sheet)),
+        sheet: pageInfos.sheet,
+        columns: JSON.parse(JSON.stringify(pageInfos.sheet.columns)),
         spans: [],
         rows: [],
         rules: [],
@@ -1413,10 +1416,10 @@ export default class ParseReportJson {
 
           //获取json
           tool.setSheetJsonHandler(() => {
-            return sheetPage?.sheet || {};
+            return sheetPage;
           });
           printTool.setSheetJsonHandler(() => {
-            return sheetPrintPage?.sheet || {};
+            return sheetPrintPage;
           });
 
           let hasRuntimePlugins = false;
@@ -2023,6 +2026,7 @@ export default class ParseReportJson {
     rows,
     rowCount,
     autoMergeRanges,
+    columns = [],
   }) {
     if (!sheet) {
       return;
@@ -2050,6 +2054,14 @@ export default class ParseReportJson {
       sheet.rows = [];
     }
     sheet.rows.push(...rows);
+
+    //行高
+    if (sheet.columns) {
+      sheet.columns.length = 0;
+    } else {
+      sheet.columns = [];
+    }
+    sheet.columns.push(...columns);
 
     //自动合并区域
     sheet.autoMergeRangeInfos = autoMergeRanges;
