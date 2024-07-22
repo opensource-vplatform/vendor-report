@@ -2022,6 +2022,7 @@ export default class ParseReportJson {
     rows,
     rowCount,
     autoMergeRanges,
+    columns = [],
   }) {
     if (!sheet) {
       return;
@@ -2041,6 +2042,14 @@ export default class ParseReportJson {
 
     //合并单元格
     sheet.spans = spans;
+
+    //列
+    if (sheet.columns) {
+      sheet.columns.length = 0;
+    } else {
+      sheet.columns = [];
+    }
+    sheet.columns.push(...columns);
 
     //行高
     if (sheet.rows) {
