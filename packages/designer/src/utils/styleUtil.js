@@ -1,9 +1,17 @@
 import { Commands } from '@commands/index';
 import { getFontSizeValues } from '@metadatas/font';
 import { getDefault } from '@metadatas/style';
-import { isFunction, isString, isUndefined } from '@toone/report-util';
+import {
+  isFunction,
+  isNull,
+  isString,
+  isUndefined,
+} from '@toone/report-util';
 
-import { cellSettingToStyle, show } from './cellSettingUtil';
+import {
+  cellSettingToStyle,
+  show,
+} from './cellSettingUtil';
 import { fireCellEnter } from './eventUtil';
 import {
   applyStyleToSelectedCell,
@@ -57,7 +65,92 @@ const toFontStr = function (params) {
   return fontElement.style.font;
 };
 
-const parseFontStr = function (font) {
+const parseFontStr = function(font, t) {
+  let fontFamily = null;
+  let fontSize = null;
+  let fontStyle = '';
+  let fontWeight = 'normal';
+  let fontVariant = 'normal';
+  let lineHeight = 'normal';
+  const list = font.split(/\s+/);
+  for (let index = 0; index < list.length; index++) {
+    const item = list[index];
+    switch (item) {
+      case 'normal':
+        break;
+      case 'italic':
+        fontStyle = fontStyle.indexOf('bold') !== -1 ? 'bold italic' : item;
+        break;
+      case 'bold':
+        fontStyle = fontStyle.indexOf('italic') !== -1 ? 'bold italic' : item;
+        fontWeight = 'bold';
+        break;
+      case 'small-caps':
+        fontVariant = item;
+        break;
+      case '100':
+      case '200':
+      case '300':
+      case '400':
+      case '500':
+      case '600':
+      case '700':
+      case '800':
+      case '900':
+        fontWeight = item;
+        break;
+      case 'lighter':
+        fontWeight = 'lighter';
+        break;
+      default:
+        if (!fontSize) {
+          const arr = item.split('/');
+          if (
+            (isNull(list[index + 1]) ||
+              '/' !== list[index + 1] ||
+              isNull(list[index + 2]) ||
+              ((arr[1] = list[index + 2]), (index += 2)),
+            -1 !== (fontSize = arr[0]).indexOf('px') && t)
+          )
+            fontSize = j(f(parseFloat(fontSize), !0) + '') + 'pt';
+          1 < arr.length &&
+            -1 !== (lineHeight = arr[1]).indexOf('px') &&
+            t &&
+            (lineHeight = f(parseFloat(lineHeight)) + 'pt');
+          break;
+        }
+        fontFamily
+          ? (fontFamily += ' ' + list[index])
+          : (fontFamily = list[index]);
+    }
+  }
+  if (!fontStyle) {
+    fontStyle = 'normal';
+  }
+  if (fontFamily) {
+    if (fontFamily.startsWith('"')) {
+      fontFamily = fontFamily.substr(1, fontFamily.length);
+    }
+    const index = fontFamily.indexOf('"');
+    if (index !== -1) {
+      fontFamily = fontFamily.substr(0, index);
+    }
+    const len = fontFamily.length;
+    if ("'" === fontFamily[0] && "'" === fontFamily[len - 1]) {
+      fontFamily = fontFamily.substring(1, len - 1);
+    }
+  }
+  return {
+    fontStyle,
+    fontVariant,
+    fontWeight,
+    fontSize,
+    lineHeight,
+    fontFamily,
+  };
+}
+
+function i(font) {
   let fontStyle = Style_Default.fontStyle,
     fontVariant = Style_Default.fontVariant,
     fontWeight = Style_Default.fontWeight,

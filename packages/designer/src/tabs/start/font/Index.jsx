@@ -44,6 +44,8 @@ import {
 
 const FontItem = styled.span`
     font-family: ${(props) => props.fontFamily};
+    overflow: hidden;
+    white-space: nowrap;
     padding: 8px 10px;
 `;
 
