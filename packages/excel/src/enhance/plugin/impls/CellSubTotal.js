@@ -14,11 +14,13 @@ class CellSubTotal extends Plugin {
    */
   groupSubTotal(value, tool) {
     const config = this.getConfig();
-    const { functionNum, tableCode, fieldCode } = config;
+    const { functionNum, bindingPath, tableCode, fieldCode } = config;
     const unionDatasource = tool.getUnionDatasource();
     const values = this._isTreeSumField(value, tool)
       ? unionDatasource.getLeafFieldValues(tableCode, fieldCode)
-      : unionDatasource.getFieldValues(tableCode, fieldCode);
+      : bindingPath
+        ? unionDatasource.getFieldValuesByPath(bindingPath)
+        : unionDatasource.getFieldValues(tableCode, fieldCode);
     const filter = () => {
       const result = [];
       values.forEach(({ value }) => {

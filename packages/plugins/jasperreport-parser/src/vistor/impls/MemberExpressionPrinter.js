@@ -56,6 +56,12 @@ class MemberExpressionPrinter extends Printer{
                         text: res.text,
                     }
                 }
+            }else if(property.name=='replaceAll'){
+                return {
+                    type: ResultType.funcName,
+                    text: "SUBSTITUTE",
+                    args: [`TOONE.GET(${res.text.split('.').map(code=>`"${code}"`).join(',')})`]
+                }
             }
         }else{
             throw Error("未识别场景！");

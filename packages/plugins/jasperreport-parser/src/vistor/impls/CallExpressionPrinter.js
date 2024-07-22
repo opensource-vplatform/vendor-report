@@ -23,7 +23,16 @@ class CallExpressionPrinter extends Printer {
   }
 
   printVariable(args, context) {
-    throw Error("不支持变量");
+    const child = create(args[0]);
+    const rest = child.print(context);
+    if(rest.text=='index'){
+      return {
+        type: ResultType.formula,
+        text: `TOONE.SEQ("g")`
+      }
+    }else{
+      throw Error("不支持变量");
+    }
   }
 
   print(context) {
@@ -51,6 +60,18 @@ class CallExpressionPrinter extends Printer {
                 type: ResultType.bindingPath,
                 text: result.text + '.' + field,
             }
+        }else if(result.type==ResultType.funcName){
+          const args = this.createChildren("arguments");
+          args.forEach(arg=>{
+            const res = arg.print(context);
+            if(res.type == ResultType.text){
+              result.args.push(`"${res.text}"`);
+            }
+          });
+          return {
+            type: ResultType.formula,
+            text: `${result.text}(${result.args.join(',')})`
+          }
         }
         return result;
     }

@@ -6,7 +6,10 @@ export const ValueType = {
 }
 
 export const ResultType = {
-    text: 0,
-    bindingPath: 1,
-    formula:2,
+    boolean:0,
+    number:1,
+    text: 2,
+    bindingPath: 3,
+    formula:4,
+    funcName:5,
 }

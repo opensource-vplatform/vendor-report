@@ -3,29 +3,6 @@ import { create } from '../Factory';
 import Printer from '../Printer';
 
 class BinaryExpressionPrinter extends Printer {
-
-    toArg(result){
-        const type = result.type;
-        if(type == ResultType.text){
-            return this.stringToArg(result);
-        }else if(type == ResultType.bindingPath){
-            return this.bindingPathToArg(result);
-        }else{
-            return result.text;
-        }
-    }
-
-    bindingPathToArg(result){
-        const text = result.text;
-        let args = text.split('.')
-        args = args.map(arg=>`"${arg}"`);
-        return `TOONE.GET(${args.join(',')})`;
-    }
-
-    stringToArg(result){
-        return `"${result.text}"`;
-    }
-
   printAdd(context) {
     const left = this.getLeft();
     const right = this.getRight();
@@ -35,7 +12,33 @@ class BinaryExpressionPrinter extends Printer {
     const rightArg = this.toArg(rightRes);
     return {
       type: ResultType.formula,
-      text: `CONCAT(${leftArg},${rightArg})`
+      text: `CONCAT(${leftArg},${rightArg})`,
+    };
+  }
+
+  printEqual(context) {
+    const left = this.getLeft();
+    const right = this.getRight();
+    const leftRes = left.print(context);
+    const rightRes = right.print(context);
+    const leftArg = this.toArg(leftRes);
+    const rightArg = this.toArg(rightRes);
+    return {
+      type: ResultType.formula,
+      text: `${leftArg}=${rightArg}`,
+    };
+  }
+
+  printDiv(context) {
+    const left = this.getLeft();
+    const right = this.getRight();
+    const leftRes = left.print(context);
+    const rightRes = right.print(context);
+    const leftArg = this.toArg(leftRes);
+    const rightArg = this.toArg(rightRes);
+    return {
+      type: ResultType.formula,
+      text: `${leftArg}/${rightArg}`,
     };
   }
 
@@ -60,21 +63,24 @@ class BinaryExpressionPrinter extends Printer {
     const operator = node.operator;
     if (operator === '+') {
       return this.printAdd(context);
+    } else if (operator === '==') {
+      return this.printEqual(context);
+    } else if (operator === '/') {
+      return this.printDiv(context);
     } else {
       throw Error('未识别操作符：' + operator);
     }
   }
 
-  getValueType(){
+  getValueType() {
     const left = this.getLeft();
     let type = left.getValueType();
     const right = this.getRight();
-    if(right.getValueType()>type){
-        type = right.getValueType();
+    if (right.getValueType() > type) {
+      type = right.getValueType();
     }
     return type;
   }
-
 }
 
 BinaryExpressionPrinter.type = 'BinaryExpression';

@@ -1,18 +1,16 @@
 import { parse } from '@babel/parser';
+import { uuid } from '@toone/report-util';
 
 import Cell from '../../model/Cell';
-/*import {
-  FieldSyntax,
-  ParameterSyntax,
-  parse,
-  print,
-  StringIdentifierSyntax,
-} from '../../syntax/index';*/
-import { getChild, getText } from '../../util/XmlUtil';
+import { convertFormatter } from '../../util/formatterUtil';
+import {
+  getChild,
+  getText,
+} from '../../util/XmlUtil';
+import { ResultType } from '../../vistor/Constanst';
 import Context from '../../vistor/Context';
 import { create } from '../../vistor/Factory';
 import StaticText from './StaticText';
-import { uuid } from '@toone/report-util';
 
 const Force_Type_Syntax = /\(Map\)|\(String\)|\((Double)\)/g;
 
@@ -63,9 +61,9 @@ class TextField extends StaticText {
           const ctx = new Context(`${name}_parameter`, `${name}_detail`);
           const res = printer.print(ctx);
           const type = res.type;
-          if (type == 2) {
+          if(type==ResultType.formula){
             cell.setFormula(res.text);
-          } else if (type == 1) {
+          }else if(type == ResultType.bindingPath){
             cell.setBindingPath(res.text);
           } else {
             cell.setText(res.text);
@@ -88,7 +86,7 @@ class TextField extends StaticText {
     cell.setWordWrap(this.getAttribute('isStretchWithOverflow') == 'true');
     const pattern = this.getAttribute('pattern');
     if (pattern) {
-      cell.setFormatter(pattern);
+      cell.setFormatter(convertFormatter(pattern));
     }
     this.parseReportElement(cell, context);
     this.parseBox(cell, context);

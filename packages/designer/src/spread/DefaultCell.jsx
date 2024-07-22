@@ -43,8 +43,12 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
           this._showDirectionIcons(item);
         });
       }
-    } else {
-      item.ele.style.display = 'block';
+    } else if(item){
+      const {sheetName,row,col} = item;
+      const ele = document.getElementById(this._genDirectionIconId(sheetName,row,col));
+      if(ele){
+        ele.style.display = 'block';
+      }
     }
   }
 
@@ -56,8 +60,12 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
           this._hideDirectionIcons(item);
         });
       }
-    } else {
-      item.ele.style.display = 'none';
+    } else if(item){
+      const {sheetName,row,col} = item;
+      const ele = document.getElementById(this._genDirectionIconId(sheetName,row,col));
+      if(ele){
+        ele.style.display = 'none';
+      }
     }
   }
 
@@ -74,13 +82,15 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         return;
       }
       const spread = this.sheet.getParent();
+      const { row, col, sheetName } = item;
+      const ele = document.getElementById(this._genDirectionIconId(sheetName, row, col));
       if (
+        ele &&
         spread &&
         this._isDesignMode(this.sheet) &&
         spread.getActiveSheet() === this.sheet &&
-        item.sheet == this.sheet
+        item.sheetName == this.sheet.name()
       ) {
-        const { row, col } = item;
         const span = this.sheet.getSpan(row, col);
         const rowIndex = row;
         const colIndex = col;
@@ -98,7 +108,6 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
             undefined,
             this.sheet
           )[0];
-          const ele = item.ele;
           const offset = getOffsetFromBody(ele);
           if (rect && offset) {
             const zoom = this.sheet.zoom() || 1;
@@ -113,7 +122,9 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
           }
         }
       }
-      item.ele.style.display = 'none';
+      if (ele) {
+        ele.style.display = 'none';
+      }
     }
   }
 
@@ -203,7 +214,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     bind({
       event: EVENTS.onPreviewVisible,
       handler: () => {
-        //预览时隐藏设置图标
+        //预览时隐藏设置图�?
         this._hideIcon();
         this._hideDirectionIcons();
       },
@@ -255,53 +266,75 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
       this._hideIcon();
     }
   }
-  _initDirectionIcon(width, height, src) {
-    let iconEle = document.createElement('img');
-    const style = iconEle.style;
-    style.position = 'absolute';
-    iconEle.dataset.width = width;
-    iconEle.dataset.height = height;
-    style.backgroundColor = '#ffea37';
-    style.display = height;
-    iconEle.src = src;
-    document.body.append(iconEle);
-    return iconEle;
+  _createOrUpdateDirectionIcon(id, width, height, src) {
+    const ele = document.getElementById(id);
+    if (!ele) {
+      let iconEle = document.createElement('img');
+      const style = iconEle.style;
+      style.position = 'absolute';
+      iconEle.dataset.width = width;
+      iconEle.dataset.height = height;
+      style.backgroundColor = '#ffea37';
+      style.display = height;
+      iconEle.src = src;
+      iconEle.id = id;
+      document.body.append(iconEle);
+    } else {
+      const dataset = ele.dataset;
+      if (dataset.width != width) {
+        dataset.width = width;
+      }
+      if (dataset.height != height) {
+        dataset.height = height;
+      }
+      if (ele.src != src) {
+        ele.src = src;
+      }
+    }
   }
+
+  _genDirectionIconId(sheetName, row, col) {
+    return `$_${row}_${col}_${sheetName}`;
+  }
+
   /**
-   * 绘画单元格扩展方向图标
+   * 绘画单元格扩展方向图�?
    * @param {*} sheet
    * @param {*} row
    * @param {*} col
    */
   _paintDirectionIcon(sheet, row, col) {
+    const sheetName = sheet.name();
     const direction = getDirection(sheet, row, col);
     if (direction != null) {
       const directionIcons = this.directionIcons || [];
-      let ele = null;
       let item = directionIcons.find(
-        (item) => item.row === row && item.col === col && item.sheet === sheet
+        (item) =>
+          item.row === row && item.col === col && item.sheetName === sheetName
       );
       if (!item) {
-        if (direction == 'v') {
-          ele = this._initDirectionIcon(
-            6,
-            12,
-            getBaseUrl() + '/css/icons/design/arrowDown.svg'
-          );
-        } else if (direction == 'h') {
-          ele = this._initDirectionIcon(
-            12,
-            6,
-            getBaseUrl() + '/css/icons/design/arrowRight.svg'
-          );
-        }
         item = {
           row,
           col,
-          sheet,
-          ele,
+          sheetName: sheet.name(),
         };
         directionIcons.push(item);
+      }
+      const eleId = this._genDirectionIconId(sheetName, row, col);
+      if (direction == 'v') {
+        this._createOrUpdateDirectionIcon(
+          eleId,
+          6,
+          12,
+          getBaseUrl() + '/css/icons/design/arrowDown.svg'
+        );
+      } else if (direction == 'h') {
+        this._createOrUpdateDirectionIcon(
+          eleId,
+          12,
+          6,
+          getBaseUrl() + '/css/icons/design/arrowRight.svg'
+        );
       }
       this._refreshDirectionIconPosition(item);
       this.directionIcons = directionIcons;
@@ -310,12 +343,15 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
       if (directionIcons) {
         const icon = directionIcons.find(
           (icon) =>
-            icon.row === row && icon.col === col && icon.sheet === this.sheet
+            icon.row === row && icon.col === col && icon.sheetName === sheetName
         );
         if (icon) {
-          document.body.removeChild(icon.ele);
-          const index = directionIcons.indexOf(icon);
-          directionIcons.splice(index, 1);
+          const eleId = this._genDirectionIconId(sheetName, row, col);
+          const ele = document.getElementById(eleId);
+          if (ele) {
+            document.body.removeChild(ele);
+          }
+          directionIcons.splice(directionIcons.indexOf(icon), 1);
         }
       }
     }
@@ -327,7 +363,7 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
     value = paintCell(context, style, value, { canvasCtx: ctx, x, y, w, h });
     const { row, col } = getActiveIndexBySheet(this.sheet);
     if (row == context.row && col == context.col) {
-      //当前绘制的单元格为激活的单元格，才判断是否需要显示设置图标
+      //当前绘制的单元格为激活的单元格，才判断是否需要显示设置图�?
       this._paintSettingIcon(this.sheet, row, col);
     } else {
       //非绘制激活的单元格，隐藏设置图标
@@ -361,10 +397,9 @@ export class DefaultCell extends GC.Spread.Sheets.CellTypes.Text {
         style.backgroundColor = 'white';
         style.alignItems = 'center';
         style.justifyContent = 'center';
-        style.zIndex = 1; //防止被扩展方向箭头遮盖
+        style.zIndex = 1; //防止被扩展方向箭头遮�?
         this._iconEle = iconEle;
         this.root = createRoot(iconEle);
-        debugger;
         this.root.render(<Setting sheet={this.sheet}></Setting>);
       }
     }

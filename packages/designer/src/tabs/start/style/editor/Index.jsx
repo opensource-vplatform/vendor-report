@@ -15,7 +15,12 @@ import CalculationIcon from '@icons/formula/Calculation';
 import ImageIcon from '@icons/shape/Image';
 import CellEditorsIcon from '@icons/style/cellEditors';
 import ClearCellTypeIcon from '@icons/style/ClearCellType';
-import { isFunction } from '@toone/report-util';
+import {
+  getCellTag,
+  getNamespace,
+  isFunction,
+} from '@toone/report-util';
+import { getText } from '@utils/datasourceutil';
 import { showEditorDialog } from '@utils/sparklineUtil';
 import { exeCommand } from '@utils/spreadUtil';
 import {
@@ -29,7 +34,7 @@ import context from '../../../../DesignerContext';
 import SubTotalDialog from './SubTotalDialog';
 
 const Cell_Type_Menus = [
-    /*{
+  /*{
         value: 'pageCellType',
         title: '当前页',
         text: '当前页',
@@ -75,44 +80,82 @@ const Cell_Type_Menus = [
             }
         },
     },*/
-    {
-        value: 'imageCellType',
-        title: '图片',
-        text: '图片',
-        icon: <ImageIcon></ImageIcon>,
-        handler: showEditorDialog,
-    },
-    {
-        value: 'cellSubTotal',
-        title: '汇总',
-        text: '汇总',
-        icon: <CalculationIcon></CalculationIcon>,
-        handler: (spread, disptach, context, setData) => {
-            const sheet = spread.getActiveSheet();
-            const { row, col } = getActiveIndexBySheet(sheet);
-            const plugin = getCellTagPlugin(sheet, row, col, 'cellSubTotal');
-            const config = plugin ? plugin.config : {};
-            setData((data) => {
-                return {
-                    ...data,
-                    visible: true,
-                    config,
-                };
+  {
+    value: 'imageCellType',
+    title: '图片',
+    text: '图片',
+    icon: <ImageIcon></ImageIcon>,
+    handler: showEditorDialog,
+  },
+  {
+    value: 'cellSubTotal',
+    title: '汇总',
+    text: '汇总',
+    icon: <CalculationIcon></CalculationIcon>,
+    handler: (spread, disptach, context, setData, datasourceStore) => {
+      const sheet = spread.getActiveSheet();
+      const { row, col } = getActiveIndexBySheet(sheet);
+      const plugin = getCellTagPlugin(sheet, row, col, 'cellSubTotal');
+      if (plugin) {
+        //修改汇总设置
+        const config = plugin ? plugin.config : {};
+        setData((data) => {
+          return {
+            ...data,
+            visible: true,
+            config,
+          };
+        });
+      } else {
+        if (row > 0) {
+          //获取上一格的数据绑定路径
+          const rowIndex = row - 1;
+          const bindingPath = sheet.getBindingPath(rowIndex, col);
+          if (bindingPath) {
+            const instanceId = getCellTag(sheet, rowIndex, col, 'instanceId');
+            const GC = getNamespace();
+            const CalcEngine = GC.Spread.Sheets.CalcEngine;
+            const rangeStr = CalcEngine.rangeToFormula(
+              new GC.Spread.Sheets.Range(rowIndex, col, 1, 1),
+              0,
+              0,
+              CalcEngine.RangeReferenceRelative.allRelative
+            );
+            exeCommand(spread, Commands.CellType.SubTotal, {
+              text: `[求和(${getText(bindingPath, datasourceStore)})]`,
+              config: {
+                functionNum: 109,
+                range: rangeStr,
+                instanceId,
+                bindingPath,
+              },
             });
-        },
+            return;
+          }
+        }
+        const config = plugin ? plugin.config : {};
+        setData((data) => {
+          return {
+            ...data,
+            visible: true,
+            config,
+          };
+        });
+      }
     },
-    'divider',
-    {
-        value: 'clearCellType',
-        title: '清除单元格类型',
-        text: '清除单元格类型',
-        icon: <ClearCellTypeIcon></ClearCellTypeIcon>,
-        handler: function (spread) {
-            const { sheet, row, col } = getActiveIndexBySpread(spread);
-            clearAllCellTagPlugin(sheet, row, col);
-        },
+  },
+  'divider',
+  {
+    value: 'clearCellType',
+    title: '清除单元格类型',
+    text: '清除单元格类型',
+    icon: <ClearCellTypeIcon></ClearCellTypeIcon>,
+    handler: function (spread) {
+      const { sheet, row, col } = getActiveIndexBySpread(spread);
+      clearAllCellTagPlugin(sheet, row, col);
     },
-    /*{
+  },
+  /*{
     value: 'cellType',
     title: '单元格类型',
     text: '单元格类型',
@@ -266,52 +309,53 @@ const Cell_Type_Menus = [
 ];
 
 export default function () {
-    const { spread } = useSelector(({ appSlice }) => appSlice);
-    const dispatch = useDispatch();
-    const ctx = useContext(context);
-    const [data, setData] = useState(() => {
-        return {
-            visible: false,
-            config: {},
-        };
+  const { spread } = useSelector(({ appSlice }) => appSlice);
+  const datasourceStore = useSelector(({ datasourceSlice }) => datasourceSlice);
+  const dispatch = useDispatch();
+  const ctx = useContext(context);
+  const [data, setData] = useState(() => {
+    return {
+      visible: false,
+      config: {},
+    };
+  });
+  const handleNodeClick = (val, node) => {
+    const handler = node.handler;
+    if (isFunction(handler)) {
+      handler(spread, dispatch, ctx, setData, datasourceStore);
+    }
+  };
+  const handleConfirm = (config, text) => {
+    exeCommand(spread, Commands.CellType.SubTotal, {
+      text,
+      config,
     });
-    const handleNodeClick = (val, node) => {
-        const handler = node.handler;
-        if (isFunction(handler)) {
-            handler(spread, dispatch, ctx, setData);
-        }
-    };
-    const handleConfirm = (config, text) => {
-        exeCommand(spread, Commands.CellType.SubTotal, {
-            text,
-            config,
-        });
-        handleCancel();
-    };
-    const handleCancel = () => {
-        setData((data) => {
-            return {
-                ...data,
-                visible: false,
-            };
-        });
-    };
-    return (
-        <Fragment>
-            <VIconTitleWithDropdown
-                title='单元格类型'
-                menus={Cell_Type_Menus}
-                icon={CellEditorsIcon}
-                onNodeClick={handleNodeClick}
-            ></VIconTitleWithDropdown>
-            {data.visible ? (
-                <SubTotalDialog
-                    functionNum={data.config.functionNum}
-                    range={data.config.range}
-                    onConfirm={handleConfirm}
-                    onCancel={handleCancel}
-                ></SubTotalDialog>
-            ) : null}
-        </Fragment>
-    );
+    handleCancel();
+  };
+  const handleCancel = () => {
+    setData((data) => {
+      return {
+        ...data,
+        visible: false,
+      };
+    });
+  };
+  return (
+    <Fragment>
+      <VIconTitleWithDropdown
+        title='单元格类型'
+        menus={Cell_Type_Menus}
+        icon={CellEditorsIcon}
+        onNodeClick={handleNodeClick}
+      ></VIconTitleWithDropdown>
+      {data.visible ? (
+        <SubTotalDialog
+          functionNum={data.config.functionNum}
+          range={data.config.range}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        ></SubTotalDialog>
+      ) : null}
+    </Fragment>
+  );
 }

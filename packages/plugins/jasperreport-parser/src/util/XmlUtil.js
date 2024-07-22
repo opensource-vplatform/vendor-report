@@ -7,7 +7,7 @@ export const getChild = function (childName, node) {
 
 const removeBreakLine = function(text){
   if(typeof text == 'string'){
-    return text.replaceAll('\n','');
+    return text.replaceAll('\\n','');
   }
   return text;
 }

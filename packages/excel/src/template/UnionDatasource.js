@@ -490,6 +490,24 @@ class UnionDatasource {
   }
 
   /**
+   * 根据绑定路径获取字段值
+   */
+  getValueByPath(bandingPath, index = 0) {
+    let data = this.datas[index];
+    let value = null;
+    if (data) {
+      const paths = bandingPath.split('.');
+      paths.reverse();
+      while (paths.length > 0) {
+        const path = paths.pop();
+        data = data[path];
+      }
+      value = data;
+    }
+    return { type: 'text', value };
+  }
+
+  /**
    * 获取字段值
    * @param {*} dsCode
    * @param {*} fieldCode
@@ -500,6 +518,21 @@ class UnionDatasource {
     let index = 0;
     while (index < count) {
       result.push(this.getValue(dsCode, fieldCode, '', index));
+      index++;
+    }
+    return result;
+  }
+
+  /**
+   * 根据绑定路径获取字段值
+   * @param {*} bindingPath
+   */
+  getFieldValuesByPath(bindingPath) {
+    const result = [];
+    const count = this.getCount();
+    let index = 0;
+    while (index < count) {
+      result.push(this.getValueByPath(bindingPath, index));
       index++;
     }
     return result;

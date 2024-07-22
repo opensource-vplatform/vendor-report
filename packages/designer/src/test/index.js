@@ -433,7 +433,7 @@ export default {
       /*type: {
         text: '#,##0',
         decimals: '#,##0_);-#,##0',
-      },*/
+      },
       // 格式化数据源
       dataSource: {
         Ipes_MP_Billpay_DetailCalc: {
@@ -443,7 +443,7 @@ export default {
           cost: '#,##0_);-#,##0',
         },
         age: '#,##0.00_);-#,##0.00',
-      },
+      },*/
     },
   },
   event: {
