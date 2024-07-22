@@ -73,6 +73,14 @@ const UNITS = [
       text: `IF(TOONE.GET("rpt08_03_detail","gcl")=0,"",IF(TOONE.GET("rpt08_03_detail","valueMap","GCF")/TOONE.GET("rpt08_03_detail","gcl")=0,TOONE.GET("rpt08_03_detail","values","JAGPRICE"),TOONE.GET("rpt08_03_detail","values","GCFPRICE")))`,
     },
   },
+  {
+    input:`$F("gcl")==0?"":
+(($F("valueMap")).get("GCF")).doubleValue()/$F("gcl")==0?($F("values")).get("JAGPRICE"):($F("values")).get("GCFPRICE")`,
+    output:{
+      type: ResultType.formula,
+      text: 'IF(TOONE.GET("rpt08_03_detail","gcl")=0,"",IF(TOONE.GET("rpt08_03_detail","valueMap","GCF")/TOONE.GET("rpt08_03_detail","gcl")=0,TOONE.GET("rpt08_03_detail","values","JAGPRICE"),TOONE.GET("rpt08_03_detail","values","GCFPRICE")))'
+    }
+  }
 ];
 
 export const test = function () {

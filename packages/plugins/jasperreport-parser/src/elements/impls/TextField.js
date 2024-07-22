@@ -1,15 +1,14 @@
-import { parse } from '@babel/parser';
 import { uuid } from '@toone/report-util';
 
 import Cell from '../../model/Cell';
 import { convertFormatter } from '../../util/formatterUtil';
+import { parse } from '../../util/syntaxUtil';
 import {
   getChild,
   getText,
 } from '../../util/XmlUtil';
 import { ResultType } from '../../vistor/Constanst';
 import Context from '../../vistor/Context';
-import { create } from '../../vistor/Factory';
 import StaticText from './StaticText';
 
 const Force_Type_Syntax = /\(Map\)|\(String\)|\((Double)\)/g;
@@ -54,12 +53,9 @@ class TextField extends StaticText {
       let text = getText(textFieldExpression);
       if (text) {
         try {
-          text = this._adjustExpression(text);
-          const node = parse(text);
-          const printer = create(node);
           const name = context.getName();
           const ctx = new Context(`${name}_parameter`, `${name}_detail`);
-          const res = printer.print(ctx);
+          const res =  parse(text,ctx);
           const type = res.type;
           if(type==ResultType.formula){
             cell.setFormula(res.text);

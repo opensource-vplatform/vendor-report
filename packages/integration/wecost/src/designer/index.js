@@ -1,10 +1,4 @@
 import {
-  getReportConfigUrl,
-  getSaveReportUrl,
-  getTableDataUrl,
-  getTableMetadataUrl,
-} from '../utils/constant';
-import {
   genResponseErrorCallback,
   getData,
   handleError,
@@ -64,10 +58,12 @@ const Type_Map = {
   number: 'decimals',
   boolean: 'text',
   date: 'text',
-  longDate: 'text',
+  longdate: 'text',
   file: 'text',
   object: 'text',
   integer: 'integer',
+  map:'map',
+  list: 'list',
 };
 
 const enhanceType = function (type) {
