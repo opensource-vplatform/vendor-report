@@ -290,7 +290,13 @@ export default function (props) {
         handleSheets(json);
         handleDatas();
         if (onInited) {
-          onInited(data.spread);
+          const promise = onInited(data.spread);
+          //很重要。详见handleWorkbookInitialized
+          if (promise && promise.then) {
+            promise.then((json) => {
+              handleSheets(json);
+            });
+          }
         }
       }
     })();
