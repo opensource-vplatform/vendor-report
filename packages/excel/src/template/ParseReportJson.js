@@ -393,7 +393,7 @@ export default class ParseReportJson {
 
       //计算内容区域的可用高度，不包含章合计和总计
       let { contentHeight } = calculate(header, footer, content);
-
+      debugger;
       //内容总高度，不包括头部和底部
       pageInfos.contentTotalHeight = contentHeight;
       //已经消耗的内容高度
@@ -406,6 +406,9 @@ export default class ParseReportJson {
       pageInfos.dataLen = undefined;
       //标识是否在最后一页已经处理过章合计
       pageInfos.hasHandleLastPage = false;
+
+      pageInfos.contentUnionDatasource =
+        content?.template?.[0]?.unionDatasource;
 
       while (pageInfos.flag) {
         //用于存储当前页内容
@@ -1053,7 +1056,6 @@ export default class ParseReportJson {
       }
       pageInfos.sheet.namedStyles = this.namedStyles;
       this.resetSheet(this.sheetPages[name].datas[0]);
-      debugger;
       this.reportJson.sheets[name] = this.sheetPages[name].datas[0].sheet;
     });
   }
@@ -1358,11 +1360,20 @@ export default class ParseReportJson {
             delete colDataTable.bindingPath;
             delete printColDataTable.bindingPath;
             const plugins = tagObj?.plugins;
-            const { type, value: newVlaue } = unionDatasource.getValue(
+            let { type, value: newVlaue } = unionDatasource.getValue(
               ...bindingPaths,
               i,
               plugins
             );
+            if (isGroupSumArea || isTotalArea) {
+              const res = pageInfos.contentUnionDatasource.getValue(
+                ...bindingPaths,
+                (pageInfos.contentUnionDatasource.getCount() || 1) - 1,
+                plugins
+              );
+              type = res.type;
+              newVlaue = res.value;
+            }
             if (type === 'text') {
               colDataTable.value = newVlaue;
               printColDataTable.value = newVlaue;
@@ -1541,8 +1552,8 @@ export default class ParseReportJson {
                 let res = exePlugins(
                   {
                     type: 'text',
-                    value: colDataTable.value,
-                    //value: values[colStr],
+                    //value: colDataTable.value,
+                    value: values[colStr] || colDataTable.value,
                   },
                   plugins,
                   tool
@@ -1553,8 +1564,8 @@ export default class ParseReportJson {
                 let res1 = exePlugins(
                   {
                     type: 'text',
-                    value: printColDataTable.value,
-                    //value: values[colStr],
+                    //value: printColDataTable.value,
+                    value: values[colStr] || printColDataTable.value,
                   },
                   plugins,
                   printTool
@@ -1748,9 +1759,14 @@ export default class ParseReportJson {
         height: tempHeight,
         unionDatasource,
         verticalAutoMergeRanges,
+        isTotalArea = false,
+        isGroupSumArea = false,
       } = temp;
 
-      const dataLen = unionDatasource.getCount() || 1;
+      let dataLen = unionDatasource.getCount() || 1;
+      if (isTotalArea || isGroupSumArea) {
+        dataLen = 1;
+      }
 
       const sheetPageRowCount = sheetPage.rowCount;
       const sheetPrintPageRowCount = sheetPrintPage?.rowCount;
