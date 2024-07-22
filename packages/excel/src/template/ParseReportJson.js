@@ -497,7 +497,7 @@ export default class ParseReportJson {
             footerTemplates = newTemplates;
           } else {
             //如果剩余高度不能渲染包含章合计的底部，则继续循环
-            pageInfos.dataLen += 1;
+            // pageInfos.dataLen += 1;
             pageInfos.flag = true;
             pageInfos.hasHandleLastPage = true;
           }
@@ -739,8 +739,16 @@ export default class ParseReportJson {
     return pageInfos;
   }
   collectTemplate(temp, type, columns = []) {
-    const { datas, allDatas, dataTables, dataPath, cellPlugins, tableArray } =
-      temp;
+    const {
+      datas,
+      allDatas,
+      dataTables,
+      dataPath,
+      cellPlugins,
+      tableArray,
+      isTotalArea,
+      isGroupSumArea,
+    } = temp;
 
     //生成联合数据源
     const setting = {
@@ -764,7 +772,10 @@ export default class ParseReportJson {
 
     //计算高度
     let height = 0;
-    const dataLen = type === 'content' ? 1 : unionDatasource.getCount() || 1;
+    let dataLen = type === 'content' ? 1 : unionDatasource.getCount() || 1;
+    if (isTotalArea || isGroupSumArea) {
+      dataLen = 1;
+    }
     this.templates.datas = { ...this.templates.datas, ...datas };
     for (let i = 0; i < dataLen; i++) {
       height += this.calcTempAfterRenderHeight({
@@ -1638,6 +1649,9 @@ export default class ParseReportJson {
                 }
                 if (value <= 1) {
                   value = 1;
+                }
+                if (value > pageInfos.dataLen) {
+                  value = '';
                 }
                 return { type: 'text', value };
               });
