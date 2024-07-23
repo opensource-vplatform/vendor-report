@@ -1,6 +1,10 @@
-import { getNamespace, withBatchUpdate } from './spreadUtil';
-import { getActiveIndexBySheet } from './worksheetUtil';
 import { isFunction } from '@toone/report-util';
+
+import {
+  getNamespace,
+  withBatchUpdate,
+} from './spreadUtil';
+import { getActiveIndexBySheet } from './worksheetUtil';
 
 const GC = getNamespace();
 
@@ -242,18 +246,17 @@ export const getDefineByBindingPath = function (spread, bindingPath) {
       const datasource = datasources.find(
         (datasource) => datasource.code == code
       );
-      if (datasource) {
-        defines.push(datasource);
-        if (paths.length == 2) {
-          const children = datasource.children;
-          if (children && children.length > 0) {
-            const field = children.find((field) => field.code == paths[1]);
-            if (field) {
-              defines.push(field);
-            }
+      const iter = (list,paths)=>{
+        if(list&&list.length>0&&paths&&paths.length>0){
+          const [path] = paths.splice(0,1);
+          const item = list.find(item=>item.code==path);
+          if(item){
+            defines.push(item);
+            iter(item.children,paths);
           }
         }
       }
+      iter(datasources,paths);
     }
   }
   return defines;
