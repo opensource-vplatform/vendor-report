@@ -199,8 +199,8 @@ export default function (props) {
         tabStripVisible,
       });
       spread.TOONE_FUNCS = {
-        setJSON(json) {
-          const result = spread.fromJSON(json);
+        setJSON(json,options) {
+          const result = spread.fromJSON(json,options);
           result.then(() => {
             fire({
               event: EVENTS.OnSpreadJsonParsed,

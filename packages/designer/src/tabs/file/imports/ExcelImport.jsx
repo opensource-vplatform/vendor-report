@@ -73,7 +73,7 @@ function ExcelImport(props) {
                                         if (target) {
                                             target.value = null;
                                         }
-                                        const promise = spread.fromJSON(json, excelOpenFlags);
+                                        const promise = spread.TOONE_FUNCS.setJSON(json, excelOpenFlags);
                                         closeHandler();
                                         showLoadingMessage(dispatch, null);
                                         if(promise){
