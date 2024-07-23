@@ -198,6 +198,18 @@ function TreeItem(props) {
   );
 }
 
+function filter(datas, searchKey) {
+  let result = datas.filter(function ({ name = '', children }) {
+    let result = name.includes(searchKey);
+    if (!result && isArray(children) && children.length > 0) {
+      result = filter(children, searchKey);
+      result = result.length > 0;
+    }
+    return result;
+  });
+  return result;
+}
+
 //树形数据源列表
 export default function Index(props) {
   const dispatch = useDispatch();
@@ -237,13 +249,14 @@ export default function Index(props) {
 
   let _datas = datas;
   if (searchKey) {
-    _datas = datas.filter(function ({ name = '', children }) {
+    /*  _datas = datas.filter(function ({ name = '', children }) {
       let result = name.includes(searchKey);
       if (!result && isArray(children) && children.length > 0) {
         result = children.some(({ name = '' }) => name.includes(searchKey));
       }
       return result;
-    });
+    }); */
+    _datas = filter(datas, searchKey);
   }
 
   let isAllowToEdit = !getDataSourceConfig(context, 'allowToEdit');
