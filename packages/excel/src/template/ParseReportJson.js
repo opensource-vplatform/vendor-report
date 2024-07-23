@@ -458,6 +458,7 @@ export default class ParseReportJson {
           pageInfos,
           sheetPage,
           sheetPrintPage: pageInfos.sheetPrintPage,
+          type: 'header',
         });
 
         //处理内容区域
@@ -1193,8 +1194,15 @@ export default class ParseReportJson {
             this.templates.datas[tableCode] = this.datas[tableCode] || [];
           }
           if (rowHeightType === 'autoFitByContent') {
-            style.wordWrap = true;
-            _colDataTable.style = style;
+            if (isString(style)) {
+              _colDataTable.style = {
+                parentName: style,
+                wordWrap: true,
+              };
+            } else {
+              style.wordWrap = true;
+              _colDataTable.style = style;
+            }
           } else if (rowHeightType === 'autoFitByZoom') {
             if (isString(style)) {
               _colDataTable.style = {
@@ -1382,6 +1390,7 @@ export default class ParseReportJson {
             tagObj = JSON.parse(tag);
           }
 
+          const tempType = type;
           if (bindingPath?.includes?.('.')) {
             const bindingPaths = bindingPath.split('.');
             if (bindingPaths.length === 2) {
@@ -1404,6 +1413,17 @@ export default class ParseReportJson {
               type = res.type;
               newVlaue = res.value;
             }
+
+            if (tempType === 'header') {
+              const res = pageInfos.contentUnionDatasource.getValue(
+                ...bindingPaths,
+                pageInfos.contentDataIndex,
+                plugins
+              );
+              type = res.type;
+              newVlaue = res.value;
+            }
+
             if (type === 'text') {
               colDataTable.value = newVlaue;
               printColDataTable.value = newVlaue;
@@ -1783,7 +1803,7 @@ export default class ParseReportJson {
   }
 
   genPageDataTables(params) {
-    const { templates, pageInfos, sheetPage, sheetPrintPage } = params;
+    const { templates, pageInfos, sheetPage, sheetPrintPage, type } = params;
     templates.forEach((temp) => {
       if (!temp) {
         return;
@@ -1818,6 +1838,7 @@ export default class ParseReportJson {
           ...params,
           temp,
           i,
+          type,
         });
       }
       //纵向上自动合并信息(在纵向上连续，只需修改起始行号和行号数)
