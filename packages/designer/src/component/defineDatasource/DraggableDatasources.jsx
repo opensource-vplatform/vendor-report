@@ -278,9 +278,9 @@ export default function Index() {
   const { dsList, showHyperlink, datasourceSelectorVisible } = useSelector(
     ({ datasourceSlice }) => datasourceSlice
   );
-  const { allowInvalidFormula } = useSelector(
-    ({ workbookSettingSlice }) => workbookSettingSlice
-  );
+  // const { allowInvalidFormula } = useSelector(
+  //   ({ workbookSettingSlice }) => workbookSettingSlice
+  // );
   const context = useContext(DesignerContext);
   //是否允许查看数据源
   const isAllowToView = !getDataSourceConfig(context, 'allowToView');
@@ -359,8 +359,9 @@ export default function Index() {
             const sheet = cacheDatasRef.current.spread.getActiveSheet();
             const { row, col } = getActiveIndexBySheet(sheet);
             const cell = sheet.getCell(row, col);
-            const curText =
-              cell.text() == '[函数(Fx)]' ? cell.formula() : cell.text();
+            const curText = !!cell.formula()
+              ? '=' + cell.formula()
+              : cell.text();
             if (isFormula(curText)) {
               try {
                 // const lastIndex = curText.length - 1;
@@ -432,17 +433,43 @@ export default function Index() {
     });
     return unBindHandler;
   }, []);
+  // useEffect(() => {
+  //   const id = uuid();
+  //   const unBindHandler = bind({
+  //     id,
+  //     event: EVENTS.CellDoubleClick,
+  //     handler: () => {
+  //       // 记录点击单元格编辑表达式
+  //       cacheDatasRef.current.currentClickBar = false;
+  //     },
+  //   });
+  //   return unBindHandler;
+  // }, []);
+
   useEffect(() => {
-    const id = uuid();
-    const unBindHandler = bind({
-      id,
-      event: EVENTS.CellDoubleClick,
-      handler: () => {
-        // 记录点击单元格编辑表达式
+    const handleElementFromPoint = function (event) {
+      // var x = event.clientX;
+      // var y = event.clientY;
+      // console.log('Mouse Position:', x, y);
+      // console.log('Element at Mouse Position:', element);
+      // 获取光标位置所在的元素
+      // var element = document.elementFromPoint(x, y);
+      var activeElement = document.activeElement;
+      if (
+        activeElement.getAttribute('gcuielement') == 'gcAttachedFormulaTextBox'
+      ) {
+        cacheDatasRef.current.currentClickBar = true;
+        var activeElement = document.activeElement;
+      } else if (
+        activeElement.getAttribute('gcuielement') == 'gcEditingInput'
+      ) {
         cacheDatasRef.current.currentClickBar = false;
-      },
-    });
-    return unBindHandler;
+      }
+    };
+    document.addEventListener('mousemove', handleElementFromPoint);
+    return () => {
+      document.removeEventListener('mousemove', handleElementFromPoint);
+    };
   }, []);
   useEffect(() => {
     const id = uuid();
@@ -452,17 +479,16 @@ export default function Index() {
       handler: () => {
         // 记录点击表达式框
         if (!cacheDatasRef.current.notChangecurrentClickBar) {
-          cacheDatasRef.current.currentClickBar = true;
+          // cacheDatasRef.current.currentClickBar = true;
           // console.log('editStarting');
           const sheet = cacheDatasRef.current.spread.getActiveSheet();
           const { row, col } = getActiveIndexBySheet(sheet);
           const cell = sheet.getCell(row, col);
-          const curText = cell.text().includes('[函数(Fx)]')
-            ? '=' + cell.formula()
-            : cell.text();
+          const curText = !!cell.formula() ? '=' + cell.formula() : cell.text();
           cacheDatasRef.current.startCellValue = curText;
-          cacheDatasRef.current.startAllowInvalidFormula = allowInvalidFormula;
-          !allowInvalidFormula &&
+          cacheDatasRef.current.startAllowInvalidFormula =
+            cacheDatasRef.current.spread.options.allowInvalidFormula;
+          !cacheDatasRef.current.spread.options.allowInvalidFormula &&
             (cacheDatasRef.current.spread.options.allowInvalidFormula = true);
         }
       },
