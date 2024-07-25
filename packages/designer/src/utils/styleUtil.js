@@ -281,7 +281,7 @@ export const setStyle = function (sheet, style) {
   applyStyleToSelectedCell(sheet, function (sheet, row, col) {
     let sty = sheet.getStyle(row, col);
     const GC = getNamespace();
-    sty = sty ? sty.toJSON() : new GC.Spread.Sheets.Style();
+    sty = sty ? sty : new GC.Spread.Sheets.Style();
     for (let [attr, val] of Object.entries(style)) {
       const handler = attrDispatcher[attr];
       if (isFunction(handler)) {

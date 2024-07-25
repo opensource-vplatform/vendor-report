@@ -1,5 +1,9 @@
 import { setFormulaDecoration } from '../utils';
 
+const GET_REGEX = /TOONE\.GET\((.+?)\)/g;
+
+
+
 const paintCell = function (context, style, value) {
     const { sheet, row, col } = context;
     const formula = sheet.getFormula(row, col);

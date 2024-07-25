@@ -1,8 +1,8 @@
-import { parse } from './util/syntaxUtil';
-import { ResultType } from './vistor/Constanst';
-import Context from './vistor/Context';
+import { ResultType } from './transformer/printer/Constanst';
+import Context from './transformer/printer/Context';
+import { parse } from './transformer/util/syntaxUtil';
 
-const UNITS = [
+const UNITS = [/*
   {
     input: `$P{ECRPT_REPORTTITLE}+$P{alreadyAudit}`,
     output: {
@@ -20,8 +20,8 @@ const UNITS = [
   {
     input: `"OP_PC"`,
     output: {
-      type: ResultType.text,
-      text: `OP_PC`,
+      type: ResultType.formula,
+      text: `CONCAT("共 ",TOONE.PAGECOUNT()," 页")`,
     },
   },
   {
@@ -88,6 +88,32 @@ const UNITS = [
       text: `TOONE.GET("rpt08_03_detail","valueMap","DESBF")-TOONE.GET("rpt08_03_detail","valueMap","SBSJ")`,
     },
   },
+  {
+    input: `"第 " + String.valueOf($V{PAGE_NUMBER}.intValue()+new Integer(0).intValue()) + " 页"`,
+    output: {
+      type: ResultType.formula,
+      text: `CONCAT(CONCAT("第 ",TOONE.PAGEINDEX())," 页")`,
+    },
+  },{
+    input: `"利润\n(元)"`,
+    output: {
+      type: ResultType.text,
+      text: `利润(元)`
+    }
+  },
+  {
+    input:`"( "+($P{PP_QZZH}==null?"":$P{PP_QZZH})+" )"`,
+    output: {
+      type: ResultType.formula,
+      text: `CONCAT(CONCAT("( ",IF(TOONE.GET("rpt08_03_parameter","PP_QZZH")="","",TOONE.GET("rpt08_03_parameter","PP_QZZH")))," )")`
+    }
+  },*/{
+    input: `$P{editDATE}.trim()`,
+    output:{
+      type: ResultType.formula,
+      text: `TRIM(TOONE.GET("rpt08_03_parameter","editDATE"))`
+    }
+  }
 ];
 
 export const test = function () {

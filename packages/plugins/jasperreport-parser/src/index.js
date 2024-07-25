@@ -1,4 +1,4 @@
-import Parser from './Parser';
-import ZipParser from './ZipParser';
+import JRXMLParser from './JRXMLParser';
+import RPTPParser from './RPTPParser';
 
-export default { JasperReportParser: Parser, WECReportParser: ZipParser };
+export default { JasperReportParser: JRXMLParser, WECReportParser: RPTPParser };
