@@ -24,7 +24,7 @@ import {
 } from '../Component';
 import {
   MUTEX_PLUGIN_CELL_TYPE,
-  PLUGIN_CELL_LIST_TYPE,
+  PLUGIN_CELL_TEXT_TYPE,
 } from '../constant';
 import {
   getBindText,
@@ -33,7 +33,7 @@ import {
 } from '../utils';
 import Group from './Group';
 
-const PLUGIN_TYPE = PLUGIN_CELL_LIST_TYPE;
+const PLUGIN_TYPE = PLUGIN_CELL_TEXT_TYPE;
 
 const Component = function (props) {
   const { onConfirm, onCancel, sheet, plugin } = props;
@@ -45,7 +45,6 @@ const Component = function (props) {
     };
     withBatchCalcUpdate(sheet.getParent(), () => {
       applyToSelectedCell(sheet, (sheet, row, col) => {
-        //clearAllCellTagPlugin(sheet, row, col);
         const bindingPath = sheet.getBindingPath(row, col);
         if (bindingPath) {
           MUTEX_PLUGIN_CELL_TYPE.forEach((type) => {
@@ -62,7 +61,7 @@ const Component = function (props) {
   return (
     <Fragment>
       <FormItem label='扩展方向'>
-        <Text>纵向</Text>
+        <Text>不扩展</Text>
       </FormItem>
       <RowHeight
         value={config.rowHeight ? config.rowHeight : ''}
@@ -127,7 +126,7 @@ function getOptions(sheet) {
   if (hasBindField(sheet, row, col)) {
     options.push({
       value: PLUGIN_TYPE,
-      text: '列表',
+      text: '文本',
     });
   }
   return options;

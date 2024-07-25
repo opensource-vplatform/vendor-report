@@ -10,47 +10,81 @@ import ColorScaleRygIcon from '@icons/style/colorgradation/ColorScaleRyg';
 import ColorScaleWgIcon from '@icons/style/colorgradation/ColorScaleWg';
 import ColorScaleWrIcon from '@icons/style/colorgradation/ColorScaleWr';
 import ColorScaleYgIcon from '@icons/style/colorgradation/ColorScaleYg';
-import GradientFillBlueDataBarIcon from '@icons/style/databar/GradientFillBlueDataBar';
-import GradientFillGreenDataBarIcon from '@icons/style/databar/GradientFillGreenDataBar';
-import GradientFillLightBlueDataBarIcon from '@icons/style/databar/GradientFillLightBlueDataBar';
-import GradientFillOrangeDataBarIcon from '@icons/style/databar/GradientFillOrangeDataBar';
-import GradientFillPurpleDataBarIcon from '@icons/style/databar/GradientFillPurpleDataBar';
-import GradientFillRedDataBarIcon from '@icons/style/databar/GradientFillRedDataBar';
-import SolidFillBlueDataBarIcon from '@icons/style/databar/SolidFillBlueDataBar';
-import SolidFillGreenDataBarIcon from '@icons/style/databar/SolidFillGreenDataBar';
-import SolidFillLightBlueDataBarIcon from '@icons/style/databar/SolidFillLightBlueDataBar';
-import SolidFillOrangeDataBarIcon from '@icons/style/databar/SolidFillOrangeDataBar';
-import SolidFillPurpleDataBarIcon from '@icons/style/databar/SolidFillPurpleDataBar';
+import GradientFillBlueDataBarIcon
+  from '@icons/style/databar/GradientFillBlueDataBar';
+import GradientFillGreenDataBarIcon
+  from '@icons/style/databar/GradientFillGreenDataBar';
+import GradientFillLightBlueDataBarIcon
+  from '@icons/style/databar/GradientFillLightBlueDataBar';
+import GradientFillOrangeDataBarIcon
+  from '@icons/style/databar/GradientFillOrangeDataBar';
+import GradientFillPurpleDataBarIcon
+  from '@icons/style/databar/GradientFillPurpleDataBar';
+import GradientFillRedDataBarIcon
+  from '@icons/style/databar/GradientFillRedDataBar';
+import SolidFillBlueDataBarIcon
+  from '@icons/style/databar/SolidFillBlueDataBar';
+import SolidFillGreenDataBarIcon
+  from '@icons/style/databar/SolidFillGreenDataBar';
+import SolidFillLightBlueDataBarIcon
+  from '@icons/style/databar/SolidFillLightBlueDataBar';
+import SolidFillOrangeDataBarIcon
+  from '@icons/style/databar/SolidFillOrangeDataBar';
+import SolidFillPurpleDataBarIcon
+  from '@icons/style/databar/SolidFillPurpleDataBar';
 import SolidFillRedDataBarIcon from '@icons/style/databar/SolidFillRedDataBar';
-import HighlightCellsRulesBetweenIcon from '@icons/style/HighlightCellsRulesBetween';
-import HighlightCellsRulesContainsIcon from '@icons/style/HighlightCellsRulesContains';
-import HighlightCellsRulesDateOccurringIcon from '@icons/style/HighlightCellsRulesDateOccurring';
-import HighlightCellsRulesDuplicateValuesIcon from '@icons/style/HighlightCellsRulesDuplicateValues';
-import HighlightCellsRulesEqualToIcon from '@icons/style/HighlightCellsRulesEqualTo';
-import HighlightCellsRulesGreaterThanIcon from '@icons/style/HighlightCellsRulesGreaterThan';
-import HighlightCellsRulesLessThanIcon from '@icons/style/HighlightCellsRulesLessThan';
+import HighlightCellsRulesBetweenIcon
+  from '@icons/style/HighlightCellsRulesBetween';
+import HighlightCellsRulesContainsIcon
+  from '@icons/style/HighlightCellsRulesContains';
+import HighlightCellsRulesDateOccurringIcon
+  from '@icons/style/HighlightCellsRulesDateOccurring';
+import HighlightCellsRulesDuplicateValuesIcon
+  from '@icons/style/HighlightCellsRulesDuplicateValues';
+import HighlightCellsRulesEqualToIcon
+  from '@icons/style/HighlightCellsRulesEqualTo';
+import HighlightCellsRulesGreaterThanIcon
+  from '@icons/style/HighlightCellsRulesGreaterThan';
+import HighlightCellsRulesLessThanIcon
+  from '@icons/style/HighlightCellsRulesLessThan';
+import HighlightCellsRulesNotEqualToIcon
+  from '@icons/style/HighlightCellsRulesNotEqualTo';
 import IconSet3TrianglesIcon from '@icons/style/icons/IconSet3Triangles';
-import IconSetFiveArrowsColoredIcon from '@icons/style/icons/IconSetFiveArrowsColored';
-import IconSetFiveArrowsGrayIcon from '@icons/style/icons/IconSetFiveArrowsGray';
+import IconSetFiveArrowsColoredIcon
+  from '@icons/style/icons/IconSetFiveArrowsColored';
+import IconSetFiveArrowsGrayIcon
+  from '@icons/style/icons/IconSetFiveArrowsGray';
 import IconSetFiveBoxesIcon from '@icons/style/icons/IconSetFiveBoxes';
 import IconSetFiveQuartersIcon from '@icons/style/icons/IconSetFiveQuarters';
 import IconSetFiveRatingsIcon from '@icons/style/icons/IconSetFiveRatings';
-import IconSetFourArrowsColoredIcon from '@icons/style/icons/IconSetFourArrowsColored';
-import IconSetFourArrowsGrayIcon from '@icons/style/icons/IconSetFourArrowsGray';
+import IconSetFourArrowsColoredIcon
+  from '@icons/style/icons/IconSetFourArrowsColored';
+import IconSetFourArrowsGrayIcon
+  from '@icons/style/icons/IconSetFourArrowsGray';
 import IconSetFourRatingsIcon from '@icons/style/icons/IconSetFourRatings';
-import IconSetFourRedToBlackIcon from '@icons/style/icons/IconSetFourRedToBlack';
-import IconSetFourTrafficLightsIcon from '@icons/style/icons/IconSetFourTrafficLights';
-import IconSetThreeArrowsColoredIcon from '@icons/style/icons/IconSetThreeArrowsColored';
-import IconSetThreeArrowsGrayIcon from '@icons/style/icons/IconSetThreeArrowsGray';
+import IconSetFourRedToBlackIcon
+  from '@icons/style/icons/IconSetFourRedToBlack';
+import IconSetFourTrafficLightsIcon
+  from '@icons/style/icons/IconSetFourTrafficLights';
+import IconSetThreeArrowsColoredIcon
+  from '@icons/style/icons/IconSetThreeArrowsColored';
+import IconSetThreeArrowsGrayIcon
+  from '@icons/style/icons/IconSetThreeArrowsGray';
 import IconSetThreeFlagsIcon from '@icons/style/icons/IconSetThreeFlags';
 import IconSetThreeSignsIcon from '@icons/style/icons/IconSetThreeSigns';
 import IconSetThreeStarsIcon from '@icons/style/icons/IconSetThreeStars';
-import IconSetThreeSymbolsCircledIcon from '@icons/style/icons/IconSetThreeSymbolsCircled';
-import IconSetThreeSymbolsUnCircledIcon from '@icons/style/icons/IconSetThreeSymbolsUnCircled';
-import IconSetThreeTrafficLightsRimmedIcon from '@icons/style/icons/IconSetThreeTrafficLightsRimmed';
-import IconSetThreeTrafficLightsUnRimmedIcon from '@icons/style/icons/IconSetThreeTrafficLightsUnRimmed';
-import TopBottomRulesAboveAverageIcon from '@icons/style/TopBottomRulesAboveAverage';
-import TopBottomRulesBelowAverageIcon from '@icons/style/TopBottomRulesBelowAverage';
+import IconSetThreeSymbolsCircledIcon
+  from '@icons/style/icons/IconSetThreeSymbolsCircled';
+import IconSetThreeSymbolsUnCircledIcon
+  from '@icons/style/icons/IconSetThreeSymbolsUnCircled';
+import IconSetThreeTrafficLightsRimmedIcon
+  from '@icons/style/icons/IconSetThreeTrafficLightsRimmed';
+import IconSetThreeTrafficLightsUnRimmedIcon
+  from '@icons/style/icons/IconSetThreeTrafficLightsUnRimmed';
+import TopBottomRulesAboveAverageIcon
+  from '@icons/style/TopBottomRulesAboveAverage';
+import TopBottomRulesBelowAverageIcon
+  from '@icons/style/TopBottomRulesBelowAverage';
 import TopBottomRulesBottom10Icon from '@icons/style/TopBottomRulesBottom10';
 import TopBottomRulesTop10Icon from '@icons/style/TopBottomRulesTop10';
 import { isFunction } from '@toone/report-util';
@@ -195,6 +229,11 @@ export const getRowColumnVisibleRulesMenu = function () {
       'rowColumnVisibleRulesEqualTo',
       '等于...',
       HighlightCellsRulesEqualToIcon
+    ),
+    toConditionMenuType(
+      'rowColumnVisibleRulesNotEqualTo',
+      '不等于...',
+      HighlightCellsRulesNotEqualToIcon
     ),
     toConditionMenuType(
       'rowColumnVisibleRulesContains',

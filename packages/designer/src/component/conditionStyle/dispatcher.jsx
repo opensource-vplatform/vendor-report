@@ -215,6 +215,19 @@ const dispatcher = {
     );
     dispatcher(setRowColumnVisibleCompareVisible(true));
   },
+  rowColumnVisibleRulesNotEqualTo: (spread, dispatcher) => {
+    dispatcher(
+      setRowColumnVisibleCompareConfig({
+        title: '不等于',
+        desc: '为不等于以下值',
+        ruleType: 'rowColumnVisibleRule',
+        operator: 'notEqualTo',
+        target: 'row',
+        visible: false,
+      })
+    );
+    dispatcher(setRowColumnVisibleCompareVisible(true));
+  },
   rowColumnVisibleRulesContains: (spread, dispatcher) => {
     dispatcher(
       setRowColumnVisibleCompareConfig({

@@ -11,10 +11,11 @@ import salesData from './jsonData/salesData.json';
 import tourismData from './jsonData/tourismData.json';
 //import wecost from './jsonData/wecost.json';
 import wecost from './wecost/index';
+import subItemProject from './wecost/subItemProject';
 
 let json = JSON.parse(jsonStr);
 
-//salesData.data.length = 100;
+salesData.data.length = 1;
 /* salesData.data = salesData.data.filter(function (item) {
     return ['西北'].includes(item.sales_area);
 }); */
@@ -368,15 +369,20 @@ const dataSource = {
       },
     ],
   }, //数据源数据*/
-  dataSourceDefinition: wecost.dataSource,
-  datas: wecost.datas,
+  /* dataSourceDefinition: wecost.dataSource, */
+  dataSourceDefinition: [subItemProject.ds, salesData.ds, ...wecost.dataSource],
+
+  datas: {
+    subItemProject: subItemProject.data,
+    sales: salesData.data,
+  },
   allowToView: true, //是否允许查看数据源
   allowToEdit: true, //是否允许编辑数据源
 };
 
 export default {
-  /* json,
-  json: { reportJson: json }, */
+  json,
+  /*json: { reportJson: json }, */
   /*batchGetDatasURL,
     datasPath,  */
   /* toolbar: [
@@ -433,7 +439,7 @@ export default {
       /*type: {
         text: '#,##0',
         decimals: '#,##0_);-#,##0',
-      },
+      },*/
       // 格式化数据源
       dataSource: {
         Ipes_MP_Billpay_DetailCalc: {
@@ -443,7 +449,7 @@ export default {
           cost: '#,##0_);-#,##0',
         },
         age: '#,##0.00_);-#,##0.00',
-      },*/
+      },
     },
   },
   event: {

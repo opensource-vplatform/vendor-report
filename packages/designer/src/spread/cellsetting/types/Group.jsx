@@ -23,12 +23,16 @@ import {
   Toolbar,
 } from '../Component';
 import {
+  MUTEX_PLUGIN_CELL_TYPE,
+  PLUGIN_CELL_GROUP_TYPE,
+} from '../constant';
+import {
   getBindText,
   hasBindField,
   setGroupDecoration,
 } from '../utils';
 
-const PLUGIN_TYPE = 'cellGroup';
+const PLUGIN_TYPE = PLUGIN_CELL_GROUP_TYPE;
 
 const Component = function (props) {
   const { onConfirm, onCancel, sheet, plugin } = props;
@@ -43,8 +47,10 @@ const Component = function (props) {
         //clearAllCellTagPlugin(sheet, row, col);
         const bindingPath = sheet.getBindingPath(row, col);
         if (bindingPath) {
-          clearCellTagPlugin(sheet, row, col, {
-            type: 'cellList',
+          MUTEX_PLUGIN_CELL_TYPE.forEach((type) => {
+            clearCellTagPlugin(sheet, row, col, {
+              type,
+            });
           });
           setCellTagPlugin(sheet, row, col, plugin);
         }

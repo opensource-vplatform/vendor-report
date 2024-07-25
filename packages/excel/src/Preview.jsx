@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import styled, { keyframes } from 'styled-components';
 
 import { isFunction } from '@toone/report-util';
 
+import HeaderToolbar from './HeaderToolbar';
 import useInitFormatter from './hooks/useInitFormatter';
 import useLoading from './hooks/useLoading';
 import usePage from './hooks/usePage';
@@ -18,7 +23,6 @@ import { withDivStyled } from './utils/componentUtil';
 import { getSpreadWrapRect } from './utils/spreadUtil';
 import WorkBook from './Workbook';
 import WorkSheet from './WorkSheet';
-import HeaderToolbar from './HeaderToolbar';
 
 const Wrap = withDivStyled({
   position: 'relative',
@@ -148,9 +152,9 @@ export default (props) => {
     setLoading() {},
     closeLoading() {},
     isRefresh: false,
-    exportSettings : {
-      type : 'allPage',   // curPage | allPage
-    }
+    exportSettings: {
+      type: 'allPage', // curPage | allPage
+    },
   });
   const paperWrapEl = useRef(null);
 
@@ -186,7 +190,7 @@ export default (props) => {
         tempConfig: template,
         setting,
       });
-
+      debugger;
       parseReportJsonInst = parseResult;
       const { activeSheetName, sheetPages, sheetPrintPages } = parseResult;
       //分页相关信息

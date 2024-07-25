@@ -21,13 +21,14 @@ import Image from './types/Image';
 import List from './types/List';
 import Merge from './types/Merge';
 import Sum from './types/Sum';
+import Text from './types/Text';
 
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-const PLUGINS = [Formula, List, Group, /*Sum, Image,*/ Merge];
+const PLUGINS = [Formula, List, Group, /*Sum, Image,*/ Merge, Text];
 
 export default function (props) {
   const { sheet, onConfirm, onCancel } = props;
@@ -103,6 +104,15 @@ export default function (props) {
           onCancel={onCancel}
         ></Image.Component>
       );
+    case Text.PLUGIN_TYPE:
+      children = (
+        <Text.Component
+          plugin={data.plugin}
+          sheet={sheet}
+          onConfirm={handleSetting}
+          onCancel={onCancel}
+        ></Text.Component>
+      );
   }
   /*useEffect(() => {
     const newData = { ...data };
@@ -128,6 +138,7 @@ export default function (props) {
               onChange={(val) => {
                 let plugin = null;
                 switch (val) {
+                  case Text.PLUGIN_TYPE:
                   case List.PLUGIN_TYPE:
                   case Group.PLUGIN_TYPE:
                     plugin = { type: val };

@@ -61,6 +61,14 @@ class RowColumnVisible extends Plugin {
     }
   }
 
+  notEqualTo(value, config, tool) {
+    const formula = `${this.valueToFormula(value)}<>${config.value}`;
+    const result = evaluateFormula(formula);
+    if (result) {
+      this.handleVisible(config, tool);
+    }
+  }
+
   contains(value, config, tool) {
     const formula = `ISNUMBER(SEARCH(${config.value},${this.valueToFormula(
       value
@@ -79,7 +87,7 @@ class RowColumnVisible extends Plugin {
     }
     return {
       type: 'text',
-      value: value,
+      value: value?.value,
     };
   }
 }

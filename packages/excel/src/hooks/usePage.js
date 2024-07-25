@@ -1,3 +1,5 @@
+import { zoom } from './useZoom';
+
 export default function usePage(ctxVal, setCtxVal) {
   //跳转指定页码
   ctxVal.changePageIndex = (pageNumber) => {
@@ -31,7 +33,8 @@ export default function usePage(ctxVal, setCtxVal) {
           value: pageIndex,
           done: pageIndex === ctxVal.total,
         });
-        return { ...ctxVal, pageIndex, isLoading: false };
+        const zoomResult = zoom(ctxVal);
+        return { ...zoomResult, pageIndex, isLoading: false };
       });
     });
   };

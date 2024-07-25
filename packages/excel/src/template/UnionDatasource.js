@@ -144,6 +144,13 @@ class UnionDatasource {
                 type: 'cellGroup',
               });
             }
+
+            if (plugin.type == 'cellText') {
+              this.cellPlugins.push({
+                bindingPath,
+                type: 'cellText',
+              });
+            }
           }
         }
       });
@@ -359,8 +366,12 @@ class UnionDatasource {
       const concat_char = '_@_#_$_%_^_&_*_(_)_';
       result.forEach((item) => {
         const values = [];
-        const get = (tableCode, fieldCode) => {
-          const data = item[tableCode];
+        const get = (tableCode, fieldCode, pluginType) => {
+          let data = item[tableCode];
+          //如果是文本，则默认取第一条数据
+          if (pluginType === 'cellText') {
+            data = result?.[0]?.[tableCode];
+          }
           let value = null;
           if (data) {
             value = data[fieldCode];
@@ -370,7 +381,7 @@ class UnionDatasource {
         this.cellPlugins.forEach((plugin) => {
           const bindingPath = plugin.bindingPath;
           const [tableCode, fieldCode] = bindingPath.split('.');
-          values.push(get(tableCode, fieldCode));
+          values.push(get(tableCode, fieldCode, plugin.type));
         });
         notGroupPaths.forEach((path) => {
           const { tableCode, fieldCode } = path;
@@ -448,19 +459,21 @@ class UnionDatasource {
 
   /**
    * 获取字段值
+   * @param {string} path 路径。dscode.fieldCode.其它
    * @param {string} dsCode 数据源编号
    * @param {string} fieldCode 字段编号
    * @param {string} index 记录下标
    */
-  getValue(dsCode, fieldCode, mapKey, index = 0, plugins = []) {
+  getValue(path, index = 0, plugins = []) {
     const data = this.datas[index];
     let value = null;
     if (data) {
-      const val = data[dsCode]?.[fieldCode];
-      value = val === undefined ? null : val;
-      if (mapKey) {
-        value = value?.[mapKey];
+      const paths = path.split('.');
+      let val = data;
+      while (paths.length > 0) {
+        val = val?.[paths.shift()];
       }
+      value = val === undefined ? null : val;
       if (Array.isArray(value)) {
         let index = -1;
         if (plugins && plugins.length > 0) {
@@ -468,14 +481,15 @@ class UnionDatasource {
             const plugin = plugins?.[i] || {};
             const { type, config = {} } = plugin;
             if (
-              type == 'cellGroup' ||
-              type == 'cellGroupType' ||
-              type == 'cellList'
+              (type == 'cellGroup' ||
+                type == 'cellGroupType' ||
+                type == 'cellList' ||
+                type == 'cellText') &&
+              isObject(config) &&
+              config.hasOwnProperty('listIndex')
             ) {
-              if (isObject(config) && config.hasOwnProperty('listIndex')) {
-                index = Number(config.listIndex) - 1;
-                break;
-              }
+              index = Number(config.listIndex) - 1;
+              break;
             }
           }
         }
@@ -486,6 +500,7 @@ class UnionDatasource {
         }
       }
     }
+
     return { type: 'text', value };
   }
 
