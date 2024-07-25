@@ -25,23 +25,17 @@ export default function useInitFormatter({
     baseConfig.current.typeFormatterMap.clear();
     const { formatter, metadatasType } = persistingDataSlice || {};
     if (!!formatter) {
-      for (let [dataSourceKey, dataSourceValue] of Object.entries(
-        formatter.dataSource || {}
-      )) {
-        if (typeof dataSourceValue === 'string')
-          baseConfig.current.dataSourceFormatterMap.set(
-            dataSourceKey,
-            dataSourceValue
-          );
-        else
-          for (let [dataSourceItemKey, dataSourceItemValue] of Object.entries(
-            dataSourceValue
-          )) {
-            baseConfig.current.dataSourceFormatterMap.set(
-              `${dataSourceKey}.${dataSourceItemKey}`,
-              dataSourceItemValue
-            );
-          }
+      const stack = [{ obj: formatter.dataSource || {}, path: '' }]; 
+      while (stack.length) {
+          const { obj, path } = stack.pop();
+          Object.entries(obj).forEach(([key, value]) => {
+              const fullPath = path ? `${path}.${key}` : key;
+              if (typeof value === 'object' && value !== null) {
+                  stack.push({ obj: value, path: fullPath });
+              } else {
+                baseConfig.current.dataSourceFormatterMap.set(fullPath, value);
+              }
+          });
       }
 
       const formatterType = formatter.type || {};
