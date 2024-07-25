@@ -197,7 +197,8 @@ const call = (requestJson, resolve) => {
           delete window[`JWebTopCallback_${index}`]
         }
       }
-      JWebTop.invokeRemote_CallBack(requestJson, `JWebTopCallback_${index}`)
+      // JWebTop.invokeRemote_CallBack(requestJson, `JWebTopCallback_${index}`)
+      window.vdaas_invokeRemote_CallBack(requestJson, `JWebTopCallback_${index}`)
     }
     handler();
   }

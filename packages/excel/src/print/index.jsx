@@ -11,6 +11,8 @@ import { download } from '../utils/fileUtil';
 import { getNamespace, getPluginSrc } from '../utils/spreadUtil';
 import Excel from './Excel';
 import Print from './Print';
+import { defaultConfig } from '../config';
+import { setPrintInfo } from '../utils/printUtil';
 
 const GC = getNamespace();
 const printTotal = 20;
@@ -98,16 +100,77 @@ const exportExcelHandler = ({ filename, options, exportResolve, ctxVal }) => {
       const excelIO = new GC.Spread.Excel.IO();
       const sheet = spread.getActiveSheet();
       const promiseFns = [];
-      if(ctxVal.exportSettings.type == 'allPage'){
+      if (defaultConfig.exportSettings.type == 'allPage') {
+        const datasLen = pageDatas.datas.length;
+        for (let i = 0; i < datasLen; i++) {
+          promiseFns.push(() => {
+            return new Promise((resolve) => {
+              let newfilename = filename + (i + 1) + '.xlsx';
+              const sheetJson = sheet.toJSON();
+              zoomPrint(sheetJson, inst);
+              const newSheet = pageDatas.datas[i];
+              newSheet.sheet = sheetJson;
+              inst.resetSheet(newSheet);
+              sheet.setRowCount(0);
+              sheet.fromJSON(sheetJson);
+              const enhancer = new ExcelEnhancer(spread).enhance();
+              const enhancerHandler = (result) => {
+                const json = JSON.stringify(result);
+                //当前批次导出excel成功回调
+                const success = (blob) => {
+                  blobs.unshift({
+                    filename: newfilename,
+                    blob,
+                  });
+                  if (isFunction(options.progress)) {
+                    let currentIndex = (i + 1) * 20;
+                    const total = currentIndex;
+                    if (currentIndex >= ctxVal.total) {
+                      currentIndex = ctxVal.total;
+                    }
+                    for (let i = total - 20 + 1; i <= currentIndex; i++) {
+                      options.progress(i, ctxVal.total);
+                    }
+                  }
 
-      const datasLen = pageDatas.datas.length;
-      for (let i = 0; i < datasLen; i++) {
+                  if (blobs.length === pageDatas.datas.length) {
+                    _resolve();
+                  }
+                  resolve();
+                };
+
+                excelIO.save(
+                  json,
+                  success,
+                  (err) => {
+                    reject(err);
+                  },
+                  {
+                    columnHeadersAsFrozenRows: false,
+                    includeAutoMergedCells: false,
+                    includeBindingSource: false,
+                    includeCalcModelCache: false,
+                    includeEmptyRegionCells: true,
+                    includeFormulas: !options.ignoreFormula,
+                    includeStyles: !options.ignoreStyle,
+                    includeUnusedNames: true,
+                    password: undefined,
+                    rowHeadersAsFrozenColumns: false,
+                    saveAsView: false,
+                  }
+                );
+              };
+              enhancer.then(enhancerHandler).catch(reject);
+            });
+          });
+        }
+      } else {
         promiseFns.push(() => {
           return new Promise((resolve) => {
-            let newfilename = filename + (i + 1) + '.xlsx';
+            let newfilename = filename + '.xlsx';
             const sheetJson = sheet.toJSON();
             zoomPrint(sheetJson, inst);
-            const newSheet = pageDatas.datas[i];
+            const newSheet = ctxVal.pages[ctxVal.pageIndex - 1];
             newSheet.sheet = sheetJson;
             inst.resetSheet(newSheet);
             sheet.setRowCount(0);
@@ -123,20 +186,12 @@ const exportExcelHandler = ({ filename, options, exportResolve, ctxVal }) => {
                 });
 
                 if (isFunction(options.progress)) {
-                  let currentIndex = (i + 1) * 20;
-                  const total = currentIndex;
-                  if (currentIndex >= datas.total) {
-                    currentIndex = datas.total;
+                  for (let i = 1; i <= 100; i++) {
+                    options.progress(i);
                   }
-                  for (let i = total - 20 + 1; i <= currentIndex; i++) {
-                    options.progress(i, datas.total);
-                  }
-                }
-
-                if (blobs.length === pageDatas.datas.length) {
-                  _resolve();
                 }
                 resolve();
+                _resolve();
               };
 
               excelIO.save(
@@ -164,69 +219,6 @@ const exportExcelHandler = ({ filename, options, exportResolve, ctxVal }) => {
           });
         });
       }
-    }else{
-      promiseFns.push(() => {
-        return new Promise((resolve) => {
-          let newfilename = filename + (i + 1) + '.xlsx';
-          const sheetJson = sheet.toJSON();
-          zoomPrint(sheetJson, inst);
-          const newSheet = pageDatas.datas[i];
-          newSheet.sheet = sheetJson;
-          inst.resetSheet(newSheet);
-          sheet.setRowCount(0);
-          sheet.fromJSON(sheetJson);
-          const enhancer = new ExcelEnhancer(spread).enhance();
-          const enhancerHandler = (result) => {
-            const json = JSON.stringify(result);
-            //当前批次导出excel成功回调
-            const success = (blob) => {
-              blobs.unshift({
-                filename: newfilename,
-                blob,
-              });
-
-              if (isFunction(options.progress)) {
-                let currentIndex = (i + 1) * 20;
-                const total = currentIndex;
-                if (currentIndex >= datas.total) {
-                  currentIndex = datas.total;
-                }
-                for (let i = total - 20 + 1; i <= currentIndex; i++) {
-                  options.progress(i, datas.total);
-                }
-              }
-
-              if (blobs.length === pageDatas.datas.length) {
-                _resolve();
-              }
-              resolve();
-            };
-
-            excelIO.save(
-              json,
-              success,
-              (err) => {
-                reject(err);
-              },
-              {
-                columnHeadersAsFrozenRows: false,
-                includeAutoMergedCells: false,
-                includeBindingSource: false,
-                includeCalcModelCache: false,
-                includeEmptyRegionCells: true,
-                includeFormulas: !options.ignoreFormula,
-                includeStyles: !options.ignoreStyle,
-                includeUnusedNames: true,
-                password: undefined,
-                rowHeadersAsFrozenColumns: false,
-                saveAsView: false,
-              }
-            );
-          };
-          enhancer.then(enhancerHandler).catch(reject);
-        });
-      });
-    }
       promiseFns.reduce((prev, cur) => {
         return prev.then((a) => {
           return cur().then(() => {});
@@ -289,15 +281,73 @@ const exportPDFHandler = ({
       } = ctxVal;
 
       const sheet = spread.getActiveSheet();
-      const datasLen = pageDatas.datas.length;
-
+      if (!!spread) {
+        const sheets = spread.sheets;
+        sheets.forEach((sheet) => {
+          setPrintInfo(sheet);
+          const printInfo = sheet.printInfo();
+          printInfo.rowStart(-1);
+          printInfo.rowEnd(-1);
+          printInfo.columnStart(-1);
+          printInfo.columnEnd(-1);
+          sheet.removeCustomName('Print_Area');
+        });
+      }
       const promiseFns = [];
-      for (let i = 0; i < datasLen; i++) {
+      if (defaultConfig.exportSettings.type == 'allPage') {
+        const datasLen = pageDatas.datas.length;
+        const blobs = [];
+        for (let i = 0; i < datasLen; i++) {
+          promiseFns.push(() => {
+            return new Promise((resolve, reject) => {
+              const sheetJson = sheet.toJSON();
+              zoomPrint(sheetJson, inst);
+              const newSheet = pageDatas.datas[i];
+              newSheet.sheet = sheetJson;
+              inst.resetSheet(newSheet);
+              sheet.setRowCount(0);
+              sheet.fromJSON(sheetJson);
+              const enhancer = new ExcelEnhancer(spread).enhance();
+              const success = (data) => {
+                blobs.push(data);
+                if (persistence) {
+                  download(data, filename);
+                }
+                if (isFunction(exportPdfHandler)) {
+                  exportPdfHandler({
+                    total: datasLen,
+                    blob: data,
+                    index: i + 1,
+                  });
+                }
+                resolve();
+              };
+              const thenHandler = () => {
+                spread.savePDF(
+                  success,
+                  (err) => {
+                    reject(err);
+                  },
+                  {
+                    author,
+                    creator,
+                    keywords,
+                    subject,
+                    title,
+                  },
+                  sheetIndex == null ? undefined : sheetIndex
+                );
+              };
+              enhancer.then(thenHandler).catch(reject);
+            });
+          });
+        }
+      } else {
         promiseFns.push(() => {
           return new Promise((resolve, reject) => {
             const sheetJson = sheet.toJSON();
             zoomPrint(sheetJson, inst);
-            const newSheet = pageDatas.datas[i];
+            const newSheet = ctxVal.pages[ctxVal.pageIndex - 1];
             newSheet.sheet = sheetJson;
             inst.resetSheet(newSheet);
             sheet.setRowCount(0);
@@ -309,9 +359,9 @@ const exportPDFHandler = ({
               }
               if (isFunction(exportPdfHandler)) {
                 exportPdfHandler({
-                  total: datasLen,
+                  total: 1,
                   blob: data,
-                  index: i + 1,
+                  index: 1,
                 });
               }
               resolve();
@@ -365,6 +415,19 @@ const printHandler = ({ ctxVal }) => {
     printIndex,
   } = ctxVal;
 
+  if (!!spread) {
+    const sheets = spread.sheets;
+    sheets.forEach((sheet) => {
+      setPrintInfo(sheet);
+      const printInfo = sheet.printInfo();
+      printInfo.rowStart(-1);
+      printInfo.rowEnd(-1);
+      printInfo.columnStart(-1);
+      printInfo.columnEnd(-1);
+      sheet.removeCustomName('Print_Area');
+    });
+  }
+
   const sheet = spread.getActiveSheet();
   const sheetJson = sheet.toJSON();
   const newPageIndex = printIndex - 1;
@@ -401,16 +464,17 @@ export default (props) => {
     end: printTotal, //本次打印结束范围
     spread: null,
     handler: null,
-    pages : [],
-    exportSettings : {
-      type : 'allPage',   // curPage | allPage
-    }
+    pages: [],
+    exportSettings: {
+      type: 'allPage', // curPage | allPage
+    },
   });
   ctxVal.total = context.total; //总共有多少页
   ctxVal.printPages = context.printPages;
   ctxVal.parseReportJsonInst = context.parseReportJsonInst;
   ctxVal.pages = context.pages;
   ctxVal.exportSettings = context.exportSettings;
+  ctxVal.pageIndex = context.pageIndex;
 
   ctxVal.close = () => {
     setCtxVal((ctxVal) => {

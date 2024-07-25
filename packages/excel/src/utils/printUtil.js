@@ -2,7 +2,7 @@ import { isNullOrUndef } from '@toone/report-util';
 
 import { getNamespace } from './spreadUtil';
 
-export const setPrintInfo = function (sheet, printInfo) {
+export const setPrintInfo = function (sheet, printInfo = {}) {
     let {
         orientation,
         printQuality,

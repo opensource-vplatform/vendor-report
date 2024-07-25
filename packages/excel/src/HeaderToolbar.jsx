@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 
 import { Select, CheckBox, Button } from '@toone/report-ui';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import PreviewContext from './PreviewContext';
-import { deepMerge } from '@toone/report-util';
+// import { deepMerge } from '@toone/report-util';
+import { setDefaultConfig } from './config';
 
 const Toolbar = styled.div`
   background-color: #fbfbfb;
@@ -144,7 +145,7 @@ export default (props) => {
 };
 
 const ExportSetting = ({
-  ctxVal,
+  // ctxVal,
   title = '导出设置',
   defaultValue = 'allPage',
   onChange,
@@ -159,6 +160,14 @@ const ExportSetting = ({
     },
   ],
 }) => {
+  useEffect(() => {
+    setDefaultConfig({
+      exportSettings: {
+        type: defaultValue,
+      },
+    });
+  });
+
   return (
     <Wrap>
       {title ? <Text>{title}</Text> : null}
@@ -166,12 +175,17 @@ const ExportSetting = ({
         defaultValue={defaultValue}
         datas={options}
         onChange={(val) => {
-          ctxVal.setCtxVal((ctxVal) => {
-            return deepMerge({}, ctxVal, {
-              exportSettings: {
-                type: val
-              },
-            });
+          // ctxVal.setCtxVal((ctxVal) => {
+          //   return deepMerge({}, ctxVal, {
+          //     exportSettings: {
+          //       type: val,
+          //     },
+          //   });
+          // });
+          setDefaultConfig({
+            exportSettings: {
+              type: val,
+            },
           });
           onChange && onChange(val);
         }}
@@ -203,11 +217,27 @@ const DataSourceFormatter = ({
   );
 };
 
-const ExportButton = ({ title = '导出', onClick, ctxVal }) => {
+const ExportButton = ({ title = '导出', onClick, ctxVal,type='excel' ,fileName='未命名',onProgress}) => {
   return (
     <Button
       onClick={() => {
-        ctxVal.exportExcel('未命名');
+        if(type==='excel')
+        ctxVal.exportExcel(fileName, {
+          ignoreFormula: false,
+          ignoreStyle: false,
+          progress: (progress, total) => {
+            console.log(progress, total);
+          },
+        });
+        else if(type==='pdf')
+        ctxVal.exportPDF(fileName, {
+            ignoreFormula: false,
+            ignoreStyle: false,
+            progress: (progress, total) => {
+              console.log(progress, total);
+            },
+          });
+        // ctxVal.printHandler()
         if (onClick) onClick();
       }}
     >
