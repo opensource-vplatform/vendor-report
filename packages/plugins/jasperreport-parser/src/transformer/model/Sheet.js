@@ -267,6 +267,10 @@ class Sheet {
     }
   }
 
+  setPlugin(row,col,plugin){
+
+  }
+
   setTag(row, col, tag) {
     if (tag) {
       const cell = this.getCell(row, col);
