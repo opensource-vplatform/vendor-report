@@ -2,7 +2,8 @@ import { parse as toAST } from '@babel/parser';
 
 import { create } from '../printer/Factory';
 
-const Force_Type_Syntax = /\(Map\)|\(String\)|\((Double)\)|\.doubleValue\(\)/g;
+const Force_Type_Syntax =
+  /(\(([\w\.])+?\))|(\.doubleValue\(\))|(\((\w\[\])+?\))/g; ///\(Map\)|\(String\)|\((Double)\)|\.doubleValue\(\)|\(String\[\]\)|\(double\[\]\)/g;
 
 const Parameter_Syntax = /\$P{((\w+))}/g;
 
@@ -11,6 +12,10 @@ const Field_Syntax = /\$F{(\w+)}/g;
 const Variable_Syntax = /\$V{(\w+)}/g;
 
 const Break_Line_Syntax = /\n/g;
+
+function removePrefix(text) {
+  return text.replace('com.toone.util.lang.', '');
+}
 
 /**
  * 移除java强制类型转换语法
@@ -23,7 +28,7 @@ function convertSyntax(text) {
   text = text.replace(Parameter_Syntax, (group, match) => `$P("${match}")`);
   text = text.replace(Field_Syntax, (group, match) => `$F("${match}")`);
   text = text.replace(Variable_Syntax, (group, match) => `$V("${match}")`);
-  text = text.replace(Break_Line_Syntax,"");
+  text = text.replace(Break_Line_Syntax, '');
   return text;
 }
 
@@ -33,6 +38,7 @@ function convertSyntax(text) {
  */
 function adjustSyntax(text) {
   if (typeof text == 'string') {
+    text = removePrefix(text);
     text = removeForceTypeChange(text);
     return convertSyntax(text);
   }

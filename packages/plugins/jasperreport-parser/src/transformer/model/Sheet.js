@@ -1,7 +1,4 @@
-import {
-  isUndefined,
-  uuid,
-} from '@toone/report-util';
+import { isUndefined, uuid } from '@toone/report-util';
 
 import { addUniqueItem } from '../../util/ArrayUtil';
 import { clone } from '../../util/ObjectUtil';
@@ -12,16 +9,14 @@ import {
 import { getSheetJson } from '../metadata/Sheet';
 import { ResultType } from '../printer/Constanst';
 import Context from '../printer/Context';
-import { convertFormatter } from '../util/formatterUtil';
-import {
-  toHAlign,
-  toVAlign,
-} from '../util/spreadUtil';
+import { convertFormatter, isNumberFormatter } from '../util/formatterUtil';
+import { toHAlign, toVAlign } from '../util/spreadUtil';
 import { parse } from '../util/syntaxUtil';
 
 class Sheet {
-  constructor(report) {
+  constructor(report, metadata) {
     this.report = report;
+    this.metadata = metadata;
     this.json = clone(getSheetJson());
   }
 
@@ -45,33 +40,38 @@ class Sheet {
   }
 
   setCellText(cell, row, col) {
-    const { text } = cell.getConfig();
+    const { text, areaType } = cell.getConfig();
     if (text) {
       const config = this.report.getConfig();
       const name = config.name;
-      const ctx = new Context(`${name}_parameter`, `${name}_detail`);
+      const ctx = new Context(
+        `${name}_parameter`,
+        `${name}_detail`,
+        this.metadata
+      );
       try {
         const res = parse(text, ctx);
         const type = res.type;
-        const text = res.text;
+        const resText = res.text;
         switch (type) {
           case ResultType.formula:
-            return this.setFormula(row, col, text);
+            return this.setFormula(row, col, resText);
           case ResultType.bindingPath:
-            return this.setBindingPath(row, col, text);
+            const index = res.index;
+            if (!isUndefined(index)) {
+              if (['columnHeader'].indexOf(areaType) != -1) {
+                this.setCellPlugin(row, col, 'cellText', { listIndex: index });
+              } else if (['detail'].indexOf(areaType) != -1) {
+                this.setCellPlugin(row, col, 'cellList', { listIndex: index });
+              }
+            }
+            return this.setBindingPath(row, col, resText);
           default:
-            this.setValue(row, col, text);
+            this.setValue(row, col, resText);
         }
       } catch (e) {
         this.setValue(row, col, text);
-        this.setTag(
-          row,
-          col,
-          JSON.stringify({
-            instanceId: uuid(),
-            plugins: [{ type: 'error', config: {} }],
-          })
-        );
+        this.setCellPlugin(row, col, 'error', {});
       }
     }
   }
@@ -105,6 +105,15 @@ class Sheet {
     }
   }
 
+  setAreaInfo(areaType, row) {
+    switch (areaType) {
+      case 'detail':
+        return this.setPageArea(row);
+      case 'groupFooter':
+        return this.setTotalArea(row);
+    }
+  }
+
   /**
    * 设置单元格样式
    * @param {*} col
@@ -118,29 +127,45 @@ class Sheet {
       vAlign,
       bold,
       wordWrap,
-      formatter,
+      pattern,
       borderTop,
       borderRight,
       borderBottom,
       borderLeft,
+      areaType,
     } = cell.getConfig();
     const style = {
-      hAlign: toHAlign(hAlign.toLowerCase()),
-      vAlign: toVAlign(vAlign.toLowerCase()),
+      hAlign: toHAlign(hAlign),
+      vAlign: toVAlign(vAlign),
       font: `${fontSize}pt ${font}`,
       fontFamily: font,
       fontSize: fontSize + 'pt',
       fontWeight: bold ? 'bold' : 'normal',
       wordWrap: wordWrap,
     };
-    if (formatter) {
-      style.formatter = convertFormatter(formatter);
+    if (pattern) {
+      style.formatter = convertFormatter(pattern);
     }
     this.appnedBorderStyle('borderTop', borderTop, style);
     this.appnedBorderStyle('borderRight', borderRight, style);
     this.appnedBorderStyle('borderBottom', borderBottom, style);
     this.appnedBorderStyle('borderLeft', borderLeft, style);
     this.setStyle(row, col, style);
+    this.setAreaInfo(areaType, row);
+    this.setAutoFit(cell, row, col);
+  }
+
+  setAutoFit(cell, row, col) {
+    const { pattern, isStretchWithOverflow } = cell.getConfig();
+    if (isStretchWithOverflow) {
+      let rowHeight;
+      if (pattern && isNumberFormatter(pattern)) {
+        rowHeight = 'autoFitByZoom';
+      } else {
+        rowHeight = 'autoFitByContent';
+      }
+      this.setCellPlugin(row, col, 'cellList', { rowHeight });
+    }
   }
 
   appnedBorderStyle(type, border, style) {
@@ -267,15 +292,45 @@ class Sheet {
     }
   }
 
-  setPlugin(row,col,plugin){
-
-  }
-
-  setTag(row, col, tag) {
+  setCellPlugin(row, col, cellType, pluginConfig) {
+    const cell = this.getCell(row, col);
+    const tag = cell.tag;
+    let tagObj;
     if (tag) {
-      const cell = this.getCell(row, col);
-      cell.tag = tag;
+      tagObj = JSON.parse(tag);
+      const plugins = tagObj.plugins;
+      let notAssigned = true;
+      const pluginTypes = ['cellList', 'cellText'];
+      for (let i = 0; i < plugins.length; i++) {
+        const plugin = plugins[i];
+        const type = plugin.type;
+        const index1 = pluginTypes.indexOf(type);
+        const index2 = pluginTypes.indexOf(cellType);
+        if (index1 != -1 && index2 != -1) {
+          notAssigned = false;
+          if (index2 > index1) {
+            plugin.type = cellType;
+          }
+          plugin.config = {
+            ...plugin.config,
+            ...pluginConfig,
+          };
+          break;
+        }
+      }
+      if (notAssigned) {
+        plugins.push({
+          type: cellType,
+          config: pluginConfig,
+        });
+      }
+    } else {
+      tagObj = {
+        instanceId: uuid(),
+        plugins: [{ type: cellType, config: pluginConfig }],
+      };
     }
+    cell.tag = JSON.stringify(tagObj);
   }
 
   addSpan(row, col, rowCount, colCount) {
@@ -294,6 +349,56 @@ class Sheet {
     const st = cell.style || {};
     Object.assign(st, style);
     cell.style = st;
+  }
+
+  getOrCreateSheetTag() {
+    let tag = this.json.data.defaultDataNode.tag;
+    if (!tag) {
+      tag = '{}';
+    }
+    return JSON.parse(tag);
+  }
+
+  setSheetTag(tag) {
+    this.json.data.defaultDataNode.tag = JSON.stringify(tag);
+  }
+
+  genArea(row, area) {
+    if (area) {
+      const [minStr, maxStr] = area.split(':');
+      let min = parseInt(minStr);
+      let max = parseInt(maxStr);
+      if (row < min) {
+        min = row;
+      } else if (row > max) {
+        max = row;
+      }
+      return `${min}:${max}`;
+    } else {
+      return `${row}:${row}`;
+    }
+  }
+
+  /**
+   * 设置分页区域
+   */
+  setPageArea(row) {
+    row += 1;
+    const tag = this.getOrCreateSheetTag();
+    tag.isFillData = true;
+    tag.pageArea = this.genArea(row, tag.pageArea);
+    this.setSheetTag(tag);
+  }
+
+  /**
+   * 设置总计区域
+   * @param {*} area
+   */
+  setTotalArea(row) {
+    row += 1;
+    const tag = this.getOrCreateSheetTag();
+    tag.totalArea = this.genArea(row, tag.totalArea);
+    this.setSheetTag(tag);
   }
 }
 

@@ -1,18 +1,21 @@
-class Context{
+class Context {
+  constructor(parameterName, detailName, metadata) {
+    this.parameterName = parameterName;
+    this.detailName = detailName;
+    this.metadata = metadata;
+  }
 
-    constructor(parameterName,detailName){
-        this.parameterName = parameterName;
-        this.detailName = detailName;
-    }
+  getParameterName() {
+    return this.parameterName;
+  }
 
-    getParameterName(){
-        return this.parameterName;
-    }
+  getDetailName() {
+    return this.detailName;
+  }
 
-    getDetailName(){
-        return this.detailName;
-    }
-
+  getMetadata() {
+    return this.metadata;
+  }
 }
 
 export default Context;

@@ -20,10 +20,10 @@ class Element {
     return val == 'true';
   }
 
-  getAttribute(attr, node) {
+  getAttribute(attr, node, def=null) {
     node = node || this.node;
     const attributes = node.attributes;
-    return attributes ? attributes[attr] : null;
+    return attributes ? attributes[attr] : def;
   }
 
   getNode() {

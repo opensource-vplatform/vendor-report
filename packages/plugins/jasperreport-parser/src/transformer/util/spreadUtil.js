@@ -1,19 +1,19 @@
 const HAligns = {
-  left: 0,
-  center: 1,
-  right: 2,
+  Left: 0,
+  Center: 1,
+  Right: 2,
 };
 
 const VAlgins = {
-  bottom: 2,
-  middle: 1,
-  top: 0,
+  Bottom: 2,
+  Middle: 1,
+  Top: 0,
 };
 
 export const toHAlign = function (hAlign) {
-  return HAligns[hAlign];
+  return hAlign ? HAligns[hAlign]:HAligns.Left;
 };
 
 export const toVAlign = function (vAlign) {
-  return VAlgins[vAlign];
+  return vAlign ? VAlgins[vAlign]:VAlgins.Top;
 };

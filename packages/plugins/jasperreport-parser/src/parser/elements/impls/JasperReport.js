@@ -58,17 +58,14 @@ class JasperReport extends Element {
         const instance = createByNode(child);
         if (instance) {
           const height = instance.getHeight();
-          const children = this.createChildren(child);
-          children.forEach((child) => {
-            const cell = child.parse(context);
-            if (cell) {
-              if (Array.isArray(cell)) {
-                cells = cells.concat(cell);
-              } else {
-                cells.push(cell);
-              }
+          const cell = instance.parse(context);
+          if (cell) {
+            if (Array.isArray(cell)) {
+              cells = cells.concat(cell);
+            } else {
+              cells.push(cell);
             }
-          });
+          }
           context.appendTopOffset(height);
         }
       }

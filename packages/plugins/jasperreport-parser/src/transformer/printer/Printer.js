@@ -59,10 +59,6 @@ class Printer {
   getNode() {
     return this.node;
   }
-
-  getValueType() {
-    throw Error('未实现getValueType方法，请检查！');
-  }
 }
 
 export default Printer;

@@ -10,6 +10,7 @@ export const ResultType = {
     number:1,
     text: 2,
     bindingPath: 3,
-    formula:4,
-    funcName:5,
+    identifier:4,
+    formula:5,
+    handler:6,
 }

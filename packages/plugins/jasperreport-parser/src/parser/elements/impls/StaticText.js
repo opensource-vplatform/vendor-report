@@ -61,7 +61,7 @@ class StaticText extends Element {
     const node = this.getNode();
     const text = getChild('text', node);
     const config = cell.getConfig();
-    config.text = getText(text);
+    config.text = `"${getText(text)}"`;
   }
 
   parse(context) {

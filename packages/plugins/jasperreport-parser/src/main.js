@@ -1,5 +1,7 @@
-import { test } from './syntaxTestUnit';
-import { testUnits } from './test/index';
+import {
+  testSyntaxUnits,
+  //testUnits,
+} from './test/index';
 
-test();
-testUnits();
+testSyntaxUnits();
+//testUnits();

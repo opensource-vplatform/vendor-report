@@ -4,9 +4,10 @@ import Printer from '../Printer';
 class IdentifierPrinter extends Printer{
 
     print(context){
+        const node = this.getNode();
         return {
-            type: ResultType.text,
-            text: '',
+            type: ResultType.identifier,
+            text: node.name,
         }
     }
 
