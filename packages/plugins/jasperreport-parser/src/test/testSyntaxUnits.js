@@ -1,9 +1,9 @@
+import Metadata from '../transformer/model/Metadata';
 import { ResultType } from '../transformer/printer/Constanst';
 import Context from '../transformer/printer/Context';
 import { parse } from '../transformer/util/syntaxUtil';
-import { equals } from './utils';
 import metadata from './metadata';
-import Metadata from '../transformer/model/Metadata';
+import { equals } from './utils';
 
 const UNITS = [
   /*
@@ -188,7 +188,13 @@ const UNITS = [
       type: ResultType.formula,
       text: `IF()`,
     },
-  },
+  },{
+    input: `Math.abs(((java.lang.Double)(((Map[])$F{valueMaps})[0].get("FZFL"))).doubleValue()*100)>0?"%":""`,
+    output:{
+      type: ResultType.formula,
+      text:``
+    }
+  }
 ];
 
 export const testSyntaxUnits = function () {
